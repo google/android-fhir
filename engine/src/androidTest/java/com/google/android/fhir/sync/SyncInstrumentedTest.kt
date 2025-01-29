@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,12 +86,13 @@ class SyncInstrumentedTest {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
     val workManager = WorkManager.getInstance(context)
     runBlocking {
-      Sync.oneTimeSync<TestSyncWorker>(context = context)
-        .transformWhile {
-          emit(it is CurrentSyncJobStatus.Succeeded)
-          it !is CurrentSyncJobStatus.Succeeded
+      val statusFlow = Sync.oneTimeSync<TestSyncWorker>(context = context)
+      statusFlow
+        .transformWhile { status ->
+          emit(status is CurrentSyncJobStatus.Succeeded)
+          status !is CurrentSyncJobStatus.Succeeded
         }
-        .shareIn(this, SharingStarted.Eagerly, 5)
+        .shareIn(this, SharingStarted.Eagerly, replay = 5)
     }
 
     assertThat(workManager.getWorkInfosByTag(TestSyncWorker::class.java.name).get().first().state)
@@ -103,13 +104,20 @@ class SyncInstrumentedTest {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
     val states = mutableListOf<CurrentSyncJobStatus>()
     runBlocking {
-      Sync.oneTimeSync<TestSyncWorker>(context = context)
-        .transformWhile {
-          states.add(it)
-          emit(it is CurrentSyncJobStatus.Succeeded)
-          it !is CurrentSyncJobStatus.Succeeded
-        }
-        .shareIn(this, SharingStarted.Eagerly, 5)
+      val statusFlow = Sync.oneTimeSync<TestSyncWorker>(context = context)
+      launch {
+        statusFlow
+          .transformWhile { status ->
+            states.add(status)
+            emit(status is CurrentSyncJobStatus.Succeeded)
+            status !is CurrentSyncJobStatus.Succeeded
+          }
+          .collect { isSuccess ->
+            if (isSuccess) {
+              // Flow has completed successfully
+            }
+          }
+      }
     }
     assertThat(states.first()).isInstanceOf(CurrentSyncJobStatus.Running::class.java)
     assertThat(states.last()).isInstanceOf(CurrentSyncJobStatus.Succeeded::class.java)
@@ -122,20 +130,24 @@ class SyncInstrumentedTest {
       val states = mutableListOf<CurrentSyncJobStatus>()
       val nextExecutionStates = mutableListOf<CurrentSyncJobStatus>()
 
+      // First one-time sync
       launch {
-          Sync.oneTimeSync<TestSyncWorker>(context = context).collect {
-            states.add(it)
-            if (it is CurrentSyncJobStatus.Succeeded) {
+          val statusFlow = Sync.oneTimeSync<TestSyncWorker>(context = context)
+          statusFlow.collect { status ->
+            states.add(status)
+            if (status is CurrentSyncJobStatus.Succeeded) {
               cancel()
             }
           }
         }
         .join()
 
+      // Second one-time sync
       launch {
-          Sync.oneTimeSync<TestSyncWorker>(context = context).collect {
-            nextExecutionStates.add(it)
-            if (it is CurrentSyncJobStatus.Succeeded) {
+          val statusFlow = Sync.oneTimeSync<TestSyncWorker>(context = context)
+          statusFlow.collect { status ->
+            nextExecutionStates.add(status)
+            if (status is CurrentSyncJobStatus.Succeeded) {
               cancel()
             }
           }
@@ -151,25 +163,38 @@ class SyncInstrumentedTest {
   fun oneTime_worker_failedSyncState() {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
     val states = mutableListOf<CurrentSyncJobStatus>()
+
     runBlocking {
-      Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
+      val statusFlow =
+        Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
           context = context,
-          RetryConfiguration(
-            BackoffCriteria(
-              BackoffPolicy.LINEAR,
-              30,
-              TimeUnit.SECONDS,
+          retryConfiguration =
+            RetryConfiguration(
+              backoffCriteria =
+                BackoffCriteria(
+                  BackoffPolicy.LINEAR,
+                  30,
+                  TimeUnit.SECONDS,
+                ),
+              maxRetries = 0,
             ),
-            0,
-          ),
         )
-        .transformWhile {
-          states.add(it)
-          emit(it is CurrentSyncJobStatus.Failed)
-          it !is CurrentSyncJobStatus.Failed
-        }
-        .shareIn(this, SharingStarted.Eagerly, 5)
+
+      launch {
+        statusFlow
+          .transformWhile { status ->
+            states.add(status)
+            emit(status is CurrentSyncJobStatus.Failed)
+            status !is CurrentSyncJobStatus.Failed
+          }
+          .collect { isFailed ->
+            if (isFailed) {
+              // Flow has completed with a failure
+            }
+          }
+      }
     }
+
     assertThat(states.first()).isInstanceOf(CurrentSyncJobStatus.Running::class.java)
     assertThat(states.last()).isInstanceOf(CurrentSyncJobStatus.Failed::class.java)
   }
@@ -182,44 +207,52 @@ class SyncInstrumentedTest {
       val nextExecutionStates = mutableListOf<CurrentSyncJobStatus>()
 
       launch {
-          Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
+          val statusFlow =
+            Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
               context = context,
-              RetryConfiguration(
-                BackoffCriteria(
-                  BackoffPolicy.LINEAR,
-                  30,
-                  TimeUnit.SECONDS,
+              retryConfiguration =
+                RetryConfiguration(
+                  backoffCriteria =
+                    BackoffCriteria(
+                      BackoffPolicy.LINEAR,
+                      30,
+                      TimeUnit.SECONDS,
+                    ),
+                  maxRetries = 0,
                 ),
-                0,
-              ),
             )
-            .collect {
-              states.add(it)
-              if (it is CurrentSyncJobStatus.Failed) {
-                cancel()
-              }
+
+          statusFlow.collect { status ->
+            states.add(status)
+            if (status is CurrentSyncJobStatus.Failed) {
+              cancel()
             }
+          }
         }
         .join()
 
       launch {
-          Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
+          val nextStatusFlow =
+            Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
               context = context,
-              RetryConfiguration(
-                BackoffCriteria(
-                  BackoffPolicy.LINEAR,
-                  30,
-                  TimeUnit.SECONDS,
+              retryConfiguration =
+                RetryConfiguration(
+                  backoffCriteria =
+                    BackoffCriteria(
+                      BackoffPolicy.LINEAR,
+                      30,
+                      TimeUnit.SECONDS,
+                    ),
+                  maxRetries = 0,
                 ),
-                0,
-              ),
             )
-            .collect {
-              nextExecutionStates.add(it)
-              if (it is CurrentSyncJobStatus.Failed) {
-                cancel()
-              }
+
+          nextStatusFlow.collect { status ->
+            nextExecutionStates.add(status)
+            if (status is CurrentSyncJobStatus.Failed) {
+              cancel()
             }
+          }
         }
         .join()
 
@@ -234,7 +267,8 @@ class SyncInstrumentedTest {
     val states = mutableListOf<PeriodicSyncJobStatus>()
     // run and wait for periodic worker to finish
     runBlocking {
-      Sync.periodicSync<TestSyncWorker>(
+      val flow =
+        Sync.periodicSync<TestSyncWorker>(
           context = context,
           periodicSyncConfiguration =
             PeriodicSyncConfiguration(
@@ -242,6 +276,7 @@ class SyncInstrumentedTest {
               repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
             ),
         )
+      flow
         .transformWhile {
           states.add(it)
           emit(it)
@@ -263,9 +298,10 @@ class SyncInstrumentedTest {
   fun periodic_worker_failedPeriodicSyncState() {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
     val states = mutableListOf<PeriodicSyncJobStatus>()
-    // run and wait for periodic worker to finish
+
     runBlocking {
-      Sync.periodicSync<TestSyncWorkerForDownloadFailing>(
+      val statusFlow =
+        Sync.periodicSync<TestSyncWorkerForDownloadFailing>(
           context = context,
           periodicSyncConfiguration =
             PeriodicSyncConfiguration(
@@ -273,12 +309,18 @@ class SyncInstrumentedTest {
               repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
             ),
         )
-        .transformWhile {
-          states.add(it)
-          emit(it)
-          it.currentSyncJobStatus !is CurrentSyncJobStatus.Enqueued
-        }
-        .shareIn(this, SharingStarted.Eagerly, 5)
+
+      launch {
+        statusFlow
+          .transformWhile { status ->
+            states.add(status)
+            emit(status)
+            status.currentSyncJobStatus !is CurrentSyncJobStatus.Enqueued
+          }
+          .collect { status ->
+            // Flow has emitted a value
+          }
+      }
     }
 
     assertThat(states.first().currentSyncJobStatus)
@@ -293,9 +335,11 @@ class SyncInstrumentedTest {
   fun periodic_worker_still_queued_to_run_after_oneTime_worker_started() {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
     val workManager = WorkManager.getInstance(context)
-    // run and wait for periodic worker to finish
+
+    // Run and wait for periodic worker to finish
     runBlocking {
-      Sync.periodicSync<TestSyncWorker>(
+      val statusFlow =
+        Sync.periodicSync<TestSyncWorker>(
           context = context,
           periodicSyncConfiguration =
             PeriodicSyncConfiguration(
@@ -303,36 +347,47 @@ class SyncInstrumentedTest {
               repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
             ),
         )
-        .transformWhile {
-          emit(it)
-          it.currentSyncJobStatus !is CurrentSyncJobStatus.Enqueued
-        }
-        .shareIn(this, SharingStarted.Eagerly, 5)
+
+      launch {
+        statusFlow
+          .transformWhile { status ->
+            emit(status)
+            status.currentSyncJobStatus !is CurrentSyncJobStatus.Enqueued
+          }
+          .collect { status -> }
+      }
     }
 
-    // Verify the periodic worker completed the run, and is queued to run again
-    val periodicWorkerId =
-      workManager.getWorkInfosByTag(TestSyncWorker::class.java.name).get().first().id
-    assertThat(workManager.getWorkInfoById(periodicWorkerId).get().state)
-      .isEqualTo(WorkInfo.State.ENQUEUED)
+    // Verify the periodic worker completed the run and is queued to run again
+    val periodicWorkerInfo =
+      workManager
+        .getWorkInfoById(
+          workManager.getWorkInfosByTag(TestSyncWorker::class.java.name).get().first().id,
+        )
+        .get()
+    assertThat(periodicWorkerInfo.state).isEqualTo(WorkInfo.State.ENQUEUED)
 
-    // Start and complete a oneTime job, and verify it does not remove the periodic worker
+    // Start and complete a one-time job, and verify it does not remove the periodic worker
     runBlocking {
-      Sync.oneTimeSync<TestSyncWorker>(context = context)
-        .transformWhile {
-          emit(it)
-          it !is CurrentSyncJobStatus.Succeeded
+      val oneTimeStatusFlow = Sync.oneTimeSync<TestSyncWorker>(context = context)
+
+      oneTimeStatusFlow
+        .transformWhile { status ->
+          emit(status)
+          status !is CurrentSyncJobStatus.Succeeded
         }
-        .shareIn(this, SharingStarted.Eagerly, 5)
+        .collect { status -> }
     }
+
     assertThat(workManager.getWorkInfosByTag(TestSyncWorker::class.java.name).get().size)
       .isEqualTo(2)
 
     // Move forward to the next epoch to trigger the periodic sync
     val testDriver = WorkManagerTestInitHelper.getTestDriver(context)
-    testDriver?.setPeriodDelayMet(periodicWorkerId)
+    testDriver?.setPeriodDelayMet(periodicWorkerInfo.id)
 
-    assertThat(workManager.getWorkInfoById(periodicWorkerId).get().state)
+    // Confirm the periodic worker is running after advancing the period
+    assertThat(workManager.getWorkInfoById(periodicWorkerInfo.id).get().state)
       .isEqualTo(WorkInfo.State.RUNNING)
   }
 }
