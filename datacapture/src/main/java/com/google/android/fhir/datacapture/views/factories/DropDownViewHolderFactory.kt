@@ -26,7 +26,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnNextLayout
@@ -45,7 +45,6 @@ import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import timber.log.Timber
@@ -57,7 +56,7 @@ internal object DropDownViewHolderFactory :
       private lateinit var header: HeaderView
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
-      private lateinit var clearInputIcon: FrameLayout
+      private lateinit var clearInputIcon: ImageView
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var context: AppCompatActivity
 
@@ -74,7 +73,6 @@ internal object DropDownViewHolderFactory :
         }
         clearInputIcon.setOnClickListener {
           context.lifecycleScope.launch {
-            delay(200) // to show ripple effect on the icon before clearing the answer
             questionnaireViewItem.clearAnswer()
             autoCompleteTextView.doOnNextLayout { autoCompleteTextView.showDropDown() }
           }

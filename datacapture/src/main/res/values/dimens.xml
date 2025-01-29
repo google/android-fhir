@@ -97,7 +97,6 @@
     <dimen name="drop_down_padding">16dp</dimen>
     <dimen name="drop_down_clear_icon_margin_end">38dp</dimen>
     <dimen name="drop_down_clear_icon_margin_top">4dp</dimen>
-    <dimen name="drop_down_clear_input_icon_ripple_padding">4dp</dimen>
 
     <!--  Item Answer Media  -->
     <dimen name="item_answer_media_image_size">48dp</dimen>
