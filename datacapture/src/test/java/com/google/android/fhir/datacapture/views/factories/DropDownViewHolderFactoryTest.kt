@@ -340,7 +340,7 @@ class DropDownViewHolderFactoryTest {
       ),
     )
 
-    val clearIcon = viewHolder.itemView.findViewById<ImageView>(R.id.clearIcon)
+    val clearIcon = viewHolder.itemView.findViewById<ImageView>(R.id.clear_input_icon)
     assertThat(clearIcon.visibility).isEqualTo(View.GONE)
   }
 
@@ -350,25 +350,21 @@ class DropDownViewHolderFactoryTest {
       Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
         value =
           Coding().apply {
-            code = "test-code"
-            display = "Test Code"
+            code = "code"
+            display = "display"
           }
       }
 
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { addAnswer().apply { value = answerOption.valueCoding } },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
 
-    val autoCompleteTextView =
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
-    val clearIcon = viewHolder.itemView.findViewById<ImageView>(R.id.clearIcon)
-    autoCompleteTextView.setText("Some Text")
-
+    val clearIcon = viewHolder.itemView.findViewById<ImageView>(R.id.clear_input_icon)
     assertThat(clearIcon.visibility).isEqualTo(View.VISIBLE)
   }
 

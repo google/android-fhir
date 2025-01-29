@@ -19,14 +19,18 @@ package com.google.android.fhir.datacapture.test.views
 import android.view.View
 import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.PerformException
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isPlatformPopup
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -51,6 +55,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -275,30 +280,75 @@ class DropDownViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldShowDropDownWhenClearIconIsClicked() {
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        createAnswerOptions("Coding 1", "Coding 2", "Coding 3", "Add", "Subtract"),
-        responseValueStringOptions(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      )
-    val autoCompleteTextView =
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
-
-    runOnUI {
-      viewHolder.bind(questionnaireViewItem)
-      autoCompleteTextView.setText("Some Text")
+  fun shouldPreventTypingWhenAnswerIsSelectedInAutoCompleteDropdown() {
+    val preselectedAnswer = QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+      addAnswer().value = StringType("Coding 1")
     }
 
-    // Delay the execution to allow the view hierarchy to be fully initialized
-    Thread.sleep(1000)
+    val questionnaireItem = QuestionnaireViewItem(
+      createAnswerOptions("Coding 1", "Coding 2", "Coding 3"),
+      preselectedAnswer,
+      validationResult = NotValidated,
+      answersChangedCallback = { _, _, _, _ -> }
+    )
 
-    // Click the clear icon
-    onView(withId(R.id.clearIcon)).perform(click())
+    val autoComplete = viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
 
-    // Verify that the drop-down is shown
-    onView(withText("Coding 1")).inRoot(isPlatformPopup()).check(matches(isDisplayed()))
+    runOnUI {
+      viewHolder.bind(questionnaireItem)
+      autoComplete.showDropDown()
+    }
+
+    assertThrows(PerformException::class.java) {
+      onView(withId(R.id.auto_complete)).perform(typeText("new text"))
+    }
+
+    assertThat(autoComplete.text.toString())
+      .isEqualTo("Coding 1")
+  }
+
+  @Test
+  fun shouldSelectAndClearAnswerInAutoCompleteDropdown() {
+    var selectedAnswers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    val answerOptions = listOf("Coding 1", "Coding 2", "Coding 3")
+
+    var questionnaireItem = QuestionnaireViewItem(
+      createAnswerOptions(*answerOptions.toTypedArray()),
+      responseValueStringOptions(),
+      validationResult = NotValidated,
+      answersChangedCallback = { _, _, answers, _ -> selectedAnswers = answers }
+    )
+
+    val autoComplete = viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
+
+    runOnUI {
+      viewHolder.bind(questionnaireItem)
+      autoComplete.showDropDown()
+    }
+
+    // Test selection flow
+    onView(withText("Coding 1"))
+      .inRoot(isPlatformPopup())
+      .check(matches(isDisplayed()))
+      .perform(click())
+
+    assertThat(selectedAnswers).hasSize(1)
+    assertThat((selectedAnswers!!.first().value as StringType).valueAsString)
+      .isEqualTo("Coding 1")
+
+    // Test clearing flow
+    questionnaireItem = QuestionnaireViewItem(
+      createAnswerOptions(*answerOptions.toTypedArray()),
+      responseValueStringOptions().apply { answer = selectedAnswers },
+      validationResult = NotValidated,
+      answersChangedCallback = { _, _, answers, _ -> selectedAnswers = answers }
+    )
+
+    runOnUI { viewHolder.bind(questionnaireItem) }
+
+    onView(withId(R.id.clear_input_icon)).perform(click())
+
+    assertThat(selectedAnswers).isEmpty()
   }
 
   @Test
