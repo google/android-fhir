@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -297,12 +297,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     mutableSetOf<QuestionnaireResponseItemComponent>()
 
   private lateinit var currentPageItems: List<QuestionnaireAdapterItem>
-
-  /**
-   * True if the user has tapped the next/previous pagination buttons on the current page. This is
-   * needed to avoid spewing validation errors before any questions are answered.
-   */
-  private var forceValidation = false
 
   /**
    * Map of [QuestionnaireResponseItemAnswerComponent] for
@@ -903,7 +897,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val validationResult =
       if (
         modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
-          forceValidation ||
           isInReviewModeFlow.value
       ) {
         questionnaireResponseItemValidator.validate(
@@ -1124,13 +1117,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         it.item.validationResult is NotValidated
       }
     ) {
-      // Force update validation results for all questions on the current page. This is needed
-      // when the user has not answered any questions so no validation has been done.
-      forceValidation = true
+      // Add all items on the current page to modifiedQuestionnaireResponseItemSet.
+      // This will ensure that all fields are validated even when they're not filled by the user
+      currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().forEach {
+        modifiedQuestionnaireResponseItemSet.add(it.item.getQuestionnaireResponseItem())
+      }
       // Results in a new questionnaire state being generated synchronously, i.e., the current
       // thread will be suspended until the new state is generated.
       modificationCount.update { it + 1 }
-      forceValidation = false
     }
 
     if (
