@@ -384,7 +384,7 @@ object Sync {
   }
 
   @PublishedApi
-  internal suspend inline fun storeUniqueWorkNameInDataStore(
+  internal suspend fun storeUniqueWorkNameInDataStore(
     context: Context,
     uniqueWorkName: String,
   ) {
@@ -395,7 +395,7 @@ object Sync {
   }
 
   @PublishedApi
-  internal suspend inline fun removeUniqueWorkNameInDataStore(
+  internal suspend fun removeUniqueWorkNameInDataStore(
     context: Context,
     uniqueWorkName: String,
   ) {
