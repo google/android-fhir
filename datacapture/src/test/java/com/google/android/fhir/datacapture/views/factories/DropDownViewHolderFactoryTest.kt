@@ -326,8 +326,8 @@ class DropDownViewHolderFactoryTest {
       Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
         value =
           Coding().apply {
-            code = "test-code"
-            display = "Test Code"
+            code = "code"
+            display = "display"
           }
       }
 
