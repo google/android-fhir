@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,14 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import java.io.IOException
 import java.time.OffsetDateTime
+import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 
 @PublishedApi
@@ -98,6 +101,40 @@ internal class FhirDataStore(context: Context) {
 
   internal fun writeLastSyncTimestamp(datetime: OffsetDateTime) {
     runBlocking { dataStore.edit { pref -> pref[lastSyncTimestampKey] = datetime.toString() } }
+  }
+
+  private val mutexMap = ConcurrentHashMap<String, Mutex>()
+
+  private fun getOrCreateMutex(key: String): Mutex {
+    // computeIfAbsent is thread-safe and only creates a Mutex if one doesn't exist.
+    return mutexMap.computeIfAbsent(key) { Mutex() }
+  }
+
+  /** Stores the given unique-work-name in DataStore. */
+  @PublishedApi
+  internal suspend fun storeUniqueWorkName(key: String, value: String) {
+    getOrCreateMutex(key).withLock {
+      dataStore.edit { preferences -> preferences[stringPreferencesKey("$key-key")] = value }
+    }
+  }
+
+  @PublishedApi
+  internal suspend fun removeUniqueWorkName(key: String) {
+    getOrCreateMutex(key).withLock {
+      dataStore.edit { preferences ->
+        val value = preferences.remove(stringPreferencesKey("$key-key"))
+        Timber.d("Removed value: $value")
+      }
+    }
+  }
+
+  /** Fetches the stored unique-work-name from DataStore. */
+  @PublishedApi
+  internal suspend fun fetchUniqueWorkName(key: String): String? {
+    return getOrCreateMutex(key).withLock {
+      val preferences = dataStore.data.first()
+      preferences[stringPreferencesKey("$key-key")]
+    }
   }
 
   companion object {
