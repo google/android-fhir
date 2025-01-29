@@ -280,12 +280,14 @@ object ResourceMapper {
             listOf(it.first().asExpectedType(questionnaireItem.type))
           }
 
-        // For answer options, the initialSelected extension is used to highlight initial values.
-        // Note: If the initial expression evaluates to 1, 2, 3, 4, 5, but only 3 answer options (1,
-        // 2, 3) exist,
-        // then 4 and 5 will be ignored. These values are not added as additional options, nor would
-        // it make sense to do so.
-        // This behavior ensures the answer options remain consistent with the defined set.
+        /**
+         * For answer options, the initialSelected extension is used to highlight initial values.
+         *
+         * Note: If the initial expression evaluates to five values (1, 2, 3, 4, 5) but only three
+         * answer options (1, 2, 3) exist, then 4 and 5 will be ignored. These values are not added
+         * as additional options, nor would it make sense to do so. This behavior ensures the answer
+         * options remain consistent with the defined set.
+         */
         if (questionnaireItem.answerOption.isNotEmpty()) {
           questionnaireItem.answerOption.forEach { answerOption ->
             answerOption.initialSelected =
