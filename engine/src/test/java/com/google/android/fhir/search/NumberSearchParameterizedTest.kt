@@ -53,8 +53,7 @@ class NumberSearchParameterizedTest(
     """
     SELECT a.resourceUuid, a.serializedResource
     FROM ResourceEntity a
-    WHERE a.resourceType = ?
-    AND a.resourceUuid IN (
+    WHERE a.resourceUuid IN (
     SELECT resourceUuid FROM NumberIndexEntity
         """
       .trimIndent()
@@ -86,7 +85,6 @@ class NumberSearchParameterizedTest(
     assertThat(search.args)
       .isEqualTo(
         listOf(
-          ResourceType.RiskAssessment.name,
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
           lowerBound.toDouble(),
@@ -123,7 +121,6 @@ class NumberSearchParameterizedTest(
       .isEqualTo(
         listOf(
           ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
           lowerBound.toDouble(),
           upperBound.toDouble(),
@@ -159,7 +156,6 @@ class NumberSearchParameterizedTest(
       .isEqualTo(
         listOf(
           ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
           num.toDouble(),
         ),
@@ -193,7 +189,6 @@ class NumberSearchParameterizedTest(
     assertThat(search.args)
       .isEqualTo(
         listOf(
-          ResourceType.RiskAssessment.name,
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
           num.toDouble(),
@@ -229,7 +224,6 @@ class NumberSearchParameterizedTest(
       .isEqualTo(
         listOf(
           ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
           num.toDouble(),
         ),
@@ -262,7 +256,6 @@ class NumberSearchParameterizedTest(
     assertThat(search.args)
       .isEqualTo(
         listOf(
-          ResourceType.RiskAssessment.name,
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
           num.toDouble(),
@@ -318,7 +311,6 @@ class NumberSearchParameterizedTest(
       .isEqualTo(
         listOf(
           ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
           num.toDouble(),
         ),
@@ -373,7 +365,6 @@ class NumberSearchParameterizedTest(
       .isEqualTo(
         listOf(
           ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
           num.toDouble(),
         ),
@@ -407,7 +398,6 @@ class NumberSearchParameterizedTest(
     assertThat(search.args)
       .isEqualTo(
         listOf(
-          ResourceType.RiskAssessment.name,
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
           0.09,

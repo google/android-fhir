@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ object Releases {
 
   object Engine : LibraryArtifact {
     override val artifactId = "engine"
-    override val version = "1.0.0"
+    override val version = "1.2.0"
     override val name = "Android FHIR Engine Library"
   }
 
@@ -95,6 +95,12 @@ object Releases {
 
   object Catalog {
     const val applicationId = "com.google.android.fhir.catalog"
+    const val versionCode = 1
+    const val versionName = "1.0"
+  }
+
+  object WorkflowDemo {
+    const val applicationId = "com.google.android.fhir.workflow.demo"
     const val versionCode = 1
     const val versionName = "1.0"
   }

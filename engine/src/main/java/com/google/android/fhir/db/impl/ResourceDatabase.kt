@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ import org.json.JSONObject
       PositionIndexEntity::class,
       LocalChangeResourceReferenceEntity::class,
     ],
-  version = 8,
+  version = 10,
   exportSchema = true,
 )
 @TypeConverters(DbTypeConverters::class)
@@ -205,6 +205,53 @@ internal val MIGRATION_7_8 =
           }
           continueIterating = it.moveToNext()
         }
+      }
+    }
+  }
+
+internal val Migration_8_9 =
+  object : Migration(8, 9) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.beginTransaction()
+      try {
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value_resourceUuid`;",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_resourceType_index_name_index_value_resourceUuid` ON `TokenIndexEntity` (`resourceType`, `index_name`, `index_value`, `resourceUuid`);",
+        )
+        database.setTransactionSuccessful()
+      } finally {
+        database.endTransaction()
+      }
+    }
+  }
+
+internal val Migration_9_10 =
+  object : Migration(9, 10) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.beginTransaction()
+      try {
+        database.execSQL("DROP INDEX IF EXISTS `index_DateIndexEntity_resourceUuid`;")
+        database.execSQL("DROP INDEX IF EXISTS `index_DateTimeIndexEntity_resourceUuid`;")
+        database.execSQL("DROP INDEX IF EXISTS `index_NumberIndexEntity_resourceUuid`;")
+        database.execSQL("DROP INDEX IF EXISTS `index_StringIndexEntity_resourceUuid`;")
+
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceUuid_index_name_index_from` ON `DateIndexEntity` (`resourceUuid`, `index_name`, `index_from`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceUuid_index_name_index_from` ON `DateTimeIndexEntity` (`resourceUuid`, `index_name`, `index_from`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_NumberIndexEntity_resourceUuid_index_name_index_value` ON `NumberIndexEntity` (`resourceUuid`, `index_name`, `index_value`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_StringIndexEntity_resourceUuid_index_name_index_value` ON `StringIndexEntity` (`resourceUuid`, `index_name`, `index_value`);",
+        )
+        database.setTransactionSuccessful()
+      } finally {
+        database.endTransaction()
       }
     }
   }
