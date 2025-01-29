@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -358,7 +358,9 @@ class DropDownViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { addAnswer().apply { value = answerOption.valueCoding } },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer().apply { value = answerOption.valueCoding }
+        },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       ),

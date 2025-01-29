@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,8 @@ internal object DropDownViewHolderFactory :
         context = itemView.context.tryUnwrapContext()!!
         autoCompleteTextView.setOnFocusChangeListener { view, hasFocus ->
           if (!hasFocus) {
-            (view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(view.windowToken, 0)
+            (view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+              .hideSoftInputFromWindow(view.windowToken, 0)
           }
         }
         clearInputIcon.setOnClickListener {
