@@ -56,7 +56,7 @@ object Releases {
 
   object DataCapture : LibraryArtifact {
     override val artifactId = "data-capture"
-    override val version = "1.2.0-preview9.1-SNAPSHOT"
+    override val version = "1.2.0-preview9.2-SNAPSHOT"
     override val name = "Android FHIR Structured Data Capture Library"
   }
 
