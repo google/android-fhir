@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Google LLC
+ * Copyright 2024-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,36 +31,43 @@ import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.SyncJobStatus
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class PeriodicSyncViewModel(application: Application) : AndroidViewModel(application) {
 
-  val pollPeriodicSyncJobStatus: SharedFlow<PeriodicSyncJobStatus> =
-    Sync.periodicSync<DemoFhirSyncWorker>(
-        application.applicationContext,
+  private val _uiStateFlow = MutableStateFlow(PeriodicSyncUiState())
+  val uiStateFlow: StateFlow<PeriodicSyncUiState> = _uiStateFlow
+
+  private val _pollPeriodicSyncJobStatus = MutableSharedFlow<PeriodicSyncJobStatus>(replay = 10)
+
+  init {
+    viewModelScope.launch { initializePeriodicSync() }
+  }
+
+  private suspend fun initializePeriodicSync() {
+    val periodicSyncJobStatusFlow =
+      Sync.periodicSync<DemoFhirSyncWorker>(
+        context = getApplication<Application>().applicationContext,
         periodicSyncConfiguration =
           PeriodicSyncConfiguration(
             syncConstraints = Constraints.Builder().build(),
             repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
           ),
       )
-      .shareIn(viewModelScope, SharingStarted.Eagerly, 10)
 
-  private val _uiStateFlow = MutableStateFlow(PeriodicSyncUiState())
-  val uiStateFlow: StateFlow<PeriodicSyncUiState> = _uiStateFlow
-
-  init {
-    collectPeriodicSyncJobStatus()
+    periodicSyncJobStatusFlow.collect { status -> _pollPeriodicSyncJobStatus.emit(status) }
   }
 
-  private fun collectPeriodicSyncJobStatus() {
+  fun collectPeriodicSyncJobStatus() {
     viewModelScope.launch {
-      pollPeriodicSyncJobStatus.collect { periodicSyncJobStatus ->
+      _pollPeriodicSyncJobStatus.collect { periodicSyncJobStatus ->
+        Timber.d(
+          "currentSyncJobStatus: ${periodicSyncJobStatus.currentSyncJobStatus}  lastSyncJobStatus ${periodicSyncJobStatus.lastSyncJobStatus}",
+        )
         val lastSyncStatus = getLastSyncStatus(periodicSyncJobStatus.lastSyncJobStatus)
         val lastSyncTime = getLastSyncTime(periodicSyncJobStatus.lastSyncJobStatus)
         val currentSyncStatus =
@@ -80,6 +87,14 @@ class PeriodicSyncViewModel(application: Application) : AndroidViewModel(applica
             progress = progress,
           )
       }
+    }
+  }
+
+  fun cancelPeriodicSyncJob() {
+    viewModelScope.launch {
+      Sync.cancelPeriodicSync<DemoFhirSyncWorker>(
+        getApplication<FhirApplication>().applicationContext,
+      )
     }
   }
 
