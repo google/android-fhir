@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,7 +156,7 @@ class QuestionnaireFragment : Fragment() {
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.pages = viewModel.getQuestionnairePages()
-      viewModel.questionnaireStateFlow.collect { state ->
+      viewModel.questionnaireStateStateFlow.collect { state ->
         when (val displayMode = state.displayMode) {
           is DisplayMode.ReviewMode -> {
             // Set items
