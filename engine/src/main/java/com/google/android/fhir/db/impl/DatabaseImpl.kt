@@ -43,10 +43,10 @@ import com.google.android.fhir.toLocalChange
 import com.google.android.fhir.updateMeta
 import java.time.Instant
 import java.util.UUID
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.Dispatchers
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -318,8 +318,8 @@ internal class DatabaseImpl(
           .newJsonParser()
           .parseResource(currentResourceEntity.serializedResource) as Resource
       val resourceUuid = currentResourceEntity.resourceUuid
-      updateResourceEntity(resourceUuid, updatedResource) 
-      
+      updateResourceEntity(resourceUuid, updatedResource)
+
       if (currentResourceId == updatedResource.logicalId) {
         return@withTransaction
       }
