@@ -305,6 +305,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val modifiedQuestionnaireResponseItemSet =
     mutableSetOf<QuestionnaireResponseItemComponent>()
 
+  private lateinit var currentPageItems: List<QuestionnaireAdapterItem>
+
   /**
    * Map of [QuestionnaireResponseItemAnswerComponent] for
    * [Questionnaire.QuestionnaireItemComponent]s that are disabled now. The answers will be used to
@@ -1132,8 +1134,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireStateStateFlow.value.items.filterIsInstance<QuestionnaireAdapterItem.Question>()
 
     if (currentPageQuestionItems.any { it.item.validationResult is NotValidated }) {
-      // Force update validation results for all questions on the current page. This is needed
-      // when the user has not answered any questions so no validation has been done.
+      // Add all items on the current page to modifiedQuestionnaireResponseItemSet.
+      // This will ensure that all fields are validated even when they're not filled by the user
       val currentPageQuestionnaireResponseItems =
         currentPageQuestionItems.map { it.item.getQuestionnaireResponseItem() }
       modifiedQuestionnaireResponseItemSet.addAll(currentPageQuestionnaireResponseItems)
