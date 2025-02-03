@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,6 +177,8 @@ interface FhirEngine {
    *   an empty list if no changes.
    */
   suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange>
+
+  suspend fun getUnsyncedLocalChanges(): List<LocalChange>
 
   /**
    * Purges a resource from the database without deleting data from the server.

@@ -44,6 +44,9 @@ import com.google.android.fhir.updateMeta
 import java.time.Instant
 import java.util.UUID
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -443,6 +446,11 @@ internal class DatabaseImpl(
         )
       }
     }
+  }
+
+  /** Implementation of a parallelized map */
+  suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
+    map { async { f(it) } }.awaitAll()
   }
 
   companion object {

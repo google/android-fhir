@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
@@ -32,11 +33,15 @@ import com.google.android.fhir.sync.upload.request.UploadRequestGeneratorFactory
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
+import java.nio.charset.StandardCharsets
 import java.time.OffsetDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import org.apache.commons.io.IOUtils
+import org.hl7.fhir.r4.model.OperationOutcome
+import retrofit2.HttpException
 import timber.log.Timber
 
 /**
@@ -131,6 +136,8 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       }
 
     val result = synchronizer.synchronize()
+    if (result is SyncJobStatus.Failed) onFailedSyncJobResult(result)
+
     val output = buildWorkData(result)
 
     // await/join is needed to collect states completely
@@ -148,6 +155,34 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       else -> {
         if (retries > runAttemptCount) Result.retry() else Result.failure(output)
       }
+    }
+  }
+
+  open fun onFailedSyncJobResult(failedSyncJobStatus: SyncJobStatus.Failed) {
+    try {
+      val jsonParser = FhirContext.forR4().newJsonParser()
+      val exceptions = (failedSyncJobStatus).exceptions
+
+      exceptions.forEach { resourceSyncException ->
+        val operationOutcome =
+          jsonParser.parseResource(
+            IOUtils.toString(
+              (resourceSyncException.exception as HttpException)
+                .response()
+                ?.errorBody()
+                ?.byteStream(),
+              StandardCharsets.UTF_8,
+            ),
+          ) as OperationOutcome
+
+        operationOutcome.issue.forEach { operationOutcome ->
+          Timber.e(
+            "SERVER ${operationOutcome.severity} - HTTP ${resourceSyncException.exception.code()} | Code - ${operationOutcome.code} | Diagnostics - ${operationOutcome.diagnostics}",
+          )
+        }
+      }
+    } catch (e: Exception) {
+      Timber.e(e)
     }
   }
 
