@@ -33,7 +33,7 @@ android {
     }
 
     packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")) }
-    kotlin { jvmToolchain(11) }
+    kotlin { jvmToolchain(17) }
 }
 
 dependencies {
@@ -51,4 +51,5 @@ dependencies {
 
     implementation("com.google.android.fhir:engine:1.1.0")
     implementation("androidx.fragment:fragment-ktx:1.8.3")
+    implementation("com.google.android.fhir:engine:1.1.0")
 }
