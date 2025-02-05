@@ -6,7 +6,6 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        // workaround: just signed up for google cla for this commit
         classpath("com.android.tools.build:gradle:8.7.3")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20")
 
