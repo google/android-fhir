@@ -51,5 +51,4 @@ dependencies {
 
     implementation("com.google.android.fhir:engine:1.1.0")
     implementation("androidx.fragment:fragment-ktx:1.8.3")
-    implementation("com.google.android.fhir:engine:1.1.0")
 }
