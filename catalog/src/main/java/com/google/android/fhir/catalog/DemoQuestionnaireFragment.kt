@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,6 +146,7 @@ class DemoQuestionnaireFragment : Fragment() {
                     .LOCATION_WIDGET_PROVIDER,
                 )
                 setQuestionnaire(args.questionnaireJsonStringKey!!)
+                showReviewPageBeforeSubmit(args.enableReviewMode)
               }
               .build()
           add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
