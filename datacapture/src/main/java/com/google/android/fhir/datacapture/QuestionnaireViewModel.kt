@@ -492,9 +492,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-  //  fun validateMinvalueExtensionAndMaxValueExtension() {
-  //    questionnaire.
-  //  }
 
   /** Clears all the answers from the questionnaire response by iterating through each item. */
   fun clearAllAnswers() {
