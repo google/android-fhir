@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.expressions.EnabledAnswerOptionsEvaluator
 import com.google.android.fhir.datacapture.extensions.EntryMode
@@ -77,12 +78,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.Type
 import timber.log.Timber
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
@@ -204,7 +209,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       item: QuestionnaireItemComponent,
       questionnaireItemToParentMap: ItemToParentMap,
     ) {
+      CheckMinAndMaxExtensionValues(item.minValue, item.maxValue)
       for (child in item.item) {
+        CheckMinAndMaxExtensionValues(child.minValue, child.maxValue)
         questionnaireItemToParentMap[child] = item
         buildParentList(child, questionnaireItemToParentMap)
       }
@@ -484,6 +491,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       authored = Date()
     }
   }
+
+  //  fun validateMinvalueExtensionAndMaxValueExtension() {
+  //    questionnaire.
+  //  }
 
   /** Clears all the answers from the questionnaire response by iterating through each item. */
   fun clearAllAnswers() {
@@ -1139,6 +1150,22 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
     ) {
       block()
+    }
+  }
+
+  private fun CheckMinAndMaxExtensionValues(minValue: Type?, maxValue: Type?) {
+    if (minValue == null || maxValue == null) {
+      return
+    }
+    if (
+      (minValue is IntegerType && maxValue is IntegerType) ||
+        (minValue is DecimalType && maxValue is DecimalType) ||
+        (minValue is DateType && maxValue is DateType) ||
+        (minValue is DateTimeType && maxValue is DateTimeType)
+    ) {
+      if (minValue > maxValue) {
+        throw IllegalArgumentException("minValue cannot be greater than maxValue")
+      }
     }
   }
 }

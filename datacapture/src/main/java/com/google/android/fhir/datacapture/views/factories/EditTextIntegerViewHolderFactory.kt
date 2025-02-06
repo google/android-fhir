@@ -39,17 +39,6 @@ internal object EditTextIntegerViewHolderFactory :
         InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
       ) {
 
-      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        super.bind(questionnaireViewItem)
-
-        val minValue = (questionnaireViewItem.minAnswerValue as? IntegerType)?.value
-        val maxValue = (questionnaireViewItem.maxAnswerValue as? IntegerType)?.value
-
-        if (minValue != null && maxValue != null && minValue > maxValue) {
-          throw IllegalArgumentException("minValue cannot be greater than maxValue")
-        }
-      }
-
       override suspend fun handleInput(
         editable: Editable,
         questionnaireViewItem: QuestionnaireViewItem,
@@ -102,7 +91,6 @@ internal object EditTextIntegerViewHolderFactory :
             questionnaireViewItem,
             questionnaireViewItem.validationResult,
           )
-
         val minValue =
           (questionnaireViewItem.minAnswerValue as? IntegerType)?.value ?: Int.MIN_VALUE
         val maxValue =
