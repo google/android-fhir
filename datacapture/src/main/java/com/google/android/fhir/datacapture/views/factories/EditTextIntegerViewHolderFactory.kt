@@ -92,11 +92,13 @@ internal object EditTextIntegerViewHolderFactory :
           )
         // Update error message if draft answer present
         if (questionnaireViewItem.draftAnswer != null) {
+          val minValue = questionnaireViewItem.minAnswerValue?.toString() ?: IntegerType(Int.MIN_VALUE).toString()
+          val maxValue = questionnaireViewItem.maxAnswerValue?.toString() ?: IntegerType(Int.MAX_VALUE).toString()
           textInputLayout.error =
             textInputLayout.context.getString(
               R.string.integer_format_validation_error_msg,
-              formatInteger(Int.MIN_VALUE),
-              formatInteger(Int.MAX_VALUE),
+              minValue,
+              maxValue
             )
         }
       }
