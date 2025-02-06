@@ -304,6 +304,7 @@ class CrudOperationFragment : Fragment() {
         gender = it.gender,
         isActive = it.isActive,
       )
+      setupUiForCrudOperation(OperationType.CREATE)
     }
   }
 
