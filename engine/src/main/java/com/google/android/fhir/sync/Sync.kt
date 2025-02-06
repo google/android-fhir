@@ -260,6 +260,7 @@ object Sync {
           periodicSyncConfiguration.repeat.timeUnit,
         )
         .setConstraints(periodicSyncConfiguration.syncConstraints)
+        .setInitialDelay(periodicSyncConfiguration.initialDelay)
 
     periodicSyncConfiguration.retryConfiguration?.let {
       periodicWorkRequestBuilder.setBackoffCriteria(

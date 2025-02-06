@@ -20,6 +20,7 @@ import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
+import java.time.Duration
 
 /**
  * Class that holds what type of resources we need to synchronise and what are the parameters of
@@ -62,6 +63,9 @@ class PeriodicSyncConfiguration(
 
   /** Configuration for synchronization retry */
   val retryConfiguration: RetryConfiguration? = defaultRetryConfiguration,
+
+  /** The initial delay before the first sync is triggered */
+  val initialDelay: Duration = Duration.ZERO,
 )
 
 data class RepeatInterval(
