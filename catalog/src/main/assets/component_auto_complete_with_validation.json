@@ -7,6 +7,26 @@
       "type": "choice",
       "repeats": true,
       "required": true,
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "instruction",
+          "text": "Try typing Asthma, Chronic Lung Disease, Depression, Diabetes, Hypertension, High Blood Pressure, or High Cholesterol",
+          "type": "display"
+        }
+      ],
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -27,7 +47,8 @@
           "valueCoding": {
             "code": "asthma",
             "display": "Asthma"
-          }
+          },
+          "initialSelected": true
         },
         {
           "valueCoding": {
@@ -55,7 +76,7 @@
         },
         {
           "valueCoding": {
-            "code": "hypertension",
+            "code": "hbp",
             "display": "High Blood Pressure"
           }
         },
@@ -65,13 +86,7 @@
             "display": "High Cholesterol"
           }
         }
-      ],
-      "initial": {
-        "valueCoding": {
-          "code": "asthma",
-          "display": "Asthma"
-        }
-      }
+      ]
     }
   ]
 }
