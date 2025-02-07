@@ -209,14 +209,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       item: QuestionnaireItemComponent,
       questionnaireItemToParentMap: ItemToParentMap,
     ) {
-      CheckMinAndMaxExtensionValues(item.minValue, item.maxValue)
+      checkMinAndMaxExtensionValues(item.minValue, item.maxValue)
       for (child in item.item) {
-        CheckMinAndMaxExtensionValues(child.minValue, child.maxValue)
+        checkMinAndMaxExtensionValues(child.minValue, child.maxValue)
         questionnaireItemToParentMap[child] = item
         buildParentList(child, questionnaireItemToParentMap)
       }
     }
-
     questionnaireItemParentMap = buildMap {
       for (item in questionnaire.item) {
         buildParentList(item, this)
@@ -491,7 +490,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       authored = Date()
     }
   }
-
 
   /** Clears all the answers from the questionnaire response by iterating through each item. */
   fun clearAllAnswers() {
@@ -1150,7 +1148,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-  private fun CheckMinAndMaxExtensionValues(minValue: Type?, maxValue: Type?) {
+  private fun checkMinAndMaxExtensionValues(minValue: Type?, maxValue: Type?) {
     if (minValue == null || maxValue == null) {
       return
     }

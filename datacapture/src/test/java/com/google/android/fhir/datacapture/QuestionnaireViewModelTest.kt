@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,9 @@ import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -226,6 +228,94 @@ class QuestionnaireViewModelTest {
         },
       )
     }
+  }
+
+  @Test
+  fun `should throw exception if minValue is greater than maxValue for integer type`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem().apply {
+          type = Questionnaire.QuestionnaireItemType.INTEGER
+          addExtension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            setValue(IntegerType(10))
+          }
+          addExtension().apply {
+            url = MAX_VALUE_EXTENSION_URL
+            setValue(IntegerType(1))
+          }
+        }
+      }
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> { createQuestionnaireViewModel(questionnaire) }
+        .localizedMessage
+    assertThat(errorMessage).isEqualTo("minValue cannot be greater than maxValue")
+  }
+
+  @Test
+  fun `should throw exception if minValue is greater than maxValue for decimal type`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem().apply {
+          type = Questionnaire.QuestionnaireItemType.INTEGER
+          addExtension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            setValue(DecimalType(10.0))
+          }
+          addExtension().apply {
+            url = MAX_VALUE_EXTENSION_URL
+            setValue(DecimalType(1.5))
+          }
+        }
+      }
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> { createQuestionnaireViewModel(questionnaire) }
+        .localizedMessage
+    assertThat(errorMessage).isEqualTo("minValue cannot be greater than maxValue")
+  }
+
+  @Test
+  fun `should throw exception if minValue is greater than maxValue for datetime type`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem().apply {
+          type = Questionnaire.QuestionnaireItemType.DATETIME
+          addExtension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            setValue(DateTimeType("2020-01-01T00:00:00Z"))
+          }
+          addExtension().apply {
+            url = MAX_VALUE_EXTENSION_URL
+            setValue(DateTimeType("2019-01-01T00:00:00Z"))
+          }
+        }
+      }
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> { createQuestionnaireViewModel(questionnaire) }
+        .localizedMessage
+    assertThat(errorMessage).isEqualTo("minValue cannot be greater than maxValue")
+  }
+
+  @Test
+  fun `should throw exception if minValue is greater than maxValue for date type`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem().apply {
+          type = Questionnaire.QuestionnaireItemType.DATE
+          addExtension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            setValue(DateType("2020-01-01"))
+          }
+          addExtension().apply {
+            url = MAX_VALUE_EXTENSION_URL
+            setValue(DateType("2019-01-01"))
+          }
+        }
+      }
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> { createQuestionnaireViewModel(questionnaire) }
+        .localizedMessage
+    assertThat(errorMessage).isEqualTo("minValue cannot be greater than maxValue")
   }
 
   @Test
