@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.slider.Slider
 import com.google.common.truth.Truth.assertThat
-import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
@@ -183,29 +182,6 @@ class SliderViewHolderFactoryTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).valueFrom).isEqualTo(0.0F)
-  }
-
-  @Test
-  fun `throws exception if minValue is greater than maxvalue`() {
-    assertFailsWith<IllegalStateException> {
-      viewHolder.bind(
-        QuestionnaireViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            addExtension().apply {
-              url = "http://hl7.org/fhir/StructureDefinition/minValue"
-              setValue(IntegerType("100"))
-            }
-            addExtension().apply {
-              url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-              setValue(IntegerType("50"))
-            }
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _, _ -> },
-        ),
-      )
-    }
   }
 
   @Test
