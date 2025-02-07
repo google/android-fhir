@@ -211,7 +211,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     ) {
       checkMinAndMaxExtensionValues(item.minValue, item.maxValue)
       for (child in item.item) {
-        checkMinAndMaxExtensionValues(child.minValue, child.maxValue)
         questionnaireItemToParentMap[child] = item
         buildParentList(child, questionnaireItemToParentMap)
       }
