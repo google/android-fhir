@@ -188,9 +188,13 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.EditMode -> {
             // Set items
             questionnaireReviewRecyclerView.visibility = View.GONE
-            questionnaireEditAdapter.submitList(
-              state.filterEmptyTextItems(),
-            ) // filterEmptyTextItems
+            val itemsToSubmit =
+              if (viewModel.columnCount != null) {
+                state.filterEmptyTextItems()
+              } else {
+                state.items
+              }
+            questionnaireEditAdapter.submitList(itemsToSubmit)
             questionnaireEditRecyclerView.visibility = View.VISIBLE
             reviewModeEditButton.visibility = View.GONE
 
@@ -596,11 +600,9 @@ class QuestionnaireFragment : Fragment() {
 
   internal fun QuestionnaireState.filterEmptyTextItems() =
     items.filterNot { item ->
-      // Check if the item is a Question and has an empty text
-      //      item is QuestionnaireAdapterItem.Question &&
-      // item.item.questionnaireItem.text.isNullOrBlank()
       item is QuestionnaireAdapterItem.Question &&
-        item.item.questionnaireItem.type == QuestionnaireItemType.GROUP
+        item.item.questionnaireItem.type == QuestionnaireItemType.GROUP &&
+        item.item.questionText.isNullOrEmpty()
     }
 }
 
