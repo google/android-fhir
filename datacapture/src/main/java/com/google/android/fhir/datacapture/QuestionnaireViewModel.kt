@@ -50,6 +50,7 @@ import com.google.android.fhir.datacapture.extensions.minValue
 import com.google.android.fhir.datacapture.extensions.minValueCqfCalculatedValueExpression
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
+import com.google.android.fhir.datacapture.extensions.rootGroupItemColumnCount
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
 import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
@@ -99,6 +100,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
 
+  internal val columnCount: Int?
+
   init {
     questionnaire =
       when {
@@ -122,6 +125,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             "Neither EXTRA_QUESTIONNAIRE_JSON_URI nor EXTRA_QUESTIONNAIRE_JSON_STRING is supplied.",
           )
       }
+    columnCount = questionnaire.rootGroupItemColumnCount
+    Timber.d("Column count value is $columnCount")
   }
 
   /** The current questionnaire response as questions are being answered. */

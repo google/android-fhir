@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -38,6 +39,7 @@ import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemView
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 import timber.log.Timber
 
 /**
@@ -146,7 +148,7 @@ class QuestionnaireFragment : Fragment() {
 
     questionnaireEditRecyclerView.adapter = questionnaireEditAdapter
     val linearLayoutManager = LinearLayoutManager(view.context)
-    questionnaireEditRecyclerView.layoutManager = linearLayoutManager
+    questionnaireEditRecyclerView.layoutManager = getLayoutManager()
     // Animation does work well with views that could gain focus
     questionnaireEditRecyclerView.itemAnimator = null
 
@@ -186,7 +188,9 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.EditMode -> {
             // Set items
             questionnaireReviewRecyclerView.visibility = View.GONE
-            questionnaireEditAdapter.submitList(state.items)
+            questionnaireEditAdapter.submitList(
+              state.filterEmptyTextItems(),
+            ) // filterEmptyTextItems
             questionnaireEditRecyclerView.visibility = View.VISIBLE
             reviewModeEditButton.visibility = View.GONE
 
@@ -584,6 +588,20 @@ class QuestionnaireFragment : Fragment() {
     QuestionnaireItemViewHolderFactoryMatchersProvider() {
     override fun get() = emptyList<QuestionnaireItemViewHolderFactoryMatcher>()
   }
+
+  private fun getLayoutManager(): LinearLayoutManager {
+    return viewModel.columnCount?.let { GridLayoutManager(this.context, it) }
+      ?: LinearLayoutManager(this.context)
+  }
+
+  internal fun QuestionnaireState.filterEmptyTextItems() =
+    items.filterNot { item ->
+      // Check if the item is a Question and has an empty text
+      //      item is QuestionnaireAdapterItem.Question &&
+      // item.item.questionnaireItem.text.isNullOrBlank()
+      item is QuestionnaireAdapterItem.Question &&
+        item.item.questionnaireItem.type == QuestionnaireItemType.GROUP
+    }
 }
 
 /**
