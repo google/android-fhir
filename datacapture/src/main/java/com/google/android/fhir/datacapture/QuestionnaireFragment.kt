@@ -147,8 +147,8 @@ class QuestionnaireFragment : Fragment() {
       }
 
     questionnaireEditRecyclerView.adapter = questionnaireEditAdapter
-    val linearLayoutManager = LinearLayoutManager(view.context)
-    questionnaireEditRecyclerView.layoutManager = getLayoutManager()
+    val linearLayoutManager = getLayoutManager()
+    questionnaireEditRecyclerView.layoutManager = linearLayoutManager
     // Animation does work well with views that could gain focus
     questionnaireEditRecyclerView.itemAnimator = null
 
@@ -594,8 +594,11 @@ class QuestionnaireFragment : Fragment() {
   }
 
   private fun getLayoutManager(): LinearLayoutManager {
-    return viewModel.columnCount?.let { GridLayoutManager(this.context, it) }
-      ?: LinearLayoutManager(this.context)
+    return if (viewModel.columnCount != null) {
+      GridLayoutManager(context, viewModel.columnCount!!)
+    } else {
+      LinearLayoutManager(context)
+    }
   }
 
   internal fun QuestionnaireState.filterEmptyTextItems() =
