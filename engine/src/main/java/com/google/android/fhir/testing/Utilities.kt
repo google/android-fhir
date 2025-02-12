@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,6 +149,10 @@ internal object TestFhirEngineImpl : FhirEngine {
 
   override suspend fun get(type: ResourceType, id: String): Resource {
     return Patient()
+  }
+
+  override suspend fun getResources(type: ResourceType, vararg ids: String): List<Resource> {
+    return ids.map { Patient() }
   }
 
   override suspend fun delete(type: ResourceType, id: String) {}
