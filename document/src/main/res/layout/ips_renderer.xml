@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".GetData"
+>
+
+  <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+    >
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+        >
+
+      <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+            >
+
+        <TableLayout
+                    android:id="@+id/patientTable"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stretchColumns="1"
+                >
+
+          <TableRow android:background="#ABB0B8">
+            <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            android:gravity="left"
+                            android:text="Patient"
+                            android:textColor="#000000"
+                            android:textSize="24sp"
+                        />
+
+            <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            android:gravity="left"
+                            android:text=""
+                        />
+          </TableRow>
+          <View
+                        android:layout_width="match_parent"
+                        android:layout_height="5px"
+                        android:background="#000000"
+                    />
+        </TableLayout>
+      </HorizontalScrollView>
+
+      <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+            >
+
+        <TableLayout
+                    android:id="@+id/documentTable"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stretchColumns="1"
+                >
+
+          <TableRow android:background="#ABB0B8">
+            <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            android:gravity="left"
+                            android:text="Document (Composition)"
+                            android:textColor="#000000"
+                            android:textSize="24sp"
+                        />
+
+            <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            android:gravity="left"
+                            android:text=""
+                        />
+          </TableRow>
+          <View
+                        android:layout_width="match_parent"
+                        android:layout_height="5px"
+                        android:background="#000000"
+                    />
+        </TableLayout>
+      </HorizontalScrollView>
+
+      <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/allergiesSection"
+                android:orientation="vertical"
+            >
+
+        <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                >
+
+          <TableLayout
+                        android:id="@+id/allergiesTable"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:stretchColumns="1"
+                    >
+
+            <TableRow android:background="#ABB0B8">
+              <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="8dp"
+                                android:textColor="#000000"
+                                android:textSize="24sp"
+                                android:gravity="left"
+                                android:text="Allergies and Intolerances"
+                            />
+              <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="8dp"
+                                android:gravity="left"
+                                android:text=""
+                            />
+            </TableRow>
+            <View
+                            android:layout_width="match_parent"
+                            android:layout_height="5px"
+                            android:background="#000000"
+                        />
+          </TableLayout>
+        </HorizontalScrollView>
+      </LinearLayout>
+
+      <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/problemSection"
+                android:orientation="vertical"
+            >
+
+        <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                >
+
+          <TableLayout
+                        android:id="@+id/problemsTable"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:stretchColumns="1"
+                    >
+
+            <TableRow android:background="#ABB0B8">
+              <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="8dp"
+                                android:gravity="left"
+                                android:text="Active Problems"
+                                android:textColor="#000000"
+                                android:textSize="24sp"
+                            />
+
+              <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="8dp"
+                                android:gravity="left"
+                                android:text=""
+                            />
+            </TableRow>
+            <View
+                            android:layout_width="match_parent"
+                            android:layout_height="5px"
+                            android:background="#000000"
+                        />
+          </TableLayout>
+        </HorizontalScrollView>
+      </LinearLayout>
+
+      <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/medicationSection"
+                android:orientation="vertical"
+            >
+
+        <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                >
+
+          <TableLayout
+                        android:id="@+id/medicationTable"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:stretchColumns="1"
+                    >
+
+            <TableRow android:background="#ABB0B8">
+              <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:padding="8dp"
+                                android:gravity="left"
+                                android:text="Medications"
+                                android:textColor="#000000"
+                                android:textSize="24sp"
+                            />
+
+              <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="8dp"
+                                android:gravity="left"
+                                android:text=""
+                            />
+            </TableRow>
+            <View
+                            android:layout_width="match_parent"
+                            android:layout_height="5px"
+                            android:background="#000000"
+                        />
+          </TableLayout>
+        </HorizontalScrollView>
+      </LinearLayout>
+
+      <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/immunizationSection"
+                android:orientation="vertical"
+            >
+
+        <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                >
+
+          <TableLayout
+                        android:id="@+id/immunizationTable"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:stretchColumns="1"
+                    >
+
+            <TableRow android:background="#ABB0B8">
+              <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="8dp"
+                                android:gravity="left"
+                                android:text="Immunizations"
+                                android:textColor="#000000"
+                                android:textSize="24sp"
+                            />
+              <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="8dp"
+                                android:gravity="left"
+                                android:text=""
+                            />
+            </TableRow>
+            <View
+                            android:layout_width="match_parent"
+                            android:layout_height="5px"
+                            android:background="#000000"
+                        />
+          </TableLayout>
+        </HorizontalScrollView>
+      </LinearLayout>
+
+      <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/resultsSection"
+                android:orientation="vertical"
+            >
+
+        <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                >
+
+          <TableLayout
+                        android:id="@+id/resultsTable"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:stretchColumns="1"
+                    >
+
+            <TableRow android:background="#ABB0B8">
+              <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="8dp"
+                                android:gravity="left"
+                                android:text="Results"
+                                android:textColor="#000000"
+                                android:textSize="24sp"
+                            />
+              <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="8dp"
+                                android:gravity="left"
+                                android:text=""
+                            />
+            </TableRow>
+            <View
+                            android:layout_width="match_parent"
+                            android:layout_height="5px"
+                            android:background="#000000"
+                        />
+          </TableLayout>
+        </HorizontalScrollView>
+      </LinearLayout>
+
+    </LinearLayout>
+  </ScrollView>
+</RelativeLayout>
