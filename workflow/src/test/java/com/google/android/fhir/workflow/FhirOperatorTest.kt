@@ -25,6 +25,7 @@ import com.google.android.fhir.knowledge.FhirNpmPackage
 import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
+import junit.framework.TestCase.assertNotNull
 import java.io.File
 import java.util.TimeZone
 import org.hl7.fhir.r4.model.CanonicalType
@@ -206,6 +207,81 @@ class FhirOperatorTest {
       jsonWriter.setPrettyPrint(true).encodeResourceToString(measureReport),
       true,
     )
+  }
+
+  @Test
+  fun generateMeaslesCarePlan() = runBlockingOnWorkerThread {
+    loader.loadFile("/measles-immunizations/Library-FHIRCommon.json", ::installToIgManager)
+    loader.loadFile("/measles-immunizations/Library-FHIRHelpers.json", ::installToIgManager)
+    loader.loadFile("/measles-immunizations/Library-IMMZCommon.json", ::installToIgManager)
+    loader.loadFile(
+      "/measles-immunizations/Library-IMMZCommonIzDataElements.json",
+      ::installToIgManager,
+    )
+    loader.loadFile(
+      "/measles-immunizations/Library-IMMZConcepts.json",
+      ::installToIgManager,
+    )
+    loader.loadFile("/measles-immunizations/Library-IMMZConfig.json", ::installToIgManager)
+    loader.loadFile(
+      "/measles-immunizations/Library-IMMZD2DTMeaslesLogic.json",
+      ::installToIgManager,
+    )
+    loader.loadFile(
+      "/measles-immunizations/Library-IMMZIndicatorCommon.json",
+      ::installToIgManager,
+    )
+    loader.loadFile(
+      "/measles-immunizations/Library-IMMZINDMeasles.json",
+      ::installToIgManager,
+    )
+    loader.loadFile(
+      "/measles-immunizations/Library-IMMZVaccineLibrary.json",
+      ::installToIgManager,
+    )
+    loader.loadFile(
+      "/measles-immunizations/ActivityDefinition-IMMZD2DTMeaslesMR.json",
+      ::installToIgManager,
+    )
+    loader.loadFile(
+      "/measles-immunizations/PlanDefinition-IMMZD2DTMeasles.json",
+      ::installToIgManager,
+    )
+    loader.loadFile("/measles-immunizations/Library-WHOCommon.json", ::installToIgManager)
+    loader.loadFile("/measles-immunizations/Library-WHOConcepts.json", ::installToIgManager)
+    loader.loadFile(
+      "/measles-immunizations/ValueSet-HIVstatus-values.json",
+      ::installToIgManager,
+    )
+
+    loader.loadFile(
+      "/measles-immunizations/IMMZ-Patient-NoVaxeninfant-f.json",
+      ::importToFhirEngine,
+    )
+    loader.loadFile(
+      "/measles-immunizations/birthweightnormal-NoVaxeninfant-f.json",
+      ::importToFhirEngine,
+    )
+
+    val fhirOperator =
+      FhirOperator.Builder(context)
+        .fhirEngine(fhirEngine)
+        .fhirContext(fhirContext)
+        .knowledgeManager(knowledgeManager)
+        .build()
+
+    val carePlan =
+      fhirOperator.generateCarePlan(
+        planDefinitionCanonical =
+          CanonicalType(
+            "http://smart.who.int/smart-immunizations-measles/PlanDefinition/IMMZD2DTMeasles",
+          ),
+        subject = "Patient/IMMZ-Patient-NoVaxeninfant-f",
+      )
+
+    println(jsonWriter.encodeResourceToString(carePlan))
+
+    assertNotNull(carePlan)
   }
 
   @Test
