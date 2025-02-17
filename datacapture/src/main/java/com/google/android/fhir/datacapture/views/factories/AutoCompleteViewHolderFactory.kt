@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,19 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
+import android.content.Context
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Filter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.core.view.get
 import androidx.core.view.isEmpty
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
@@ -53,6 +58,8 @@ internal object AutoCompleteViewHolderFactory :
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
       private lateinit var chipContainer: ChipGroup
       private lateinit var textInputLayout: TextInputLayout
+      private lateinit var adapter: AutoCompleteArrayAdapter
+
       private val canHaveMultipleAnswers
         get() = questionnaireViewItem.questionnaireItem.repeats
 
@@ -66,24 +73,7 @@ internal object AutoCompleteViewHolderFactory :
         chipContainer = itemView.findViewById(R.id.chipContainer)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         errorTextView = itemView.findViewById(R.id.error)
-        autoCompleteTextView.onItemClickListener =
-          AdapterView.OnItemClickListener { _, _, position, _ ->
-            val answer =
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value =
-                  questionnaireViewItem.enabledAnswerOptions
-                    .first {
-                      it.value.identifierString(header.context) ==
-                        (autoCompleteTextView.adapter.getItem(position)
-                            as AutoCompleteViewAnswerOption)
-                          .answerId
-                    }
-                    .valueCoding
-              }
-
-            onAnswerSelected(answer)
-            autoCompleteTextView.setText("")
-          }
+        autoCompleteTextView.onItemClickListener = onClickListener()
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
@@ -96,12 +86,12 @@ internal object AutoCompleteViewHolderFactory :
               answerDisplay = it.value.displayString(header.context),
             )
           }
-        val adapter =
-          ArrayAdapter(
-            header.context,
-            R.layout.drop_down_list_item,
-            R.id.answer_option_textview,
-            answerOptionValues,
+        adapter =
+          AutoCompleteArrayAdapter(
+            context = header.context,
+            resource = R.layout.drop_down_list_item,
+            textViewResourceId = R.id.answer_option_textview,
+            objects = answerOptionValues,
           )
         autoCompleteTextView.setAdapter(adapter)
         // Remove chips if any from the last bindView call on this VH.
@@ -109,6 +99,30 @@ internal object AutoCompleteViewHolderFactory :
         presetValuesIfAny()
 
         displayValidationResult(questionnaireViewItem.validationResult)
+
+        val serverSideFiltering =
+          questionnaireViewItem.questionnaireItem.answerValueSet != null &&
+            answerOptionValues.isEmpty()
+
+        autoCompleteTextView.addTextChangedListener { text ->
+          if (serverSideFiltering) {
+            questionnaireViewItem.autoCompleteAnswerOptionResolver(
+              text.toString(),
+              questionnaireViewItem.questionnaireItem.answerValueSet,
+            ) { response ->
+              val items =
+                response.map {
+                  AutoCompleteViewAnswerOption(
+                    answerId = it.code,
+                    answerDisplay = it.display,
+                  )
+                }
+              adapter.updateData(items)
+            }
+          } else {
+            adapter.clientSideFilter(text.toString())
+          }
+        }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
@@ -135,6 +149,39 @@ internal object AutoCompleteViewHolderFactory :
           handleSelectionWhenQuestionCanHaveSingleAnswer(answer)
         }
       }
+
+      private fun onClickListener() =
+        AdapterView.OnItemClickListener { _, _, position, _ ->
+          val answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+          if (questionnaireViewItem.enabledAnswerOptions.isEmpty()) {
+            val answerValue =
+              autoCompleteTextView.adapter.getItem(position) as AutoCompleteViewAnswerOption
+            val answerCoding =
+              Coding().apply {
+                code = answerValue.answerId
+                display = answerValue.answerDisplay
+              }
+            answer =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = answerCoding
+              }
+          } else {
+            answer =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value =
+                  questionnaireViewItem.enabledAnswerOptions
+                    .first {
+                      it.value.identifierString(header.context) ==
+                        (autoCompleteTextView.adapter.getItem(position)
+                            as AutoCompleteViewAnswerOption)
+                          .answerId
+                    }
+                    .valueCoding
+              }
+          }
+          onAnswerSelected(answer)
+          autoCompleteTextView.setText("")
+        }
 
       /**
        * Adds a new chip if it not already present in [chipContainer].It returns [true] if a new
@@ -245,5 +292,60 @@ internal object AutoCompleteViewHolderFactory :
 internal data class AutoCompleteViewAnswerOption(val answerId: String, val answerDisplay: String) {
   override fun toString(): String {
     return this.answerDisplay
+  }
+}
+
+internal class AutoCompleteArrayAdapter(
+  context: Context,
+  val resource: Int,
+  val textViewResourceId: Int,
+  private val objects: List<AutoCompleteViewAnswerOption>,
+) : ArrayAdapter<AutoCompleteViewAnswerOption>(context, resource, textViewResourceId, objects) {
+
+  private var items = listOf<AutoCompleteViewAnswerOption>()
+
+  override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+    val view = convertView ?: LayoutInflater.from(context).inflate(resource, parent, false)
+    val item = getItem(position)
+    view.findViewById<TextView>(textViewResourceId).text = item.toString()
+    return view
+  }
+
+  override fun getCount(): Int = items.size
+
+  fun updateData(newData: List<AutoCompleteViewAnswerOption>) {
+    items = newData
+    notifyDataSetChanged()
+  }
+
+  fun clientSideFilter(query: String) {
+    items = objects.filter { it.answerDisplay.contains(query, ignoreCase = true) }
+    notifyDataSetChanged()
+  }
+
+  override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+    return getView(position, convertView, parent)
+  }
+
+  override fun getItem(position: Int): AutoCompleteViewAnswerOption? = items.getOrNull(position)
+
+  @Suppress("UNCHECKED_CAST")
+  override fun getFilter(): Filter {
+    return object : Filter() {
+
+      override fun performFiltering(constraint: CharSequence?): FilterResults {
+        // Prevent default filtering behaviour
+        return FilterResults().apply {
+          values = items
+          count = items.size
+        }
+      }
+
+      override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+        @Suppress("UNCHECKED_CAST")
+        val data = results?.values as? List<AutoCompleteViewAnswerOption> ?: emptyList()
+        updateData(data)
+      }
+    }
   }
 }
