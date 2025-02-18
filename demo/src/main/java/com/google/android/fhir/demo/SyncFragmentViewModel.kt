@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,13 +53,19 @@ class SyncFragmentViewModel(application: Application) : AndroidViewModel(applica
   val pollState: SharedFlow<CurrentSyncJobStatus> =
     _oneTimeSyncTrigger
       .flatMapLatest {
-        Sync.oneTimeSync<DemoFhirSyncWorker>(context = application.applicationContext)
+        Sync.oneTimeSync<DemoFhirSyncWorker>(
+          context = application.applicationContext,
+        )
       }
       .map { it }
-      .shareIn(viewModelScope, SharingStarted.Eagerly, 0)
+      .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 0)
 
   fun triggerOneTimeSync() {
     viewModelScope.launch { _oneTimeSyncTrigger.emit(true) }
+  }
+
+  fun cancelOneTimeSyncWork() {
+    viewModelScope.launch { Sync.cancelOneTimeSync<DemoFhirSyncWorker>(getApplication()) }
   }
 
   /** Emits last sync time. */

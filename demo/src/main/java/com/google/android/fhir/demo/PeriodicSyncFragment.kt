@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Google LLC
+ * Copyright 2024-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -48,6 +49,7 @@ class PeriodicSyncFragment : Fragment() {
     setUpActionBar()
     setHasOptionsMenu(true)
     refreshPeriodicSynUi()
+    setUpSyncButtons(view)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -65,6 +67,30 @@ class PeriodicSyncFragment : Fragment() {
       title = requireContext().getString(R.string.periodic_sync)
       setDisplayHomeAsUpEnabled(true)
     }
+  }
+
+  private fun setUpSyncButtons(view: View) {
+    val syncNowButton = view.findViewById<Button>(R.id.sync_now_button)
+    val cancelSyncButton = view.findViewById<Button>(R.id.cancel_sync_button)
+    syncNowButton.apply {
+      setOnClickListener {
+        periodicSyncViewModel.collectPeriodicSyncJobStatus()
+        toggleButtonVisibility(hiddenButton = syncNowButton, visibleButton = cancelSyncButton)
+        visibility = View.GONE
+      }
+    }
+    cancelSyncButton.apply {
+      setOnClickListener {
+        periodicSyncViewModel.cancelPeriodicSyncJob()
+        toggleButtonVisibility(hiddenButton = cancelSyncButton, visibleButton = syncNowButton)
+        visibility = View.GONE
+      }
+    }
+  }
+
+  private fun toggleButtonVisibility(hiddenButton: View, visibleButton: View) {
+    hiddenButton.visibility = View.GONE
+    visibleButton.visibility = View.VISIBLE
   }
 
   private fun refreshPeriodicSynUi() {
