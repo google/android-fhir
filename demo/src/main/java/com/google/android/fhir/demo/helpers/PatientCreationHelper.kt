@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Google LLC
+ * Copyright 2024-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.demo.helpers
 
 import android.icu.text.SimpleDateFormat
+import java.text.ParseException
 import java.util.*
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.ContactPoint
@@ -26,20 +27,20 @@ import org.hl7.fhir.r4.model.Patient
 
 object PatientCreationHelper {
 
-  private fun createPatient(
+  fun createPatient(
+    patientId: String,
     firstName: String,
-    lastName: String,
-    birthDate: String,
-    gender: Enumerations.AdministrativeGender,
-    phoneNumber: String,
-    city: String,
-    country: String,
+    lastName: String? = null,
+    birthDate: String? = null,
+    gender: Enumerations.AdministrativeGender? = null,
+    phoneNumber: String? = null,
+    city: String? = null,
+    country: String? = null,
     isActive: Boolean,
   ): Patient {
     val patient = Patient()
 
     // Set UUID as patient ID
-    val patientId = UUID.randomUUID().toString()
     patient.id = patientId
 
     // Set patient name
@@ -47,8 +48,12 @@ object PatientCreationHelper {
     patient.addName(name)
 
     // Set patient birth date
-    val dob = SimpleDateFormat("yyyy-MM-dd").parse(birthDate)
-    patient.birthDate = dob
+    birthDate
+      ?.takeIf { it.isNotEmpty() }
+      ?.let {
+        val dob = SimpleDateFormat("yyyy-MM-dd").parse(birthDate)
+        patient.birthDate = dob
+      }
 
     // Set patient gender
     patient.gender = gender
@@ -77,6 +82,7 @@ object PatientCreationHelper {
     // Patient 1
     patients.add(
       createPatient(
+        patientId = createPatientId(),
         firstName = "John",
         lastName = "Doe",
         birthDate = "1990-01-01",
@@ -91,6 +97,7 @@ object PatientCreationHelper {
     // Patient 2
     patients.add(
       createPatient(
+        patientId = createPatientId(),
         firstName = "Jane",
         lastName = "Smith",
         birthDate = "1985-05-15",
@@ -105,6 +112,7 @@ object PatientCreationHelper {
     // Patient 3
     patients.add(
       createPatient(
+        patientId = createPatientId(),
         firstName = "Emily",
         lastName = "Johnson",
         birthDate = "1978-11-12",
@@ -119,6 +127,7 @@ object PatientCreationHelper {
     // Patient 4
     patients.add(
       createPatient(
+        patientId = createPatientId(),
         firstName = "Michael",
         lastName = "Brown",
         birthDate = "1982-04-07",
@@ -133,6 +142,7 @@ object PatientCreationHelper {
     // Patient 5
     patients.add(
       createPatient(
+        patientId = createPatientId(),
         firstName = "Sophia",
         lastName = "Davis",
         birthDate = "1995-08-22",
@@ -147,6 +157,7 @@ object PatientCreationHelper {
     // Patient 6
     patients.add(
       createPatient(
+        patientId = createPatientId(),
         firstName = "Liam",
         lastName = "Wilson",
         birthDate = "2001-12-30",
@@ -161,6 +172,7 @@ object PatientCreationHelper {
     // Patient 7
     patients.add(
       createPatient(
+        patientId = createPatientId(),
         firstName = "Olivia",
         lastName = "Martinez",
         birthDate = "1989-03-17",
@@ -175,6 +187,7 @@ object PatientCreationHelper {
     // Patient 8
     patients.add(
       createPatient(
+        patientId = createPatientId(),
         firstName = "Noah",
         lastName = "Garcia",
         birthDate = "1975-07-05",
@@ -189,6 +202,7 @@ object PatientCreationHelper {
     // Patient 9
     patients.add(
       createPatient(
+        patientId = createPatientId(),
         firstName = "Ava",
         lastName = "Anderson",
         birthDate = "1998-02-27",
@@ -203,6 +217,7 @@ object PatientCreationHelper {
     // Patient 10
     patients.add(
       createPatient(
+        patientId = createPatientId(),
         firstName = "Ethan",
         lastName = "Harris",
         birthDate = "1993-09-10",
@@ -215,7 +230,21 @@ object PatientCreationHelper {
     )
 
     // Add more patients as needed
-
     return patients
+  }
+
+  fun createPatientId(): String {
+    return UUID.randomUUID().toString()
+  }
+
+  fun isBirthdateParsed(birthdate: String): Boolean {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    dateFormat.isLenient = false
+    return try {
+      dateFormat.parse(birthdate)
+      true
+    } catch (e: ParseException) {
+      false
+    }
   }
 }

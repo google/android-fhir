@@ -304,12 +304,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private lateinit var currentPageItems: List<QuestionnaireAdapterItem>
 
   /**
-   * True if the user has tapped the next/previous pagination buttons on the current page. This is
-   * needed to avoid spewing validation errors before any questions are answered.
-   */
-  private var forceValidation = false
-
-  /**
    * Map of [QuestionnaireResponseItemAnswerComponent] for
    * [Questionnaire.QuestionnaireItemComponent]s that are disabled now. The answers will be used to
    * pre-populate the [QuestionnaireResponseItemComponent] once the item is enabled again.
@@ -908,7 +902,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val validationResult =
       if (
         modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
-          forceValidation ||
           isInReviewModeFlow.value
       ) {
         questionnaireResponseItemValidator.validate(
@@ -1129,13 +1122,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         it.item.validationResult is NotValidated
       }
     ) {
-      // Force update validation results for all questions on the current page. This is needed
-      // when the user has not answered any questions so no validation has been done.
-      forceValidation = true
+      // Add all items on the current page to modifiedQuestionnaireResponseItemSet.
+      // This will ensure that all fields are validated even when they're not filled by the user
+      currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().forEach {
+        modifiedQuestionnaireResponseItemSet.add(it.item.getQuestionnaireResponseItem())
+      }
       // Results in a new questionnaire state being generated synchronously, i.e., the current
       // thread will be suspended until the new state is generated.
       modificationCount.update { it + 1 }
-      forceValidation = false
     }
 
     if (
