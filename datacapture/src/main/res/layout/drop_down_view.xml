@@ -35,33 +35,37 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+    >
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_layout"
             style="?attr/questionnaireDropdownLayoutStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+        >
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/auto_complete"
                 style="?attr/questionnaireDropDownSelectedTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawablePadding="@dimen/icon_drawable_padding" />
+                android:drawablePadding="@dimen/icon_drawable_padding"
+            />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-            <ImageView
-                android:id="@+id/clear_input_icon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="@dimen/drop_down_clear_icon_margin_top"
-                android:layout_marginEnd="@dimen/drop_down_clear_icon_margin_end"
-                android:layout_gravity="end|center_vertical"
-                android:src="@drawable/ic_clear"
-                android:scaleType="fitCenter"
-                app:tint="#999999"/>
+        <ImageView
+            android:id="@+id/clear_input_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="@dimen/drop_down_clear_icon_margin_top"
+            android:layout_marginEnd="@dimen/drop_down_clear_icon_margin_end"
+            android:layout_gravity="end|center_vertical"
+            android:src="@drawable/ic_clear"
+            android:scaleType="fitCenter"
+            app:tint="#999999"
+        />
 
     </FrameLayout>
 
