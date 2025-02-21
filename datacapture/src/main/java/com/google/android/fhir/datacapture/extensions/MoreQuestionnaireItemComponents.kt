@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,6 +177,9 @@ internal const val EXTENSION_VARIABLE_URL = "http://hl7.org/fhir/StructureDefini
 internal const val ITEM_INITIAL_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
 
+internal const val EXTENSION_COLUMN_COUNT_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-columnCount"
+
 // ********************************************************************************************** //
 //                                                                                                //
 // Rendering extensions: item control, choice orientation, etc.                                   //
@@ -345,6 +348,19 @@ internal val QuestionnaireItemComponent.maxValue
 
 internal val QuestionnaireItemComponent.maxValueCqfCalculatedValueExpression
   get() = getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value?.cqfCalculatedValueExpression
+
+val Questionnaire.rootGroupItemColumnCount: Int?
+  get() {
+    val rootGroupItem =
+      this.item.firstOrNull { it.type == Questionnaire.QuestionnaireItemType.GROUP }
+
+    // Ensure the item exists and contains the relevant extension
+    val columnCountExtension =
+      rootGroupItem?.extension?.firstOrNull { it.url == EXTENSION_COLUMN_COUNT_URL }
+
+    // Extract and return the column count value if available
+    return (columnCountExtension?.value as? IntegerType)?.value
+  }
 
 // ********************************************************************************************** //
 //                                                                                                //

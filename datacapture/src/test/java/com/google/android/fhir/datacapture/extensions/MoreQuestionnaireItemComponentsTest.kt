@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2593,6 +2593,77 @@ class MoreQuestionnaireItemComponentsTest {
       }
 
     assertThat(question.isRepeatedGroup).isFalse()
+  }
+
+  @Test
+  fun `rootGroupItemColumnCount returns correct column count`() {
+    val questionnaire =
+      Questionnaire().apply {
+        item =
+          mutableListOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              extension =
+                mutableListOf(
+                  Extension().apply {
+                    url = EXTENSION_COLUMN_COUNT_URL
+                    setValue(IntegerType(3))
+                  },
+                )
+            },
+          )
+      }
+    assertThat(questionnaire.rootGroupItemColumnCount).isEqualTo(3)
+  }
+
+  @Test
+  fun `rootGroupItemColumnCount returns null when column count extension value is not an IntegerType`() {
+    val questionnaire =
+      Questionnaire().apply {
+        item =
+          mutableListOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              extension =
+                mutableListOf(
+                  Extension().apply {
+                    url = EXTENSION_COLUMN_COUNT_URL
+                    setValue(StringType("invalid"))
+                  },
+                )
+            },
+          )
+      }
+    assertThat(questionnaire.rootGroupItemColumnCount).isNull()
+  }
+
+  @Test
+  fun `rootGroupItemColumnCount returns null when GROUP item has no relevant extension`() {
+    val questionnaire =
+      Questionnaire().apply {
+        item =
+          mutableListOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              extension = mutableListOf()
+            },
+          )
+      }
+    assertThat(questionnaire.rootGroupItemColumnCount).isNull()
+  }
+
+  @Test
+  fun `rootGroupItemColumnCount returns null when no GROUP type item exists`() {
+    val questionnaire =
+      Questionnaire().apply {
+        item =
+          mutableListOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            },
+          )
+      }
+    assertThat(questionnaire.rootGroupItemColumnCount).isNull()
   }
 
   private val displayCategoryExtensionWithInstructionsCode =
