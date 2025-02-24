@@ -51,7 +51,12 @@
                     ],
                     "required": false,
                     "linkId": "/59408-5",
-                    "text": "SaO2 % BldA PulseOx"
+                    "text": "SaO2 % BldA PulseOx",
+                    "initial": [
+                        {
+                            "valueDecimal": 98.5
+                        }
+                    ]
                 },
                 {
                     "type": "quantity",
@@ -80,7 +85,16 @@
                     ],
                     "required": false,
                     "linkId": "/3141-9",
-                    "text": "Weight Measured"
+                    "text": "Weight Measured",
+                    "initial": [
+                        {
+                            "valueQuantity": {
+                                "value": 75,
+                                "unit": "kg",
+                                "code": "3141-9"
+                            }
+                        }
+                    ]
                 },
                 {
                     "type": "decimal",
@@ -102,7 +116,12 @@
                     ],
                     "required": false,
                     "linkId": "/8287-5",
-                    "text": "Head Circumf OFC by Tape measure"
+                    "text": "Head Circumf OFC by Tape measure",
+                    "initial": [
+                        {
+                            "valueDecimal": 56
+                        }
+                    ]
                 },
                 {
                     "type": "quantity",
@@ -145,7 +164,16 @@
                     ],
                     "required": false,
                     "linkId": "/8302-2",
-                    "text": "Body height"
+                    "text": "Body height",
+                    "initial": [
+                        {
+                            "valueQuantity": {
+                                "value": 180,
+                                "unit": "cm",
+                                "code": "8302-2"
+                            }
+                        }
+                    ]
                 },
                 {
                     "type": "quantity",
@@ -181,7 +209,16 @@
                     ],
                     "required": false,
                     "linkId": "/8306-3",
-                    "text": "Body height lying"
+                    "text": "Body height lying",
+                    "initial": [
+                        {
+                            "valueQuantity": {
+                                "value": 180,
+                                "unit": "cm",
+                                "code": "8306-3"
+                            }
+                        }
+                    ]
                 },
                 {
                     "type": "decimal",
@@ -203,7 +240,12 @@
                     ],
                     "required": false,
                     "linkId": "/8310-5",
-                    "text": "Body temperature"
+                    "text": "Body temperature",
+                    "initial": [
+                        {
+                            "valueDecimal": 37.0
+                        }
+                    ]
                 },
                 {
                     "type": "decimal",
@@ -225,7 +267,12 @@
                     ],
                     "required": false,
                     "linkId": "/8462-4",
-                    "text": "BP dias"
+                    "text": "BP dias",
+                    "initial": [
+                        {
+                            "valueDecimal": 80
+                        }
+                    ]
                 },
                 {
                     "type": "decimal",
@@ -247,7 +294,12 @@
                     ],
                     "required": false,
                     "linkId": "/8480-6",
-                    "text": "BP sys"
+                    "text": "BP sys",
+                    "initial": [
+                        {
+                            "valueDecimal": 120
+                        }
+                    ]
                 },
                 {
                     "type": "quantity",
@@ -276,7 +328,16 @@
                     ],
                     "required": false,
                     "linkId": "/8867-4",
-                    "text": "Heart rate"
+                    "text": "Heart rate",
+                    "initial": [
+                        {
+                            "valueQuantity": {
+                                "value": 72,
+                                "unit": "{beats}/min",
+                                "code": "8867-4"
+                            }
+                        }
+                    ]
                 },
                 {
                     "type": "quantity",
@@ -305,7 +366,16 @@
                     ],
                     "required": false,
                     "linkId": "/9279-1",
-                    "text": "Resp rate"
+                    "text": "Resp rate",
+                    "initial": [
+                        {
+                            "valueQuantity": {
+                                "value": 16,
+                                "unit": "{breaths}/min",
+                                "code": "9279-1"
+                            }
+                        }
+                    ]
                 },
                 {
                     "text": "This panel was created to collect the set of vital sign observations that was originally defined by HITSP and called the \"Vital Sign Result Value Set\" in the C80 Clinical Document and Message Terminology Component (Value Set OID: 2.16.840.1.113883.3.88.12.80.62), but it is not limited for use in that context. This collection includes the standard vital sign measurements (heart and respiratory rate, blood pressure and body temperature) along with measurements for height, weight, head circumference (OFC), and oximetry.",
@@ -416,7 +486,8 @@
                             "valueCoding": {
                                 "code": "LA10082-8",
                                 "display": "Sometimes"
-                            }
+                            },
+                            "initialSelected": true
                         },
                         {
                             "extension": [
@@ -510,7 +581,8 @@
                             "valueCoding": {
                                 "code": "LA6752-5",
                                 "display": "Mild"
-                            }
+                            },
+                            "initialSelected": true
                         },
                         {
                             "extension": [
@@ -604,7 +676,8 @@
                             "valueCoding": {
                                 "code": "LA137-2",
                                 "display": "None"
-                            }
+                            },
+                            "initialSelected": true
                         },
                         {
                             "extension": [
@@ -759,7 +832,8 @@
                                     "valueCoding": {
                                         "code": "LA6751-7",
                                         "display": "Moderate"
-                                    }
+                                    },
+                                    "initialSelected": true
                                 },
                                 {
                                     "extension": [
@@ -853,7 +927,8 @@
                                     "valueCoding": {
                                         "code": "LA6752-5",
                                         "display": "Mild"
-                                    }
+                                    },
+                                    "initialSelected": true
                                 },
                                 {
                                     "extension": [

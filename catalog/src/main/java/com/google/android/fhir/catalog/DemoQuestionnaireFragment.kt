@@ -147,6 +147,7 @@ class DemoQuestionnaireFragment : Fragment() {
                 )
                 setQuestionnaire(args.questionnaireJsonStringKey!!)
                 showReviewPageBeforeSubmit(args.enableReviewMode)
+                showReviewPageFirst(true)
               }
               .build()
           add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
