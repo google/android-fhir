@@ -32,6 +32,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -92,7 +93,7 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
           text =
             viewModel.getItemsTextWithValidationErrors().joinToString(separator = "\n") {
               context.getString(R.string.questionnaire_validation_error_item_text_with_bullet, it)
-            }
+            }.toSpanned()
         }
       }
   }
