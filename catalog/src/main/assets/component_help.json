@@ -51,7 +51,7 @@
               }
             }
           ],
-          "linkId": "1.3",
+          "linkId": "1.1",
           "text": "Select one",
           "type": "display"
         },
@@ -69,7 +69,7 @@
               }
             }
           ],
-          "linkId": "1.3",
+          "linkId": "1.2",
           "text": "Only one answer can be selected. If none apply, skip the question.",
           "type": "display"
         }

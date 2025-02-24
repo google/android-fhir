@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,17 @@ package com.google.android.fhir.datacapture.views.factories
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.text.Spanned
+import android.text.method.TextKeyListener
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
@@ -52,6 +56,7 @@ internal object DropDownViewHolderFactory :
       private lateinit var header: HeaderView
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
+      private lateinit var clearInputIcon: ImageView
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var context: AppCompatActivity
 
@@ -59,7 +64,20 @@ internal object DropDownViewHolderFactory :
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         autoCompleteTextView = itemView.findViewById(R.id.auto_complete)
+        clearInputIcon = itemView.findViewById(R.id.clear_input_icon)
         context = itemView.context.tryUnwrapContext()!!
+        autoCompleteTextView.setOnFocusChangeListener { view, hasFocus ->
+          if (!hasFocus) {
+            (view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+              .hideSoftInputFromWindow(view.windowToken, 0)
+          }
+        }
+        clearInputIcon.setOnClickListener {
+          context.lifecycleScope.launch {
+            questionnaireViewItem.clearAnswer()
+            autoCompleteTextView.doOnNextLayout { autoCompleteTextView.showDropDown() }
+          }
+        }
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
@@ -130,6 +148,10 @@ internal object DropDownViewHolderFactory :
               }
             }
           }
+        val isEditable = questionnaireViewItem.answers.isEmpty()
+        if (!isEditable) autoCompleteTextView.clearFocus()
+        autoCompleteTextView.keyListener = if (isEditable) TextKeyListener.getInstance() else null
+        clearInputIcon.visibility = if (isEditable) View.GONE else View.VISIBLE
 
         displayValidationResult(questionnaireViewItem.validationResult)
       }
