@@ -189,11 +189,24 @@ class QuestionnaireFragment : Fragment() {
             // Set items
             questionnaireReviewRecyclerView.visibility = View.GONE
             val itemsToSubmit =
-              if (viewModel.columnCount != null) {
+              if (viewModel.maxSpanSize != null) {
                 state.filterEmptyTextItems()
               } else {
                 state.items
               }
+
+            (questionnaireEditRecyclerView.layoutManager as? GridLayoutManager)?.spanSizeLookup =
+              object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                  val item = itemsToSubmit[position]
+                  return if (item is QuestionnaireAdapterItem.Question) {
+                    item.item.spanSize ?: viewModel.maxSpanSize!!
+                  } else {
+                    viewModel.maxSpanSize!!
+                  }
+                }
+              }
+
             questionnaireEditAdapter.submitList(itemsToSubmit)
             questionnaireEditRecyclerView.visibility = View.VISIBLE
             reviewModeEditButton.visibility = View.GONE
@@ -594,8 +607,8 @@ class QuestionnaireFragment : Fragment() {
   }
 
   private fun getLayoutManager(): LinearLayoutManager {
-    return if (viewModel.columnCount != null) {
-      GridLayoutManager(context, viewModel.columnCount!!)
+    return if (viewModel.maxSpanSize != null) {
+      GridLayoutManager(context, viewModel.maxSpanSize!!)
     } else {
       LinearLayoutManager(context)
     }

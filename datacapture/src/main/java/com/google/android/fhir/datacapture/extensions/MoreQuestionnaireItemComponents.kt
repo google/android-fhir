@@ -43,6 +43,7 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.PositiveIntType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -1065,4 +1066,42 @@ internal fun QuestionnaireItemComponent.readCustomStyleExtension(styleUrl: Style
     }
   }
   return null
+}
+
+internal fun QuestionnaireItemComponent.getColumnCount(): Int? {
+  if (this.type != Questionnaire.QuestionnaireItemType.GROUP) return null
+
+  return this.extension
+    .firstOrNull { it.url == EXTENSION_COLUMN_COUNT_URL }
+    ?.let { it.value as? PositiveIntType }
+    ?.value
+}
+
+internal fun Questionnaire.groupColumnSpanSizeMap(
+  maxSpanSize: Int,
+): MutableMap<QuestionnaireItemComponent, Int> {
+  val spanSizeMap = mutableMapOf<QuestionnaireItemComponent, Int>()
+  this.item
+    .filter { it.type == Questionnaire.QuestionnaireItemType.GROUP }
+    .forEach { groupItem ->
+      val columnCount = groupItem.getColumnCount()
+      if (columnCount != null) {
+        groupItem.processGroupItems(columnCount, maxSpanSize, spanSizeMap)
+      }
+    }
+  return spanSizeMap
+}
+
+private fun QuestionnaireItemComponent.processGroupItems(
+  columnCount: Int,
+  maxSpanSize: Int,
+  spanSizeMap: MutableMap<QuestionnaireItemComponent, Int>,
+) {
+  this.item.forEach { childItem ->
+    if (childItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
+      spanSizeMap[childItem] = maxSpanSize / columnCount
+    } else {
+      childItem.processGroupItems(columnCount, maxSpanSize, spanSizeMap)
+    }
+  }
 }

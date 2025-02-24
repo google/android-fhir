@@ -29,6 +29,7 @@ import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.expressions.EnabledAnswerOptionsEvaluator
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.allItems
+import com.google.android.fhir.datacapture.extensions.calculateLCMOfColumnCounts
 import com.google.android.fhir.datacapture.extensions.calculatedExpression
 import com.google.android.fhir.datacapture.extensions.copyNestedItemsToChildlessAnswers
 import com.google.android.fhir.datacapture.extensions.cqfExpression
@@ -36,6 +37,7 @@ import com.google.android.fhir.datacapture.extensions.createQuestionnaireRespons
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
 import com.google.android.fhir.datacapture.extensions.forEachItemPair
+import com.google.android.fhir.datacapture.extensions.groupColumnSpanSizeMap
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isHelpCode
@@ -50,7 +52,6 @@ import com.google.android.fhir.datacapture.extensions.minValue
 import com.google.android.fhir.datacapture.extensions.minValueCqfCalculatedValueExpression
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
-import com.google.android.fhir.datacapture.extensions.rootGroupItemColumnCount
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
 import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
@@ -100,7 +101,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
 
-  internal val columnCount: Int?
+  internal var maxSpanSize: Int? = null
+  private var spanSizeMap: MutableMap<QuestionnaireItemComponent, Int>? = null
 
   init {
     questionnaire =
@@ -125,8 +127,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             "Neither EXTRA_QUESTIONNAIRE_JSON_URI nor EXTRA_QUESTIONNAIRE_JSON_STRING is supplied.",
           )
       }
-    columnCount = questionnaire.rootGroupItemColumnCount
-    Timber.d("Column count value is $columnCount")
   }
 
   /** The current questionnaire response as questions are being answered. */
@@ -171,6 +171,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     // Add extension for questionnaire launch time stamp
     questionnaireResponse.launchTimestamp = DateTimeType(Date())
     questionnaireResponse.packRepeatedGroups(questionnaire)
+    questionnaire.calculateLCMOfColumnCounts()?.let { lcmValue ->
+      maxSpanSize = lcmValue
+      spanSizeMap = questionnaire.groupColumnSpanSizeMap(lcmValue)
+    }
   }
 
   /**
@@ -983,6 +987,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               ),
             isHelpCardOpen = isHelpCard && isHelpCardOpen,
             helpCardStateChangedCallback = helpCardStateChangedCallback,
+            spanSize = spanSizeMap?.let { it.get(questionnaireItem) },
           ),
         )
       add(question)
