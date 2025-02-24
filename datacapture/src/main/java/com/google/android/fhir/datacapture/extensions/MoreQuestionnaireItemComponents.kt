@@ -349,20 +349,6 @@ internal val QuestionnaireItemComponent.maxValue
 
 internal val QuestionnaireItemComponent.maxValueCqfCalculatedValueExpression
   get() = getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value?.cqfCalculatedValueExpression
-
-val Questionnaire.rootGroupItemColumnCount: Int?
-  get() {
-    val rootGroupItem =
-      this.item.firstOrNull { it.type == Questionnaire.QuestionnaireItemType.GROUP }
-
-    // Ensure the item exists and contains the relevant extension
-    val columnCountExtension =
-      rootGroupItem?.extension?.firstOrNull { it.url == EXTENSION_COLUMN_COUNT_URL }
-
-    // Extract and return the column count value if available
-    return (columnCountExtension?.value as? IntegerType)?.value
-  }
-
 // ********************************************************************************************** //
 //                                                                                                //
 // Additional display utilities: display item control, localized text spanned,                    //

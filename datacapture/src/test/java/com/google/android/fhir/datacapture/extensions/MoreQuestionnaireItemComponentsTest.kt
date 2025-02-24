@@ -37,6 +37,7 @@ import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.PositiveIntType
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -2596,74 +2597,55 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `rootGroupItemColumnCount returns correct column count`() {
-    val questionnaire =
-      Questionnaire().apply {
-        item =
+  fun `groupItemColumnCount returns correct column count`() {
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        extension =
           mutableListOf(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              type = Questionnaire.QuestionnaireItemType.GROUP
-              extension =
-                mutableListOf(
-                  Extension().apply {
-                    url = EXTENSION_COLUMN_COUNT_URL
-                    setValue(IntegerType(3))
-                  },
-                )
+            Extension().apply {
+              url = EXTENSION_COLUMN_COUNT_URL
+              setValue(PositiveIntType(3))
             },
           )
       }
-    assertThat(questionnaire.rootGroupItemColumnCount).isEqualTo(3)
+
+    assertThat(questionnaireItemComponent.getColumnCount()).isEqualTo(3)
   }
 
   @Test
-  fun `rootGroupItemColumnCount returns null when column count extension value is not an IntegerType`() {
-    val questionnaire =
-      Questionnaire().apply {
-        item =
+  fun `groupItemColumnCount returns null when column count extension value is not an PositiveIntType`() {
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        extension =
           mutableListOf(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              type = Questionnaire.QuestionnaireItemType.GROUP
-              extension =
-                mutableListOf(
-                  Extension().apply {
-                    url = EXTENSION_COLUMN_COUNT_URL
-                    setValue(StringType("invalid"))
-                  },
-                )
+            Extension().apply {
+              url = EXTENSION_COLUMN_COUNT_URL
+              setValue(StringType("invalid"))
             },
           )
       }
-    assertThat(questionnaire.rootGroupItemColumnCount).isNull()
+    assertThat(questionnaireItemComponent.getColumnCount()).isNull()
   }
 
   @Test
-  fun `rootGroupItemColumnCount returns null when GROUP item has no relevant extension`() {
-    val questionnaire =
-      Questionnaire().apply {
-        item =
-          mutableListOf(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              type = Questionnaire.QuestionnaireItemType.GROUP
-              extension = mutableListOf()
-            },
-          )
+  fun `groupItemColumnCount returns null when GROUP item has no relevant extension`() {
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        extension = mutableListOf()
       }
-    assertThat(questionnaire.rootGroupItemColumnCount).isNull()
+    assertThat(questionnaireItemComponent.getColumnCount()).isNull()
   }
 
   @Test
-  fun `rootGroupItemColumnCount returns null when no GROUP type item exists`() {
-    val questionnaire =
-      Questionnaire().apply {
-        item =
-          mutableListOf(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            },
-          )
+  fun `groupItemColumnCount returns null when no GROUP type item exists`() {
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
       }
-    assertThat(questionnaire.rootGroupItemColumnCount).isNull()
+    assertThat(questionnaireItemComponent.getColumnCount()).isNull()
   }
 
   private val displayCategoryExtensionWithInstructionsCode =
