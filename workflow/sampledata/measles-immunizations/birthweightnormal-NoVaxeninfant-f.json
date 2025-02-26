@@ -1,0 +1,24 @@
+{
+  "resourceType": "Observation",
+  "id": "birthweightnormal-NoVaxeninfant-f",
+  "status": "final",
+  "code": {
+    "coding": [
+      {
+        "code": "276610007",
+        "system": "http://snomed.info/sct",
+        "display": "Birthweight"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/IMMZ-Patient-NoVaxeninfant-f"
+  },
+  "effectiveDateTime": "2023-03-02",
+  "valueQuantity": {
+    "value": 2123,
+    "code": "g",
+    "system": "http://unitsofmeasure.org",
+    "unit": "gram"
+  }
+}
