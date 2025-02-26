@@ -44,7 +44,6 @@ import java.time.Instant
 import java.time.OffsetDateTime
 import java.util.Date
 import java.util.LinkedList
-import kotlin.streams.toList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
@@ -130,11 +129,9 @@ internal open class TestDownloadManagerImpl(
     urls.poll()?.let { DownloadRequest.of(it) }
 
   override suspend fun getSummaryRequestUrls() =
-    queries
-      .stream()
-      .map { ResourceType.fromCode(it.substringBefore("?")) to it.plus("?_summary=count") }
-      .toList()
-      .toMap()
+    queries.associate {
+      ResourceType.fromCode(it.substringBefore("?")) to it.plus("?_summary=count")
+    }
 
   override suspend fun processResponse(response: Resource): Collection<Resource> {
     val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
