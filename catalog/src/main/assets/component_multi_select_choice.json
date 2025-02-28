@@ -8,7 +8,7 @@
       "linkId": "1.0.0",
       "text": "What’s the reason for today’s visit?",
       "type": "choice",
-      "repeats": true,
+      "repeats": false,
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
