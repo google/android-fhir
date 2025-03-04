@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,9 +58,6 @@ internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
         val answer = questionnaireViewItem.answers.singleOrNull()
         val minValue = getMinValue(questionnaireViewItem.minAnswerValue)
         val maxValue = getMaxValue(questionnaireViewItem.maxAnswerValue)
-        if (minValue >= maxValue) {
-          throw IllegalStateException("minValue $minValue must be smaller than maxValue $maxValue")
-        }
 
         with(slider) {
           clearOnChangeListeners()
