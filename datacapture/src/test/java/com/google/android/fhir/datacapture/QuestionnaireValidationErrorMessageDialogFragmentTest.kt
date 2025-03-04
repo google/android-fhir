@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
       assertThat(result.findViewById<TextView>(R.id.dialog_title).text).isEqualTo("Errors found")
       assertThat(result.findViewById<TextView>(R.id.dialog_subtitle).text)
         .isEqualTo("Fix the following questions:")
-      assertThat(result.findViewById<TextView>(R.id.body).text).isEqualTo("• First Name")
+      assertThat(result.findViewById<TextView>(R.id.body).text.toString()).isEqualTo("• First Name")
     }
   }
 
