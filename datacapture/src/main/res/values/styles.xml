@@ -190,6 +190,10 @@
         <item name="questionnaireAttachmentPreviewTitleStyle">
             @style/Questionnaire.AttachmentPreviewTitleStyle
         </item>
+        <item
+            name="questionnaireTitleStyle"
+        >@style/TextAppearance.Material3.TitleLarge
+        </item>
     </style>
 
     <style name="Questionnaire.GroupTypeHeaderStyle" parent="">

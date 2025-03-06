@@ -24,17 +24,36 @@
     android:layout_alignParentBottom="true"
 >
 
-    <Button
-        android:id="@+id/review_mode_edit_button"
-        style="?attr/questionnaireEditButtonStyle"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/questionnaire_title_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
-        android:layout_marginVertical="@dimen/action_button_margin_vertical"
-        app:icon="@drawable/ic_outline_edit_24"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="@dimen/title_layout_margin_horizontal"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-    />
+    >
+
+        <TextView
+            android:id="@+id/questionnaire_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="@dimen/title_margin_end"
+            style="?attr/questionnaireTitleStyle"
+        />
+
+        <Button
+            android:id="@+id/review_mode_edit_button"
+            style="?attr/questionnaireEditButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            app:icon="@drawable/ic_outline_edit_24"
+        />
+
+    </LinearLayout>
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/questionnaire_progress_indicator"
@@ -44,7 +63,7 @@
         app:layout_constraintBottom_toTopOf="@id/questionnaire_edit_recycler_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/review_mode_edit_button"
+        app:layout_constraintTop_toBottomOf="@+id/questionnaire_title_layout"
     />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -62,7 +81,7 @@
         android:layout_height="0dp"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav_container_frame"
-        app:layout_constraintTop_toBottomOf="@+id/review_mode_edit_button"
+        app:layout_constraintTop_toBottomOf="@+id/questionnaire_title_layout"
     />
 
     <FrameLayout
