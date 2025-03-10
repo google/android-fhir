@@ -56,6 +56,17 @@
             app:layout_constraintBottom_toBottomOf="parent"
         />
 
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/pagination_next_button_progress_bar"
+            style="?attr/questionnaireNextButtonCircularProgressIndicatorStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/pagination_next_button"
+            app:layout_constraintBottom_toBottomOf="@id/pagination_next_button"
+            app:layout_constraintStart_toStartOf="@id/pagination_next_button"
+            app:layout_constraintEnd_toEndOf="@id/pagination_next_button"
+        />
+
         <Button
             android:id="@+id/review_mode_button"
             style="?attr/questionnaireButtonStyle"
