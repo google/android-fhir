@@ -125,11 +125,11 @@ internal object CheckBoxGroupViewHolderFactory :
                 when (isChecked) {
                   true -> {
                     val newAnswers = questionnaireViewItem.answers.toMutableList()
+                    if(!questionnaireViewItem.questionnaireItem.repeats){
+                      newAnswers.clear()
+                    }
                     newAnswers +=
                       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                        if(!questionnaireViewItem.questionnaireItem.repeats){
-                          newAnswers.clear()
-                        }
                         value = answerOption.value
                       }
 
