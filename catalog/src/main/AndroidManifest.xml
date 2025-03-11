@@ -31,7 +31,6 @@
         android:roundIcon="@mipmap/ic_card_file_box_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Androidfhir"
-        android:usesCleartextTraffic="true"
     >
         <activity
             android:name="com.google.android.fhir.catalog.MainActivity"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -630,7 +630,8 @@ class CheckBoxGroupViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+      .isEqualTo("Question?")
   }
 
   @Test
@@ -665,7 +666,8 @@ class CheckBoxGroupViewHolderFactoryTest {
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val children = checkBoxGroup.children.asIterable().filterIsInstance<CheckBox>()
     children.forEachIndexed { index, view ->
-      assertThat(view.text.toString()).isEqualTo(questionnaire.answerOption[index].valueCoding.display)
+      assertThat(view.text.toString())
+        .isEqualTo(questionnaire.answerOption[index].valueCoding.display)
       assertThat(view.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.WRAP_CONTENT)
     }
   }
@@ -690,7 +692,8 @@ class CheckBoxGroupViewHolderFactoryTest {
 
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
-    assertThat(checkBox.isChecked).isFalse()  // Ensure checkbox is unchecked when no answer is selected
+    assertThat(checkBox.isChecked)
+      .isFalse() // Ensure checkbox is unchecked when no answer is selected
   }
 
   @Test
@@ -930,12 +933,10 @@ class CheckBoxGroupViewHolderFactoryTest {
     )
 
     assertThat(
-      (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group).getChildAt(1)
-              as CheckBox)
-        .isEnabled,
-    )
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group).getChildAt(1)
+            as CheckBox)
+          .isEnabled,
+      )
       .isFalse()
   }
-
-
 }
