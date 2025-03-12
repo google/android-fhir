@@ -82,7 +82,7 @@
         },
         {
           "valueCoding": {
-            "code": "hypertension",
+            "code": "hbp",
             "display": "High Blood Pressure"
           }
         },
