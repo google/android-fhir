@@ -89,6 +89,18 @@
             app:nullable="true"
             android:defaultValue="@null"
         />
+    <argument
+            android:name="questionnaireResponseJsonString"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null"
+        />
+    <argument
+            android:name="layoutMode"
+            app:argType="com.google.android.fhir.catalog.LayoutMode"
+            app:nullable="false"
+            android:defaultValue="DEFAULT"
+        />
     <action
             android:id="@+id/action_galleryQuestionnaireFragment_to_questionnaireResponseFragment"
             app:destination="@id/questionnaireResponseFragment"

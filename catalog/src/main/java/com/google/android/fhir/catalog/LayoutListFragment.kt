@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,13 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
                 backgroundContext = coroutineContext,
                 fileName = layout.questionnaireFileName,
               ),
+            questionnaireResponseJsonString =
+              getQuestionnaireJsonStringFromAssets(
+                context = requireContext(),
+                backgroundContext = coroutineContext,
+                fileName = layout.questionnaireResponseFileName,
+              ),
+            layoutMode = layout.layoutMode,
           ),
         )
     }
