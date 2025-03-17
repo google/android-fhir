@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@ package com.google.android.fhir.catalog
 
 import android.app.Application
 import android.content.Context
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 
@@ -31,27 +29,45 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
   }
 
   enum class Layout(
-    @DrawableRes val iconId: Int,
-    @StringRes val textId: Int,
-    val questionnaireFileName: String,
+    val config: LayoutConfig,
   ) {
     DEFAULT(
-      R.drawable.ic_defaultlayout,
-      R.string.layout_name_default_text,
-      "layout_default.json",
+      layoutConfig {
+        iconId = R.drawable.ic_defaultlayout
+        textId = R.string.layout_name_default_text
+        questionnaireFileName = "layout_default.json"
+        enableReviewMode = false
+      },
     ),
     PAGINATED(
-      R.drawable.ic_paginatedlayout,
-      R.string.layout_name_paginated,
-      "layout_paginated.json",
+      layoutConfig {
+        iconId = R.drawable.ic_paginatedlayout
+        textId = R.string.layout_name_paginated
+        questionnaireFileName = "layout_paginated.json"
+        enableReviewMode = false
+      },
     ),
-    REVIEW(R.drawable.ic_reviewlayout, R.string.layout_name_review, ""),
-    READ_ONLY(R.drawable.ic_readonlylayout, R.string.layout_name_read_only, ""),
+    REVIEW(
+      layoutConfig {
+        iconId = R.drawable.ic_reviewlayout
+        textId = R.string.layout_name_review
+        questionnaireFileName = "layout_review.json"
+        enableReviewMode = true
+      },
+    ),
+    READ_ONLY(
+      layoutConfig {
+        iconId = R.drawable.ic_readonlylayout
+        textId = R.string.layout_name_read_only
+        questionnaireFileName = ""
+        enableReviewMode = false
+      },
+    ),
   }
 
   fun isDefaultLayout(context: Context, title: String) =
-    context.getString(Layout.DEFAULT.textId) == title
+    context.getString(Layout.DEFAULT.config.textId) == title
 
   fun isPaginatedLayout(context: Context, title: String) =
-    context.getString(Layout.PAGINATED.textId) == title
+    context.getString(Layout.PAGINATED.config.textId) == title
 }
