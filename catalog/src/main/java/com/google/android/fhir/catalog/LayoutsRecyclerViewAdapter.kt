@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,9 +42,9 @@ class LayoutViewHolder(
   private val onItemClick: (LayoutListViewModel.Layout) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
   fun bind(layout: LayoutListViewModel.Layout) {
-    binding.componentLayoutIconImageview.setImageResource(layout.iconId)
+    binding.componentLayoutIconImageview.setImageResource(layout.config.iconId)
     binding.componentLayoutTextView.text =
-      binding.componentLayoutTextView.context.getString(layout.textId)
+      binding.componentLayoutTextView.context.getString(layout.config.textId)
     binding.root.setOnClickListener { onItemClick(layout) }
   }
 }

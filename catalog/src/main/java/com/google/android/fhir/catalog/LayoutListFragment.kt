@@ -63,7 +63,7 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
   private fun onItemClick(layout: LayoutListViewModel.Layout) {
     // TODO Remove check when all layout questionnaire json are updated.
     // https://github.com/google/android-fhir/issues/1079
-    if (layout.questionnaireFileName.isEmpty()) {
+    if (layout.config.questionnaireFileName.isEmpty()) {
       return
     }
     launchQuestionnaireFragment(layout)
@@ -74,14 +74,14 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
       findNavController()
         .navigate(
           MainNavGraphDirections.actionGlobalGalleryQuestionnaireFragment(
-            questionnaireTitleKey = context?.getString(layout.textId) ?: "",
+            questionnaireTitleKey = context?.getString(layout.config.textId) ?: "",
             questionnaireJsonStringKey =
               getQuestionnaireJsonStringFromAssets(
                 context = requireContext(),
                 backgroundContext = coroutineContext,
-                fileName = layout.questionnaireFileName,
+                fileName = layout.config.questionnaireFileName,
               ),
-            enableReviewMode = layout.enableReviewMode,
+            enableReviewMode = layout.config.enableReviewMode,
           ),
         )
     }
