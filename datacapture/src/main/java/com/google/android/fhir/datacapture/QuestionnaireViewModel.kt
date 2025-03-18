@@ -29,6 +29,7 @@ import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.expressions.EnabledAnswerOptionsEvaluator
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.allItems
+import com.google.android.fhir.datacapture.extensions.calculateLCMOfColumnCounts
 import com.google.android.fhir.datacapture.extensions.calculatedExpression
 import com.google.android.fhir.datacapture.extensions.copyNestedItemsToChildlessAnswers
 import com.google.android.fhir.datacapture.extensions.cqfExpression
@@ -36,6 +37,7 @@ import com.google.android.fhir.datacapture.extensions.createQuestionnaireRespons
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
 import com.google.android.fhir.datacapture.extensions.forEachItemPair
+import com.google.android.fhir.datacapture.extensions.groupColumnSpanSizeMap
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isHelpCode
@@ -98,6 +100,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
+
+  internal var maxSpanSize: Int? = null
+  private var spanSizeMap: MutableMap<QuestionnaireItemComponent, Int>? = null
 
   init {
     questionnaire =
@@ -166,6 +171,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     // Add extension for questionnaire launch time stamp
     questionnaireResponse.launchTimestamp = DateTimeType(Date())
     questionnaireResponse.packRepeatedGroups(questionnaire)
+    questionnaire.calculateLCMOfColumnCounts()?.let { lcmValue ->
+      maxSpanSize = lcmValue
+      spanSizeMap = questionnaire.groupColumnSpanSizeMap(lcmValue)
+    }
   }
 
   /**
@@ -978,6 +987,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               ),
             isHelpCardOpen = isHelpCard && isHelpCardOpen,
             helpCardStateChangedCallback = helpCardStateChangedCallback,
+            spanSize = spanSizeMap?.let { it.get(questionnaireItem) },
           ),
         )
       add(question)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import kotlin.math.abs
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeType
@@ -227,4 +228,21 @@ private suspend fun forEachItemPair(
       }
     }
   }
+}
+
+internal fun Questionnaire.calculateLCMOfColumnCounts(): Int? {
+  val columnCounts = this.item.mapNotNull { it.getColumnCount() }
+  return if (columnCounts.isNotEmpty()) {
+    columnCounts.reduce { acc, value -> lcm(acc, value) }
+  } else {
+    null
+  }
+}
+
+private fun lcm(a: Int, b: Int): Int {
+  return abs(a * b) / gcd(a, b)
+}
+
+private fun gcd(a: Int, b: Int): Int {
+  return if (b == 0) a else gcd(b, a % b)
 }
