@@ -196,6 +196,7 @@ data class QuestionnaireViewItem(
    */
   fun answerString(context: Context): String {
     if (!questionnaireResponseItem.hasAnswer()) return context.getString(R.string.not_answered)
+    else if (questionnaireItem.type==Questionnaire.QuestionnaireItemType.ATTACHMENT) return context.getString(R.string.answered)
     return questionnaireResponseItem.answer.joinToString { it.value.displayString(context) }
   }
 
