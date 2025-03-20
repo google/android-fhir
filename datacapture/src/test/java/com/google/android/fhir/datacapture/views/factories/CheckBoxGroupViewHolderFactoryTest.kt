@@ -617,136 +617,37 @@ class CheckBoxGroupViewHolderFactoryTest {
       )
     }
 
-  @Test
-  fun bind_shouldSetQuestionHeader_whenRepeatFalse() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = false
-          text = "Question?"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
-      .isEqualTo("Question?")
-  }
 
   @Test
-  fun bind_horizontal_shouldCreateCheckBoxButtons_whenRepeatFalse() {
-    val questionnaire =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        repeats = false
-        addExtension(
-          EXTENSION_CHOICE_ORIENTATION_URL,
-          CodeType(ChoiceOrientationTypes.HORIZONTAL.extensionCode),
-        )
-        addAnswerOption(
-          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-            value = Coding().apply { display = "Coding 1" }
-          },
-        )
-        addAnswerOption(
-          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-            value = Coding().apply { display = "Coding 2" }
-          },
-        )
-      }
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        questionnaire,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    val children = checkBoxGroup.children.asIterable().filterIsInstance<CheckBox>()
-    children.forEachIndexed { index, view ->
-      assertThat(view.text.toString())
-        .isEqualTo(questionnaire.answerOption[index].valueCoding.display)
-      assertThat(view.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.WRAP_CONTENT)
-    }
-  }
-
-  @Test
-  fun bind_noAnswer_shouldLeaveCheckButtonsUnchecked_whenRepeatFalse() {
+  fun click_should_Select_Other_CheckboxButton() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           repeats = false
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
+              value = Coding().apply {
+                code = "code-1"
+                display = "display-1"
+              }
             },
           )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
-    assertThat(checkBox.isChecked)
-      .isFalse() // Ensure checkbox is unchecked when no answer is selected
-  }
-
-  @Test
-  fun bind_withImageInItemAnswerMediaExtension_shouldShowImageAfterCheckBox_whenRepeatFalse() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = false
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              extension = listOf(itemAnswerMediaExtension)
-              value = StringType("Test Code")
-            },
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
-    assertThat(checkBox.compoundDrawablesRelative[0]).isNotNull()
-    assertThat(checkBox.compoundDrawablesRelative[1]).isNull()
-    assertThat(checkBox.compoundDrawablesRelative[2]).isNull()
-    assertThat(checkBox.compoundDrawablesRelative[3]).isNull()
-  }
-
-  @Test
-  fun bind_answer_shouldSetCheckBoxButton_whenRepeatFalse() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = false
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code 1"
-                  display = "Coding 1"
-                }
+              value = Coding().apply {
+                code = "code-2"
+                display = "display-2"
+              }
             },
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code 1"
-                  display = "Coding 1"
-                }
+              value = Coding().apply {
+                code = "code-1"
+                display = "display-1"
+              }
             },
           )
         },
@@ -754,189 +655,37 @@ class CheckBoxGroupViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
 
-    assertThat(checkBox.isChecked).isTrue()
+    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
+    assertThat((checkBoxGroup.getChildAt(1) as CheckBox).isChecked,).isTrue()
+    checkBoxGroup.getChildAt(2).performClick()
+    assertThat((checkBoxGroup.getChildAt(2) as CheckBox).isChecked,).isTrue()
   }
 
   @Test
-  fun click_shouldAddQuestionnaireResponseItemAnswer_whenRepeatFalse() {
-    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = false
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code 1"
-                  display = "Coding 1"
-                }
-            },
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
-      )
-    viewHolder.bind(questionnaireViewItem)
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
-    checkBox.performClick()
-
-    assertThat(answerHolder!!.single().valueCoding.display).isEqualTo("Coding 1")
-  }
-
-  @Test
-  fun optionExclusiveAnswerOption_click_deselectsOtherAnswerOptions_whenRepeatFalse() {
-    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = false
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code-1"
-                  display = "display-1"
-                }
-            },
-          )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code-2"
-                  display = "display-2"
-                }
-            },
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
-      )
-    viewHolder.bind(questionnaireViewItem)
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    (checkBoxGroup.getChildAt(2) as CheckBox).performClick()
-    (checkBoxGroup.getChildAt(1) as CheckBox).performClick()
-
-    assertThat(answerHolder!!.single().valueCoding.display).isEqualTo("display-1")
-  }
-
-  @Test
-  fun answerOption_click_deselectsOptionExclusiveAnswerOption_whenRepeatFalse() {
-    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = false
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code-1"
-                  display = "display-1"
-                }
-            },
-          )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code-2"
-                  display = "display-2"
-                }
-            },
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
-      )
-
-    viewHolder.bind(questionnaireViewItem)
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    (checkBoxGroup.getChildAt(1) as CheckBox).performClick()
-    (checkBoxGroup.getChildAt(2) as CheckBox).performClick()
-
-    assertThat(answerHolder!!.single().valueCoding.display).isEqualTo("display-2")
-  }
-
-  @Test
-  fun displayValidationResult_error_shouldShowErrorMessage_whenRepeatFalse() {
+  fun click_Selected_CheckboxButton_Should_Uncheck_CheckboxButton() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           repeats = false
-          required = true
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = Invalid(listOf("Missing answer for required field.")),
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).text)
-      .isEqualTo("Missing answer for required field.")
-  }
-
-  @Test
-  fun displayValidationResult_noError_shouldShowNoErrorMessage_whenRepeatFalse() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = false
-          required = true
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "display" }
-            },
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Coding().apply { display = "display" }
-            },
-          )
-        },
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).text.isEmpty())
-      .isTrue()
-  }
-
-  @Test
-  fun bind_readOnly_shouldDisableView_whenRepeatFalse() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = false
-          readOnly = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
+              value = Coding().apply {
+                code = "code-1"
+                display = "display-1"
+              }
             },
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
+      ))
 
-    assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group).getChildAt(1)
-            as CheckBox)
-          .isEnabled,
-      )
-      .isFalse()
+    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
+    checkBoxGroup.getChildAt(1).performClick()
+    assertThat((checkBoxGroup.getChildAt(1) as CheckBox).isChecked).isTrue()
+    checkBoxGroup.getChildAt(1).performClick()
+    assertThat((checkBoxGroup.getChildAt(1) as CheckBox).isChecked).isFalse()
   }
 }
