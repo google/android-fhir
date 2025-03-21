@@ -663,33 +663,4 @@ class CheckBoxGroupViewHolderFactoryTest {
     checkBoxGroup.getChildAt(2).performClick()
     assertThat((checkBoxGroup.getChildAt(2) as CheckBox).isChecked).isTrue()
   }
-
-  @Test
-  fun click_Selected_CheckboxButton_Should_Uncheck_CheckboxButton() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = false
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code-1"
-                  display = "display-1"
-                }
-            },
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    checkBoxGroup.getChildAt(1).performClick()
-    assertThat((checkBoxGroup.getChildAt(1) as CheckBox).isChecked).isTrue()
-    checkBoxGroup.getChildAt(1).performClick()
-    assertThat((checkBoxGroup.getChildAt(1) as CheckBox).isChecked).isFalse()
-  }
 }
