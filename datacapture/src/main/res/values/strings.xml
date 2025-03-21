@@ -38,8 +38,8 @@
     <!-- 2. The following sections include strings used in widgets -->
 
     <!-- 2.1 All Widgets -->
-    <string name="not_answered">"Not Answered"</string>
-    <string name="answered">"Answered"</string>
+    <string name="not_answered">Not Answered</string>
+    <string name="answered">Answered</string>
     <string name="help">Help</string>
 
     <!-- 2.2 Boolean -->
