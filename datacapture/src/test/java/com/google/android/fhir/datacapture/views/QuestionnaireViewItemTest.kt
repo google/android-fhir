@@ -1003,4 +1003,21 @@ class QuestionnaireViewItemTest {
       )
       .isTrue()
   }
+
+  @Test
+  fun `answerString() should return  answered with answered`() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(StringType("Attachment")),
+          ),
+        validationResult = Valid,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    assertThat(questionnaireViewItem.answerString(context)).isEqualTo("Attachment")
+  }
+
 }
