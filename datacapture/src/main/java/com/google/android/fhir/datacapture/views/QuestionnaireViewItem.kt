@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -195,8 +195,10 @@ data class QuestionnaireViewItem(
    * if question is answered else 'Not Answered'
    */
   fun answerString(context: Context): String {
-    if (!questionnaireResponseItem.hasAnswer()) return context.getString(R.string.not_answered)
-    else if (questionnaireItem.type==Questionnaire.QuestionnaireItemType.ATTACHMENT) return context.getString(R.string.answered)
+    if (!questionnaireResponseItem.hasAnswer()) {
+      return context.getString(R.string.not_answered)
+    } else if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.ATTACHMENT)
+      return context.getString(R.string.answered)
     return questionnaireResponseItem.answer.joinToString { it.value.displayString(context) }
   }
 
