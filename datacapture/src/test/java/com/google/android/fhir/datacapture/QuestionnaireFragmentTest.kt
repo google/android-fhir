@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -239,17 +239,21 @@ class QuestionnaireFragmentTest {
   ]
 }
 """
-    val scenario =
-      launchFragment<QuestionnaireFragment>(
-        bundleOf(
-          EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
-        ),
-      )
-    scenario.moveToState(Lifecycle.State.RESUMED)
-    val view = scenario.withFragment { requireView() }
-    view.findViewById<Button>(R.id.pagination_next_button).performClick()
-    assertThat(view.findViewById<Button>(R.id.pagination_next_button).visibility)
-      .isEqualTo(View.GONE)
+    runTest {
+      questionnaireViewModelCoroutineContext = testScheduler
+
+      val scenario =
+        launchFragment<QuestionnaireFragment>(
+          bundleOf(
+            EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
+          ),
+        )
+      scenario.moveToState(Lifecycle.State.RESUMED)
+      val view = scenario.withFragment { requireView() }
+      view.findViewById<Button>(R.id.pagination_next_button).performClick()
+      assertThat(view.findViewById<Button>(R.id.pagination_next_button).visibility)
+        .isEqualTo(View.GONE)
+    }
   }
 
   @Test
@@ -313,16 +317,20 @@ class QuestionnaireFragmentTest {
   ]
 }
 """
-    val scenario =
-      launchFragment<QuestionnaireFragment>(
-        bundleOf(
-          EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
-        ),
-      )
-    scenario.moveToState(Lifecycle.State.RESUMED)
-    val view = scenario.withFragment { requireView() }
-    assertThat(view.findViewById<Button>(R.id.pagination_previous_button).visibility)
-      .isEqualTo(View.GONE)
+    runTest {
+      questionnaireViewModelCoroutineContext = testScheduler
+
+      val scenario =
+        launchFragment<QuestionnaireFragment>(
+          bundleOf(
+            EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
+          ),
+        )
+      scenario.moveToState(Lifecycle.State.RESUMED)
+      val view = scenario.withFragment { requireView() }
+      assertThat(view.findViewById<Button>(R.id.pagination_previous_button).visibility)
+        .isEqualTo(View.GONE)
+    }
   }
 
   @Test
