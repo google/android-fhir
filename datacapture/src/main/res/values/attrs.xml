@@ -183,6 +183,9 @@
     <!--   Style for attachment preview title. -->
     <attr name="questionnaireAttachmentPreviewTitleStyle" format="reference" />
 
+    <!--  Style for questionnaire title  -->
+    <attr name="questionnaireTitleStyle" format="reference" />
+
     <declare-styleable name="QuestionnaireTheme">
         <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must
              extend Theme.Questionnaire. If unspecified, Theme.Questionnaire will be used. -->

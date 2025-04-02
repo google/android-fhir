@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
@@ -94,6 +95,7 @@ class QuestionnaireFragment : Fragment() {
       view.findViewById<RecyclerView>(R.id.questionnaire_edit_recycler_view)
     val questionnaireReviewRecyclerView =
       view.findViewById<RecyclerView>(R.id.questionnaire_review_recycler_view)
+    val questionnaireTitle = view.findViewById<TextView>(R.id.questionnaire_title)
 
     // This container frame floats at the bottom of the view to make navigation controls visible at
     // all times when the user scrolls. Use
@@ -170,6 +172,8 @@ class QuestionnaireFragment : Fragment() {
               } else {
                 View.GONE
               }
+            questionnaireTitle.visibility = View.VISIBLE
+            questionnaireTitle.text = getString(R.string.questionnaire_review_mode_title)
 
             // Set bottom navigation
             if (state.bottomNavItem != null) {
@@ -189,6 +193,7 @@ class QuestionnaireFragment : Fragment() {
             questionnaireEditAdapter.submitList(state.items)
             questionnaireEditRecyclerView.visibility = View.VISIBLE
             reviewModeEditButton.visibility = View.GONE
+            questionnaireTitle.visibility = View.GONE
 
             // Set bottom navigation
             if (state.bottomNavItem != null) {
