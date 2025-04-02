@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -90,9 +91,12 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
           val viewModel: QuestionnaireValidationErrorViewModel by
             activityViewModels(factoryProducer = factoryProducer)
           text =
-            viewModel.getItemsTextWithValidationErrors().joinToString(separator = "\n") {
-              context.getString(R.string.questionnaire_validation_error_item_text_with_bullet, it)
-            }
+            viewModel
+              .getItemsTextWithValidationErrors()
+              .joinToString(separator = "\n") {
+                context.getString(R.string.questionnaire_validation_error_item_text_with_bullet, it)
+              }
+              .toSpanned()
         }
       }
   }
