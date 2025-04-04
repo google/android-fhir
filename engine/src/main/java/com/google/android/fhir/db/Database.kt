@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,15 @@ internal interface Database {
    */
   @Throws(ResourceNotFoundException::class)
   suspend fun select(type: ResourceType, id: String): Resource
+
+  /**
+   * Selects the FHIR resources of type `clazz` with `ids`.
+   *
+   * @param <R> The resource type
+   * @throws ResourceNotFoundException if the resources are not found in the database
+   */
+  @Throws(ResourceNotFoundException::class)
+  suspend fun selectResources(type: ResourceType, vararg ids: String): List<Resource>
 
   /**
    * Selects the saved `ResourceEntity` of type `clazz` with `id`.

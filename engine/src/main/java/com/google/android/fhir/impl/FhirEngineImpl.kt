@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,9 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun get(type: ResourceType, id: String) =
     withContext(Dispatchers.IO) { database.select(type, id) }
+
+  override suspend fun getResources(type: ResourceType, vararg ids: String) =
+    withContext(Dispatchers.IO) { database.selectResources(type, *ids) }
 
   override suspend fun update(vararg resource: Resource) =
     withContext(Dispatchers.IO) { database.update(*resource) }

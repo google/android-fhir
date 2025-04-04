@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadRequestResult
 import com.google.android.fhir.sync.upload.UploadStrategy
 import java.time.OffsetDateTime
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -82,6 +83,17 @@ interface FhirEngine {
    */
   @Throws(ResourceNotFoundException::class)
   suspend fun get(type: ResourceType, id: String): Resource
+
+  /**
+   * Loads multiple FHIR resources given [ResourceType] and logical IDs.
+   *
+   * @param type The type of the resource to load.
+   * @param ids The logical IDs of the resources.
+   * @return The list of requested FHIR resources.
+   * @throws ResourceNotFoundException if the resources are not found.
+   */
+  @Throws(ResourceNotFoundException::class)
+  suspend fun getResources(type: ResourceType, vararg ids: String): List<Resource>
 
   /**
    * Updates one or more FHIR [Resource]s in the local storage.
@@ -225,6 +237,19 @@ interface FhirEngine {
 @Throws(ResourceNotFoundException::class)
 suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
   return get(getResourceType(R::class.java), id) as R
+}
+
+/**
+ * Retrieves FHIR resources of type [R] with the given [ids] from the local storage.
+ *
+ * @param R The type of the FHIR resource to retrieve.
+ * @param ids The logical IDs of the resources to retrieve.
+ * @return The list of requested FHIR resources.
+ * @throws ResourceNotFoundException if the resource is not found.
+ */
+@Throws(ResourceNotFoundException::class)
+suspend inline fun <reified R : Resource> FhirEngine.getResources(vararg ids: String): List<R> {
+  return getResources(getResourceType(R::class.java), *ids).pmap(Dispatchers.Default) { it as R }
 }
 
 /**
