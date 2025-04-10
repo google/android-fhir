@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ internal object EditTextIntegerViewHolderFactory :
       QuestionnaireItemEditTextViewHolderDelegate(
         InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
       ) {
+
       override suspend fun handleInput(
         editable: Editable,
         questionnaireViewItem: QuestionnaireViewItem,
@@ -90,13 +91,18 @@ internal object EditTextIntegerViewHolderFactory :
             questionnaireViewItem,
             questionnaireViewItem.validationResult,
           )
+        val minValue =
+          (questionnaireViewItem.minAnswerValue as? IntegerType)?.value ?: Int.MIN_VALUE
+        val maxValue =
+          (questionnaireViewItem.maxAnswerValue as? IntegerType)?.value ?: Int.MAX_VALUE
+
         // Update error message if draft answer present
         if (questionnaireViewItem.draftAnswer != null) {
           textInputLayout.error =
             textInputLayout.context.getString(
               R.string.integer_format_validation_error_msg,
-              formatInteger(Int.MIN_VALUE),
-              formatInteger(Int.MAX_VALUE),
+              formatInteger(minValue),
+              formatInteger(maxValue),
             )
         }
       }
