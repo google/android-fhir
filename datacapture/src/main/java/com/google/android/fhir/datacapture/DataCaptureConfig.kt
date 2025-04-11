@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,12 +74,18 @@ data class DataCaptureConfig(
  * allows the library to render answer options to `choice` and `open-choice` type questions more
  * dynamically.
  *
+ * Optional query parameter can be used to accept the search string from user input for server-side
+ * filtering.
+ *
  * NOTE: The result of the resolution may be cached to improve performance. In other words, the
  * resolver may be called only once after which the same answer value set may be used multiple times
  * in the UI to populate answer options.
+ *
+ * @param uri The uri used to identify the questionnaire item
+ * @param query The text input from the user
  */
 interface ExternalAnswerValueSetResolver {
-  suspend fun resolve(uri: String): List<Coding>
+  suspend fun resolve(uri: String, query: String?): List<Coding>
 }
 
 /**
