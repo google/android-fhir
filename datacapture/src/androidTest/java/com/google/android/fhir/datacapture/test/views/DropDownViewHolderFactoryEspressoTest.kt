@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.PerformException
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -51,6 +52,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -272,6 +274,81 @@ class DropDownViewHolderFactoryEspressoTest {
           .count,
       )
       .isEqualTo(3)
+  }
+
+  @Test
+  fun shouldPreventTypingWhenAnswerIsSelectedInAutoCompleteDropdown() {
+    val preselectedAnswer =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer().value = StringType("Coding 1")
+      }
+
+    val questionnaireItem =
+      QuestionnaireViewItem(
+        createAnswerOptions("Coding 1", "Coding 2", "Coding 3"),
+        preselectedAnswer,
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    val autoComplete = viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
+
+    runOnUI {
+      viewHolder.bind(questionnaireItem)
+      autoComplete.showDropDown()
+    }
+
+    assertThrows(PerformException::class.java) {
+      onView(withId(R.id.auto_complete)).perform(typeText("new text"))
+    }
+
+    assertThat(autoComplete.text.toString()).isEqualTo("Coding 1")
+  }
+
+  @Test
+  fun shouldSelectAndClearAnswerInAutoCompleteDropdown() {
+    var selectedAnswers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? =
+      null
+    val answerOptions = listOf("Coding 1", "Coding 2", "Coding 3")
+
+    var questionnaireItem =
+      QuestionnaireViewItem(
+        createAnswerOptions(*answerOptions.toTypedArray()),
+        responseValueStringOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, answers, _ -> selectedAnswers = answers },
+      )
+
+    val autoComplete = viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
+
+    runOnUI {
+      viewHolder.bind(questionnaireItem)
+      autoComplete.showDropDown()
+    }
+
+    // Test selection flow
+    onView(withText("Coding 1"))
+      .inRoot(isPlatformPopup())
+      .check(matches(isDisplayed()))
+      .perform(click())
+
+    assertThat(selectedAnswers).hasSize(1)
+    assertThat((selectedAnswers!!.first().value as StringType).valueAsString).isEqualTo("Coding 1")
+
+    // Test clearing flow
+    questionnaireItem =
+      QuestionnaireViewItem(
+        createAnswerOptions(*answerOptions.toTypedArray()),
+        responseValueStringOptions().apply { answer = selectedAnswers },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, answers, _ -> selectedAnswers = answers },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireItem) }
+
+    onView(withId(R.id.clear_input_icon)).perform(click())
+
+    assertThat(selectedAnswers).isEmpty()
   }
 
   @Test
