@@ -89,6 +89,11 @@
             app:nullable="true"
             android:defaultValue="@null"
         />
+    <argument
+            android:name="enableReviewMode"
+            app:argType="boolean"
+            android:defaultValue="false"
+        />
     <action
             android:id="@+id/action_galleryQuestionnaireFragment_to_questionnaireResponseFragment"
             app:destination="@id/questionnaireResponseFragment"
