@@ -146,9 +146,6 @@ class DemoQuestionnaireFragment : Fragment() {
                     .LOCATION_WIDGET_PROVIDER,
                 )
                 setQuestionnaire(args.questionnaireJsonStringKey!!)
-                if (args.questionnaireTitleKey == "Attachment") {
-                  showReviewPageBeforeSubmit(true)
-                }
               }
               .build()
           add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
