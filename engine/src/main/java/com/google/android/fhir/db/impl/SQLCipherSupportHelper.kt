@@ -74,7 +74,8 @@ internal class SQLCipherSupportHelper(
       }
     }
 
-  override val databaseName = standardHelper.databaseName
+  override val databaseName
+    get() = standardHelper.databaseName
 
   override fun setWriteAheadLoggingEnabled(enabled: Boolean) {
     standardHelper.setWriteAheadLoggingEnabled(enabled)
@@ -119,7 +120,8 @@ internal class SQLCipherSupportHelper(
     throw lastException ?: DatabaseEncryptionException(Exception(), UNKNOWN)
   }
 
-  override val readableDatabase = writableDatabase
+  override val readableDatabase
+    get() = writableDatabase
 
   override fun close() {
     standardHelper.close()
