@@ -36,7 +36,7 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
         iconId = R.drawable.ic_defaultlayout
         textId = R.string.layout_name_default_text
         questionnaireFileName = "layout_default.json"
-        enableReviewMode = false
+        questionnaireLambdaKey = ""
       },
     ),
     PAGINATED(
@@ -44,7 +44,7 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
         iconId = R.drawable.ic_paginatedlayout
         textId = R.string.layout_name_paginated
         questionnaireFileName = "layout_paginated.json"
-        enableReviewMode = false
+        questionnaireLambdaKey = ""
       },
     ),
     REVIEW(
@@ -52,7 +52,7 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
         iconId = R.drawable.ic_reviewlayout
         textId = R.string.layout_name_review
         questionnaireFileName = "layout_review.json"
-        enableReviewMode = true
+        questionnaireLambdaKey = "showreviewpagefirstandbeforesubmit"
       },
     ),
     READ_ONLY(
@@ -60,7 +60,7 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
         iconId = R.drawable.ic_readonlylayout
         textId = R.string.layout_name_read_only
         questionnaireFileName = ""
-        enableReviewMode = false
+        questionnaireLambdaKey = ""
       },
     ),
   }

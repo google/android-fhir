@@ -81,7 +81,7 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
                 backgroundContext = coroutineContext,
                 fileName = layout.config.questionnaireFileName,
               ),
-            enableReviewMode = layout.config.enableReviewMode,
+            questionnaireLambdaKey = layout.config.questionnaireLambdaKey,
           ),
         )
     }

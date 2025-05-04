@@ -138,19 +138,18 @@ class DemoQuestionnaireFragment : Fragment() {
       if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) == null) {
         childFragmentManager.commit {
           setReorderingAllowed(true)
-          val questionnaireFragment =
-            QuestionnaireFragment.builder()
-              .apply {
-                setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
-                  ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory
-                    .LOCATION_WIDGET_PROVIDER,
-                )
-                setQuestionnaire(args.questionnaireJsonStringKey!!)
-                showReviewPageBeforeSubmit(args.enableReviewMode)
-                showReviewPageFirst(true)
-              }
-              .build()
-          add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
+          val questionnaireFragmentLambda =
+            LayoutConfig.questionnaireLambdaMap[args.questionnaireLambdaKey]
+          val questionnaireFragmentBuilder =
+            QuestionnaireFragment.builder().apply {
+              setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
+                ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory
+                  .LOCATION_WIDGET_PROVIDER,
+              )
+              setQuestionnaire(args.questionnaireJsonStringKey!!)
+            }
+          questionnaireFragmentLambda?.invoke(questionnaireFragmentBuilder)
+          add(R.id.container, questionnaireFragmentBuilder.build(), QUESTIONNAIRE_FRAGMENT_TAG)
         }
       }
     }

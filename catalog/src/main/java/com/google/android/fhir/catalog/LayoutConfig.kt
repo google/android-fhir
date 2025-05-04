@@ -18,22 +18,40 @@ package com.google.android.fhir.catalog
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import com.google.android.fhir.datacapture.QuestionnaireFragment
 
 data class LayoutConfig(
   @DrawableRes val iconId: Int,
   @StringRes val textId: Int,
   val questionnaireFileName: String,
-  val enableReviewMode: Boolean,
+  val questionnaireLambdaKey: String,
 ) {
+
+  companion object {
+    val questionnaireLambdaMap: Map<String, QuestionnaireFragment.Builder.() -> Unit> =
+      mapOf(
+        "" to
+          {
+            showReviewPageFirst(false)
+            showReviewPageBeforeSubmit(false)
+          },
+        "showreviewpagefirstandbeforesubmit" to
+          {
+            showReviewPageFirst(true)
+            showReviewPageBeforeSubmit(true)
+          },
+      )
+  }
+
   class Builder {
     @DrawableRes var iconId: Int = 0
 
     @StringRes var textId: Int = 0
     var questionnaireFileName: String = ""
-    var enableReviewMode: Boolean = false
+    var questionnaireLambdaKey: String = ""
 
     fun build(): LayoutConfig {
-      return LayoutConfig(iconId, textId, questionnaireFileName, enableReviewMode)
+      return LayoutConfig(iconId, textId, questionnaireFileName, questionnaireLambdaKey)
     }
   }
 }
