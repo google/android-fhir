@@ -64,7 +64,7 @@ function setup() {
   sudo npm cache clean -f
   sudo npm install -g n
   sudo n 16.18.0
-  sudo apt install -y openjdk-17-jdk openjdk-17-jre
+  sudo apt install -y openjdk-17-jdk
 
   gcloud components update --quiet
 
