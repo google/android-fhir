@@ -16,7 +16,7 @@
 
 object Sdk {
   const val COMPILE_SDK = 36
-  const val TARGET_SDK = 36
+  const val TARGET_SDK = 34
 
   // Engine and SDC must support API 24.
   // Remove desugaring when upgrading it to 26.

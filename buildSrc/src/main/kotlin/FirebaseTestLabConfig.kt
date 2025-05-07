@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,12 @@ fun Project.configureFirebaseTestLabForLibraries() {
         ),
         mapOf(
           "model" to "MediumPhone.arm",
-          "version" to "${project.extensions.getByType(LibraryExtension::class.java).compileSdk}",
+          "version" to "33",
+          "locale" to "en_US",
+        ),
+        mapOf(
+          "model" to "MediumPhone.arm",
+          "version" to "34",
           "locale" to "en_US",
         ),
       ),
@@ -67,7 +72,12 @@ fun Project.configureFirebaseTestLabForMicroBenchmark() {
       listOf(
         mapOf(
           "model" to "panther",
-          "version" to "${project.extensions.getByType(LibraryExtension::class.java).compileSdk}",
+          "version" to "33",
+          "locale" to "en_US",
+        ),
+        mapOf(
+          "model" to "shiba",
+          "version" to "34",
           "locale" to "en_US",
         ),
       ),
