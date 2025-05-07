@@ -56,6 +56,17 @@ function zip_artifacts() {
     | sed 's|gs://|https://storage.googleapis.com/|'
 }
 
+function installJdk21() {
+  wget https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_linux-x64_bin.tar.gz
+  tar xvf openjdk-21+35_linux-x64_bin.tar.gz
+  sudo mv jdk-21/ /opt/jdk-21/
+  echo 'export JAVA_HOME=/opt/jdk-21' | sudo tee /etc/profile.d/java21.sh
+  echo 'export PATH=$JAVA_HOME/bin:$PATH'|sudo tee -a /etc/profile.d/java21.sh
+  source /etc/profile.d/java21.sh
+  echo $JAVA_HOME
+  java --version
+}
+
 # Installs dependencies to run CI pipeline. Dependencies are:
 #   1. npm to run spotlessApply
 #   2. Android Command Line tools, accepting its licenses
@@ -64,7 +75,8 @@ function setup() {
   sudo npm cache clean -f
   sudo npm install -g n
   sudo n 16.18.0
-  sudo apt install -y openjdk-17-jdk
+  installJdk21
+#  sudo apt install -y openjdk-17-jdk
 
   gcloud components update --quiet
 
