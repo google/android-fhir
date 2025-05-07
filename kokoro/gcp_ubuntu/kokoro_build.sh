@@ -60,7 +60,7 @@ function zip_artifacts() {
 function installJdk21() {
   wget --quiet https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_linux-x64_bin.tar.gz
   tar xvf openjdk-21+35_linux-x64_bin.tar.gz
-  sudo mv jdk-21/ /opt/jdk-21/ > /dev/null
+  sudo mv jdk-21/ /opt/jdk-21/
   echo 'export JAVA_HOME=/opt/jdk-21' | sudo tee /etc/profile.d/java21.sh
   echo 'export PATH=$JAVA_HOME/bin:$PATH'|sudo tee -a /etc/profile.d/java21.sh
   source /etc/profile.d/java21.sh

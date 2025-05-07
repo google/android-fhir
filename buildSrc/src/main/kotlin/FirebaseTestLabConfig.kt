@@ -46,11 +46,6 @@ fun Project.configureFirebaseTestLabForLibraries() {
           "version" to "33",
           "locale" to "en_US",
         ),
-        mapOf(
-          "model" to "MediumPhone.arm",
-          "version" to "34",
-          "locale" to "en_US",
-        ),
       ),
     )
   }
@@ -73,11 +68,6 @@ fun Project.configureFirebaseTestLabForMicroBenchmark() {
         mapOf(
           "model" to "panther",
           "version" to "33",
-          "locale" to "en_US",
-        ),
-        mapOf(
-          "model" to "shiba",
-          "version" to "34",
           "locale" to "en_US",
         ),
       ),
