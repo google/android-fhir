@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,19 +34,35 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
     @DrawableRes val iconId: Int,
     @StringRes val textId: Int,
     val questionnaireFileName: String,
+    val questionnaireResponseFileName: String,
+    val layoutMode: LayoutMode = LayoutMode.DEFAULT,
   ) {
     DEFAULT(
       R.drawable.ic_defaultlayout,
       R.string.layout_name_default_text,
       "layout_default.json",
+      "",
     ),
     PAGINATED(
       R.drawable.ic_paginatedlayout,
       R.string.layout_name_paginated,
       "layout_paginated.json",
+      "",
     ),
-    REVIEW(R.drawable.ic_reviewlayout, R.string.layout_name_review, ""),
-    READ_ONLY(R.drawable.ic_readonlylayout, R.string.layout_name_read_only, ""),
+    REVIEW(
+      R.drawable.ic_reviewlayout,
+      R.string.layout_name_review,
+      "layout_default.json",
+      "",
+      LayoutMode.REVIEW,
+    ),
+    READ_ONLY(
+      R.drawable.ic_readonlylayout,
+      R.string.layout_name_read_only,
+      "layout_default.json",
+      "layout_default_response.json",
+      LayoutMode.READ_ONLY,
+    ),
   }
 
   fun isDefaultLayout(context: Context, title: String) =
@@ -54,4 +70,10 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
 
   fun isPaginatedLayout(context: Context, title: String) =
     context.getString(Layout.PAGINATED.textId) == title
+}
+
+enum class LayoutMode {
+  DEFAULT,
+  REVIEW,
+  READ_ONLY,
 }
