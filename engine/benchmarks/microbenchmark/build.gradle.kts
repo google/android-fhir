@@ -5,11 +5,14 @@ plugins {
 }
 
 android {
-  namespace = "com.google.android.fhir.benchmark"
+  namespace = "com.google.android.fhir.engine.microbenchmark"
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidBenchmarkRunner
+    // Enable measuring on an emulator, or devices with low battery
+    //    testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] =
+    // "EMULATOR,LOW-BATTERY"
   }
 
   testBuildType = "release"
