@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,60 +14,58 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.benchmark
+package com.google.android.fhir.microbenchmark
 
+import android.content.Context
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.search.count
 import com.google.common.truth.Truth.assertThat
-import java.io.InputStream
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Resource
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@LargeTest
 @RunWith(AndroidJUnit4::class)
-class EngineDatabaseBenchmark {
+class DemoFhirEngineBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
-
-  private fun open(assetName: String): InputStream? {
-    return javaClass.getResourceAsStream(assetName)
-  }
+  private val applicationContext = ApplicationProvider.getApplicationContext<Context>()
+  private val assetManager = applicationContext.assets
+  private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
 
   @Test
-  fun createAndGet() = runBlocking {
-    benchmarkRule.measureRepeated {
-      runBlocking {
-        val fhirEngine = runWithTimingDisabled {
-          FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-        }
+  fun create() {
+    val bulkFiles =
+      assetManager.list(BULK_DATA_DIR)?.filter { it.endsWith(".ndjson") } ?: emptyList()
+    val resources =
+      bulkFiles
+        .asSequence()
+        .map { assetManager.open("$BULK_DATA_DIR/$it") }
+        .flatMap { inputStream -> inputStream.bufferedReader().readLines() }
+        .map { fhirContext.newJsonParser().parseResource(it) as Resource }
+        .toList()
 
-        val patientImmunizationHistory = runWithTimingDisabled {
-          val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
-          val jsonParser = fhirContext.newJsonParser()
-          jsonParser.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
-        }
+    val fhirEngine = FhirEngineProvider.getInstance(applicationContext)
 
-        for (entry in patientImmunizationHistory.entry) {
-          fhirEngine.create(entry.resource)
-        }
-        assertThat(fhirEngine.get(ResourceType.Patient, "d4d35004-24f8-40e4-8084-1ad75924514f"))
-          .isNotNull()
-      }
-    }
+    benchmarkRule.measureRepeated { runBlocking { fhirEngine.create(*resources.toTypedArray()) } }
+    assertThat(runBlocking { fhirEngine.count<Patient> {} }).isGreaterThan(1L)
   }
 
   companion object {
+    private const val BULK_DATA_DIR = "bulk_data"
 
     @JvmStatic
     @BeforeClass
