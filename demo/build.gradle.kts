@@ -50,7 +50,7 @@ dependencies {
   implementation(libs.androidx.datastore.preferences)
   implementation(libs.androidx.fragment)
   implementation(libs.androidx.lifecycle.livedata)
-  implementation(libs.androidx.lifecycle.runtime)
+  implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(libs.androidx.lifecycle.viewmodel)
   implementation(libs.androidx.navigation.fragment)
   implementation(libs.androidx.navigation.ui)
