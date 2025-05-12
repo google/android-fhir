@@ -18,8 +18,11 @@ package com.google.android.fhir.engine.benchmarks.app.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,15 +33,88 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.fhir.engine.benchmarks.app.CrudApiViewModel
 
 @Composable
-fun CrudDetail(
+internal fun CrudDetail(
   viewModel: CrudApiViewModel,
   navigateToHome: () -> Unit,
 ) {
-  val detailState = viewModel.detailStateFlow.collectAsStateWithLifecycle()
+  val createUiState = viewModel.createStateFlow.collectAsStateWithLifecycle()
+  val getUiState = viewModel.getStateFlow.collectAsStateWithLifecycle()
+  val updateUiState = viewModel.updateStateFlow.collectAsStateWithLifecycle()
+  val deleteUiState = viewModel.deleteStateFlow.collectAsStateWithLifecycle()
 
   DetailScaffold("CRUD", navigateToHome) {
-    Column(Modifier.fillMaxSize().padding(8.dp), verticalArrangement = Arrangement.Center) {
-      Text(detailState.value, fontSize = 20.sp, textAlign = TextAlign.Center)
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)){
+      if (createUiState.value.isNotEmpty()) {
+        Column(Modifier.padding(8.dp)) {
+          Text("Create API")
+          Spacer(Modifier.size(8.dp))
+          FlowRow {
+            createUiState.value.forEach {
+              Column {
+                Text("${it.first}")
+                Text("${it.second}")
+              }
+              Spacer(Modifier.size(8.dp))
+            }
+          }
+        }
+      } else {
+        // Show loading
+      }
+
+      if (getUiState.value.isNotEmpty()) {
+        Column(Modifier.padding(8.dp)) {
+          Text("Get API")
+          Spacer(Modifier.size(8.dp))
+          FlowRow {
+            getUiState.value.forEach {
+              Column {
+                Text("${it.first}")
+                Text("${it.second}")
+              }
+              Spacer(Modifier.size(8.dp))
+            }
+          }
+        }
+      } else {
+        // Show loading
+      }
+
+      if (updateUiState.value.isNotEmpty()) {
+        Column(Modifier.padding(8.dp)) {
+          Text("Update API")
+          Spacer(Modifier.size(8.dp))
+          FlowRow {
+            updateUiState.value.forEach {
+              Column {
+                Text("${it.first}")
+                Text("${it.second}")
+              }
+              Spacer(Modifier.size(8.dp))
+            }
+          }
+        }
+      } else {
+        // Show loading
+      }
+
+      if (deleteUiState.value.isNotEmpty()) {
+        Column(Modifier.padding(8.dp)) {
+          Text("Delete API")
+          Spacer(Modifier.size(8.dp))
+          FlowRow {
+            deleteUiState.value.forEach {
+              Column {
+                Text("${it.first}")
+                Text("${it.second}")
+              }
+              Spacer(Modifier.size(8.dp))
+            }
+          }
+        }
+      } else {
+        // Show loading
+      }
     }
   }
 }
