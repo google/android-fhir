@@ -18,4 +18,4 @@ package com.google.android.fhir.engine.benchmarks.app
 
 import androidx.lifecycle.ViewModel
 
-class MainViewModel() : ViewModel()
+internal class MainViewModel() : ViewModel()

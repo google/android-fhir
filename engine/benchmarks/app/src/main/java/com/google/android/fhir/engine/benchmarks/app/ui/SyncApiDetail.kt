@@ -30,7 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.fhir.engine.benchmarks.app.SyncApiViewModel
 
 @Composable
-fun SyncApiDetail(viewModel: SyncApiViewModel, navigateToHome: () -> Unit) {
+internal fun SyncApiDetail(viewModel: SyncApiViewModel, navigateToHome: () -> Unit) {
   val detailState = viewModel.detailStateFlow.collectAsStateWithLifecycle()
 
   DetailScaffold("Sync API", navigateToHome) {

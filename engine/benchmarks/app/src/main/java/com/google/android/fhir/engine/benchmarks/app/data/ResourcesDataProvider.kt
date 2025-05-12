@@ -27,7 +27,7 @@ class ResourcesDataProvider(
   private val assetManager: AssetManager,
   private val fhirR4JsonParser: IParser,
 ) {
-  suspend fun provideResources(onResourcesProvided: (Iterable<Resource>) -> Unit) {
+  suspend fun provideResources(onResourcesProvided: (List<Resource>) -> Unit) {
     try {
       readFileResources()
         .chunked(READ_CHUNK_SIZE)
