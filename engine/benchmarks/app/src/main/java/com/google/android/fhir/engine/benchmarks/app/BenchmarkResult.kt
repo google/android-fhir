@@ -16,8 +16,17 @@
 
 package com.google.android.fhir.engine.benchmarks.app
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlin.time.Duration
 
-@OptIn(ExperimentalCoroutinesApi::class)
-internal val benchmarkingViewModelWorkDispatcher = Dispatchers.Default.limitedParallelism(1)
+internal sealed interface BenchmarkResult {
+  data object Nil : BenchmarkResult
+}
+
+internal data class BenchmarkDuration(val size: Int, val duration: Duration) : BenchmarkResult {
+  val averageDuration: Duration
+    get() = duration.div(size)
+}
+
+internal operator fun BenchmarkDuration.plus(other: BenchmarkDuration): BenchmarkResult {
+  return BenchmarkDuration(this.size + other.size, this.duration + other.duration)
+}
