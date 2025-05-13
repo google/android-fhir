@@ -33,6 +33,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -57,7 +59,7 @@ fun DetailScaffold(
         },
       )
     },
-    modifier = Modifier.fillMaxSize(),
+    modifier = Modifier.fillMaxSize().semantics { testTagsAsResourceId = true },
   ) { innerPadding ->
     Card(
       shape = RoundedCornerShape(10.dp),
