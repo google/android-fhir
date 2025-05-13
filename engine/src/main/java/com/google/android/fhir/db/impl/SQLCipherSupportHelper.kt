@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,8 @@ internal class SQLCipherSupportHelper(
       }
     }
 
-  override val databaseName = standardHelper.databaseName
+  override val databaseName
+    get() = standardHelper.databaseName
 
   override fun setWriteAheadLoggingEnabled(enabled: Boolean) {
     standardHelper.setWriteAheadLoggingEnabled(enabled)
@@ -119,7 +120,8 @@ internal class SQLCipherSupportHelper(
     throw lastException ?: DatabaseEncryptionException(Exception(), UNKNOWN)
   }
 
-  override val readableDatabase = writableDatabase
+  override val readableDatabase
+    get() = writableDatabase
 
   override fun close() {
     standardHelper.close()

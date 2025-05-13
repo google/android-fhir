@@ -11,7 +11,7 @@ repositories {
 dependencies {
   implementation("com.diffplug.spotless:spotless-plugin-gradle:6.22.0")
 
-  implementation("com.android.tools.build:gradle:8.5.0")
+  implementation("com.android.tools.build:gradle:8.9.2")
 
   implementation("app.cash.licensee:licensee-gradle-plugin:1.8.0")
   implementation("com.osacky.flank.gradle:fladle:0.17.4")

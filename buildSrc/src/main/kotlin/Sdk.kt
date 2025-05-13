@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 
 object Sdk {
-  const val COMPILE_SDK = 33
-  const val TARGET_SDK = 31
+  const val COMPILE_SDK = 36
+  const val TARGET_SDK = 33
 
   // Engine and SDC must support API 24.
   // Remove desugaring when upgrading it to 26.
