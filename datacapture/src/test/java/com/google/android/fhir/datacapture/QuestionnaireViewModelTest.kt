@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -5022,7 +5022,7 @@ class QuestionnaireViewModelTest {
       DataCaptureConfig(
         valueSetResolverExternal =
           object : ExternalAnswerValueSetResolver {
-            override suspend fun resolve(uri: String): List<Coding> {
+            override suspend fun resolve(uri: String, query: String?): List<Coding> {
               return if (uri == CODE_SYSTEM_YES_NO) {
                 listOf(
                   Coding().apply {
