@@ -61,7 +61,7 @@ internal fun CrudBenchmarkResultView(headline: String, result: BenchmarkResult) 
     when (result) {
       is BenchmarkDuration -> {
         Text("Takes ~${result.duration} for ${result.size} resources")
-        Text("Average: ~${result.averageDuration}")
+        Text("Averages: ~${result.averageDuration}")
       }
       is BenchmarkResult.Nil -> {
         Text("Waiting for results\u2026")
