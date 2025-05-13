@@ -18,103 +18,66 @@ package com.google.android.fhir.engine.benchmarks.app.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.fhir.engine.benchmarks.app.BenchmarkDuration
+import com.google.android.fhir.engine.benchmarks.app.BenchmarkResult
 import com.google.android.fhir.engine.benchmarks.app.CrudApiViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 internal fun CrudDetail(
   viewModel: CrudApiViewModel,
   navigateToHome: () -> Unit,
 ) {
-  val createUiState = viewModel.createStateFlow.collectAsStateWithLifecycle()
-  val getUiState = viewModel.getStateFlow.collectAsStateWithLifecycle()
-  val updateUiState = viewModel.updateStateFlow.collectAsStateWithLifecycle()
-  val deleteUiState = viewModel.deleteStateFlow.collectAsStateWithLifecycle()
+  val crudUiState = viewModel.crudStateFlow.collectAsStateWithLifecycle()
+  val crudUiStateValue by remember { crudUiState }
 
   DetailScaffold("CRUD", navigateToHome) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)){
-      if (createUiState.value.isNotEmpty()) {
-        Column(Modifier.padding(8.dp)) {
-          Text("Create API")
-          Spacer(Modifier.size(8.dp))
-          FlowRow {
-            createUiState.value.forEach {
-              Column {
-                Text("${it.first}")
-                Text("${it.second}")
-              }
-              Spacer(Modifier.size(8.dp))
-            }
-          }
-        }
-      } else {
-        // Show loading
-      }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+      CrudBenchmarkResultView("FhirEngine#Create", crudUiStateValue.create)
+      CrudBenchmarkResultView("FhirEngine#Get", crudUiStateValue.read)
+      CrudBenchmarkResultView("FhirEngine#Update", crudUiStateValue.update)
+      CrudBenchmarkResultView("FhirEngine#Delete", crudUiStateValue.delete)
+    }
+  }
+}
 
-      if (getUiState.value.isNotEmpty()) {
-        Column(Modifier.padding(8.dp)) {
-          Text("Get API")
-          Spacer(Modifier.size(8.dp))
-          FlowRow {
-            getUiState.value.forEach {
-              Column {
-                Text("${it.first}")
-                Text("${it.second}")
-              }
-              Spacer(Modifier.size(8.dp))
-            }
-          }
-        }
-      } else {
-        // Show loading
+@Composable
+internal fun CrudBenchmarkResultView(headline: String, result: BenchmarkResult) {
+  Column(Modifier.padding(8.dp)) {
+    Text(headline, style = MaterialTheme.typography.headlineMedium)
+    Spacer(Modifier.size(8.dp))
+    when (result) {
+      is BenchmarkDuration -> {
+        Text("Takes ~${result.duration} for ${result.size} resources")
+        Text("Average: ~${result.averageDuration}")
       }
-
-      if (updateUiState.value.isNotEmpty()) {
-        Column(Modifier.padding(8.dp)) {
-          Text("Update API")
-          Spacer(Modifier.size(8.dp))
-          FlowRow {
-            updateUiState.value.forEach {
-              Column {
-                Text("${it.first}")
-                Text("${it.second}")
-              }
-              Spacer(Modifier.size(8.dp))
-            }
-          }
-        }
-      } else {
-        // Show loading
-      }
-
-      if (deleteUiState.value.isNotEmpty()) {
-        Column(Modifier.padding(8.dp)) {
-          Text("Delete API")
-          Spacer(Modifier.size(8.dp))
-          FlowRow {
-            deleteUiState.value.forEach {
-              Column {
-                Text("${it.first}")
-                Text("${it.second}")
-              }
-              Spacer(Modifier.size(8.dp))
-            }
-          }
-        }
-      } else {
-        // Show loading
+      is BenchmarkResult.Nil -> {
+        Text("Waiting for results\u2026")
       }
     }
   }
+}
+
+@Preview(showBackground = true)
+@Composable
+internal fun PreviewCrudBenchmarkResultView() {
+  CrudBenchmarkResultView("FhirEngine#Create", BenchmarkDuration(20, 1008.milliseconds))
+}
+
+@Preview(showBackground = true)
+@Composable
+internal fun PreviewCrudNilBenchmarkResultView() {
+  CrudBenchmarkResultView("FhirEngine#Create", BenchmarkResult.Nil)
 }
