@@ -17,10 +17,14 @@
 package com.google.android.fhir.engine.macrobenchmark
 
 import androidx.benchmark.macro.ExperimentalMetricApi
+import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.Until
+import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,6 +52,10 @@ class FhirEngineCrudBenchmark {
       setupBlock = { startActivityAndWait() },
     ) {
       clickOnTestTag("crudBenchmarkSection")
+
+      @Suppress("ControlFlowWithEmptyBody")
+      // Loops indefinitely until done - todo: add some form of time
+      while (!device.wait(Until.gone(By.textStartsWith("Waiting for results")), 700)){}
     }
   }
 }
