@@ -51,6 +51,8 @@ fun Project.configureFirebaseTestLabForLibraries() {
   }
 }
 
+// TODO: configureFirebaseTestLab ForMacroBenchmark && for Benchmark Apps
+
 fun Project.configureFirebaseTestLabForMicroBenchmark() {
   apply(plugin = Plugins.BuildPlugins.fladle)
   configure<FlankGradleExtension> {
