@@ -18,7 +18,8 @@
 # Fail on any error.
 set -e
 
-lib_names=("workflow:benchmark" "engine:benchmark" "datacapture" "engine" "knowledge" "workflow")
+# TODO: Add "engine:benchmarks:app" and "engine:benchmarks:macrobenchmark" to lib_names for firebase testing
+lib_names=("workflow:benchmark" "engine:benchmarks:microbenchmark" "datacapture" "engine" "knowledge" "workflow")
 firebase_pids=()
 
 for lib_name in "${lib_names[@]}"; do
