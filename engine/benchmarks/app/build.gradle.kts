@@ -48,6 +48,8 @@ android {
   kotlin { jvmToolchain(11) }
 }
 
+configureSyntheaTask()
+
 dependencies {
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
   implementation(project(":engine"))
