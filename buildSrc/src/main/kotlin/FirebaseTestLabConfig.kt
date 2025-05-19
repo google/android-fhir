@@ -25,6 +25,11 @@ fun Project.configureFirebaseTestLabForLibraries() {
   apply(plugin = Plugins.BuildPlugins.fladle)
   configure<FlankGradleExtension> {
     commonConfigurationForFirebaseTestLab(this@configureFirebaseTestLabForLibraries)
+    debugApk.set(
+      project.provider {
+        "${project.rootDir}/demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk"
+      },
+    )
     instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/debug/*.apk" })
     environmentVariables.set(
       mapOf(
@@ -51,39 +56,54 @@ fun Project.configureFirebaseTestLabForLibraries() {
   }
 }
 
-// TODO: configureFirebaseTestLab ForMacroBenchmark && for Benchmark Apps
+fun Project.configureFirebaseTestLabForMacroBenchmark() {
+  apply(plugin = Plugins.BuildPlugins.fladle)
+  configure<FlankGradleExtension> {
+    commonConfigurationForFirebaseTestLabBenchmark(this@configureFirebaseTestLabForMacroBenchmark)
+    debugApk.set(
+      project.provider {
+        "${project.rootDir}/engine/benchmarks/app/build/outputs/apk/benchmark/app-benchmark.apk"
+      },
+    )
+    instrumentationApk.set(project.provider { "$buildDir/outputs/apk/benchmark/*.apk" })
+  }
+}
 
 fun Project.configureFirebaseTestLabForMicroBenchmark() {
   apply(plugin = Plugins.BuildPlugins.fladle)
   configure<FlankGradleExtension> {
-    commonConfigurationForFirebaseTestLab(this@configureFirebaseTestLabForMicroBenchmark)
+    commonConfigurationForFirebaseTestLabBenchmark(this@configureFirebaseTestLabForMicroBenchmark)
+    debugApk.set(
+      project.provider {
+        "${project.rootDir}/demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk"
+      },
+    )
     instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/release/*.apk" })
-    environmentVariables.set(
-      mapOf(
-        "additionalTestOutputDir" to "/sdcard/Download",
-        "no-isolated-storage" to "true",
-        "clearPackageData" to "true",
-      ),
-    )
-    devices.set(
-      listOf(
-        mapOf(
-          "model" to "panther",
-          "version" to "33",
-          "locale" to "en_US",
-        ),
-      ),
-    )
   }
+}
+
+private fun FlankGradleExtension.commonConfigurationForFirebaseTestLabBenchmark(project: Project) {
+  commonConfigurationForFirebaseTestLab(project)
+  environmentVariables.set(
+    mapOf(
+      "additionalTestOutputDir" to "/sdcard/Download",
+      "no-isolated-storage" to "true",
+      "clearPackageData" to "true",
+    ),
+  )
+  devices.set(
+    listOf(
+      mapOf(
+        "model" to "panther",
+        "version" to "33",
+        "locale" to "en_US",
+      ),
+    ),
+  )
 }
 
 private fun FlankGradleExtension.commonConfigurationForFirebaseTestLab(project: Project) {
   projectId.set("android-fhir-instrumeted-tests")
-  debugApk.set(
-    project.provider {
-      "${project.rootDir}/demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk"
-    },
-  )
   useOrchestrator.set(true)
   flakyTestAttempts.set(1)
   maxTestShards.set(10)
