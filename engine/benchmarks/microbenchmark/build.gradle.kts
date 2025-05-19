@@ -10,9 +10,6 @@ android {
   defaultConfig {
     minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidBenchmarkRunner
-    // Enable measuring on an emulator, or devices with low battery
-    //    testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] =
-    // "EMULATOR,LOW-BATTERY"
   }
 
   testBuildType = "release"

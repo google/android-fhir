@@ -31,6 +31,8 @@ android {
   kotlin { jvmToolchain(11) }
 }
 
+afterEvaluate { configureFirebaseTestLabForMacroBenchmark() }
+
 dependencies {
   implementation(libs.androidx.test.ext.junit)
   implementation(libs.androidx.test.espresso.core)

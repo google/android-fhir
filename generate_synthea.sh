@@ -13,10 +13,9 @@ fi
 
 rm -rf "$SYNTHEA_DIR"/output
 
-pushd "$SYNTHEA_DIR" || exit
+cd "$SYNTHEA_DIR" || exit
 # generate valid R4 resources in output/fhir
 ./run_synthea -m pregnancy -p "$POPULATION" --exporter.fhir.included_resources Patient --exporter.fhir.transaction_bundle false --exporter.years_of_history 1 --exporter.fhir.use_us_core_ig false --exporter.fhir.bulk_data true
-popd || exit
 
 # Move to output dir
 if [ -n "$OUTPUT_DIR" ]; then

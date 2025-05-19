@@ -52,7 +52,7 @@ class FhirEngineCrudBenchmark {
       clickOnTestTag("crudBenchmarkSection")
 
       @Suppress("ControlFlowWithEmptyBody")
-      // Loops indefinitely until done - todo: add some form of time
+      // Loops indefinitely until done - todo: add some form of timeout
       while (!device.wait(Until.gone(By.textStartsWith("Waiting for results")), 700)) {}
     }
   }

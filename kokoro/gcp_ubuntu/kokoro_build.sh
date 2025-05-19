@@ -100,11 +100,17 @@ function build_only() {
   ./gradlew check --scan --stacktrace
 }
 
+function setup_device_benchmarks() {
+  ./gradlew :engine:benchmark:app:generateSynthea -Ppopulation=10000
+  ./gradlew :engine:benchmark:app:assembleBenchmark :engine:benchmarks:macrobenchmark:assembleBenchmark
+}
+
 # Runs instrumentation tests using Firebase Test Lab, and retrieves the code
 # coverage reports.
 function device_tests() {
   ./gradlew packageDebugAndroidTest --scan --stacktrace
   ./gradlew packageReleaseAndroidTest --scan --stacktrace
+  setup_device_benchmarks
   .github/workflows/runFlank.sh
 }
 
