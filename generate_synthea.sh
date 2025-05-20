@@ -20,5 +20,5 @@ cd "$SYNTHEA_DIR" || exit
 # Move to output dir
 if [ -n "$OUTPUT_DIR" ]; then
   mkdir -p "$OUTPUT_DIR"
-  cp "$SYNTHEA_DIR"/output/fhir/Patient*.ndjson "$OUTPUT_DIR"
+  cp "$SYNTHEA_DIR"/output/fhir/*.ndjson "$OUTPUT_DIR"
 fi
