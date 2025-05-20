@@ -31,7 +31,6 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-@Suppress("unused")
 internal class CrudApiViewModel(
   private val resourcesDataProvider: ResourcesDataProvider,
   private val fhirEngine: FhirEngine,
@@ -49,7 +48,7 @@ internal class CrudApiViewModel(
     fhirEngine.clearDatabase()
     val savedResourceTypeIdPairs: MutableList<List<Pair<ResourceType, String>>> = mutableListOf()
 
-    resourcesDataProvider.provideResources { resources ->
+    resourcesDataProvider.collectPatientResources { resources ->
       val (logicalIds, duration) = traceCreateResources(resources)
       val result = BenchmarkDuration(logicalIds.size, duration)
       _crudMutableStateFlow.update {
