@@ -14,8 +14,18 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.engine.benchmarks.app
+import org.gradle.api.Project
+import org.gradle.api.tasks.Exec
 
-import androidx.lifecycle.ViewModel
+fun Project.configureSyntheaTask() {
+  tasks.register("generateSynthea", Exec::class.java) {
+    val assetsDirPath = "${projectDir.path}/src/main/assets/bulk_data"
+    val populationSize = providers.gradleProperty("population")
+    val scriptPath = "${rootDir.path}/generate_synthea.sh"
 
-internal class MainViewModel() : ViewModel()
+    doFirst {
+      val scriptArgs = arrayOf("sh", scriptPath, populationSize.orNull ?: "50", assetsDirPath)
+      commandLine(*scriptArgs)
+    }
+  }
+}
