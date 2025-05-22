@@ -23,7 +23,9 @@ object Plugins {
     const val dokka = "org.jetbrains.dokka"
     const val kotlin = "kotlin"
     const val kotlinAndroid = "kotlin-android"
+    const val kotlinCompose = "org.jetbrains.kotlin.plugin.compose"
     const val kotlinKsp = "com.google.devtools.ksp"
+    const val kotlinSerialization = "org.jetbrains.kotlin.plugin.serialization"
     const val mavenPublish = "maven-publish"
     const val fladle = "com.osacky.fladle"
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
@@ -36,6 +38,10 @@ object Plugins {
   const val benchmarkGradlePlugin =
     "androidx.benchmark:benchmark-gradle-plugin:${Versions.benchmarkPlugin}"
   const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
+  const val kotlinComposePlugin =
+    "org.jetbrains.kotlin.plugin.compose:org.jetbrains.kotlin.plugin.compose.gradle.plugin:${Versions.kotlin}"
+  const val kotlinSerializationPlugin =
+    "org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin:${Versions.kotlin}"
   const val navSafeArgsGradlePlugin = "androidx.navigation:navigation-safe-args-gradle-plugin:2.6.0"
   const val rulerGradlePlugin = "com.spotify.ruler:ruler-gradle-plugin:1.2.1"
   const val flankGradlePlugin = "com.osacky.flank.gradle:fladle:0.17.4"
