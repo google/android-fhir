@@ -42,9 +42,9 @@ class LayoutViewHolder(
   private val onItemClick: (LayoutListViewModel.Layout) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
   fun bind(layout: LayoutListViewModel.Layout) {
-    binding.componentLayoutIconImageview.setImageResource(layout.config.iconId)
+    binding.componentLayoutIconImageview.setImageResource(layout.iconId)
     binding.componentLayoutTextView.text =
-      binding.componentLayoutTextView.context.getString(layout.config.textId)
+      binding.componentLayoutTextView.context.getString(layout.textId)
     binding.root.setOnClickListener { onItemClick(layout) }
   }
 }

@@ -138,8 +138,6 @@ class DemoQuestionnaireFragment : Fragment() {
       if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) == null) {
         childFragmentManager.commit {
           setReorderingAllowed(true)
-          val questionnaireFragmentLambda =
-            LayoutConfig.questionnaireLambdaMap[args.questionnaireLambdaKey]
           val questionnaireFragmentBuilder =
             QuestionnaireFragment.builder().apply {
               setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
@@ -148,7 +146,9 @@ class DemoQuestionnaireFragment : Fragment() {
               )
               setQuestionnaire(args.questionnaireJsonStringKey!!)
             }
-          questionnaireFragmentLambda?.invoke(questionnaireFragmentBuilder)
+          LayoutListViewModel.questionnaireLambdaMap[args.questionnaireLambdaKey ?: ""]!!.invoke(
+            questionnaireFragmentBuilder,
+          )
           add(R.id.container, questionnaireFragmentBuilder.build(), QUESTIONNAIRE_FRAGMENT_TAG)
         }
       }
