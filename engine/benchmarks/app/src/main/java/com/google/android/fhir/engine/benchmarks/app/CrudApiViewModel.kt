@@ -52,14 +52,7 @@ internal class CrudApiViewModel(
     resourcesDataProvider.provideResources { resources ->
       val (logicalIds, duration) = traceCreateResources(resources)
       val result = BenchmarkDuration(logicalIds.size, duration)
-      _crudMutableStateFlow.update {
-        val newUpdatedResult =
-          when (it.create) {
-            is BenchmarkResult.Nil -> result
-            is BenchmarkDuration -> it.create + result
-          }
-        it.copy(create = newUpdatedResult)
-      }
+      _crudMutableStateFlow.update { it.copy(create = it.create + result) }
 
       savedResourceTypeIdPairs += resources.zip(logicalIds) { r, l -> Pair(r.resourceType, l) }
     }
@@ -71,14 +64,7 @@ internal class CrudApiViewModel(
         val (resource, duration) = traceGetResource(resourceType, logicalId)
 
         val result = BenchmarkDuration(1, duration)
-        _crudMutableStateFlow.update {
-          val newUpdatedResult =
-            when (it.read) {
-              is BenchmarkResult.Nil -> result
-              is BenchmarkDuration -> it.read + result
-            }
-          it.copy(read = newUpdatedResult)
-        }
+        _crudMutableStateFlow.update { it.copy(read = it.read + result) }
         resource
       }
 
@@ -88,30 +74,16 @@ internal class CrudApiViewModel(
         val duration = traceUpdateResources(listOf(resource))
 
         val result = BenchmarkDuration(1, duration)
-        _crudMutableStateFlow.update {
-          val newUpdatedResult =
-            when (it.update) {
-              is BenchmarkResult.Nil -> result
-              is BenchmarkDuration -> it.update + result
-            }
-          it.copy(update = newUpdatedResult)
-        }
+        _crudMutableStateFlow.update { it.copy(update = it.update + result) }
         resource
       }
 
     // Delete
     updateDbResources.shuffled().forEachIndexed { index, resource ->
       val logicalId = resource.idElement?.idPart.orEmpty()
-      val duration = runBlocking { traceDeleteResources(resource.resourceType, logicalId) }
+      val duration = traceDeleteResources(resource.resourceType, logicalId)
       val result = BenchmarkDuration(1, duration)
-      _crudMutableStateFlow.update {
-        val newUpdatedResult =
-          when (it.delete) {
-            is BenchmarkResult.Nil -> result
-            is BenchmarkDuration -> it.delete + result
-          }
-        it.copy(delete = newUpdatedResult)
-      }
+      _crudMutableStateFlow.update { it.copy(delete = it.delete + result) }
     }
   }
 
@@ -148,8 +120,8 @@ internal class CrudApiViewModel(
 }
 
 internal data class CRUDUiState(
-  val create: BenchmarkResult = BenchmarkResult.Nil,
-  val read: BenchmarkResult = BenchmarkResult.Nil,
-  val update: BenchmarkResult = BenchmarkResult.Nil,
-  val delete: BenchmarkResult = BenchmarkResult.Nil,
+  val create: BenchmarkDuration = BenchmarkDuration.ZERO,
+  val read: BenchmarkDuration = BenchmarkDuration.ZERO,
+  val update: BenchmarkDuration = BenchmarkDuration.ZERO,
+  val delete: BenchmarkDuration = BenchmarkDuration.ZERO,
 )

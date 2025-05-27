@@ -31,7 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.fhir.engine.benchmarks.app.BenchmarkDuration
-import com.google.android.fhir.engine.benchmarks.app.BenchmarkResult
 import com.google.android.fhir.engine.benchmarks.app.CrudApiViewModel
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -54,17 +53,15 @@ internal fun CrudDetail(
 }
 
 @Composable
-internal fun CrudBenchmarkResultView(headline: String, result: BenchmarkResult) {
+internal fun CrudBenchmarkResultView(headline: String, benchmarkDuration: BenchmarkDuration) {
   Column(Modifier.padding(8.dp)) {
     Text(headline, style = MaterialTheme.typography.headlineMedium)
     Spacer(Modifier.size(8.dp))
-    when (result) {
-      is BenchmarkDuration -> {
-        Text("Takes ~${result.duration} for ${result.size} resources")
-        Text("Averages: ~${result.averageDuration}")
-      }
-      is BenchmarkResult.Nil -> {
-        Text("Waiting for results\u2026")
+    when {
+      benchmarkDuration == BenchmarkDuration.ZERO -> Text("Waiting for results\u2026")
+      else -> {
+        Text("Takes ~${benchmarkDuration.duration} for ${benchmarkDuration.size} resources")
+        Text("Averages: ~${benchmarkDuration.averageDuration}")
       }
     }
   }
@@ -79,5 +76,5 @@ internal fun PreviewCrudBenchmarkResultView() {
 @Preview(showBackground = true)
 @Composable
 internal fun PreviewCrudNilBenchmarkResultView() {
-  CrudBenchmarkResultView("FhirEngine#Create", BenchmarkResult.Nil)
+  CrudBenchmarkResultView("FhirEngine#Create", BenchmarkDuration.ZERO)
 }

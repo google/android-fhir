@@ -18,15 +18,15 @@ package com.google.android.fhir.engine.benchmarks.app
 
 import kotlin.time.Duration
 
-internal sealed interface BenchmarkResult {
-  data object Nil : BenchmarkResult
-}
-
-internal data class BenchmarkDuration(val size: Int, val duration: Duration) : BenchmarkResult {
+internal data class BenchmarkDuration(val size: Int, val duration: Duration) {
   val averageDuration: Duration
-    get() = duration.div(size)
+    get() = if (size > 0) duration.div(size) else Duration.ZERO
+
+  companion object {
+    val ZERO: BenchmarkDuration = BenchmarkDuration(size = 0, duration = Duration.ZERO)
+  }
 }
 
-internal operator fun BenchmarkDuration.plus(other: BenchmarkDuration): BenchmarkResult {
+internal operator fun BenchmarkDuration.plus(other: BenchmarkDuration): BenchmarkDuration {
   return BenchmarkDuration(this.size + other.size, this.duration + other.duration)
 }
