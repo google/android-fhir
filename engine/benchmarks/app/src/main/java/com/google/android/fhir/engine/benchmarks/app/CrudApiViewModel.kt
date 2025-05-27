@@ -18,16 +18,13 @@ package com.google.android.fhir.engine.benchmarks.app
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.tracing.trace
+import androidx.tracing.traceAsync
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.engine.benchmarks.app.data.ResourcesDataProvider
-import kotlin.time.measureTime
-import kotlin.time.measureTimedValue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -91,25 +88,23 @@ internal class CrudApiViewModel(
    * measureTime wraps to get time elapsed for display in UI while trace wraps for use in
    * macrobenchmarking of the application as a TraceMetric
    */
-  private fun traceCreateResources(resources: List<Resource>) = measureTimedValue {
-    trace(TRACE_CREATE_SECTION_NAME) {
-      runBlocking { fhirEngine.create(*resources.toTypedArray()) }
+  private suspend fun traceCreateResources(resources: List<Resource>) = measureTimedValueAsync {
+    traceAsync(TRACE_CREATE_SECTION_NAME, 0) { fhirEngine.create(*resources.toTypedArray()) }
+  }
+
+  private suspend fun traceUpdateResources(resources: List<Resource>) = measureTimeAsync {
+    traceAsync(TRACE_UPDATE_SECTION_NAME, 1) { fhirEngine.update(*resources.toTypedArray()) }
+  }
+
+  private suspend fun traceGetResource(resourceType: ResourceType, resourceId: String) =
+    measureTimedValueAsync {
+      traceAsync(TRACE_GET_SECTION_NAME, 2) { fhirEngine.get(resourceType, resourceId) }
     }
-  }
 
-  private fun traceUpdateResources(resources: List<Resource>) = measureTime {
-    trace(TRACE_UPDATE_SECTION_NAME) {
-      runBlocking { fhirEngine.update(*resources.toTypedArray()) }
+  private suspend fun traceDeleteResources(resourceType: ResourceType, resourceId: String) =
+    measureTimeAsync {
+      traceAsync(TRACE_DELETE_SECTION_NAME, 3) { fhirEngine.delete(resourceType, resourceId) }
     }
-  }
-
-  private fun traceGetResource(resourceType: ResourceType, resourceId: String) = measureTimedValue {
-    trace(TRACE_GET_SECTION_NAME) { runBlocking { fhirEngine.get(resourceType, resourceId) } }
-  }
-
-  private fun traceDeleteResources(resourceType: ResourceType, resourceId: String) = measureTime {
-    trace(TRACE_DELETE_SECTION_NAME) { runBlocking { fhirEngine.delete(resourceType, resourceId) } }
-  }
 
   companion object {
     const val TRACE_CREATE_SECTION_NAME = "Create API"
