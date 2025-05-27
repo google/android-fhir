@@ -101,7 +101,7 @@ function build_only() {
 }
 
 function setup_device_benchmarks() {
-  ./gradlew :engine:benchmark:app:generateSynthea -Ppopulation=10000
+  ./gradlew :engine:benchmark:app:generateSynthea -Ppopulation=100000
   ./gradlew :engine:benchmark:app:assembleBenchmark :engine:benchmarks:macrobenchmark:assembleBenchmark
 }
 

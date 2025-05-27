@@ -38,7 +38,7 @@ class ResourcesDataProvider(
       .forEach { it.useLines { line -> line.consume(block) } }
   }
 
-  suspend fun collectPatientResources(block: (List<Resource>) -> Unit) {
+  suspend fun collectPatientResources(block: suspend (List<Resource>) -> Unit) {
     assetFilePaths({ it.contains(ResourceType.Patient.name, ignoreCase = true) })
       .map { assetManager.open(it).bufferedReader() }
       .forEach { it.useLines { line -> line.consume(block) } }
