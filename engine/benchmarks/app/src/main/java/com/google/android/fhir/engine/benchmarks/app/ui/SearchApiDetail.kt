@@ -18,6 +18,7 @@ package com.google.android.fhir.engine.benchmarks.app.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,11 +40,23 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 internal fun SearchApiDetail(viewModel: SearchApiViewModel, navigateToHome: () -> Unit) {
+  val benchmarkProgressState = viewModel.benchmarkProgressStateFlow.collectAsStateWithLifecycle()
+  val benchmarkProgressStateValue by remember { benchmarkProgressState }
+
   val searchApiUiState = viewModel.searchApiUiStateFlow.collectAsStateWithLifecycle()
   val searchApiUiStateValue by remember { searchApiUiState }
 
   DetailScaffold("Search API", navigateToHome) {
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+      if (benchmarkProgressStateValue) {
+        item {
+          Text(
+            text = "Loading \u2026",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+          )
+        }
+      }
       items(searchApiUiStateValue, SearchApiUiState::first) {
         SearchBenchmarkResultView(it.first, it.second)
       }
@@ -62,7 +76,7 @@ internal fun SearchBenchmarkResultView(name: String, duration: Duration) {
   }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 internal fun PreviewSearchBenchmarkResultView() {
   SearchBenchmarkResultView("SearchCountAllResources", 3000.milliseconds)

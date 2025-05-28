@@ -53,7 +53,8 @@ class FhirEngineCrudBenchmark {
 
       @Suppress("ControlFlowWithEmptyBody")
       // Loops indefinitely until done - todo: add some form of timeout
-      while (!device.wait(Until.gone(By.textStartsWith("Waiting for results")), 700)) {}
+      while (!device.wait(Until.gone(By.textStartsWith("Waiting for results")), 1000)) {}
+      device.pressBack()
     }
   }
 }
