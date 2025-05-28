@@ -61,13 +61,17 @@ internal class SearchApiViewModel(
   private val fhirEngine: FhirEngine,
 ) : ViewModel() {
 
+  private val _benchmarkProgressMutableStateFlow = MutableStateFlow(false)
+  val benchmarkProgressStateFlow: StateFlow<Boolean> =
+    _benchmarkProgressMutableStateFlow.asStateFlow()
+
   private val _searchApiUiMutableStateFlow = MutableStateFlow(listOf<SearchApiUiState>())
   val searchApiUiStateFlow: StateFlow<List<SearchApiUiState>> =
     _searchApiUiMutableStateFlow.asStateFlow()
 
   init {
     viewModelScope.launch(benchmarkingViewModelWorkDispatcher) {
-      //      loadData()
+      _benchmarkProgressMutableStateFlow.update { true }
       traceSearchString()
       traceSearchNumber()
       traceSearchDate()
@@ -81,6 +85,7 @@ internal class SearchApiViewModel(
       traceSearchWithPatientGivenNamesDisjunct()
       traceSearchEncounterLocalLastUpdated()
       traceSearchPatientWithRevIncludeCondition()
+      _benchmarkProgressMutableStateFlow.update { false }
     }
   }
 
