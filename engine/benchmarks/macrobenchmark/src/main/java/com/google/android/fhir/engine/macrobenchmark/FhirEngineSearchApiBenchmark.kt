@@ -90,7 +90,7 @@ class FhirEngineSearchApiBenchmark {
     benchmarkRule.measureRepeated(
       packageName = TARGET_PACKAGE,
       metrics = metrics,
-      iterations = 2,
+      iterations = 1,
       startupMode = null,
       setupBlock = { startActivityAndWait() },
     ) {
