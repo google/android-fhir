@@ -49,6 +49,7 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Observation
+import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
@@ -72,6 +73,8 @@ internal class SearchApiViewModel(
   init {
     viewModelScope.launch(benchmarkingViewModelWorkDispatcher) {
       _benchmarkProgressMutableStateFlow.update { true }
+      preLoadData()
+
       traceSearchString()
       traceSearchNumber()
       traceSearchDate()
@@ -85,19 +88,30 @@ internal class SearchApiViewModel(
       traceSearchWithPatientGivenNamesDisjunct()
       traceSearchEncounterLocalLastUpdated()
       traceSearchPatientWithRevIncludeCondition()
+
       _benchmarkProgressMutableStateFlow.update { false }
     }
   }
 
-  private suspend fun loadData() {
+  private suspend fun preLoadData() {
     withContext(currentCoroutineContext()) {
       fhirEngine.clearDatabase()
       resourcesDataProvider.collectResources { fhirEngine.create(*it.toTypedArray()) }
     }
   }
 
+  private suspend fun triggerChangeInSqlitePageCache() {
+    withContext(currentCoroutineContext()) {
+      // Search to add sqlite pages with Organization/Practitioner to cache
+      fhirEngine.search<Organization> { count = 1 }
+
+      fhirEngine.search<Practitioner> { count = 1 }
+    }
+  }
+
   private suspend fun namedTrace(name: String, traceFunction: suspend (String) -> Duration) {
-    loadData()
+    triggerChangeInSqlitePageCache()
+
     val duration = traceFunction.invoke(name)
     _searchApiUiMutableStateFlow.update { it + SearchApiUiState(name, duration) }
   }

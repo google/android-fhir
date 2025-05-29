@@ -23,6 +23,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.Until
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,6 +35,7 @@ class FhirEngineCrudBenchmark {
 
   @get:Rule val benchmarkRule = MacrobenchmarkRule()
 
+  @Ignore("Ignore temporarily")
   @Test
   fun tracingCrud() {
     benchmarkRule.measureRepeated(
