@@ -18,27 +18,63 @@ package com.google.android.fhir.engine.benchmarks.app.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.fhir.engine.benchmarks.app.BenchmarkDuration
 import com.google.android.fhir.engine.benchmarks.app.CrudApiViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
-fun CrudDetail(
+internal fun CrudDetail(
   viewModel: CrudApiViewModel,
   navigateToHome: () -> Unit,
 ) {
-  val detailState = viewModel.detailStateFlow.collectAsStateWithLifecycle()
+  val crudUiState = viewModel.crudStateFlow.collectAsStateWithLifecycle()
+  val crudUiStateValue by remember { crudUiState }
 
   DetailScaffold("CRUD", navigateToHome) {
-    Column(Modifier.fillMaxSize().padding(8.dp), verticalArrangement = Arrangement.Center) {
-      Text(detailState.value, fontSize = 20.sp, textAlign = TextAlign.Center)
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+      CrudBenchmarkResultView("FhirEngine#Create", crudUiStateValue.create)
+      CrudBenchmarkResultView("FhirEngine#Get", crudUiStateValue.read)
+      CrudBenchmarkResultView("FhirEngine#Update", crudUiStateValue.update)
+      CrudBenchmarkResultView("FhirEngine#Delete", crudUiStateValue.delete)
     }
   }
+}
+
+@Composable
+internal fun CrudBenchmarkResultView(headline: String, benchmarkDuration: BenchmarkDuration) {
+  Column(Modifier.padding(8.dp)) {
+    Text(headline, style = MaterialTheme.typography.headlineMedium)
+    Spacer(Modifier.size(8.dp))
+    when {
+      benchmarkDuration == BenchmarkDuration.ZERO -> Text("Waiting for results\u2026")
+      else -> {
+        Text("Takes ~${benchmarkDuration.duration} for ${benchmarkDuration.size} resources")
+        Text("Averages: ~${benchmarkDuration.averageDuration}")
+      }
+    }
+  }
+}
+
+@Preview(showBackground = true)
+@Composable
+internal fun PreviewCrudBenchmarkResultView() {
+  CrudBenchmarkResultView("FhirEngine#Create", BenchmarkDuration(20, 1008.milliseconds))
+}
+
+@Preview(showBackground = true)
+@Composable
+internal fun PreviewCrudNilBenchmarkResultView() {
+  CrudBenchmarkResultView("FhirEngine#Create", BenchmarkDuration.ZERO)
 }

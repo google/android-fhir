@@ -19,6 +19,7 @@ package com.google.android.fhir.engine.benchmarks.app
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import androidx.tracing.Trace
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
@@ -31,6 +32,8 @@ class MainApplication : Application() {
 
   override fun onCreate() {
     super.onCreate()
+    Trace.forceEnableAppTracing()
+
     FhirEngineProvider.init(
       FhirEngineConfiguration(
         enableEncryptionIfSupported = true,

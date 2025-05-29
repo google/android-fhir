@@ -16,6 +16,17 @@
 
 package com.google.android.fhir.engine.benchmarks.app
 
-import androidx.lifecycle.ViewModel
+import kotlin.time.Duration
 
-internal class MainViewModel() : ViewModel()
+internal data class BenchmarkDuration(val size: Int, val duration: Duration) {
+  val averageDuration: Duration
+    get() = if (size > 0) duration.div(size) else Duration.ZERO
+
+  companion object {
+    val ZERO: BenchmarkDuration = BenchmarkDuration(size = 0, duration = Duration.ZERO)
+  }
+}
+
+internal operator fun BenchmarkDuration.plus(other: BenchmarkDuration): BenchmarkDuration {
+  return BenchmarkDuration(this.size + other.size, this.duration + other.duration)
+}
