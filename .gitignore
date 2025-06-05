@@ -97,3 +97,6 @@ docs/use/api/*/**
 
 # Kotlin 2.0
 .kotlin/
+
+# Synthea
+synthea

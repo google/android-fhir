@@ -16,8 +16,29 @@
 
 package com.google.android.fhir.engine.benchmarks.app
 
+import kotlin.time.Duration
+import kotlin.time.TimeSource
+import kotlin.time.TimedValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.hl7.fhir.r4.model.Resource
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal val benchmarkingViewModelWorkDispatcher = Dispatchers.Default.limitedParallelism(1)
+
+internal suspend fun measureTimeAsync(block: suspend () -> Unit): Duration {
+  val mark = TimeSource.Monotonic.markNow()
+  block()
+  return mark.elapsedNow()
+}
+
+internal suspend fun <T> measureTimedValueAsync(block: suspend () -> T): TimedValue<T> {
+  val mark = TimeSource.Monotonic.markNow()
+  val result = block()
+  return TimedValue(result, mark.elapsedNow())
+}
+
+internal val Resource.logicalId: String
+  get() {
+    return this.idElement?.idPart.orEmpty()
+  }

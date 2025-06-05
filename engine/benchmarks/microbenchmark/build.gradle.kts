@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-  namespace = "com.google.android.fhir.benchmark"
+  namespace = "com.google.android.fhir.engine.microbenchmark"
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
