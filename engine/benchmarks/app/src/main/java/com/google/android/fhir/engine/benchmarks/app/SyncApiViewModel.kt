@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @Suppress("unused")
-class SyncApiViewModel(
+internal class SyncApiViewModel(
   private val resourcesDataProvider: ResourcesDataProvider,
   private val fhirEngine: FhirEngine,
 ) : ViewModel() {
