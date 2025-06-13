@@ -43,20 +43,21 @@ internal class CrudApiViewModel(
   private suspend fun traceCRUD() {
     // Create
     fhirEngine.clearDatabase()
-    val savedResourceTypeIdPairs: MutableList<List<Pair<ResourceType, String>>> = mutableListOf()
+    var savedResourceTypeIdPairSequence: Sequence<Pair<ResourceType, String>> = sequenceOf()
 
     resourcesDataProvider.collectPatientResources { resources ->
       val (logicalIds, duration) = traceCreateResources(resources)
       val result = BenchmarkDuration(logicalIds.size, duration)
       _crudMutableStateFlow.update { it.copy(create = it.create + result) }
 
-      savedResourceTypeIdPairs += resources.zip(logicalIds) { r, l -> Pair(r.resourceType, l) }
+      savedResourceTypeIdPairSequence +=
+        resources.zip(logicalIds) { r, l -> Pair(r.resourceType, l) }
     }
 
     // Get
     val dbResources =
-      savedResourceTypeIdPairs.mapIndexed { index, list ->
-        val (resourceType, logicalId) = list.shuffled().random()
+      savedResourceTypeIdPairSequence.shuffled().take(RUD_SAMPLE_SIZE).toList().map { pair ->
+        val (resourceType, logicalId) = pair
         val (resource, duration) = traceGetResource(resourceType, logicalId)
 
         val result = BenchmarkDuration(1, duration)
@@ -66,7 +67,7 @@ internal class CrudApiViewModel(
 
     // Update
     val updateDbResources =
-      dbResources.shuffled().mapIndexed { index, resource ->
+      dbResources.shuffled().map { resource ->
         val duration = traceUpdateResources(listOf(resource))
 
         val result = BenchmarkDuration(1, duration)
@@ -75,7 +76,7 @@ internal class CrudApiViewModel(
       }
 
     // Delete
-    updateDbResources.shuffled().forEachIndexed { index, resource ->
+    updateDbResources.shuffled().forEach { resource ->
       val logicalId = resource.idElement?.idPart.orEmpty()
       val duration = traceDeleteResources(resource.resourceType, logicalId)
       val result = BenchmarkDuration(1, duration)
@@ -110,6 +111,8 @@ internal class CrudApiViewModel(
     const val TRACE_UPDATE_SECTION_NAME = "Update API"
     const val TRACE_GET_SECTION_NAME = "Get API"
     const val TRACE_DELETE_SECTION_NAME = "Delete API"
+
+    const val RUD_SAMPLE_SIZE = 500
   }
 }
 
