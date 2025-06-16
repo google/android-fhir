@@ -29,11 +29,8 @@ allprojects {
 }
 
 subprojects {
-  // We have some empty folders like the :contrib root folder, which Gradle recognizes as projects.
-  // Don't configure plugins for those folders.
-  if (project.buildFile.exists()) {
-    configureLicensee()
-  }
+  applyLicenseeConfig()
+
   tasks.withType(Test::class.java).configureEach {
     maxParallelForks = 1
     if (project.providers.environmentVariable("GITHUB_ACTIONS").isPresent) {

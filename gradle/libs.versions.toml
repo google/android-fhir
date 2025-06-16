@@ -8,7 +8,8 @@ androidx-activity = "1.7.2"
 androidx-activity-compose = "1.10.1"
 androidx-appcompat = "1.6.1"
 androidx-arch-core = "2.2.0"
-androidx-benchmark = "1.1.1"
+androidx-benchmark = "1.3.4"
+androidx-benchmark-macro = "1.3.4"
 androidx-compose-bom = "2025.04.01"
 androidx-constraintlayout = "2.1.4"
 androidx-core = "1.10.1"
@@ -48,6 +49,7 @@ androidx-activity-compose = { group = "androidx.activity", name = "activity-comp
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-arch-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "androidx-arch-core" }
 androidx-benchmark-junit4 = { module = "androidx.benchmark:benchmark-junit4", version.ref = "androidx-benchmark" }
+androidx-benchmark-macro-junit4 = { module = "androidx.benchmark:benchmark-macro-junit4", version.ref = "androidx-benchmark-macro" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidx-compose-bom" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
