@@ -16,6 +16,11 @@ nav:
               - use/FEL/Sync-data-with-FHIR-server.md
               - use/FEL/Privacy-Security.md
           - use/FEL/Demo-app.md
+          - Benchmarking:
+              - use/FEL/Benchmark-introduction.md
+              - use/FEL/Benchmark-app.md
+              - use/FEL/Macro-benchmark.md
+              - use/FEL/Benchmark-results-showcase.md
           - Reference:
               - use/FEL/FHIR-search-specification-support.md
       - Structured Data Capture Library:
