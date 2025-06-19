@@ -18,7 +18,7 @@
 # Fail on any error.
 set -e
 
-lib_names=("workflow:benchmark" "engine:benchmark" "datacapture" "engine" "knowledge" "workflow")
+lib_names=("workflow:benchmark" "engine:benchmarks:macrobenchmark" "engine:benchmarks:microbenchmark" "datacapture" "engine" "knowledge" "workflow")
 firebase_pids=()
 
 for lib_name in "${lib_names[@]}"; do
