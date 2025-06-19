@@ -1,6 +1,6 @@
-# FhirEngine Benchmark App
+# _FHIR Engine Library_ Benchmark App
 
-The FhirEngine Benchmark app runs benchmarks for the _FHIR Engine Library_ APIs including Data Access API, Search API and Sync API.
+The _FHIR Engine Library_ Benchmark app runs benchmarks for the _FHIR Engine Library_ APIs including Data Access API, Search API and Sync API.
 
 It can be configured to run the benchmarks for different population sizes whereby population refers to the number of Patients and their associated data
 

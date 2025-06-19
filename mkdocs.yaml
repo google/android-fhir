@@ -20,7 +20,7 @@ nav:
               - use/FEL/Benchmark-introduction.md
               - use/FEL/Benchmark-app.md
               - use/FEL/Macro-benchmark.md
-              - use/FEL/Benchmark-results-showcase.md
+              - use/FEL/Benchmark-results.md
           - Reference:
               - use/FEL/FHIR-search-specification-support.md
       - Structured Data Capture Library:
