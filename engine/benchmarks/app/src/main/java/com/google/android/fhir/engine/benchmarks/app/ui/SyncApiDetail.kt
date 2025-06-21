@@ -54,45 +54,52 @@ internal fun SyncApiDetail(viewModel: SyncApiViewModel, navigateToHome: () -> Un
     viewModel.downloadBenchmarkSyncStateFlow.collectAsStateWithLifecycle()
   val downloadSyncBenchmarkStateValue by remember { downloadSyncBenchmarkState }
 
-  DetailScaffold("Sync API", navigateToHome) { SyncApiView(downloadSyncBenchmarkStateValue) }
+  val uploadSyncBenchmarkState =
+    viewModel.uploadBenchmarkSyncStateFlow.collectAsStateWithLifecycle()
+  val uploadSyncBenchmarkStateValue by remember { uploadSyncBenchmarkState }
+
+  DetailScaffold("Sync API", navigateToHome) {
+    SyncApiView(downloadSyncBenchmarkStateValue, uploadSyncBenchmarkStateValue)
+  }
 }
 
 @Composable
-internal fun SyncApiView(downloadSynBenchmarkSyncState: BenchmarkSyncState) {
+internal fun SyncApiView(
+  downloadSynBenchmarkSyncState: BenchmarkSyncState,
+  uploadSynBenchmarkSyncState: BenchmarkSyncState,
+) {
   Column(
     Modifier.fillMaxSize().padding(8.dp),
     verticalArrangement = Arrangement.spacedBy(16.dp),
   ) {
-    Column {
-      Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth(),
-      ) {
-        Text("Download", style = MaterialTheme.typography.titleMedium)
-        SyncProgressIndicator(downloadSynBenchmarkSyncState.syncStatus)
-      }
-      Spacer(modifier = Modifier.height(8.dp))
+    SyncBenchmarkView("Download", downloadSynBenchmarkSyncState)
+    SyncBenchmarkView("Upload", uploadSynBenchmarkSyncState)
+  }
+}
+
+@Composable
+internal fun SyncBenchmarkView(type: String, syncState: BenchmarkSyncState) {
+  Column {
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween,
+      modifier = Modifier.fillMaxWidth(),
+    ) {
+      Text(type, style = MaterialTheme.typography.titleMedium)
+      SyncProgressIndicator(syncState.syncStatus)
+    }
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+      "${if (syncState.benchmarkDuration == Duration.ZERO) "-" else syncState.benchmarkDuration}",
+      style = MaterialTheme.typography.displaySmall,
+      fontFamily = FontFamily.Monospace,
+    )
+
+    if (syncState.completedResources > 0 && syncState.benchmarkDuration != Duration.ZERO) {
       Text(
-        "${if (downloadSynBenchmarkSyncState.benchmarkDuration == Duration.ZERO) "-" else downloadSynBenchmarkSyncState.benchmarkDuration}",
-        style = MaterialTheme.typography.displaySmall,
+        "Completed: ${syncState.completedResources} resources",
         fontFamily = FontFamily.Monospace,
       )
-
-      if (
-        downloadSynBenchmarkSyncState.completedResources > 0 &&
-          downloadSynBenchmarkSyncState.benchmarkDuration != Duration.ZERO
-      ) {
-        Text(
-          "Completed: ${downloadSynBenchmarkSyncState.completedResources} resources",
-          fontFamily = FontFamily.Monospace,
-        )
-      }
-    }
-
-    Column {
-      Text("Upload", style = MaterialTheme.typography.titleMedium)
-      Text("-", style = MaterialTheme.typography.displaySmall, fontFamily = FontFamily.Monospace)
     }
   }
 }
@@ -126,7 +133,14 @@ internal fun SyncProgressIndicator(currentSyncJobStatus: CurrentSyncJobStatus) {
 @Preview(showBackground = true)
 @Composable
 internal fun PreviewSyncApiView() {
-  SyncApiView(BenchmarkSyncState(benchmarkDuration = 20.milliseconds, completedResources = 20_000))
+  SyncApiView(
+    BenchmarkSyncState(benchmarkDuration = 20.milliseconds, completedResources = 20_000),
+    BenchmarkSyncState(
+      benchmarkDuration = 18.milliseconds,
+      completedResources = 100,
+      syncStatus = CurrentSyncJobStatus.Succeeded(OffsetDateTime.now()),
+    ),
+  )
 }
 
 @Preview(showBackground = true)
