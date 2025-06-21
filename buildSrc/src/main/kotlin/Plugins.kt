@@ -31,6 +31,7 @@ object Plugins {
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
     const val ruler = "com.spotify.ruler"
     const val spotless = "com.diffplug.spotless"
+    const val androidTest = "com.android.test"
   }
 
   // classpath plugins
@@ -50,7 +51,7 @@ object Plugins {
 
   object Versions {
     const val androidGradlePlugin = "8.9.2"
-    const val benchmarkPlugin = "1.1.0"
+    const val benchmarkPlugin = "1.3.4"
     const val dokka = "1.9.20"
     const val kspPlugin = "2.1.20-2.0.1"
     const val kotlin = "2.1.20"

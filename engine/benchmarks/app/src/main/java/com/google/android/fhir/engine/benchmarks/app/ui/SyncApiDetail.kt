@@ -18,24 +18,142 @@ package com.google.android.fhir.engine.benchmarks.app.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.fhir.engine.benchmarks.app.BenchmarkSyncState
 import com.google.android.fhir.engine.benchmarks.app.SyncApiViewModel
+import com.google.android.fhir.sync.CurrentSyncJobStatus
+import com.google.android.fhir.sync.SyncJobStatus
+import com.google.android.fhir.sync.SyncOperation
+import java.time.OffsetDateTime
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
-fun SyncApiDetail(viewModel: SyncApiViewModel, navigateToHome: () -> Unit) {
-  val detailState = viewModel.detailStateFlow.collectAsStateWithLifecycle()
+internal fun SyncApiDetail(viewModel: SyncApiViewModel, navigateToHome: () -> Unit) {
+  val downloadSyncBenchmarkState =
+    viewModel.downloadBenchmarkSyncStateFlow.collectAsStateWithLifecycle()
+  val downloadSyncBenchmarkStateValue by remember { downloadSyncBenchmarkState }
+
+  val uploadSyncBenchmarkState =
+    viewModel.uploadBenchmarkSyncStateFlow.collectAsStateWithLifecycle()
+  val uploadSyncBenchmarkStateValue by remember { uploadSyncBenchmarkState }
 
   DetailScaffold("Sync API", navigateToHome) {
-    Column(Modifier.fillMaxSize().padding(8.dp), verticalArrangement = Arrangement.Center) {
-      Text(detailState.value, fontSize = 20.sp, textAlign = TextAlign.Center)
+    SyncApiView(downloadSyncBenchmarkStateValue, uploadSyncBenchmarkStateValue)
+  }
+}
+
+@Composable
+internal fun SyncApiView(
+  downloadSynBenchmarkSyncState: BenchmarkSyncState,
+  uploadSynBenchmarkSyncState: BenchmarkSyncState,
+) {
+  Column(
+    Modifier.fillMaxSize().padding(8.dp),
+    verticalArrangement = Arrangement.spacedBy(16.dp),
+  ) {
+    SyncBenchmarkView("Download", downloadSynBenchmarkSyncState)
+    SyncBenchmarkView("Upload", uploadSynBenchmarkSyncState)
+  }
+}
+
+@Composable
+internal fun SyncBenchmarkView(type: String, syncState: BenchmarkSyncState) {
+  Column {
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween,
+      modifier = Modifier.fillMaxWidth(),
+    ) {
+      Text(type, style = MaterialTheme.typography.titleMedium)
+      SyncProgressIndicator(syncState.syncStatus)
     }
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+      "${if (syncState.benchmarkDuration == Duration.ZERO) "-" else syncState.benchmarkDuration}",
+      style = MaterialTheme.typography.displaySmall,
+      fontFamily = FontFamily.Monospace,
+    )
+
+    if (syncState.completedResources > 0 && syncState.benchmarkDuration != Duration.ZERO) {
+      Text(
+        "Completed: ${syncState.completedResources} resources",
+        fontFamily = FontFamily.Monospace,
+      )
+    }
+  }
+}
+
+@Composable
+internal fun SyncProgressIndicator(currentSyncJobStatus: CurrentSyncJobStatus) {
+  val status =
+    when (currentSyncJobStatus) {
+      is CurrentSyncJobStatus.Enqueued -> "Started \u2026"
+      is CurrentSyncJobStatus.Running -> "Running \u2026"
+      is CurrentSyncJobStatus.Failed -> "Failed"
+      is CurrentSyncJobStatus.Succeeded -> "Success"
+      is CurrentSyncJobStatus.Cancelled -> "Cancelled"
+      is CurrentSyncJobStatus.Blocked -> "Blocked"
+    }
+
+  Row(
+    verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
+  ) {
+    if (
+      currentSyncJobStatus is CurrentSyncJobStatus.Running ||
+        currentSyncJobStatus == CurrentSyncJobStatus.Enqueued
+    ) {
+      CircularProgressIndicator(modifier = Modifier.then(Modifier.size(16.dp)))
+    }
+    Text(status)
+  }
+}
+
+@Preview(showBackground = true)
+@Composable
+internal fun PreviewSyncApiView() {
+  SyncApiView(
+    BenchmarkSyncState(benchmarkDuration = 20.milliseconds, completedResources = 20_000),
+    BenchmarkSyncState(
+      benchmarkDuration = 18.milliseconds,
+      completedResources = 100,
+      syncStatus = CurrentSyncJobStatus.Succeeded(OffsetDateTime.now()),
+    ),
+  )
+}
+
+@Preview(showBackground = true)
+@Composable
+internal fun PreviewSyncProgressIndicator() {
+  Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    SyncProgressIndicator(CurrentSyncJobStatus.Enqueued)
+    SyncProgressIndicator(
+      CurrentSyncJobStatus.Running(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, 100, 50)),
+    )
+    SyncProgressIndicator(CurrentSyncJobStatus.Failed(OffsetDateTime.now()))
+    SyncProgressIndicator(CurrentSyncJobStatus.Succeeded(OffsetDateTime.now()))
+    SyncProgressIndicator(CurrentSyncJobStatus.Cancelled)
+    SyncProgressIndicator(CurrentSyncJobStatus.Blocked)
   }
 }
