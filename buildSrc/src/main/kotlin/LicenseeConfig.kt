@@ -19,8 +19,8 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 
 fun Project.applyLicenseeConfig() {
-  // Skip project "demo:benchmark" since it's a "com.android.test" project which is not compatible
-  // with Licensee
+  // Skip project ":engine:benchmarks:macrobenchmark" since it's a "com.android.test" project
+  // which is not compatible with Licensee
   if (project.path == ":engine:benchmarks:macrobenchmark") {
     return
   }

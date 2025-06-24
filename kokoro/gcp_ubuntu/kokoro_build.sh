@@ -101,8 +101,8 @@ function build_only() {
 }
 
 function setup_device_benchmarks() {
-  ./gradlew :engine:benchmark:app:generateSynthea -Ppopulation=10000 > /dev/null
-  ./gradlew :engine:benchmark:app:assembleBenchmark :engine:benchmarks:macrobenchmark:assembleBenchmark
+  ./gradlew :engine:benchmarks:app:generateSynthea -Ppopulation=10000 > /dev/null
+  ./gradlew :engine:benchmarks:app:assembleBenchmark :engine:benchmarks:macrobenchmark:assembleBenchmark
 }
 
 # Runs instrumentation tests using Firebase Test Lab, and retrieves the code
