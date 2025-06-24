@@ -24,41 +24,31 @@ import android.content.IntentFilter
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.tracing.traceAsync
 import androidx.work.ExistingWorkPolicy
-import androidx.work.WorkerParameters
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.engine.benchmarks.app.data.BundleUploadFhirSyncWorker
+import com.google.android.fhir.engine.benchmarks.app.data.DownloadFhirSyncWorker
+import com.google.android.fhir.engine.benchmarks.app.data.PerResourceUploadFhirSyncWorker
 import com.google.android.fhir.engine.benchmarks.app.data.ResourcesDataProvider
-import com.google.android.fhir.search.search
-import com.google.android.fhir.sync.AcceptLocalConflictResolver
-import com.google.android.fhir.sync.AcceptRemoteConflictResolver
-import com.google.android.fhir.sync.ConflictResolver
+import com.google.android.fhir.engine.benchmarks.app.data.SYNC_BUNDLE_UPLOAD_BENCHMARK_BROADCAST_ACTION
+import com.google.android.fhir.engine.benchmarks.app.data.SYNC_DOWNLOAD_BENCHMARK_BROADCAST_ACTION
+import com.google.android.fhir.engine.benchmarks.app.data.SYNC_INDIVIDUAL_UPLOAD_BENCHMARK_BROADCAST_ACTION
 import com.google.android.fhir.sync.CurrentSyncJobStatus
 import com.google.android.fhir.sync.CurrentSyncJobStatus.Cancelled
 import com.google.android.fhir.sync.CurrentSyncJobStatus.Failed
 import com.google.android.fhir.sync.CurrentSyncJobStatus.Running
 import com.google.android.fhir.sync.CurrentSyncJobStatus.Succeeded
-import com.google.android.fhir.sync.DownloadWorkManager
-import com.google.android.fhir.sync.FhirSyncWorker
 import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.SyncJobStatus
 import com.google.android.fhir.sync.SyncOperation
 import com.google.android.fhir.sync.defaultRetryConfiguration
-import com.google.android.fhir.sync.download.ResourceParamsBasedDownloadWorkManager
-import com.google.android.fhir.sync.upload.HttpCreateMethod
-import com.google.android.fhir.sync.upload.HttpUpdateMethod
-import com.google.android.fhir.sync.upload.UploadStrategy
 import kotlin.time.Duration
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.ResourceType
 
 @ExperimentalCoroutinesApi
 internal class SyncApiViewModel(
@@ -70,8 +60,13 @@ internal class SyncApiViewModel(
   private val _downloadBenchmarkSyncMutableStateFlow = MutableStateFlow(BenchmarkSyncState())
   val downloadBenchmarkSyncStateFlow = _downloadBenchmarkSyncMutableStateFlow.asStateFlow()
 
-  private val _uploadBenchmarkSyncMutableStateFlow = MutableStateFlow(BenchmarkSyncState())
-  val uploadBenchmarkSyncStateFlow = _uploadBenchmarkSyncMutableStateFlow.asStateFlow()
+  private val _bundleUploadBenchmarkSyncMutableStateFlow = MutableStateFlow(BenchmarkSyncState())
+  val bundleUploadBenchmarkSyncStateFlow = _bundleUploadBenchmarkSyncMutableStateFlow.asStateFlow()
+
+  private val _perResourceChangeUploadBenchmarkSyncMutableStateFlow =
+    MutableStateFlow(BenchmarkSyncState())
+  val perResourceChangeUploadBenchmarkSyncStateFlow =
+    _perResourceChangeUploadBenchmarkSyncMutableStateFlow.asStateFlow()
 
   private val syncBenchmarkBroadcastReceiver =
     object : BroadcastReceiver() {
@@ -83,9 +78,15 @@ internal class SyncApiViewModel(
               it.copy(benchmarkDuration = benchmarkDuration)
             }
           }
-          SYNC_UPLOAD_BENCHMARK_BROADCAST_ACTION -> {
+          SYNC_BUNDLE_UPLOAD_BENCHMARK_BROADCAST_ACTION -> {
             val benchmarkDuration = Duration.parse(intent.getStringExtra("benchmarkDuration")!!)
-            _uploadBenchmarkSyncMutableStateFlow.update {
+            _bundleUploadBenchmarkSyncMutableStateFlow.update {
+              it.copy(benchmarkDuration = benchmarkDuration)
+            }
+          }
+          SYNC_INDIVIDUAL_UPLOAD_BENCHMARK_BROADCAST_ACTION -> {
+            val benchmarkDuration = Duration.parse(intent.getStringExtra("benchmarkDuration")!!)
+            _perResourceChangeUploadBenchmarkSyncMutableStateFlow.update {
               it.copy(benchmarkDuration = benchmarkDuration)
             }
           }
@@ -108,23 +109,44 @@ internal class SyncApiViewModel(
             it.updateWith(currentSyncJobStatus, SyncOperation.DOWNLOAD)
           }
 
-          if (currentSyncJobStatus is Succeeded || currentSyncJobStatus is Failed) {
+          if (currentSyncJobStatus.isCompleted()) {
             downloadSyncCompletableDeferred.complete(currentSyncJobStatus is Succeeded)
           }
         }
     }
 
+    val bundleUploadCompletableDeferred = CompletableDeferred<Boolean>()
     viewModelScope.launch(benchmarkingViewModelWorkDispatcher) {
       downloadSyncCompletableDeferred.await()
-      Sync.oneTimeSync<UploadFhirSyncWorker>(
+      Sync.oneTimeSync<BundleUploadFhirSyncWorker>(
           getApplication(),
           defaultRetryConfiguration.copy(maxRetries = 0),
           ExistingWorkPolicy.REPLACE,
         )
         .collect { currentSyncJobStatus ->
-          _uploadBenchmarkSyncMutableStateFlow.update {
+          _bundleUploadBenchmarkSyncMutableStateFlow.update {
             it.updateWith(currentSyncJobStatus, SyncOperation.UPLOAD)
           }
+
+          if (currentSyncJobStatus.isCompleted()) {
+            bundleUploadCompletableDeferred.complete(currentSyncJobStatus is Succeeded)
+          }
+          println(currentSyncJobStatus)
+        }
+    }
+
+    viewModelScope.launch(benchmarkingViewModelWorkDispatcher) {
+      bundleUploadCompletableDeferred.await()
+      Sync.oneTimeSync<PerResourceUploadFhirSyncWorker>(
+          getApplication(),
+          defaultRetryConfiguration.copy(maxRetries = 0),
+          ExistingWorkPolicy.REPLACE,
+        )
+        .collect { currentSyncJobStatus ->
+          _perResourceChangeUploadBenchmarkSyncMutableStateFlow.update {
+            it.updateWith(currentSyncJobStatus, SyncOperation.UPLOAD)
+          }
+          println(currentSyncJobStatus)
         }
     }
   }
@@ -137,7 +159,8 @@ internal class SyncApiViewModel(
 
   private fun cancelWorkers() {
     viewModelScope.launch(benchmarkingViewModelWorkDispatcher) {
-      Sync.cancelOneTimeSync<UploadFhirSyncWorker>(getApplication())
+      Sync.cancelOneTimeSync<PerResourceUploadFhirSyncWorker>(getApplication())
+      Sync.cancelOneTimeSync<BundleUploadFhirSyncWorker>(getApplication())
       Sync.cancelOneTimeSync<DownloadFhirSyncWorker>(getApplication())
     }
   }
@@ -149,6 +172,18 @@ internal class SyncApiViewModel(
       IntentFilter(SYNC_DOWNLOAD_BENCHMARK_BROADCAST_ACTION),
       ContextCompat.RECEIVER_NOT_EXPORTED,
     )
+    ContextCompat.registerReceiver(
+      getApplication(),
+      syncBenchmarkBroadcastReceiver,
+      IntentFilter(SYNC_BUNDLE_UPLOAD_BENCHMARK_BROADCAST_ACTION),
+      ContextCompat.RECEIVER_NOT_EXPORTED,
+    )
+    ContextCompat.registerReceiver(
+      getApplication(),
+      syncBenchmarkBroadcastReceiver,
+      IntentFilter(SYNC_INDIVIDUAL_UPLOAD_BENCHMARK_BROADCAST_ACTION),
+      ContextCompat.RECEIVER_NOT_EXPORTED,
+    )
   }
 
   private fun unRegisterSyncBroadcastReceiver() {
@@ -156,152 +191,13 @@ internal class SyncApiViewModel(
   }
 }
 
-internal const val SYNC_DOWNLOAD_BENCHMARK_BROADCAST_ACTION =
-  "com.google.android.fhir.engine.benchmarks.app.ACTION_SYNC_DOWNLOAD_BENCHMARK_DATA"
-
-internal const val SYNC_UPLOAD_BENCHMARK_BROADCAST_ACTION =
-  "com.google.android.fhir.engine.benchmarks.app.ACTION_SYNC_UPLOAD_BENCHMARK_DATA"
-
-internal class DownloadFhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
-  FhirSyncWorker(appContext, workerParams) {
-
-  override fun getFhirEngine(): FhirEngine = MainApplication.fhirEngine(applicationContext)
-
-  override fun getDownloadWorkManager(): DownloadWorkManager =
-    ResourceParamsBasedDownloadWorkManager(
-      syncParams =
-        mapOf(
-          //          ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"),
-          ResourceType.Patient to emptyMap(),
-          ResourceType.Encounter to emptyMap(),
-          ResourceType.Practitioner to emptyMap(),
-          ResourceType.Organization to emptyMap(),
-          ResourceType.Location to emptyMap(),
-        ),
-      context =
-        object : ResourceParamsBasedDownloadWorkManager.TimestampContext {
-          override suspend fun saveLastUpdatedTimestamp(
-            resourceType: ResourceType,
-            timestamp: String?,
-          ) {
-            // no-op
-          }
-
-          override suspend fun getLasUpdateTimestamp(resourceType: ResourceType): String? = null
-        },
-    )
-
-  override fun getConflictResolver(): ConflictResolver = AcceptRemoteConflictResolver
-
-  override fun getUploadStrategy(): UploadStrategy =
-    UploadStrategy.forBundleRequest(
-      methodForCreate = HttpCreateMethod.PUT,
-      methodForUpdate = HttpUpdateMethod.PATCH,
-      squash = true,
-      bundleSize = 0,
-    )
-
-  override suspend fun doWork(): Result {
-    getFhirEngine().clearDatabase()
-
-    val (result, duration) =
-      measureTimedValueAsync { traceAsync(DOWNLOAD_SYNC_TRACE_NAME, 14) { super.doWork() } }
-
-    applicationContext.sendBroadcast(
-      Intent(SYNC_DOWNLOAD_BENCHMARK_BROADCAST_ACTION).apply {
-        putExtra("benchmarkDuration", duration.toString())
-        setPackage("com.google.android.fhir.engine.benchmarks.app")
-      },
-    )
-
-    return result
-  }
-
-  companion object {
-    const val DOWNLOAD_SYNC_TRACE_NAME = "DownloadFhirSyncWorkerTrace"
-  }
-}
-
-internal class UploadFhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
-  FhirSyncWorker(appContext, workerParams) {
-  override fun getFhirEngine(): FhirEngine = MainApplication.fhirEngine(applicationContext)
-
-  override fun getDownloadWorkManager(): DownloadWorkManager =
-    ResourceParamsBasedDownloadWorkManager(
-      syncParams = emptyMap(),
-      context =
-        object : ResourceParamsBasedDownloadWorkManager.TimestampContext {
-          override suspend fun saveLastUpdatedTimestamp(
-            resourceType: ResourceType,
-            timestamp: String?,
-          ) {
-            // no-op
-          }
-
-          override suspend fun getLasUpdateTimestamp(resourceType: ResourceType): String? = null
-        },
-    )
-
-  override fun getConflictResolver(): ConflictResolver = AcceptLocalConflictResolver
-
-  override fun getUploadStrategy(): UploadStrategy =
-    UploadStrategy.forBundleRequest(
-      methodForCreate = HttpCreateMethod.PUT,
-      methodForUpdate = HttpUpdateMethod.PATCH,
-      squash = true,
-      bundleSize = 500,
-    )
-
-  override suspend fun doWork(): Result {
-    batchUpdatePatients {
-      it.meta.addTag(
-        Coding().apply {
-          system = "patient-type"
-          code = "benchmark"
-        },
-      )
-    }
-
-    val (result, duration) =
-      measureTimedValueAsync { traceAsync(UPLOAD_SYNC_TRACE_NAME, 65) { super.doWork() } }
-
-    applicationContext.sendBroadcast(
-      Intent(SYNC_UPLOAD_BENCHMARK_BROADCAST_ACTION).apply {
-        putExtra("benchmarkDuration", duration.toString())
-        setPackage("com.google.android.fhir.engine.benchmarks.app")
-      },
-    )
-
-    return result
-  }
-
-  private suspend fun batchUpdatePatients(batchSize: Int = 250, updateBlock: (Patient) -> Unit) {
-    val fhirEngine = getFhirEngine()
-
-    var counter = 0
-    do {
-      val patients =
-        fhirEngine
-          .search<Patient> {
-            count = batchSize
-            from = counter
-          }
-          .map { it.resource }
-      patients.forEach { updateBlock(it) }
-      counter += patients.size
-    } while (patients.size == batchSize)
-  }
-
-  companion object {
-    const val UPLOAD_SYNC_TRACE_NAME = "UploadFhirSyncWorker"
-  }
-}
-
 internal data class BenchmarkSyncState(
   val syncStatus: CurrentSyncJobStatus = Cancelled,
-  val completedResources: Int = -1,
+  val completedResources: Int = 0,
   val benchmarkDuration: Duration = Duration.ZERO,
-)
+) {
+  val isComplete = syncStatus.isCompleted()
+}
 
 internal fun BenchmarkSyncState.updateWith(
   currentSyncJobStatus: CurrentSyncJobStatus,
@@ -322,3 +218,5 @@ internal fun BenchmarkSyncState.updateWith(
     }
     else -> copy(syncStatus = currentSyncJobStatus)
   }
+
+internal fun CurrentSyncJobStatus.isCompleted() = this is Succeeded || this is Failed
