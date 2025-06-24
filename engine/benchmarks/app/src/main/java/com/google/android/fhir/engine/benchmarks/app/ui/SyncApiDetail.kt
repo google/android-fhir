@@ -18,6 +18,7 @@ package com.google.android.fhir.engine.benchmarks.app.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,8 +44,8 @@ import com.google.android.fhir.sync.CurrentSyncJobStatus
 import com.google.android.fhir.sync.SyncJobStatus
 import com.google.android.fhir.sync.SyncOperation
 import java.time.OffsetDateTime
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -54,34 +55,49 @@ internal fun SyncApiDetail(viewModel: SyncApiViewModel, navigateToHome: () -> Un
     viewModel.downloadBenchmarkSyncStateFlow.collectAsStateWithLifecycle()
   val downloadSyncBenchmarkStateValue by remember { downloadSyncBenchmarkState }
 
-  val uploadSyncBenchmarkState =
-    viewModel.uploadBenchmarkSyncStateFlow.collectAsStateWithLifecycle()
-  val uploadSyncBenchmarkStateValue by remember { uploadSyncBenchmarkState }
+  val bundleUploadSyncBenchmarkState =
+    viewModel.bundleUploadBenchmarkSyncStateFlow.collectAsStateWithLifecycle()
+  val bundleUploadSyncBenchmarkStateValue by remember { bundleUploadSyncBenchmarkState }
+
+  val perResourceChangeUploadSyncBenchmarkState =
+    viewModel.perResourceChangeUploadBenchmarkSyncStateFlow.collectAsStateWithLifecycle()
+  val perResourceChangeUploadSyncBenchmarkStateValue by remember {
+    perResourceChangeUploadSyncBenchmarkState
+  }
 
   DetailScaffold("Sync API", navigateToHome) {
-    SyncApiView(downloadSyncBenchmarkStateValue, uploadSyncBenchmarkStateValue)
+    SyncApiView(
+      downloadSyncBenchmarkStateValue,
+      bundleUploadSyncBenchmarkStateValue,
+      perResourceChangeUploadSyncBenchmarkStateValue,
+    )
   }
 }
 
 @Composable
 internal fun SyncApiView(
   downloadSynBenchmarkSyncState: BenchmarkSyncState,
-  uploadSynBenchmarkSyncState: BenchmarkSyncState,
+  bundleUploadSynBenchmarkSyncState: BenchmarkSyncState,
+  perResourceChangeUploadBenchmarkSyncState: BenchmarkSyncState,
 ) {
   Column(
     Modifier.fillMaxSize().padding(8.dp),
-    verticalArrangement = Arrangement.spacedBy(16.dp),
+    verticalArrangement = Arrangement.spacedBy(24.dp),
   ) {
     SyncBenchmarkView("Download", downloadSynBenchmarkSyncState)
-    SyncBenchmarkView("Upload", uploadSynBenchmarkSyncState)
+    SyncBenchmarkView("Upload (Transaction Bundle)", bundleUploadSynBenchmarkSyncState)
+    SyncBenchmarkView(
+      "Upload (Individual - Per Resource)",
+      perResourceChangeUploadBenchmarkSyncState,
+    )
   }
 }
 
 @Composable
 internal fun SyncBenchmarkView(type: String, syncState: BenchmarkSyncState) {
   Column {
-    Row(
-      verticalAlignment = Alignment.CenterVertically,
+    FlowRow(
+      itemVerticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween,
       modifier = Modifier.fillMaxWidth(),
     ) {
@@ -90,12 +106,12 @@ internal fun SyncBenchmarkView(type: String, syncState: BenchmarkSyncState) {
     }
     Spacer(modifier = Modifier.height(8.dp))
     Text(
-      "${if (syncState.benchmarkDuration == Duration.ZERO) "-" else syncState.benchmarkDuration}",
+      "${if (syncState.isComplete) syncState.benchmarkDuration else "-"}",
       style = MaterialTheme.typography.displaySmall,
       fontFamily = FontFamily.Monospace,
     )
 
-    if (syncState.completedResources > 0 && syncState.benchmarkDuration != Duration.ZERO) {
+    if (syncState.isComplete) {
       Text(
         "Completed: ${syncState.completedResources} resources",
         fontFamily = FontFamily.Monospace,
@@ -106,14 +122,18 @@ internal fun SyncBenchmarkView(type: String, syncState: BenchmarkSyncState) {
 
 @Composable
 internal fun SyncProgressIndicator(currentSyncJobStatus: CurrentSyncJobStatus) {
+  if (currentSyncJobStatus is CurrentSyncJobStatus.Cancelled) {
+    return
+  }
+
   val status =
     when (currentSyncJobStatus) {
       is CurrentSyncJobStatus.Enqueued -> "Started \u2026"
       is CurrentSyncJobStatus.Running -> "Running \u2026"
       is CurrentSyncJobStatus.Failed -> "Failed"
       is CurrentSyncJobStatus.Succeeded -> "Success"
-      is CurrentSyncJobStatus.Cancelled -> "Cancelled"
       is CurrentSyncJobStatus.Blocked -> "Blocked"
+      else -> ""
     }
 
   Row(
@@ -137,6 +157,29 @@ internal fun PreviewSyncApiView() {
     BenchmarkSyncState(benchmarkDuration = 20.milliseconds, completedResources = 20_000),
     BenchmarkSyncState(
       benchmarkDuration = 18.milliseconds,
+      completedResources = 100,
+      syncStatus = CurrentSyncJobStatus.Succeeded(OffsetDateTime.now()),
+    ),
+    BenchmarkSyncState(
+      benchmarkDuration = 18.seconds,
+      completedResources = 100,
+      syncStatus = CurrentSyncJobStatus.Succeeded(OffsetDateTime.now()),
+    ),
+  )
+}
+
+@Preview(showBackground = true, widthDp = 200)
+@Composable
+internal fun PreviewSyncApiViewSmallWidth() {
+  SyncApiView(
+    BenchmarkSyncState(benchmarkDuration = 20.milliseconds, completedResources = 20_000),
+    BenchmarkSyncState(
+      benchmarkDuration = 18.milliseconds,
+      completedResources = 100,
+      syncStatus = CurrentSyncJobStatus.Succeeded(OffsetDateTime.now()),
+    ),
+    BenchmarkSyncState(
+      benchmarkDuration = 18.seconds,
       completedResources = 100,
       syncStatus = CurrentSyncJobStatus.Succeeded(OffsetDateTime.now()),
     ),
