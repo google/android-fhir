@@ -65,8 +65,10 @@ include(":workflow-testing")
 
 include(":workflow:benchmark")
 
-include(":engine:benchmarks:app")
-
-include(":engine:benchmark")
+include(
+  ":engine:benchmarks:app",
+  ":engine:benchmarks:microbenchmark",
+  ":engine:benchmarks:macrobenchmark",
+)
 
 include(":workflow_demo")

@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @Suppress("unused")
-class SearchApiViewModel(
+internal class SearchApiViewModel(
   private val resourcesDataProvider: ResourcesDataProvider,
   private val fhirEngine: FhirEngine,
 ) : ViewModel() {

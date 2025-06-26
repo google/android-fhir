@@ -30,7 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.fhir.engine.benchmarks.app.SearchApiViewModel
 
 @Composable
-fun SearchApiDetail(viewModel: SearchApiViewModel, navigateToHome: () -> Unit) {
+internal fun SearchApiDetail(viewModel: SearchApiViewModel, navigateToHome: () -> Unit) {
   val detailState = viewModel.detailStateFlow.collectAsStateWithLifecycle()
 
   DetailScaffold("Search API", navigateToHome) {
