@@ -122,18 +122,13 @@ internal fun SyncBenchmarkView(type: String, syncState: BenchmarkSyncState) {
 
 @Composable
 internal fun SyncProgressIndicator(currentSyncJobStatus: CurrentSyncJobStatus) {
-  if (currentSyncJobStatus is CurrentSyncJobStatus.Cancelled) {
-    return
-  }
-
   val status =
     when (currentSyncJobStatus) {
-      is CurrentSyncJobStatus.Enqueued -> "Started \u2026"
       is CurrentSyncJobStatus.Running -> "Running \u2026"
       is CurrentSyncJobStatus.Failed -> "Failed"
       is CurrentSyncJobStatus.Succeeded -> "Success"
       is CurrentSyncJobStatus.Blocked -> "Blocked"
-      else -> ""
+      else -> "Waiting \u2026"
     }
 
   Row(
@@ -158,7 +153,8 @@ internal fun PreviewSyncApiView() {
     BenchmarkSyncState(
       benchmarkDuration = 18.milliseconds,
       completedResources = 100,
-      syncStatus = CurrentSyncJobStatus.Succeeded(OffsetDateTime.now()),
+      syncStatus =
+        CurrentSyncJobStatus.Running(SyncJobStatus.InProgress(SyncOperation.UPLOAD, 100, 100)),
     ),
     BenchmarkSyncState(
       benchmarkDuration = 18.seconds,
@@ -176,7 +172,8 @@ internal fun PreviewSyncApiViewSmallWidth() {
     BenchmarkSyncState(
       benchmarkDuration = 18.milliseconds,
       completedResources = 100,
-      syncStatus = CurrentSyncJobStatus.Succeeded(OffsetDateTime.now()),
+      syncStatus =
+        CurrentSyncJobStatus.Running(SyncJobStatus.InProgress(SyncOperation.UPLOAD, 100, 100)),
     ),
     BenchmarkSyncState(
       benchmarkDuration = 18.seconds,

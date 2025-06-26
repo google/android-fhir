@@ -54,12 +54,7 @@ internal class DownloadFhirSyncWorker(appContext: Context, workerParams: WorkerP
     ResourceParamsBasedDownloadWorkManager(
       syncParams =
         mapOf(
-          //          ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"),
           ResourceType.Patient to emptyMap(),
-          //          ResourceType.Encounter to emptyMap(),
-          //          ResourceType.Practitioner to emptyMap(),
-          //          ResourceType.Organization to emptyMap(),
-          //          ResourceType.Location to emptyMap(),
         ),
       context =
         object : ResourceParamsBasedDownloadWorkManager.TimestampContext {
@@ -101,7 +96,7 @@ internal class DownloadFhirSyncWorker(appContext: Context, workerParams: WorkerP
   }
 
   companion object {
-    const val DOWNLOAD_SYNC_TRACE_NAME = "DownloadFhirSyncWorkerTrace"
+    const val DOWNLOAD_SYNC_TRACE_NAME = "DownloadFhirSyncWorkerSection"
   }
 }
 
@@ -111,7 +106,7 @@ internal class BundleUploadFhirSyncWorker(appContext: Context, workerParams: Wor
     get() = SYNC_BUNDLE_UPLOAD_BENCHMARK_BROADCAST_ACTION
 
   override val traceSectionNameIdentifier: String
-    get() = "BundleUploadFhirSyncWorker"
+    get() = "BundleUploadFhirSyncWorkerSection"
 
   override fun getUploadStrategy(): UploadStrategy =
     UploadStrategy.forBundleRequest(
@@ -130,7 +125,7 @@ internal class PerResourceUploadFhirSyncWorker(
     get() = SYNC_INDIVIDUAL_UPLOAD_BENCHMARK_BROADCAST_ACTION
 
   override val traceSectionNameIdentifier: String
-    get() = "PerResourceUploadFhirSyncWorker"
+    get() = "PerResourceUploadFhirSyncWorkerSection"
 
   override fun getUploadStrategy(): UploadStrategy =
     UploadStrategy.forIndividualRequest(
@@ -183,7 +178,7 @@ internal abstract class UploadFhirSyncWorker(appContext: Context, workerParams: 
     return result
   }
 
-  private suspend fun batchUpdatePatients(batchSize: Int = 250, updateBlock: (Patient) -> Unit) {
+  private suspend fun batchUpdatePatients(batchSize: Int = 500, updateBlock: (Patient) -> Unit) {
     val fhirEngine = getFhirEngine()
 
     var counter = 0

@@ -131,7 +131,6 @@ internal class SyncApiViewModel(
           if (currentSyncJobStatus.isCompleted()) {
             bundleUploadCompletableDeferred.complete(currentSyncJobStatus is Succeeded)
           }
-          println(currentSyncJobStatus)
         }
     }
 
@@ -146,7 +145,6 @@ internal class SyncApiViewModel(
           _perResourceChangeUploadBenchmarkSyncMutableStateFlow.update {
             it.updateWith(currentSyncJobStatus, SyncOperation.UPLOAD)
           }
-          println(currentSyncJobStatus)
         }
     }
   }
