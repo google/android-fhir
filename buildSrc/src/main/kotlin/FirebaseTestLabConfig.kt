@@ -60,12 +60,16 @@ fun Project.configureFirebaseTestLabForMacroBenchmark() {
   apply(plugin = Plugins.BuildPlugins.fladle)
   configure<FlankGradleExtension> {
     commonConfigurationForFirebaseTestLabBenchmark(this@configureFirebaseTestLabForMacroBenchmark)
+    useOrchestrator.set(false)
     debugApk.set(
       project.provider {
         "${project.rootDir}/engine/benchmarks/app/build/outputs/apk/benchmark/app-benchmark.apk"
       },
     )
     instrumentationApk.set(project.provider { "$buildDir/outputs/apk/benchmark/*.apk" })
+    testTargets.set(
+      listOf("notClass com.google.android.fhir.engine.macrobenchmark.FhirEngineSyncApiBenchmark"),
+    )
   }
 }
 

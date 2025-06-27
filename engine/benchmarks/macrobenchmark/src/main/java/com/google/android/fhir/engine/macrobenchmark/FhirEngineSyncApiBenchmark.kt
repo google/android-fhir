@@ -17,6 +17,7 @@
 package com.google.android.fhir.engine.macrobenchmark
 
 import androidx.benchmark.macro.ExperimentalMetricApi
+import androidx.benchmark.macro.Metric
 import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -27,33 +28,46 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(ExperimentalMetricApi::class)
-@RunWith(AndroidJUnit4::class)
 @LargeTest
-class FhirEngineCrudBenchmark {
+@RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalMetricApi::class)
+class FhirEngineSyncApiBenchmark {
 
   @get:Rule val benchmarkRule = MacrobenchmarkRule()
 
   @Test
-  fun tracingCrud() {
+  fun tracingSyncApi() {
+    val metrics =
+      listOf<Metric>(
+        TraceSectionMetric(
+          "DownloadFhirSyncWorkerSection",
+          mode = TraceSectionMetric.Mode.Average,
+        ),
+        TraceSectionMetric(
+          "BundleUploadFhirSyncWorkerSection",
+          mode = TraceSectionMetric.Mode.Average,
+        ),
+        TraceSectionMetric(
+          "PerResourceUploadFhirSyncWorkerSection",
+          mode = TraceSectionMetric.Mode.Average,
+        ),
+      )
+
     benchmarkRule.measureRepeated(
       packageName = TARGET_PACKAGE,
-      metrics =
-        listOf(
-          TraceSectionMetric("Create API", mode = TraceSectionMetric.Mode.Sum),
-          TraceSectionMetric("Get API", mode = TraceSectionMetric.Mode.Average),
-          TraceSectionMetric("Update API", mode = TraceSectionMetric.Mode.Average),
-          TraceSectionMetric("Delete API", mode = TraceSectionMetric.Mode.Average),
-        ),
+      metrics = metrics,
       iterations = 1,
       startupMode = null,
       setupBlock = { startActivityAndWait() },
     ) {
-      clickOnTestTag("crudBenchmarkSection")
+      clickOnTestTag("syncBenchmarkSection")
 
       @Suppress("ControlFlowWithEmptyBody")
       // Loops indefinitely until done - todo: add some form of timeout
-      while (!device.wait(Until.gone(By.textStartsWith("Waiting for results")), 1000)) {}
+      while (!device.wait(Until.gone(By.textStartsWith("Waiting \u2026")), 1000)) {}
+      @Suppress("ControlFlowWithEmptyBody")
+      while (!device.wait(Until.gone(By.textStartsWith("Running \u2026")), 1000)) {}
+
       device.pressBack()
     }
   }
