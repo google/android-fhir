@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ import org.robolectric.util.ReflectionHelpers
  * See: https://developer.android.com/kotlin/coroutines/test#setting-main-dispatcher
  *
  * The TestDispatcher we create is then used to launch a job to collect the results from
- * [QuestionnaireViewModel.questionnaireStateFlow]
+ * [QuestionnaireViewModel.questionnaireStateStateFlow]
  *
  * See: https://developer.android.com/kotlin/flow/test#statein
  */
@@ -150,6 +150,8 @@ class QuestionnaireViewModelTest {
 
   @Before
   fun setUp() {
+    questionnaireViewModelCoroutineContext = mainDispatcherRule.testDispatcher
+
     state = SavedStateHandle()
     check(
       ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
@@ -1611,7 +1613,8 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
       assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination,
+          (viewModel.questionnaireStateStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination,
         )
         .isEqualTo(
           QuestionnairePagination(
@@ -1665,7 +1668,7 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val state = viewModel.questionnaireStateFlow.first()
+    val state = viewModel.questionnaireStateStateFlow.first()
     assertThat((state.displayMode as DisplayMode.EditMode).pagination)
       .isEqualTo(
         QuestionnairePagination(
@@ -1729,7 +1732,8 @@ class QuestionnaireViewModelTest {
       viewModel.goToNextPage()
 
       assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination,
+          (viewModel.questionnaireStateStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination,
         )
         .isEqualTo(
           QuestionnairePagination(
@@ -1785,7 +1789,8 @@ class QuestionnaireViewModelTest {
       viewModel.goToPreviousPage()
 
       assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination,
+          (viewModel.questionnaireStateStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination,
         )
         .isEqualTo(
           QuestionnairePagination(
@@ -1858,7 +1863,8 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination,
+          (viewModel.questionnaireStateStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination,
         )
         .isEqualTo(
           QuestionnairePagination(
@@ -1927,7 +1933,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
       val questionnaireStatePagination =
-        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+        (viewModel.questionnaireStateStateFlow.value.displayMode as DisplayMode.EditMode).pagination
 
       assertThat(
           questionnaireStatePagination,
@@ -2002,7 +2008,7 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       val questionnaireStatePagination =
-        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+        (viewModel.questionnaireStateStateFlow.value.displayMode as DisplayMode.EditMode).pagination
 
       assertThat(
           questionnaireStatePagination,
@@ -2077,7 +2083,8 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination,
+          (viewModel.questionnaireStateStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination,
         )
         .isEqualTo(
           QuestionnairePagination(
@@ -2145,7 +2152,8 @@ class QuestionnaireViewModelTest {
       viewModel.goToNextPage()
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
       assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination,
+          (viewModel.questionnaireStateStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination,
         )
         .isEqualTo(
           QuestionnairePagination(
@@ -2204,7 +2212,8 @@ class QuestionnaireViewModelTest {
 
       assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
       assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination,
+          (viewModel.questionnaireStateStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination,
         )
         .isEqualTo(
           QuestionnairePagination(
@@ -2259,7 +2268,8 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination,
+          (viewModel.questionnaireStateStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination,
         )
         .isEqualTo(
           QuestionnairePagination(
@@ -2315,7 +2325,7 @@ class QuestionnaireViewModelTest {
       viewModel.goToNextPage()
       viewModel.setReviewMode(true)
 
-      val questionnaireState = viewModel.questionnaireStateFlow.value
+      val questionnaireState = viewModel.questionnaireStateStateFlow.value
 
       assertThat(
           (questionnaireState.displayMode as DisplayMode.EditMode).pagination,
@@ -2566,7 +2576,7 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
 
-      val questionnaireState = viewModel.questionnaireStateFlow.value
+      val questionnaireState = viewModel.questionnaireStateStateFlow.value
 
       assertThat(
           (questionnaireState.displayMode as DisplayMode.EditMode).pagination,
@@ -2629,7 +2639,8 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination,
+          (viewModel.questionnaireStateStateFlow.value.displayMode as DisplayMode.EditMode)
+            .pagination,
         )
         .isEqualTo(
           QuestionnairePagination(
@@ -2684,7 +2695,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
-      val questionnaireState1 = viewModel.questionnaireStateFlow.value
+      val questionnaireState1 = viewModel.questionnaireStateStateFlow.value
       assertThat(
           (questionnaireState1.displayMode as DisplayMode.EditMode).pagination,
         )
@@ -2703,7 +2714,7 @@ class QuestionnaireViewModelTest {
 
       viewModel.goToPreviousPage()
 
-      val questionnaireState2 = viewModel.questionnaireStateFlow.value
+      val questionnaireState2 = viewModel.questionnaireStateStateFlow.value
       assertThat(
           (questionnaireState2.displayMode as DisplayMode.EditMode).pagination,
         )
@@ -2742,7 +2753,7 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
-      val questionnaireState = viewModel.questionnaireStateFlow.first()
+      val questionnaireState = viewModel.questionnaireStateStateFlow.first()
       assertThat(
           questionnaireState.bottomNavItem!!.questionnaireNavigationUIState.navReview
             is QuestionnaireNavigationViewUIState.Hidden,
@@ -2770,7 +2781,7 @@ class QuestionnaireViewModelTest {
           enableReviewPage = false,
           showReviewPageFirst = true,
         )
-      val questionnaireState = viewModel.questionnaireStateFlow.first()
+      val questionnaireState = viewModel.questionnaireStateStateFlow.first()
       assertThat(
           questionnaireState.bottomNavItem!!.questionnaireNavigationUIState.navReview
             is QuestionnaireNavigationViewUIState.Hidden,
@@ -2793,7 +2804,7 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
-      val questionnaireState = viewModel.questionnaireStateFlow.first()
+      val questionnaireState = viewModel.questionnaireStateStateFlow.first()
       assertThat(
           questionnaireState.bottomNavItem!!.questionnaireNavigationUIState.navReview
             is QuestionnaireNavigationViewUIState.Enabled,
@@ -2822,9 +2833,9 @@ class QuestionnaireViewModelTest {
           showSubmitButton = true,
         )
       viewModel.setReviewMode(true)
-      assertThat(viewModel.questionnaireStateFlow.first().displayMode)
+      assertThat(viewModel.questionnaireStateStateFlow.first().displayMode)
         .isInstanceOf(DisplayMode.ReviewMode::class.java)
-      assertThat(viewModel.questionnaireStateFlow.first().displayMode)
+      assertThat(viewModel.questionnaireStateStateFlow.first().displayMode)
         .isEqualTo(
           DisplayMode.ReviewMode(
             showEditButton = true,
@@ -2855,7 +2866,7 @@ class QuestionnaireViewModelTest {
         )
 
       assertThat(
-          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.ReviewMode)
+          (viewModel.questionnaireStateStateFlow.first().displayMode as DisplayMode.ReviewMode)
             .showEditButton,
         )
         .isTrue()
@@ -2901,7 +2912,7 @@ class QuestionnaireViewModelTest {
       viewModel.runViewModelBlocking {
         viewModel.goToNextPage()
         assertThat(
-            viewModel.questionnaireStateFlow.value.bottomNavItem!!
+            viewModel.questionnaireStateStateFlow.value.bottomNavItem!!
               .questionnaireNavigationUIState
               .navReview is QuestionnaireNavigationViewUIState.Hidden,
           )
@@ -2948,7 +2959,7 @@ class QuestionnaireViewModelTest {
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
       viewModel.runViewModelBlocking {
         assertThat(
-            viewModel.questionnaireStateFlow.value.bottomNavItem!!
+            viewModel.questionnaireStateStateFlow.value.bottomNavItem!!
               .questionnaireNavigationUIState
               .navReview is QuestionnaireNavigationViewUIState.Hidden,
           )
@@ -2995,7 +3006,7 @@ class QuestionnaireViewModelTest {
       viewModel.runViewModelBlocking {
         viewModel.goToNextPage()
         assertThat(
-            viewModel.questionnaireStateFlow.value.bottomNavItem!!
+            viewModel.questionnaireStateStateFlow.value.bottomNavItem!!
               .questionnaireNavigationUIState
               .navReview is QuestionnaireNavigationViewUIState.Enabled,
           )
@@ -3042,7 +3053,7 @@ class QuestionnaireViewModelTest {
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       viewModel.runViewModelBlocking {
         assertThat(
-            viewModel.questionnaireStateFlow.value.bottomNavItem!!
+            viewModel.questionnaireStateStateFlow.value.bottomNavItem!!
               .questionnaireNavigationUIState
               .navReview is QuestionnaireNavigationViewUIState.Enabled,
           )
@@ -3066,7 +3077,7 @@ class QuestionnaireViewModelTest {
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       viewModel.setReviewMode(false)
       assertThat(
-          viewModel.questionnaireStateFlow
+          viewModel.questionnaireStateStateFlow
             .first()
             .bottomNavItem!!
             .questionnaireNavigationUIState
@@ -3093,7 +3104,7 @@ class QuestionnaireViewModelTest {
       viewModel.setReviewMode(true)
 
       assertThat(
-          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.ReviewMode)
+          (viewModel.questionnaireStateStateFlow.first().displayMode as DisplayMode.ReviewMode)
             .showEditButton,
         )
         .isTrue()
@@ -3120,7 +3131,7 @@ class QuestionnaireViewModelTest {
       )
     viewModel.setReviewMode(true)
 
-    val questionnaireState = viewModel.questionnaireStateFlow.first()
+    val questionnaireState = viewModel.questionnaireStateStateFlow.first()
     assertThat(questionnaireState.items.last())
       .isInstanceOf(QuestionnaireAdapterItem.Navigation::class.java)
   }
@@ -3147,7 +3158,7 @@ class QuestionnaireViewModelTest {
       val viewModel = createQuestionnaireViewModel(questionnaire, readOnlyMode = true)
 
       assertThat(
-          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.ReviewMode)
+          (viewModel.questionnaireStateStateFlow.first().displayMode as DisplayMode.ReviewMode)
             .showEditButton,
         )
         .isFalse()
@@ -3173,7 +3184,7 @@ class QuestionnaireViewModelTest {
         showNavigationInLongScroll = true,
       )
 
-    val questionnaireState = viewModel.questionnaireStateFlow.first()
+    val questionnaireState = viewModel.questionnaireStateStateFlow.first()
     assertThat(questionnaireState.items.last())
       .isInstanceOf(QuestionnaireAdapterItem.Navigation::class.java)
   }
@@ -3198,7 +3209,7 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire, showSubmitButton = false)
     assertThat(
-        viewModel.questionnaireStateFlow
+        viewModel.questionnaireStateStateFlow
           .first()
           .bottomNavItem!!
           .questionnaireNavigationUIState
@@ -3221,7 +3232,7 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire, showSubmitButton = true)
     assertThat(
-        viewModel.questionnaireStateFlow
+        viewModel.questionnaireStateStateFlow
           .first()
           .bottomNavItem!!
           .questionnaireNavigationUIState
@@ -3244,7 +3255,7 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire, showSubmitButton = null)
     assertThat(
-        viewModel.questionnaireStateFlow
+        viewModel.questionnaireStateStateFlow
           .first()
           .bottomNavItem!!
           .questionnaireNavigationUIState
@@ -3273,7 +3284,7 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire, showCancelButton = false)
     assertThat(
-        viewModel.questionnaireStateFlow
+        viewModel.questionnaireStateStateFlow
           .first()
           .bottomNavItem!!
           .questionnaireNavigationUIState
@@ -3296,7 +3307,7 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire, showCancelButton = true)
     assertThat(
-        viewModel.questionnaireStateFlow
+        viewModel.questionnaireStateStateFlow
           .first()
           .bottomNavItem!!
           .questionnaireNavigationUIState
@@ -3319,7 +3330,7 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire, showCancelButton = null)
     assertThat(
-        viewModel.questionnaireStateFlow
+        viewModel.questionnaireStateStateFlow
           .first()
           .bottomNavItem!!
           .questionnaireNavigationUIState
@@ -3365,7 +3376,7 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, showCancelButton = false)
       assertThat(
-          viewModel.questionnaireStateFlow
+          viewModel.questionnaireStateStateFlow
             .first()
             .bottomNavItem!!
             .questionnaireNavigationUIState
@@ -3411,7 +3422,7 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, showCancelButton = true)
       assertThat(
-          viewModel.questionnaireStateFlow
+          viewModel.questionnaireStateStateFlow
             .first()
             .bottomNavItem!!
             .questionnaireNavigationUIState
@@ -3457,7 +3468,7 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, showCancelButton = null)
       assertThat(
-          viewModel.questionnaireStateFlow
+          viewModel.questionnaireStateStateFlow
             .first()
             .bottomNavItem!!
             .questionnaireNavigationUIState
@@ -3485,7 +3496,7 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, showNavigationInLongScroll = true)
-      val questionnaireState = viewModel.questionnaireStateFlow.first()
+      val questionnaireState = viewModel.questionnaireStateStateFlow.first()
       assertThat(questionnaireState.bottomNavItem).isNull()
       assertThat(questionnaireState.items.last())
         .isInstanceOf(QuestionnaireAdapterItem.Navigation::class.java)
@@ -3510,7 +3521,7 @@ class QuestionnaireViewModelTest {
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire)
-      val questionnaireState = viewModel.questionnaireStateFlow.first()
+      val questionnaireState = viewModel.questionnaireStateStateFlow.first()
       assertThat(questionnaireState.items.map { it::class.java })
         .doesNotContain(QuestionnaireAdapterItem.Navigation::class.java)
       assertThat(
@@ -7404,7 +7415,7 @@ class QuestionnaireViewModelTest {
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       assertFailsWith<ClassCastException> {
-        (viewModel.questionnaireStateFlow.value as DisplayMode.EditMode).pagination
+        (viewModel.questionnaireStateStateFlow.value as DisplayMode.EditMode).pagination
       }
     }
   }
@@ -7569,7 +7580,7 @@ class QuestionnaireViewModelTest {
 
       val job =
         this.launch {
-          viewModel.questionnaireStateFlow.collect { questionnaireState ->
+          viewModel.questionnaireStateStateFlow.collect { questionnaireState ->
             descriptionResponseItem =
               questionnaireState.items
                 .find { it.asQuestion().questionnaireItem.linkId == "a-description" }!!
@@ -7581,7 +7592,7 @@ class QuestionnaireViewModelTest {
 
       assertThat(descriptionResponseItem!!.questionText).isNull()
       val ageItemUpdated =
-        viewModel.questionnaireStateFlow.value.items
+        viewModel.questionnaireStateStateFlow.value.items
           .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-age" }
           .asQuestion()
           .apply {
@@ -7603,7 +7614,7 @@ class QuestionnaireViewModelTest {
         .isEqualTo(2)
 
       val descriptionItemUpdated =
-        viewModel.questionnaireStateFlow.value.items
+        viewModel.questionnaireStateStateFlow.value.items
           .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "a-description" }
           .asQuestion()
 
@@ -7693,7 +7704,7 @@ class QuestionnaireViewModelTest {
   }
 
   private fun QuestionnaireViewModel.getQuestionnaireItemViewItemList() =
-    questionnaireStateFlow.value.items
+    questionnaireStateStateFlow.value.items
 
   /**
    * Runs code that relies on the [QuestionnaireViewModel.viewModelScope]. Runs on
@@ -7703,7 +7714,9 @@ class QuestionnaireViewModelTest {
     crossinline block: suspend () -> Unit,
   ) {
     val collectJob =
-      viewModelScope.launch(mainDispatcherRule.testDispatcher) { questionnaireStateFlow.collect() }
+      viewModelScope.launch(mainDispatcherRule.testDispatcher) {
+        questionnaireStateStateFlow.collect()
+      }
     block.invoke()
     collectJob.cancel()
   }
