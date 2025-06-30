@@ -5,52 +5,74 @@ android-fhir-common = "0.1.0-alpha05"
 android-fhir-engine = "0.1.0-beta05"
 android-fhir-knowledge = "0.1.0-beta01"
 androidx-activity = "1.7.2"
+androidx-activity-compose = "1.10.1"
 androidx-appcompat = "1.6.1"
 androidx-arch-core = "2.2.0"
-androidx-benchmark = "1.1.1"
+androidx-benchmark = "1.3.4"
+androidx-benchmark-macro = "1.3.4"
+androidx-compose-bom = "2025.04.01"
 androidx-constraintlayout = "2.1.4"
 androidx-core = "1.10.1"
 androidx-datastore = "1.0.0"
 androidx-espresso = "3.5.1"
 androidx-fragment = "1.6.0"
-androidx-lifecycle = "2.6.1"
+androidx-lifecycle = "2.8.7"
 androidx-navigation = "2.6.0"
+androidx-navigation-compose = "2.8.9"
+androidx-profilerinstaller = "1.4.1"
 androidx-recyclerview = "1.3.2"
-androidx-room = "2.5.2"
-androidx-sqlite = "2.3.1"
+androidx-room = "2.7.1"
+androidx-sqlite = "2.5.0"
 androidx-test-core = "1.6.1"
 androidx-test-ext-junit = "1.1.5"
 androidx-test-rules = "1.5.0"
 androidx-test-runner = "1.5.0"
+androidx-tracing = "1.3.0"
 androidx-work = "2.8.1"
 glide = "4.16.0"
 junit = "4.13.2"
-kotlin-stdlib = "1.9.22"
-kotlin-test = "1.9.22"
+kotlin = "2.1.20"
 kotlinx-coroutines = "1.8.1"
+kotlinx-serialization-json = "1.8.1"
 logback-android = "3.0.0"
+material = "1.9.0"
 opencds-cqf-fhir = "3.8.0"
 truth = "1.1.5"
-material = "1.9.0"
+uiautomator = "2.3.0"
 
 [libraries]
 android-fhir-common = { module = "com.google.android.fhir:common", version.ref = "android-fhir-common" }
 android-fhir-engine = { module = "com.google.android.fhir:engine", version.ref = "android-fhir-engine" }
 android-fhir-knowledge = { module = "com.google.android.fhir:knowledge", version.ref = "android-fhir-knowledge" }
 androidx-activity = { module = "androidx.activity:activity", version.ref = "androidx-activity" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-arch-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "androidx-arch-core" }
 androidx-benchmark-junit4 = { module = "androidx.benchmark:benchmark-junit4", version.ref = "androidx-benchmark" }
+androidx-benchmark-macro-junit4 = { module = "androidx.benchmark:benchmark-macro-junit4", version.ref = "androidx-benchmark-macro" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidx-compose-bom" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "androidx-datastore" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "androidx-fragment" }
 androidx-fragment-testing = { module = "androidx.fragment:fragment-testing", version.ref = "androidx-fragment" }
 androidx-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx-lifecycle" }
-androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "androidx-lifecycle" }
 androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx-navigation" }
 androidx-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidx-navigation" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidx-navigation-compose" }
+androidx-profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version.ref = "androidx-profilerinstaller" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "androidx-recyclerview" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx-room" }
 androidx-room-room = { module = "androidx.room:room-ktx", version.ref = "androidx-room" }
@@ -64,23 +86,29 @@ androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "a
 androidx-test-ext-junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "androidx-test-ext-junit" }
 androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidx-test-rules" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test-runner" }
+androidx-tracing-tracing = { module = "androidx.tracing:tracing", version.ref = "androidx-tracing" }
+androidx-tracing-tracing-android = { module = "androidx.tracing:tracing-android", version.ref = "androidx-tracing" }
+androidx-tracing-tracing-ktx = { module = "androidx.tracing:tracing-ktx", version.ref = "androidx-tracing" }
+androidx-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-work" }
 androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "androidx-work" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 junit = { module = "junit:junit", version.ref = "junit" }
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin-stdlib" }
-kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin-test" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-playservices = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 logback-android = { module = "com.github.tony19:logback-android", version.ref = "logback-android" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 opencds-cqf-fhir-cr = { module = "org.opencds.cqf.fhir:cqf-fhir-cr", version.ref = "opencds-cqf-fhir" }
 opencds-cqf-fhir-jackson = { module = "org.opencds.cqf.fhir:cqf-fhir-jackson", version.ref = "opencds-cqf-fhir" }
 opencds-cqf-fhir-utility = { module = "org.opencds.cqf.fhir:cqf-fhir-utility", version.ref = "opencds-cqf-fhir" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [bundles]
+androidx-tracing = ["androidx-tracing-tracing", "androidx-tracing-tracing-android", "androidx-tracing-tracing-ktx"]
 
 [plugins]

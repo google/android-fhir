@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,23 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 
-fun Project.configureLicensee() {
+fun Project.applyLicenseeConfig() {
+  // Skip project ":engine:benchmarks:macrobenchmark" since it's a "com.android.test" project
+  // which is not compatible with Licensee
+  if (project.path == ":engine:benchmarks:macrobenchmark") {
+    return
+  }
+
+  // We have some empty folders like the :contrib root folder, which Gradle recognizes as projects.
+  // Don't configure plugins for those folders.
+  if (!project.buildFile.exists()) {
+    return
+  }
+
+  configureLicensee()
+}
+
+private fun Project.configureLicensee() {
   apply(plugin = "app.cash.licensee")
   configure<app.cash.licensee.LicenseeExtension> {
     allow("Apache-2.0")

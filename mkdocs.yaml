@@ -16,6 +16,7 @@ nav:
               - use/FEL/Sync-data-with-FHIR-server.md
               - use/FEL/Privacy-Security.md
           - use/FEL/Demo-app.md
+          - use/FEL/Benchmarking.md
           - Reference:
               - use/FEL/FHIR-search-specification-support.md
       - Structured Data Capture Library:

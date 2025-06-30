@@ -94,3 +94,9 @@ site/
 # (which is slightly confusing, but helps mkdocs to validate links)
 # so we ignore that here, as it's a built artifact that should not be committed
 docs/use/api/*/**
+
+# Kotlin 2.0
+.kotlin/
+
+# Synthea
+synthea

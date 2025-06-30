@@ -35,9 +35,10 @@ set -e
 # Code under repo is checked out to ${KOKORO_ARTIFACTS_DIR}/git.
 # The final directory name in this path is determined by the scm name specified
 # in the job configuration.
-export JAVA_HOME="/usr/lib/jvm/java-1.17.0-openjdk-amd64"
+#export JAVA_HOME="/usr/lib/jvm/java-1.17.0-openjdk-amd64"
 export ANDROID_HOME=${HOME}/android_sdk
-export PATH=$PATH:$JAVA_HOME/bin:${ANDROID_HOME}/cmdline-tools/latest/bin
+#export PATH=$PATH:$JAVA_HOME/bin:${ANDROID_HOME}/cmdline-tools/latest/bin
+export PATH=$PATH:${ANDROID_HOME}/cmdline-tools/latest/bin
 export GCS_BUCKET="android-fhir-build-artifacts"
 
 # Uploads files generated from builds and tests to GCS when this script exits.
@@ -56,6 +57,17 @@ function zip_artifacts() {
     | sed 's|gs://|https://storage.googleapis.com/|'
 }
 
+function installJdk21() {
+  wget --quiet https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_linux-x64_bin.tar.gz
+  tar xvf openjdk-21+35_linux-x64_bin.tar.gz
+  sudo mv jdk-21/ /opt/jdk-21/
+  echo 'export JAVA_HOME=/opt/jdk-21' | sudo tee /etc/profile.d/java21.sh
+  echo 'export PATH=$JAVA_HOME/bin:$PATH'|sudo tee -a /etc/profile.d/java21.sh
+  source /etc/profile.d/java21.sh
+#  echo $JAVA_HOME
+  java --version
+}
+
 # Installs dependencies to run CI pipeline. Dependencies are:
 #   1. npm to run spotlessApply
 #   2. Android Command Line tools, accepting its licenses
@@ -64,7 +76,8 @@ function setup() {
   sudo npm cache clean -f
   sudo npm install -g n
   sudo n 16.18.0
-  sudo apt install -y openjdk-17-jdk openjdk-17-jre
+  installJdk21
+#  sudo apt install -y openjdk-17-jdk
 
   gcloud components update --quiet
 
@@ -87,11 +100,17 @@ function build_only() {
   ./gradlew check --scan --stacktrace
 }
 
+function setup_device_benchmarks() {
+  ./gradlew :engine:benchmarks:app:generateSynthea -Ppopulation=10000 > /dev/null
+  ./gradlew :engine:benchmarks:app:assembleBenchmark :engine:benchmarks:macrobenchmark:assembleBenchmark
+}
+
 # Runs instrumentation tests using Firebase Test Lab, and retrieves the code
 # coverage reports.
 function device_tests() {
   ./gradlew packageDebugAndroidTest --scan --stacktrace
   ./gradlew packageReleaseAndroidTest --scan --stacktrace
+  setup_device_benchmarks
   .github/workflows/runFlank.sh
 }
 
