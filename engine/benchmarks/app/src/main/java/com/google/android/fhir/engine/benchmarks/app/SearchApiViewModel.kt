@@ -79,14 +79,14 @@ internal class SearchApiViewModel(
       traceSearchNumber()
       traceSearchDate()
       traceSearchQuantity()
-      traceSearchPatientWithTokenIdentifier()
+      traceSearchPatientIdWithTokenIdentifier()
       traceSearchPatientHasEncounter()
       traceSearchPatientSortedByBirthDate()
       traceSearchPatientSortedByName()
-      traceSearchDisjunctPatientGivenName()
+      traceSearchPatientGivenWithDisjunctValues()
       traceSearchPatientWithIncludeGeneralPractitioner()
-      traceSearchWithPatientGivenNamesDisjunct()
       traceSearchEncounterLocalLastUpdated()
+      traceSearchPatientWithEitherGivenNameOrBirthDate()
       traceSearchPatientWithRevIncludeCondition()
 
       _benchmarkProgressMutableStateFlow.update { false }
@@ -236,8 +236,8 @@ internal class SearchApiViewModel(
       }
     }
 
-  private suspend fun traceSearchPatientWithTokenIdentifier() =
-    namedTrace("searchPatientWithTokenIdentifier") {
+  private suspend fun traceSearchPatientIdWithTokenIdentifier() =
+    namedTrace("searchPatientIdWithTokenIdentifier") {
       measureTimeAsync {
         traceAsync(it, 4) {
           fhirEngine.search<Patient> {
@@ -285,8 +285,16 @@ internal class SearchApiViewModel(
       }
     }
 
-  private suspend fun traceSearchWithPatientGivenNamesDisjunct() =
-    namedTrace("searchWithPatientGivenNamesDisjunct") {
+  private suspend fun traceSearchPatientWithEitherGivenNameOrBirthDate() =
+    namedTrace("searchPatientWithEitherGivenNameOrBirthDate") {
+      val patientBirthDate = DateType("2025-02-09")
+      val patient =
+        Patient().apply {
+          id = Uuid.random().toString()
+          birthDateElement = patientBirthDate
+        }
+      fhirEngine.create(patient)
+
       measureTimeAsync {
         traceAsync(it, 7) {
           fhirEngine.search<Patient> {
@@ -298,32 +306,14 @@ internal class SearchApiViewModel(
                 modifier = StringFilterModifier.MATCHES_EXACTLY
               },
             )
-            filter(
-              Patient.GIVEN,
-              {
-                value = "Julio255"
-                modifier = StringFilterModifier.MATCHES_EXACTLY
-              },
-            )
+            filter(Patient.BIRTHDATE, { value = of(patientBirthDate) })
           }
         }
       }
     }
 
-  private suspend fun traceSearchPatientSortedByName() =
-    namedTrace("searchPatientSortedByName") {
-      measureTimeAsync {
-        traceAsync(it, 8) {
-          fhirEngine.search<Patient> {
-            sort(Patient.NAME, Order.DESCENDING)
-            count = 1
-          }
-        }
-      }
-    }
-
-  private suspend fun traceSearchDisjunctPatientGivenName() =
-    namedTrace("searchDisjunctPatientGivenName") {
+  private suspend fun traceSearchPatientGivenWithDisjunctValues() =
+    namedTrace("searchPatientGivenWithDisjunctValues") {
       measureTimeAsync {
         traceAsync(it, 9) {
           fhirEngine.search<Patient> {
@@ -339,6 +329,18 @@ internal class SearchApiViewModel(
               },
               operation = Operation.OR,
             )
+          }
+        }
+      }
+    }
+
+  private suspend fun traceSearchPatientSortedByName() =
+    namedTrace("searchPatientSortedByName") {
+      measureTimeAsync {
+        traceAsync(it, 8) {
+          fhirEngine.search<Patient> {
+            sort(Patient.NAME, Order.DESCENDING)
+            count = 1
           }
         }
       }

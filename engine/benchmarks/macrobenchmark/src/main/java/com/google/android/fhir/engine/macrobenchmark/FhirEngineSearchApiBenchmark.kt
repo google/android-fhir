@@ -56,7 +56,7 @@ class FhirEngineSearchApiBenchmark {
           mode = TraceSectionMetric.Mode.Average,
         ),
         TraceSectionMetric(
-          "searchPatientWithTokenIdentifier",
+          "searchPatientIdWithTokenIdentifier",
           mode = TraceSectionMetric.Mode.Average,
         ),
         TraceSectionMetric("searchPatientHasEncounter", mode = TraceSectionMetric.Mode.Average),
@@ -65,12 +65,12 @@ class FhirEngineSearchApiBenchmark {
           mode = TraceSectionMetric.Mode.Average,
         ),
         TraceSectionMetric(
-          "searchWithPatientGivenNamesDisjunct",
+          "searchPatientWithEitherGivenNameOrBirthDate",
           mode = TraceSectionMetric.Mode.Average,
         ),
         TraceSectionMetric("searchPatientSortedByName", mode = TraceSectionMetric.Mode.Average),
         TraceSectionMetric(
-          "searchDisjunctPatientGivenName",
+          "searchPatientGivenWithDisjunctValues",
           mode = TraceSectionMetric.Mode.Average,
         ),
         TraceSectionMetric(
