@@ -18,8 +18,10 @@ android {
 
     testInstrumentationRunner = Dependencies.androidJunitRunner
 
-    val fhirServerBaseUrl = properties["FHIR_SERVER_BASE_URL"]?.toString() ?: ""
-    buildConfigField(type = "String", name = "FHIR_SERVER_BASE_URL", "\"$fhirServerBaseUrl\"")
+    val baseUrlKey = "FHIR_SERVER_BASE_URL"
+    val fhirServerBaseUrl =
+      gradleLocalProperties().getProperty(baseUrlKey) ?: properties[baseUrlKey]?.toString() ?: ""
+    buildConfigField(type = "String", name = baseUrlKey, "\"$fhirServerBaseUrl\"")
   }
 
   buildTypes {
