@@ -17,6 +17,7 @@
 package com.google.android.fhir.engine.macrobenchmark
 
 import androidx.benchmark.macro.ExperimentalMetricApi
+import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -46,7 +47,7 @@ class FhirEngineCrudBenchmark {
           TraceSectionMetric("Delete API", mode = TraceSectionMetric.Mode.Average),
         ),
       iterations = 1,
-      startupMode = null,
+      startupMode = StartupMode.WARM,
       setupBlock = { startActivityAndWait() },
     ) {
       clickOnTestTag("crudBenchmarkSection")

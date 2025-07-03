@@ -19,8 +19,10 @@ package com.google.android.fhir.engine.benchmarks.app
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.tracing.traceAsync
+import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.engine.benchmarks.app.data.PATIENT_INDEX_NUMBER_EXTENSION_URL
 import com.google.android.fhir.engine.benchmarks.app.data.ResourcesDataProvider
 import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.Operation
@@ -31,6 +33,8 @@ import com.google.android.fhir.search.include
 import com.google.android.fhir.search.revInclude
 import com.google.android.fhir.search.search
 import java.math.BigDecimal
+import kotlin.random.Random
+import kotlin.random.nextLong
 import kotlin.time.Duration
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -45,16 +49,17 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Encounter
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.RiskAssessment
+import org.hl7.fhir.r4.model.ResourceType
 
 @OptIn(ExperimentalUuidApi::class)
 internal class SearchApiViewModel(
@@ -70,15 +75,17 @@ internal class SearchApiViewModel(
   val searchApiUiStateFlow: StateFlow<List<SearchApiUiState>> =
     _searchApiUiMutableStateFlow.asStateFlow()
 
+  private var patientIndexCounter = 1
+
   init {
     viewModelScope.launch(benchmarkingViewModelWorkDispatcher) {
       _benchmarkProgressMutableStateFlow.update { true }
       preLoadData()
 
+      traceSearchQuantity()
       traceSearchString()
       traceSearchNumber()
       traceSearchDate()
-      traceSearchQuantity()
       traceSearchPatientIdWithTokenIdentifier()
       traceSearchPatientHasEncounter()
       traceSearchPatientSortedByBirthDate()
@@ -88,6 +95,7 @@ internal class SearchApiViewModel(
       traceSearchEncounterLocalLastUpdated()
       traceSearchPatientWithEitherGivenNameOrBirthDate()
       traceSearchPatientWithRevIncludeCondition()
+      traceSearchPatientWithEitherGivenNameOrIndexNumber()
 
       _benchmarkProgressMutableStateFlow.update { false }
     }
@@ -96,7 +104,46 @@ internal class SearchApiViewModel(
   private suspend fun preLoadData() {
     withContext(currentCoroutineContext()) {
       fhirEngine.clearDatabase()
-      resourcesDataProvider.collectResources { fhirEngine.create(*it.toTypedArray()) }
+      resourcesDataProvider.collectResources {
+        // Update Patient resources to include patient-indexNumber
+        val patients =
+          it
+            .filter { res -> res.resourceType == ResourceType.Patient }
+            .map { res -> res as Patient }
+        patients.forEach { patient ->
+          patient.addExtension(
+            Extension().apply {
+              url = PATIENT_INDEX_NUMBER_EXTENSION_URL
+              value = IntegerType(patientIndexCounter++)
+            },
+          )
+        }
+        val conditions =
+          patients.map { res ->
+            Condition().apply {
+              id = Uuid.random().toString()
+              code =
+                CodeableConcept(
+                  Coding("http://snomed.info/sct", id.substringBefore("-"), "Diabetes"),
+                )
+              subject = Reference("Patient/${res.logicalId}")
+            }
+          }
+        val observations =
+          patients.map { res ->
+            Observation().apply {
+              id = Uuid.random().toString()
+              value =
+                Quantity().apply {
+                  value = BigDecimal(patientIndexCounter * Random.nextLong(6L))
+                  system = "http://unitsofmeasure.org"
+                  code = "g"
+                }
+            }
+          }
+
+        fhirEngine.create(*(it + conditions + observations).toTypedArray())
+      }
     }
   }
 
@@ -135,37 +182,27 @@ internal class SearchApiViewModel(
 
   private suspend fun traceSearchNumber() =
     namedTrace("searchWithTypeNumberSearchParameter") {
-      (0 until 1000)
-        .asSequence()
-        .map {
-          RiskAssessment().apply {
-            id = Uuid.random().toString()
-            addPrediction(
-              RiskAssessment.RiskAssessmentPredictionComponent()
-                .setProbability(DecimalType(it * 3L)),
-            )
-          }
-        }
-        .chunked(250)
-        .forEach { fhirEngine.create(*it.toTypedArray()) }
-
-      RiskAssessment()
-        .apply {
-          id = Uuid.random().toString()
-          addPrediction(
-            RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5)),
+      val patientIndexNumber = patientIndexCounter + Random.nextInt(100)
+      val patient =
+        Patient().apply {
+          addExtension(
+            Extension().apply {
+              url = PATIENT_INDEX_NUMBER_EXTENSION_URL
+              value = IntegerType(patientIndexNumber)
+            },
           )
         }
-        .apply { fhirEngine.create(this@apply) }
+
+      fhirEngine.create(patient)
 
       measureTimeAsync {
         traceAsync(it, 1) {
-          fhirEngine.search<RiskAssessment> {
+          fhirEngine.search<Patient> {
             filter(
-              RiskAssessment.PROBABILITY,
+              NumberClientParam("patient-index-number"),
               {
                 prefix = ParamPrefixEnum.EQUAL
-                value = BigDecimal("100")
+                value = BigDecimal(patientIndexNumber)
               },
             )
           }
@@ -192,21 +229,6 @@ internal class SearchApiViewModel(
 
   private suspend fun traceSearchQuantity() =
     namedTrace("searchWithTypeQuantitySearchParameter") {
-      (0 until 1000)
-        .map {
-          Observation().apply {
-            id = Uuid.random().toString()
-            value =
-              Quantity().apply {
-                value = BigDecimal(it * 3L)
-                system = "http://unitsofmeasure.org"
-                code = "g"
-              }
-          }
-        }
-        .chunked(250)
-        .forEach { fhirEngine.create(*it.toTypedArray()) }
-
       Observation()
         .apply {
           id = "1"
@@ -262,7 +284,7 @@ internal class SearchApiViewModel(
                     of(
                       Coding().apply {
                         system = "http://snomed.info/sct"
-                        code = "162673000"
+                        code = "33879002"
                       },
                     )
                 },
@@ -430,6 +452,40 @@ internal class SearchApiViewModel(
               },
             )
             revInclude<Condition>(Condition.SUBJECT)
+          }
+        }
+      }
+    }
+
+  private suspend fun traceSearchPatientWithEitherGivenNameOrIndexNumber() =
+    namedTrace("searchPatientWithEitherGivenNameOrIndexNumber") {
+      val patientIndexNumber = Integer.MAX_VALUE - 10
+      val patient =
+        Patient().apply {
+          addExtension(
+            Extension(PATIENT_INDEX_NUMBER_EXTENSION_URL, IntegerType(patientIndexNumber)),
+          )
+        }
+      fhirEngine.create(patient)
+
+      measureTimeAsync {
+        traceAsync(it, 14) {
+          fhirEngine.search<Patient> {
+            operation = Operation.OR
+            filter(
+              Patient.GIVEN,
+              {
+                value = "Mirian768"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              },
+            )
+            filter(
+              NumberClientParam("patient-index-number"),
+              {
+                prefix = ParamPrefixEnum.EQUAL
+                value = BigDecimal(patientIndexNumber)
+              },
+            )
           }
         }
       }

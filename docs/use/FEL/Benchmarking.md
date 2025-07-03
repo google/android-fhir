@@ -178,18 +178,19 @@ Generated from the execution of the `FhirEngineSearchApiBenchmark` test in the f
 
 *_Data preloaded contains Patients with associated resources; Encounters/Practitioners/Organization/Location_
 
-|                                             | Population size | Average duration (ms)<br/>_∣ϵ∣≤20 ms_ | Notes |
-|---------------------------------------------|----------------:|--------------------------------------:|-------|
-| searchPatientGivenWithDisjunctValues        |             10k |                                ~34.47 |       |
-| searchEncounterLocalLastUpdated             |             10k |                               ~428.07 |       |
-| searchPatientHasEncounter                   |             10k |                               ~104.66 |       |
-| searchPatientSortedByBirthDate              |             10k |                               ~612.62 |       |
-| searchPatientSortedByName                   |             10k |                               ~497.06 |       |
-| searchPatientWithIncludeGeneralPractitioner |             10k |                                 ~9.53 |       |
-| searchPatientWithRevIncludeConditions       |             10k |                                 ~8.32 |       |
-| searchPatientIdWithTokenIdentifier          |             10k |                                ~11.11 |       |
-| searchPatientWithEitherGivenNameOrBirthDate |             10k |                                ~16.17 |       |
-| searchWithTypeDateSearchParameter           |             10k |                                 ~5.65 |       |
-| searchWithTypeNumberSearchParameter         |             10k |                                 ~1.68 |       |
-| searchWithTypeQuantitySearchParameter       |             10k |                                 ~3.12 |       |
-| searchWithTypeStringSearchParameter         |             10k |                                ~24.49 |       |
+|                                               | Population size | Average duration (ms)<br/>_∣ϵ∣≤20 ms_ | Notes |
+|-----------------------------------------------|----------------:|--------------------------------------:|-------|
+| searchPatientGivenWithDisjunctValues          |             10k |                                ~34.47 |       |
+| searchEncounterLocalLastUpdated               |             10k |                               ~428.07 |       |
+| searchPatientHasEncounter                     |             10k |                               ~104.66 |       |
+| searchPatientSortedByBirthDate                |             10k |                               ~612.62 |       |
+| searchPatientSortedByName                     |             10k |                               ~497.06 |       |
+| searchPatientWithIncludeGeneralPractitioner   |             10k |                                 ~9.53 |       |
+| searchPatientWithRevIncludeConditions         |             10k |                                 ~8.32 |       |
+| searchPatientIdWithTokenIdentifier            |             10k |                                ~11.11 |       |
+| searchPatientWithEitherGivenNameOrBirthDate   |             10k |                                ~16.17 |       |
+| searchPatientWithEitherGivenNameOrIndexNumber |             10k |                                ~15.61 |       |
+| searchWithTypeDateSearchParameter             |             10k |                                 ~5.65 |       |
+| searchWithTypeNumberSearchParameter           |             10k |                                 ~1.68 |       |
+| searchWithTypeQuantitySearchParameter         |             10k |                                 ~3.12 |       |
+| searchWithTypeStringSearchParameter           |             10k |                                ~24.49 |       |

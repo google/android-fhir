@@ -18,6 +18,7 @@ package com.google.android.fhir.engine.macrobenchmark
 
 import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.Metric
+import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -85,13 +86,17 @@ class FhirEngineSearchApiBenchmark {
           "searchPatientWithRevIncludeConditions",
           mode = TraceSectionMetric.Mode.Average,
         ),
+        TraceSectionMetric(
+          "searchPatientWithEitherGivenNameOrIndexNumber",
+          mode = TraceSectionMetric.Mode.Average,
+        ),
       )
 
     benchmarkRule.measureRepeated(
       packageName = TARGET_PACKAGE,
       metrics = metrics,
       iterations = 1,
-      startupMode = null,
+      startupMode = StartupMode.WARM,
       setupBlock = { startActivityAndWait() },
     ) {
       clickOnTestTag("searchBenchmarkSection")
