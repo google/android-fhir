@@ -1830,9 +1830,13 @@ class SearchTest {
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceUuid IN (
-        SELECT resourceUuid FROM StringIndexEntity
+        SELECT *
+        FROM (SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
         INTERSECT
+        SELECT *
+        FROM (
         SELECT resourceUuid
         FROM ResourceEntity a
         WHERE a.resourceType = ? AND a.resourceId IN (
@@ -1844,6 +1848,7 @@ class SearchTest {
         INTERSECT
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        )
         )
         )
         )
@@ -1913,12 +1918,16 @@ class SearchTest {
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceUuid IN (
-        SELECT resourceUuid FROM StringIndexEntity
+        SELECT *
+        FROM (SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         UNION
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
         INTERSECT
+        SELECT *
+        FROM (
         SELECT resourceUuid
         FROM ResourceEntity a
         WHERE a.resourceType = ? AND a.resourceId IN (
@@ -1930,6 +1939,7 @@ class SearchTest {
         UNION
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        )
         )
         )
         )
