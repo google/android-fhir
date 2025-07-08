@@ -100,7 +100,7 @@ The Microbenchmark results can be accessed through the following steps
 3. Select and visit the Google Bucket url that looks as similar to
       [https://console.developers.google.com/storage/browser/android-fhir-build-artifacts/prod/openhealthstack/android-fhir/gcp_ubuntu/presubmit/5404/20250618-172425/firebase/microbenchmark](ttps://console.developers.google.com/storage/browser/android-fhir-build-artifacts/prod/openhealthstack/android-fhir/gcp_ubuntu/presubmit/5404/20250618-172425/firebase/microbenchmark)
    that navigates to the `android-fhir-build-artifacts` ![bucket](microbenchmark-bucket.png)
-4. Navigate to `matrix_0/panther-33-en_US-portrait-test_results_merged.xml` to download the benchmark .xml results file. The `panther-33-en_US-portrait` in the path refers to the Firebase Test Lab device used in running the benchmark tests.
+4. Navigate to `matrix_0/panther-33-en_US-portrait-test_results_merged.xml` to download the benchmark .xml results file. The `panther-33-en_US-portrait` in the path refers to the Firebase Test Lab device/shard used in running the benchmark tests.
 
 ## Macrobenchmark module
 
@@ -147,7 +147,7 @@ From a GitHub PR , the following steps could be used to download the benchmark r
    The bucket page would look similar to
    ![Artifacts bucket page](google-bucket-page.png)
 
-4. Navigate to `matrix_0/panther-33-en_US-portrait/artifacts/sdcard/Download/com.google.android.fhir.engine.macrobenchmark-benchmarkData.json` to download the benchmark results file. The `panther-33-en_US-portrait` in the path represents the Firebase Test Lab device that was used to run the benchmark tests.
+4. Navigate to `matrix_0/panther-33-en_US-portrait/artifacts/sdcard/Download/com.google.android.fhir.engine.macrobenchmark-benchmarkData.json` to download the benchmark results file. The `panther-33-en_US-portrait` in the path represents the Firebase Test Lab device/shard that was used to run the benchmark tests.
 
 #### Sample Benchmark Results
 
@@ -163,7 +163,7 @@ API 33
 
 ###### Data Access API results
 
-Results were generated from execution of FhirEngineCrudBenchmark test in the `engine:benchmarks:macrobenchmark` module located at `engine/benchmarks/macrobenchmark/src/main/java/com/google/android/fhir/engine/macrobenchmark/FhirEngineCrudBenchmark.kt`
+Generated from execution of `FhirEngineCrudBenchmark` test in the `engine:benchmarks:macrobenchmark` module located at `engine/benchmarks/macrobenchmark/src/main/java/com/google/android/fhir/engine/macrobenchmark/FhirEngineCrudBenchmark.kt`
 
 | API    | Average duration (ms) | Notes                                 |
 |:-------|----------------------:|---------------------------------------|
@@ -171,3 +171,26 @@ Results were generated from execution of FhirEngineCrudBenchmark test in the `en
 | update |                ~12.29 |                                       |
 | get    |                 ~3.83 |                                       |
 | delete |                 ~8.08 |                                       |
+
+###### Search DSL API
+
+Generated from the execution of the `FhirEngineSearchApiBenchmark` test in the file `engine/benchmarks/macrobenchmark/src/main/java/com/google/android/fhir/engine/macrobenchmark/FhirEngineSearchApiBenchmark.kt`.
+
+*_Data preloaded contains Patients with associated resources; Encounters/Practitioners/Organization/Location_
+
+|                                               | Population size | Average duration (ms)<br/>_∣ϵ∣≤20 ms_ | Notes |
+|-----------------------------------------------|----------------:|--------------------------------------:|-------|
+| searchPatientGivenWithDisjunctValues          |             10k |                                ~34.47 |       |
+| searchEncounterLocalLastUpdated               |             10k |                               ~428.07 |       |
+| searchPatientHasEncounter                     |             10k |                               ~104.66 |       |
+| searchPatientSortedByBirthDate                |             10k |                               ~612.62 |       |
+| searchPatientSortedByName                     |             10k |                               ~497.06 |       |
+| searchPatientWithIncludeGeneralPractitioner   |             10k |                                 ~9.53 |       |
+| searchPatientWithRevIncludeConditions         |             10k |                                 ~8.32 |       |
+| searchPatientIdWithTokenIdentifier            |             10k |                                ~11.11 |       |
+| searchPatientWithEitherGivenNameOrBirthDate   |             10k |                                ~16.17 |       |
+| searchPatientWithEitherGivenNameOrIndexNumber |             10k |                                ~15.61 |       |
+| searchWithTypeDateSearchParameter             |             10k |                                 ~5.65 |       |
+| searchWithTypeNumberSearchParameter           |             10k |                                 ~1.68 |       |
+| searchWithTypeQuantitySearchParameter         |             10k |                                 ~3.12 |       |
+| searchWithTypeStringSearchParameter           |             10k |                                ~24.49 |       |

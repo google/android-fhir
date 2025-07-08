@@ -26,6 +26,7 @@ import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.ServerConfiguration
+import com.google.android.fhir.engine.benchmarks.app.data.patientIndexNumberCustomSearchParameter
 import com.google.android.fhir.sync.remote.HttpLogger
 
 class MainApplication : Application() {
@@ -51,6 +52,7 @@ class MainApplication : Application() {
             },
           networkConfiguration = NetworkConfiguration(uploadWithGzip = false),
         ),
+        customSearchParameters = listOf(patientIndexNumberCustomSearchParameter),
       ),
     )
   }
