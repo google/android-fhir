@@ -60,6 +60,7 @@ fun Project.configureFirebaseTestLabForMacroBenchmark() {
   apply(plugin = Plugins.BuildPlugins.fladle)
   configure<FlankGradleExtension> {
     commonConfigurationForFirebaseTestLabBenchmark(this@configureFirebaseTestLabForMacroBenchmark)
+    useOrchestrator.set(false)
     debugApk.set(
       project.provider {
         "${project.rootDir}/engine/benchmarks/app/build/outputs/apk/benchmark/app-benchmark.apk"

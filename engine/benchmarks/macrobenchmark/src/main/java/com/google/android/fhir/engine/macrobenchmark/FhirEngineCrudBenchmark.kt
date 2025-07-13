@@ -17,6 +17,7 @@
 package com.google.android.fhir.engine.macrobenchmark
 
 import androidx.benchmark.macro.ExperimentalMetricApi
+import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -46,14 +47,15 @@ class FhirEngineCrudBenchmark {
           TraceSectionMetric("Delete API", mode = TraceSectionMetric.Mode.Average),
         ),
       iterations = 1,
-      startupMode = null,
+      startupMode = StartupMode.WARM,
       setupBlock = { startActivityAndWait() },
     ) {
       clickOnTestTag("crudBenchmarkSection")
 
       @Suppress("ControlFlowWithEmptyBody")
       // Loops indefinitely until done - todo: add some form of timeout
-      while (!device.wait(Until.gone(By.textStartsWith("Waiting for results")), 700)) {}
+      while (!device.wait(Until.gone(By.textStartsWith("Waiting for results")), 1000)) {}
+      device.pressBack()
     }
   }
 }
