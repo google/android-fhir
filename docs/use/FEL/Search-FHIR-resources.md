@@ -248,6 +248,15 @@ fhirEngine.search<Condition> {
 }
 ```
 
+>[!NOTE]
+>
+> For better performance on exact text searches, use a Token search parameter.
+>
+> If a [String](#string) SearchParameter is frequently used with the `StringFilterModifier.MATCHES_EXACTLY` modifier,
+> we recommend implementing a [custom SearchParameter](#adding-custom-search-parameters) of type [`Token`](#adding-custom-search-parameters) instead.
+>
+> **Reason**: Token search parameters are more performant and better optimized for exact-match searches compared to string searches
+
 #### Reference
 
 https://www.hl7.org/fhir/search.html#reference
