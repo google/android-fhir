@@ -54,7 +54,7 @@ import org.json.JSONObject
       PositionIndexEntity::class,
       LocalChangeResourceReferenceEntity::class,
     ],
-  version = 10,
+  version = 11,
   exportSchema = true,
 )
 @TypeConverters(DbTypeConverters::class)
@@ -252,6 +252,25 @@ internal val Migration_9_10 =
         database.setTransactionSuccessful()
       } finally {
         database.endTransaction()
+      }
+    }
+  }
+
+internal val Migration_10_11 =
+  object : Migration(10, 11) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+      db.beginTransaction()
+      try {
+        db.execSQL(
+          "DROP INDEX IF EXISTS `index_StringIndexEntity_resourceType_index_name_index_value`;",
+        )
+
+        db.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_StringIndexEntity_resourceType_index_name_index_value_resourceUuid` ON `StringIndexEntity` (`resourceType`, `index_name`, `index_value`, `resourceUuid`);",
+        )
+        db.setTransactionSuccessful()
+      } finally {
+        db.endTransaction()
       }
     }
   }
