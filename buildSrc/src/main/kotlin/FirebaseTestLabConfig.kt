@@ -67,6 +67,9 @@ fun Project.configureFirebaseTestLabForMacroBenchmark() {
       },
     )
     instrumentationApk.set(project.provider { "$buildDir/outputs/apk/benchmark/*.apk" })
+    testTargets.set(
+      listOf("notClass com.google.android.fhir.engine.macrobenchmark.FhirEngineSyncApiBenchmark"),
+    )
   }
 }
 

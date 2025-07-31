@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.engine.benchmarks.app
 
+import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -54,12 +55,18 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
-    setContent { AndroidfhirTheme { AndroidfhirApp(resourcesDataProvider, fhirEngine) } }
+    setContent {
+      AndroidfhirTheme { AndroidfhirApp(application, resourcesDataProvider, fhirEngine) }
+    }
   }
 }
 
 @Composable
-fun AndroidfhirApp(resourcesDataProvider: ResourcesDataProvider, fhirEngine: FhirEngine) {
+fun AndroidfhirApp(
+  application: Application,
+  resourcesDataProvider: ResourcesDataProvider,
+  fhirEngine: FhirEngine,
+) {
   val navController = rememberNavController()
   NavHost(navController, startDestination = Screen.HomeScreen) {
     composable<Screen.HomeScreen> {
@@ -112,7 +119,7 @@ fun AndroidfhirApp(resourcesDataProvider: ResourcesDataProvider, fhirEngine: Fhi
             object : ViewModelProvider.Factory {
               override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return SyncApiViewModel(resourcesDataProvider, fhirEngine) as T
+                return SyncApiViewModel(application, resourcesDataProvider, fhirEngine) as T
               }
             },
         )

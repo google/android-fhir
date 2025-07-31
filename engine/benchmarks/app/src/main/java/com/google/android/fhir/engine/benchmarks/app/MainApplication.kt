@@ -37,10 +37,11 @@ class MainApplication : Application() {
 
     FhirEngineProvider.init(
       FhirEngineConfiguration(
-        enableEncryptionIfSupported = true,
+        enableEncryptionIfSupported = !BuildConfig.DEBUG,
         RECREATE_AT_OPEN,
         ServerConfiguration(
-          "https://hapi.fhir.org/baseR4/",
+          //          "https://hapi.fhir.org/baseR4/"
+          BuildConfig.FHIR_SERVER_BASE_URL,
           httpLogger =
             HttpLogger(
               HttpLogger.Configuration(

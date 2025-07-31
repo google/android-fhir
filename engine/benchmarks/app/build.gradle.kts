@@ -17,6 +17,11 @@ android {
     versionName = "1.0"
 
     testInstrumentationRunner = Dependencies.androidJunitRunner
+
+    val baseUrlKey = "FHIR_SERVER_BASE_URL"
+    val fhirServerBaseUrl =
+      gradleLocalProperties().getProperty(baseUrlKey) ?: properties[baseUrlKey]?.toString() ?: ""
+    buildConfigField(type = "String", name = baseUrlKey, "\"$fhirServerBaseUrl\"")
   }
 
   buildTypes {
@@ -41,7 +46,10 @@ android {
     targetCompatibility = JavaVersion.VERSION_11
   }
   kotlinOptions { jvmTarget = "11" }
-  buildFeatures { compose = true }
+  buildFeatures {
+    compose = true
+    buildConfig = true
+  }
 
   packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")) }
 
@@ -65,6 +73,8 @@ dependencies {
   implementation(libs.androidx.navigation.compose)
   implementation(libs.bundles.androidx.tracing)
   implementation(libs.kotlinx.serialization.json)
+  implementation(libs.androidx.work.runtime)
+  implementation(libs.androidx.datastore.preferences)
 
   testImplementation(libs.junit)
   androidTestImplementation(libs.androidx.test.ext.junit)
