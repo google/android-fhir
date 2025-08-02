@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.PositiveIntType
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -2593,6 +2594,58 @@ class MoreQuestionnaireItemComponentsTest {
       }
 
     assertThat(question.isRepeatedGroup).isFalse()
+  }
+
+  @Test
+  fun `groupItemColumnCount returns correct column count`() {
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        extension =
+          mutableListOf(
+            Extension().apply {
+              url = EXTENSION_COLUMN_COUNT_URL
+              setValue(PositiveIntType(3))
+            },
+          )
+      }
+
+    assertThat(questionnaireItemComponent.getColumnCount()).isEqualTo(3)
+  }
+
+  @Test
+  fun `groupItemColumnCount returns null when column count extension value is not an PositiveIntType`() {
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        extension =
+          mutableListOf(
+            Extension().apply {
+              url = EXTENSION_COLUMN_COUNT_URL
+              setValue(StringType("invalid"))
+            },
+          )
+      }
+    assertThat(questionnaireItemComponent.getColumnCount()).isNull()
+  }
+
+  @Test
+  fun `groupItemColumnCount returns null when GROUP item has no relevant extension`() {
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        extension = mutableListOf()
+      }
+    assertThat(questionnaireItemComponent.getColumnCount()).isNull()
+  }
+
+  @Test
+  fun `groupItemColumnCount returns null when no GROUP type item exists`() {
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+      }
+    assertThat(questionnaireItemComponent.getColumnCount()).isNull()
   }
 
   private val displayCategoryExtensionWithInstructionsCode =
