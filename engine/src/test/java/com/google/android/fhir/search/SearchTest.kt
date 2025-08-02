@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1830,10 +1830,13 @@ class SearchTest {
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceUuid IN (
-        SELECT resourceUuid FROM StringIndexEntity
+        SELECT *
+        FROM (SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
-        AND a.resourceUuid IN (
+        INTERSECT
+        SELECT *
+        FROM (
         SELECT resourceUuid
         FROM ResourceEntity a
         WHERE a.resourceType = ? AND a.resourceId IN (
@@ -1842,10 +1845,10 @@ class SearchTest {
         WHERE a.index_name = ? AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
-        )
-        AND a.resourceUuid IN (
+        INTERSECT
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        )
         )
         )
         )
@@ -1869,6 +1872,100 @@ class SearchTest {
           Immunization.STATUS.paramName,
           "completed",
           "http://hl7.org/fhir/event-status",
+        ),
+      )
+  }
+
+  @Test
+  fun search_patient_multiple_given_disjoint_has_condition_diabetes_or_hypertension() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          has<Condition>(Condition.SUBJECT) {
+            filter(
+              Condition.CODE,
+              { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) },
+            )
+            filter(
+              Condition.CODE,
+              { value = of(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")) },
+            )
+            operation = Operation.OR
+          }
+
+          filter(
+            Patient.GIVEN,
+            {
+              value = "John"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            },
+          )
+
+          filter(
+            Patient.GIVEN,
+            {
+              value = "Jane"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            },
+          )
+          operation = Operation.OR
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.resourceUuid, a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceUuid IN (
+        SELECT *
+        FROM (SELECT resourceUuid FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        UNION
+        SELECT resourceUuid FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
+        INTERSECT
+        SELECT *
+        FROM (
+        SELECT resourceUuid
+        FROM ResourceEntity a
+        WHERE a.resourceType = ? AND a.resourceId IN (
+        SELECT substr(a.index_value, 9)
+        FROM ReferenceIndexEntity a
+        WHERE a.index_name = ? AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        UNION
+        SELECT resourceUuid FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        )
+        )
+        )
+        )
+                """
+          .trimIndent(),
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          "Patient",
+          "given",
+          "John",
+          "Patient",
+          "given",
+          "Jane",
+          "Patient",
+          "subject",
+          "Condition",
+          "code",
+          "44054006",
+          "http://snomed.info/sct",
+          "Condition",
+          "code",
+          "827069000",
+          "http://snomed.info/sct",
         ),
       )
   }
@@ -1909,7 +2006,7 @@ class SearchTest {
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         )
-        )  AND a.resourceUuid IN(
+        INTERSECT
         SELECT resourceUuid
         FROM ResourceEntity a
         WHERE a.resourceType = ? AND a.resourceId IN (
@@ -2058,8 +2155,7 @@ class SearchTest {
         WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
-        )
-        OR a.resourceUuid IN (
+        UNION
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
@@ -2089,8 +2185,7 @@ class SearchTest {
         WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
-        )
-        AND a.resourceUuid IN (
+        INTERSECT
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value LIKE ? || '%' COLLATE NOCASE OR index_value LIKE ? || '%' COLLATE NOCASE)
         )
