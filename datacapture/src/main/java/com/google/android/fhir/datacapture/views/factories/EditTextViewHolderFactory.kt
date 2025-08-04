@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views.factories
 
 import android.content.Context
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.view.View
 import android.view.View.FOCUS_DOWN
@@ -28,15 +29,26 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
+import com.google.android.fhir.datacapture.extensions.localizedFlyoverAnnotatedString
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.extensions.unit
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.QuestionnaireItemEditText
+import com.google.android.fhir.datacapture.views.compose.QuestionnaireTextFieldState
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
@@ -58,7 +70,12 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   private var unitTextView: TextView? = null
   private var textWatcher: TextWatcher? = null
 
+  private lateinit var composeView: ComposeView
+  private var editTextMutableState: MutableState<String> = mutableStateOf("")
+
   override fun init(itemView: View) {
+    composeView = itemView.findViewById<ComposeView>(R.id.test_view)
+
     context = itemView.context.tryUnwrapContext()!!
     header = itemView.findViewById(R.id.header)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
@@ -85,13 +102,61 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
         context.lifecycleScope.launch {
           // Update answer even if the text box loses focus without any change. This will mark the
           // questionnaire response item as being modified in the view model and trigger validation.
-          handleInput(textInputEditText.editableText, questionnaireViewItem)
+          handleInput(textInputEditText.editableText?.toString() ?: "", questionnaireViewItem)
         }
       }
     }
   }
 
   override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
+    val validationUiMessage =
+      getValidationTextUIMessage(questionnaireViewItem, textInputLayout.context)
+    val keyboardOptions =
+      when (rawInputType) {
+        InputType.TYPE_CLASS_PHONE ->
+          KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done)
+        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL ->
+          KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done)
+        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED ->
+          KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done)
+        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES ->
+          KeyboardOptions(
+            keyboardType = KeyboardType.Text,
+            capitalization = KeyboardCapitalization.Sentences,
+            imeAction = ImeAction.Done,
+          )
+        else -> KeyboardOptions.Default
+      }
+
+    // Debounce function onInputChange
+
+    val composeViewQuestionnaireState =
+      QuestionnaireTextFieldState(
+        inputText = editTextMutableState,
+        onInputValueChange = {
+          editTextMutableState.value = it
+
+          //          context.lifecycleScope.launch {
+          //            handleInput(editTextMutableState.value, questionnaireViewItem)
+          //          }
+        },
+        hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverAnnotatedString,
+        helperText =
+          if (!validationUiMessage.isNullOrBlank()) {
+            validationUiMessage
+          } else {
+            getRequiredOrOptionalText(questionnaireViewItem, context)
+          },
+        isError = !validationUiMessage.isNullOrBlank(),
+        unitText = questionnaireViewItem.questionnaireItem.unit?.code,
+        isReadOnly = questionnaireViewItem.questionnaireItem.readOnly,
+        keyboardOptions = keyboardOptions,
+      )
+
+    composeView.setContent {
+      Mdc3Theme { QuestionnaireItemEditText(composeViewQuestionnaireState) }
+    }
+
     header.bind(questionnaireViewItem)
     with(textInputLayout) {
       hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
@@ -102,7 +167,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
      * Ensures that any validation errors or warnings are immediately reflected in the UI whenever
      * the view is bound to a new or updated item.
      */
-    updateValidationTextUI(questionnaireViewItem, textInputLayout)
+    textInputLayout.error = validationUiMessage
 
     /**
      * Updates the EditText *only* if the EditText is not currently focused.
@@ -133,7 +198,9 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
       // TextWatcher is set only once for each question item in scenario 1
       textWatcher =
         textInputEditText.doAfterTextChanged { editable: Editable? ->
-          context.lifecycleScope.launch { handleInput(editable!!, questionnaireViewItem) }
+          editable?.let {
+            context.lifecycleScope.launch { handleInput(it.toString(), questionnaireViewItem) }
+          }
         }
     }
   }
@@ -144,7 +211,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   }
 
   /** Handles user input from the `editable` and updates the questionnaire. */
-  abstract suspend fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem)
+  abstract suspend fun handleInput(inputText: String, questionnaireViewItem: QuestionnaireViewItem)
 
   /** Handles the update of [textInputEditText].text. */
   abstract fun updateInputTextUI(
@@ -153,8 +220,8 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   )
 
   /** Handles the update of [textInputLayout].error. */
-  abstract fun updateValidationTextUI(
+  abstract fun getValidationTextUIMessage(
     questionnaireViewItem: QuestionnaireViewItem,
-    textInputLayout: TextInputLayout,
-  )
+    context: Context,
+  ): String?
 }

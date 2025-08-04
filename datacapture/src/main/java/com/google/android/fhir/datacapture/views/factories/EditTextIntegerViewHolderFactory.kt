@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,16 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
+import android.content.Context
 import android.icu.number.NumberFormatter
 import android.icu.text.DecimalFormat
 import android.os.Build
-import android.text.Editable
 import android.text.InputType
 import androidx.annotation.RequiresApi
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import java.util.Locale
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -39,10 +38,10 @@ internal object EditTextIntegerViewHolderFactory :
         InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
       ) {
       override suspend fun handleInput(
-        editable: Editable,
+        inputText: String,
         questionnaireViewItem: QuestionnaireViewItem,
       ) {
-        val input = editable.toString()
+        val input = inputText
         if (input.isEmpty()) {
           questionnaireViewItem.clearAnswer()
           return
@@ -80,24 +79,23 @@ internal object EditTextIntegerViewHolderFactory :
         }
       }
 
-      override fun updateValidationTextUI(
+      override fun getValidationTextUIMessage(
         questionnaireViewItem: QuestionnaireViewItem,
-        textInputLayout: TextInputLayout,
-      ) {
-        textInputLayout.error =
+        context: Context,
+      ): String? {
+        // Update error message if draft answer present
+        return if (questionnaireViewItem.draftAnswer != null) {
+          context.getString(
+            R.string.integer_format_validation_error_msg,
+            formatInteger(Int.MIN_VALUE),
+            formatInteger(Int.MAX_VALUE),
+          )
+        } else {
           getValidationErrorMessage(
-            textInputLayout.context,
+            context,
             questionnaireViewItem,
             questionnaireViewItem.validationResult,
           )
-        // Update error message if draft answer present
-        if (questionnaireViewItem.draftAnswer != null) {
-          textInputLayout.error =
-            textInputLayout.context.getString(
-              R.string.integer_format_validation_error_msg,
-              formatInteger(Int.MIN_VALUE),
-              formatInteger(Int.MAX_VALUE),
-            )
         }
       }
     }

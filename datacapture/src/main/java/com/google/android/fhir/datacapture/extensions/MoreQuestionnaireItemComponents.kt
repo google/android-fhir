@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.fromHtml
 import androidx.core.text.HtmlCompat
 import ca.uhn.fhir.util.UrlUtil
 import com.google.android.fhir.datacapture.DataCapture
@@ -381,12 +383,19 @@ internal fun String.toSpanned(): Spanned {
   return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
 }
 
+internal fun String.toAnnotatedString(): AnnotatedString {
+  return AnnotatedString.fromHtml(this)
+}
+
 /**
  * Localized and spanned value of [Questionnaire.QuestionnaireItemComponent.text] if translation is
  * present. Default value otherwise.
  */
 val QuestionnaireItemComponent.localizedTextSpanned: Spanned?
   get() = textElement?.getLocalizedText()?.toSpanned()
+
+val QuestionnaireItemComponent.localizedTextAnnotatedString: AnnotatedString?
+  get() = textElement?.getLocalizedText()?.toAnnotatedString()
 
 /**
  * Localized and spanned value of [Questionnaire.QuestionnaireItemComponent.prefix] if translation
@@ -435,6 +444,14 @@ val List<QuestionnaireItemComponent>.localizedFlyoverSpanned: Spanned?
           questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
       }
       ?.localizedTextSpanned
+
+val List<QuestionnaireItemComponent>.localizedFlyoverAnnotatedString: AnnotatedString?
+  get() =
+    this.firstOrNull { questionnaireItem ->
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+          questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
+      }
+      ?.localizedTextAnnotatedString
 
 /**
  * A nested questionnaire item of type display with displayCategory extension with

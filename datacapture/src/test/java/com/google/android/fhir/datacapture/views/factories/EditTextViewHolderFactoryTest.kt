@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Google LLC
+ * Copyright 2024-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.text.Editable
+import android.content.Context
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
@@ -55,7 +55,7 @@ class EditTextViewHolderFactoryTest {
             private var programmaticUpdateCounter = 0
 
             override suspend fun handleInput(
-              editable: Editable,
+              inputText: String,
               questionnaireViewItem: QuestionnaireViewItem,
             ) {}
 
@@ -67,23 +67,21 @@ class EditTextViewHolderFactoryTest {
               textInputEditText.setText("$programmaticUpdateCounter")
             }
 
-            override fun updateValidationTextUI(
+            override fun getValidationTextUIMessage(
               questionnaireViewItem: QuestionnaireViewItem,
-              textInputLayout: TextInputLayout,
-            ) {
-              textInputLayout.error =
+              context: Context,
+            ): String? {
+              // Update error message if draft answer present
+              return if (questionnaireViewItem.draftAnswer != null) {
+                context.getString(
+                  com.google.android.fhir.datacapture.R.string.decimal_format_validation_error_msg,
+                )
+              } else {
                 getValidationErrorMessage(
-                  textInputLayout.context,
+                  context,
                   questionnaireViewItem,
                   questionnaireViewItem.validationResult,
                 )
-              // Update error message if draft answer present
-              if (questionnaireViewItem.draftAnswer != null) {
-                textInputLayout.error =
-                  textInputLayout.context.getString(
-                    com.google.android.fhir.datacapture.R.string
-                      .decimal_format_validation_error_msg,
-                  )
               }
             }
           }

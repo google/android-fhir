@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.text.Editable
+import android.content.Context
 import android.text.InputType
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
@@ -36,10 +35,10 @@ internal class EditTextStringViewHolderDelegate :
     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
   ) {
   override suspend fun handleInput(
-    editable: Editable,
+    inputText: String,
     questionnaireViewItem: QuestionnaireViewItem,
   ) {
-    val input = getValue(editable.toString())
+    val input = getValue(inputText)
     if (input != null) {
       questionnaireViewItem.setAnswer(input)
     } else {
@@ -70,15 +69,13 @@ internal class EditTextStringViewHolderDelegate :
     }
   }
 
-  override fun updateValidationTextUI(
+  override fun getValidationTextUIMessage(
     questionnaireViewItem: QuestionnaireViewItem,
-    textInputLayout: TextInputLayout,
-  ) {
-    textInputLayout.error =
-      getValidationErrorMessage(
-        textInputLayout.context,
-        questionnaireViewItem,
-        questionnaireViewItem.validationResult,
-      )
-  }
+    context: Context,
+  ): String? =
+    getValidationErrorMessage(
+      context,
+      questionnaireViewItem,
+      questionnaireViewItem.validationResult,
+    )
 }

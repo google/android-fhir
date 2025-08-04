@@ -105,6 +105,7 @@ dependencies {
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.material)
+  implementation(libs.androidx.recyclerview)
 
   // Androidx Compose
   implementation(libs.androidx.activity.compose)
@@ -115,6 +116,11 @@ dependencies {
   implementation(libs.androidx.compose.material3)
   implementation(libs.androidx.navigation.compose)
   implementation(libs.accompanist.themeadapter.material3)
+
+  androidTestImplementation(platform(libs.androidx.compose.bom))
+  androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+  debugImplementation(libs.androidx.compose.ui.tooling)
+  debugImplementation(libs.androidx.compose.ui.test.manifest)
 
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
