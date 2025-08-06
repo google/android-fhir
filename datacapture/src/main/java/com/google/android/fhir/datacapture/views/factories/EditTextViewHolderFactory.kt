@@ -76,10 +76,6 @@ class QuestionnaireItemEditTextViewHolderDelegate(
 
   private lateinit var context: AppCompatActivity
   private lateinit var header: HeaderView
-  private lateinit var textInputLayout: TextInputLayout
-  private lateinit var textInputEditText: TextInputEditText
-  private var unitTextView: TextView? = null
-  private var textWatcher: TextWatcher? = null
 
   private lateinit var composeView: ComposeView
   private val editTextMutableState: MutableState<String> by lazy {
@@ -90,36 +86,8 @@ class QuestionnaireItemEditTextViewHolderDelegate(
   override fun init(itemView: View) {
     context = itemView.context.tryUnwrapContext()!!
     header = itemView.findViewById(R.id.header)
-    textInputLayout = itemView.findViewById(R.id.text_input_layout)
-    textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
-    unitTextView = itemView.findViewById(R.id.unit_text_view)
 
-    textInputEditText.setRawInputType(rawInputType)
-    // Override `setOnEditorActionListener` to avoid crash with `IllegalStateException` if it's not
-    // possible to move focus forward.
-    // See
-    // https://stackoverflow.com/questions/13614101/fatal-crash-focus-search-returned-a-view-that-wasnt-able-to-take-focus/47991577
-    textInputEditText.setOnEditorActionListener { view, actionId, _ ->
-      if (actionId != EditorInfo.IME_ACTION_NEXT) {
-        return@setOnEditorActionListener false
-      }
-      view.focusSearch(FOCUS_DOWN)?.requestFocus(FOCUS_DOWN) ?: false
-    }
-    textInputEditText.setOnFocusChangeListener { view, focused ->
-      if (!focused) {
-        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE)
-            as InputMethodManager)
-          .hideSoftInputFromWindow(view.windowToken, 0)
-
-        context.lifecycleScope.launch {
-          // Update answer even if the text box loses focus without any change. This will mark the
-          // questionnaire response item as being modified in the view model and trigger validation.
-          handleInput(textInputEditText.editableText?.toString() ?: "", questionnaireViewItem)
-        }
-      }
-    }
-
-    composeView = itemView.findViewById(R.id.test_view)
+    composeView = itemView.findViewById(R.id.text_input_view)
   }
 
   @OptIn(FlowPreview::class)
@@ -131,7 +99,7 @@ class QuestionnaireItemEditTextViewHolderDelegate(
         .collectLatest { handleInput(it, questionnaireViewItem) }
     }
 
-    val validationUiMessage = uiValidationMessage(questionnaireViewItem, textInputLayout.context)
+    val validationUiMessage = uiValidationMessage(questionnaireViewItem, context)
     val keyboardOptions =
       when (rawInputType) {
         InputType.TYPE_CLASS_PHONE ->
@@ -172,51 +140,6 @@ class QuestionnaireItemEditTextViewHolderDelegate(
     }
 
     header.bind(questionnaireViewItem)
-    with(textInputLayout) {
-      hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
-      helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
-    }
-
-    /**
-     * Ensures that any validation errors or warnings are immediately reflected in the UI whenever
-     * the view is bound to a new or updated item.
-     */
-    textInputLayout.error = validationUiMessage
-
-    /**
-     * Updates the EditText *only* if the EditText is not currently focused.
-     *
-     * This is done to avoid disrupting the user's typing experience and prevent conflicts if they
-     * are actively editing the field. Updating the text programmatically is safe in the following
-     * scenarios:
-     * 1. **ViewHolder Reuse:** When the same ViewHolder is being used to display a different
-     *    QuestionnaireViewItem, the EditText needs to be updated with the new item's content.
-     * 2. **Read-Only Items:** When the item is read-only, its value may change dynamically due to
-     *    expressions, and the EditText needs to reflect this updated value.
-     *
-     * The following actions are performed if the EditText is not focused:
-     * - Removes any existing text change listener.
-     * - Updates the input text UI based on the QuestionnaireViewItem.
-     * - Updates the unit text view (if applicable).
-     * - Attaches a new text change listener to handle user input.
-     */
-    if (!textInputEditText.isFocused) {
-      textInputEditText.removeTextChangedListener(textWatcher)
-      textInputEditText.setText(uiInputText(questionnaireViewItem))
-
-      unitTextView?.apply {
-        text = questionnaireViewItem.questionnaireItem.unit?.code
-        visibility = if (text.isNullOrEmpty()) GONE else VISIBLE
-      }
-
-      // TextWatcher is set only once for each question item in scenario 1
-      textWatcher =
-        textInputEditText.doAfterTextChanged { editable: Editable? ->
-          editable?.let {
-            context.lifecycleScope.launch { handleInput(it.toString(), questionnaireViewItem) }
-          }
-        }
-    }
   }
 
   override fun setReadOnly(isReadOnly: Boolean) {}

@@ -35,46 +35,10 @@
         android:layout_height="wrap_content"
     />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-    >
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/text_input_layout"
-            style="?attr/questionnaireTextInputLayoutStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-        >
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/text_input_edit_text"
-                style="?attr/questionnaireTextInputEditTextStyle"
-                android:inputType="text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-            />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/unit_text_view"
-            style="?attr/questionnaireHelpTextStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-            android:visibility="gone"
-        />
-
-    </LinearLayout>
-
     <androidx.compose.ui.platform.ComposeView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/test_view"
+        android:id="@+id/text_input_view"
     />
 
 </LinearLayout>
