@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.content.Context
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
@@ -49,30 +48,17 @@ class EditTextViewHolderFactoryTest {
         EditTextViewHolderFactory(
           com.google.android.fhir.datacapture.R.layout.edit_text_single_line_view,
         ) {
+        private var programmaticUpdateCounter = 0
+
         override fun getQuestionnaireItemViewHolderDelegate() =
-          object : QuestionnaireItemEditTextViewHolderDelegate(DECIMAL_INPUT_TYPE) {
-
-            private var programmaticUpdateCounter = 0
-
-            override suspend fun handleInput(
-              inputText: String,
-              questionnaireViewItem: QuestionnaireViewItem,
-            ) {}
-
-            override fun updateInputTextUI(
-              questionnaireViewItem: QuestionnaireViewItem,
-              textInputEditText: TextInputEditText,
-            ) {
+          QuestionnaireItemEditTextViewHolderDelegate(
+            DECIMAL_INPUT_TYPE,
+            uiInputText = {
               programmaticUpdateCounter += 1
-              textInputEditText.setText("$programmaticUpdateCounter")
-            }
-
-            override fun getValidationTextUIMessage(
-              questionnaireViewItem: QuestionnaireViewItem,
-              context: Context,
-            ): String? {
-              // Update error message if draft answer present
-              return if (questionnaireViewItem.draftAnswer != null) {
+              "$programmaticUpdateCounter"
+            },
+            uiValidationMessage = { questionnaireViewItem, context ->
+              if (questionnaireViewItem.draftAnswer != null) {
                 context.getString(
                   com.google.android.fhir.datacapture.R.string.decimal_format_validation_error_msg,
                 )
@@ -83,8 +69,9 @@ class EditTextViewHolderFactoryTest {
                   questionnaireViewItem.validationResult,
                 )
               }
-            }
-          }
+            },
+            handleInput = { _, _ -> },
+          )
       }
       .create(parent)
 

@@ -16,11 +16,8 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.content.Context
 import android.text.InputType
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
-import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.material.textfield.TextInputEditText
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
@@ -30,52 +27,31 @@ import org.hl7.fhir.r4.model.StringType
  *
  * Any `ViewHolder` containing a `EditText` view that collects text data should use this class.
  */
-internal class EditTextStringViewHolderDelegate :
+internal fun EditTextStringViewHolderDelegate() =
   QuestionnaireItemEditTextViewHolderDelegate(
     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
-  ) {
-  override suspend fun handleInput(
-    inputText: String,
-    questionnaireViewItem: QuestionnaireViewItem,
-  ) {
-    val input = getValue(inputText)
-    if (input != null) {
-      questionnaireViewItem.setAnswer(input)
-    } else {
-      questionnaireViewItem.clearAnswer()
-    }
-  }
-
-  private fun getValue(
-    text: String,
-  ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
-    return text.let {
-      if (it.isEmpty()) {
-        null
+    uiInputText = { it.answers.singleOrNull()?.valueStringType?.value ?: "" },
+    uiValidationMessage = { questionnaireViewItem, context ->
+      getValidationErrorMessage(
+        context,
+        questionnaireViewItem,
+        questionnaireViewItem.validationResult,
+      )
+    },
+    handleInput = { inputText, questionnaireViewItem ->
+      val input =
+        inputText.let {
+          if (it.isEmpty()) {
+            null
+          } else {
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(StringType(it))
+          }
+        }
+      if (input != null) {
+        questionnaireViewItem.setAnswer(input)
       } else {
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(StringType(it))
+        questionnaireViewItem.clearAnswer()
       }
-    }
-  }
-
-  override fun updateInputTextUI(
-    questionnaireViewItem: QuestionnaireViewItem,
-    textInputEditText: TextInputEditText,
-  ) {
-    val text = questionnaireViewItem.answers.singleOrNull()?.valueStringType?.value ?: ""
-    if ((text != textInputEditText.text.toString())) {
-      textInputEditText.text?.clear()
-      textInputEditText.append(text)
-    }
-  }
-
-  override fun getValidationTextUIMessage(
-    questionnaireViewItem: QuestionnaireViewItem,
-    context: Context,
-  ): String? =
-    getValidationErrorMessage(
-      context,
-      questionnaireViewItem,
-      questionnaireViewItem.validationResult,
-    )
-}
+    },
+  )

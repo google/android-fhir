@@ -16,67 +16,44 @@
 
 package com.google.android.fhir.datacapture.contrib.views
 
-import android.content.Context
 import android.text.InputType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
-import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemEditTextViewHolderDelegate
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
-import com.google.android.material.textfield.TextInputEditText
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
 object PhoneNumberViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.edit_text_single_line_view) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
-    object : QuestionnaireItemEditTextViewHolderDelegate(InputType.TYPE_CLASS_PHONE) {
-
-      override suspend fun handleInput(
-        inputText: String,
-        questionnaireViewItem: QuestionnaireViewItem,
-      ) {
-        val input = getValue(inputText)
-        if (input != null) {
-          questionnaireViewItem.setAnswer(input)
-        } else {
-          questionnaireViewItem.clearAnswer()
-        }
-      }
-
-      private fun getValue(
-        text: String,
-      ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
-        return text.let {
-          if (it.isEmpty()) {
-            null
-          } else {
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(StringType(it))
-          }
-        }
-      }
-
-      override fun updateInputTextUI(
-        questionnaireViewItem: QuestionnaireViewItem,
-        textInputEditText: TextInputEditText,
-      ) {
-        val text =
-          questionnaireViewItem.answers.singleOrNull()?.valueStringType?.value?.toString() ?: ""
-        if (text != textInputEditText.text.toString()) {
-          textInputEditText.setText(text)
-        }
-      }
-
-      override fun getValidationTextUIMessage(
-        questionnaireViewItem: QuestionnaireViewItem,
-        context: Context,
-      ): String? =
+    QuestionnaireItemEditTextViewHolderDelegate(
+      InputType.TYPE_CLASS_PHONE,
+      uiInputText = { it.answers.singleOrNull()?.valueStringType?.value ?: "" },
+      uiValidationMessage = { questionnaireViewItem, context ->
         getValidationErrorMessage(
           context,
           questionnaireViewItem,
           questionnaireViewItem.validationResult,
         )
-    }
+      },
+      handleInput = { inputText, questionnaireViewItem ->
+        val input =
+          inputText.let {
+            if (it.isEmpty()) {
+              null
+            } else {
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(StringType(it))
+            }
+          }
+
+        if (input != null) {
+          questionnaireViewItem.setAnswer(input)
+        } else {
+          questionnaireViewItem.clearAnswer()
+        }
+      },
+    )
 }

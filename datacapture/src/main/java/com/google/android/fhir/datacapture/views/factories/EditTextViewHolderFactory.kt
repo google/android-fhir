@@ -32,6 +32,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -51,6 +52,10 @@ import com.google.android.fhir.datacapture.views.compose.QuestionnaireItemEditTe
 import com.google.android.fhir.datacapture.views.compose.QuestionnaireTextFieldState
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 
 internal abstract class EditTextViewHolderFactory(@LayoutRes override val resId: Int) :
@@ -59,8 +64,12 @@ internal abstract class EditTextViewHolderFactory(@LayoutRes override val resId:
     QuestionnaireItemEditTextViewHolderDelegate
 }
 
-abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputType: Int) :
-  QuestionnaireItemViewHolderDelegate {
+class QuestionnaireItemEditTextViewHolderDelegate(
+  private val rawInputType: Int,
+  private val uiInputText: (QuestionnaireViewItem) -> String?,
+  private val uiValidationMessage: (QuestionnaireViewItem, Context) -> String?,
+  private val handleInput: suspend (String, QuestionnaireViewItem) -> Unit,
+) : QuestionnaireItemViewHolderDelegate {
   override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
   private lateinit var context: AppCompatActivity
@@ -71,11 +80,12 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   private var textWatcher: TextWatcher? = null
 
   private lateinit var composeView: ComposeView
-  private var editTextMutableState: MutableState<String> = mutableStateOf("")
+  private val editTextMutableState: MutableState<String> by lazy {
+    val text = uiInputText(questionnaireViewItem) ?: ""
+    mutableStateOf(text)
+  }
 
   override fun init(itemView: View) {
-    composeView = itemView.findViewById<ComposeView>(R.id.test_view)
-
     context = itemView.context.tryUnwrapContext()!!
     header = itemView.findViewById(R.id.header)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
@@ -106,11 +116,22 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
         }
       }
     }
+
+    composeView = itemView.findViewById(R.id.test_view)
+  }
+
+  @OptIn(FlowPreview::class)
+  private fun listenToEdits() {
+    context.lifecycleScope.launch {
+      snapshotFlow { editTextMutableState.value }
+        .debounce(500.milliseconds)
+        .collectLatest { handleInput(it, questionnaireViewItem) }
+    }
   }
 
   override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-    val validationUiMessage =
-      getValidationTextUIMessage(questionnaireViewItem, textInputLayout.context)
+    listenToEdits()
+    val validationUiMessage = uiValidationMessage(questionnaireViewItem, textInputLayout.context)
     val keyboardOptions =
       when (rawInputType) {
         InputType.TYPE_CLASS_PHONE ->
@@ -128,18 +149,10 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
         else -> KeyboardOptions.Default
       }
 
-    // Debounce function onInputChange
-
     val composeViewQuestionnaireState =
       QuestionnaireTextFieldState(
         inputText = editTextMutableState,
-        onInputValueChange = {
-          editTextMutableState.value = it
-
-          //          context.lifecycleScope.launch {
-          //            handleInput(editTextMutableState.value, questionnaireViewItem)
-          //          }
-        },
+        onInputValueChange = { editTextMutableState.value = it },
         hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverAnnotatedString,
         helperText =
           if (!validationUiMessage.isNullOrBlank()) {
@@ -188,7 +201,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
      */
     if (!textInputEditText.isFocused) {
       textInputEditText.removeTextChangedListener(textWatcher)
-      updateInputTextUI(questionnaireViewItem, textInputEditText)
+      textInputEditText.setText(uiInputText(questionnaireViewItem))
 
       unitTextView?.apply {
         text = questionnaireViewItem.questionnaireItem.unit?.code
@@ -205,23 +218,5 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     }
   }
 
-  override fun setReadOnly(isReadOnly: Boolean) {
-    textInputLayout.isEnabled = !isReadOnly
-    textInputEditText.isEnabled = !isReadOnly
-  }
-
-  /** Handles user input from the `editable` and updates the questionnaire. */
-  abstract suspend fun handleInput(inputText: String, questionnaireViewItem: QuestionnaireViewItem)
-
-  /** Handles the update of [textInputEditText].text. */
-  abstract fun updateInputTextUI(
-    questionnaireViewItem: QuestionnaireViewItem,
-    textInputEditText: TextInputEditText,
-  )
-
-  /** Handles the update of [textInputLayout].error. */
-  abstract fun getValidationTextUIMessage(
-    questionnaireViewItem: QuestionnaireViewItem,
-    context: Context,
-  ): String?
+  override fun setReadOnly(isReadOnly: Boolean) {}
 }

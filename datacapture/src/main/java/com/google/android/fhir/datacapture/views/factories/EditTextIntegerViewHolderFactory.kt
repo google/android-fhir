@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.content.Context
 import android.icu.number.NumberFormatter
 import android.icu.text.DecimalFormat
 import android.os.Build
@@ -24,8 +23,6 @@ import android.text.InputType
 import androidx.annotation.RequiresApi
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
-import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.material.textfield.TextInputEditText
 import java.util.Locale
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -33,58 +30,19 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal object EditTextIntegerViewHolderFactory :
   EditTextViewHolderFactory(R.layout.edit_text_single_line_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object :
-      QuestionnaireItemEditTextViewHolderDelegate(
-        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
-      ) {
-      override suspend fun handleInput(
-        inputText: String,
-        questionnaireViewItem: QuestionnaireViewItem,
-      ) {
-        val input = inputText
-        if (input.isEmpty()) {
-          questionnaireViewItem.clearAnswer()
-          return
+    QuestionnaireItemEditTextViewHolderDelegate(
+      InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
+      uiInputText = {
+        val answer = it.answers.singleOrNull()?.valueIntegerType?.value?.toString()
+        val draftAnswer = it.draftAnswer?.toString()
+        when {
+          answer.isNullOrEmpty() && draftAnswer.isNullOrEmpty() -> ""
+          answer?.toIntOrNull() != null -> answer
+          else -> draftAnswer
         }
-
-        val inputInteger = input.toIntOrNull()
-        if (inputInteger != null) {
-          questionnaireViewItem.setAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(IntegerType(input)),
-          )
-        } else {
-          questionnaireViewItem.setDraftAnswer(input)
-        }
-      }
-
-      override fun updateInputTextUI(
-        questionnaireViewItem: QuestionnaireViewItem,
-        textInputEditText: TextInputEditText,
-      ) {
-        val answer =
-          questionnaireViewItem.answers.singleOrNull()?.valueIntegerType?.value?.toString()
-        val draftAnswer = questionnaireViewItem.draftAnswer?.toString()
-
-        // Update the text on the UI only if the value of the saved answer or draft answer
-        // is different from what the user is typing. We compare the two fields as integers to
-        // avoid shifting focus if the text values are different, but their integer representation
-        // is the same (e.g. "001" compared to "1")
-        if (answer.isNullOrEmpty() && draftAnswer.isNullOrEmpty()) {
-          textInputEditText.setText("")
-        } else if (answer?.toIntOrNull() != textInputEditText.text.toString().toIntOrNull()) {
-          textInputEditText.setText(answer)
-        } else if (draftAnswer != null && draftAnswer != textInputEditText.text.toString()) {
-          textInputEditText.setText(draftAnswer)
-        }
-      }
-
-      override fun getValidationTextUIMessage(
-        questionnaireViewItem: QuestionnaireViewItem,
-        context: Context,
-      ): String? {
-        // Update error message if draft answer present
-        return if (questionnaireViewItem.draftAnswer != null) {
+      },
+      uiValidationMessage = { questionnaireViewItem, context ->
+        if (questionnaireViewItem.draftAnswer != null) {
           context.getString(
             R.string.integer_format_validation_error_msg,
             formatInteger(Int.MIN_VALUE),
@@ -97,8 +55,22 @@ internal object EditTextIntegerViewHolderFactory :
             questionnaireViewItem.validationResult,
           )
         }
-      }
-    }
+      },
+      handleInput = { inputText, questionnaireViewItem ->
+        val input = inputText
+
+        if (input.isEmpty()) {
+          questionnaireViewItem.clearAnswer()
+        } else if (input.toIntOrNull() != null) {
+          questionnaireViewItem.setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(IntegerType(input)),
+          )
+        } else {
+          questionnaireViewItem.setDraftAnswer(input)
+        }
+      },
+    )
 
   private fun formatInteger(value: Int): String {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
