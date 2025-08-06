@@ -46,7 +46,7 @@ class EditTextViewHolderFactoryTest {
   private val testViewHolder =
     object :
         EditTextViewHolderFactory(
-          com.google.android.fhir.datacapture.R.layout.edit_text_single_line_view,
+          com.google.android.fhir.datacapture.R.layout.edit_text_view,
         ) {
         private var programmaticUpdateCounter = 0
 

@@ -27,7 +27,7 @@ import org.hl7.fhir.r4.model.StringType
  *
  * Any `ViewHolder` containing a `EditText` view that collects text data should use this class.
  */
-internal fun EditTextStringViewHolderDelegate() =
+internal fun EditTextStringViewHolderDelegate(multiLine: Boolean = false) =
   QuestionnaireItemEditTextViewHolderDelegate(
     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
     uiInputText = { it.answers.singleOrNull()?.valueStringType?.value ?: "" },
@@ -54,4 +54,5 @@ internal fun EditTextStringViewHolderDelegate() =
         questionnaireViewItem.clearAnswer()
       }
     },
+    isMultiLine = multiLine
   )

@@ -54,6 +54,7 @@ fun QuestionnaireItemEditText(questionnaireTextFieldState: QuestionnaireTextFiel
       isError = questionnaireTextFieldState.isError,
       isReadOnly = questionnaireTextFieldState.isReadOnly,
       keyboardOptions = questionnaireTextFieldState.keyboardOptions,
+      isMultiLine = questionnaireTextFieldState.isMultiLine,
     )
     if (!questionnaireTextFieldState.unitText.isNullOrEmpty()) {
       UnitText(modifier = Modifier, unitString = questionnaireTextFieldState.unitText)
@@ -71,6 +72,7 @@ fun OutlinedQuestionnaireItemTextField(
   isError: Boolean,
   isReadOnly: Boolean,
   keyboardOptions: KeyboardOptions,
+  isMultiLine: Boolean,
 ) {
   val focusManager = LocalFocusManager.current
   val keyboardController = LocalSoftwareKeyboardController.current
@@ -79,7 +81,8 @@ fun OutlinedQuestionnaireItemTextField(
   OutlinedTextField(
     value = inputText,
     onValueChange = { onInputChange.invoke(it) },
-    maxLines = 1,
+    minLines = if (isMultiLine) 3 else 1,
+    singleLine = !isMultiLine,
     modifier =
       modifier.onFocusChanged {
         if (!it.isFocused) {
@@ -123,5 +126,6 @@ data class QuestionnaireTextFieldState(
   val unitText: String?,
   val isReadOnly: Boolean,
   val keyboardOptions: KeyboardOptions,
+  val isMultiLine: Boolean,
 //    val onFocusChangedAction: (Boolean) -> Unit
 )

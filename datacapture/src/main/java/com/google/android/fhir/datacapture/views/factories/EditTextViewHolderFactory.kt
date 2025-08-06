@@ -56,6 +56,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 internal abstract class EditTextViewHolderFactory(@LayoutRes override val resId: Int) :
@@ -69,6 +70,7 @@ class QuestionnaireItemEditTextViewHolderDelegate(
   private val uiInputText: (QuestionnaireViewItem) -> String?,
   private val uiValidationMessage: (QuestionnaireViewItem, Context) -> String?,
   private val handleInput: suspend (String, QuestionnaireViewItem) -> Unit,
+  private val isMultiLine: Boolean = false,
 ) : QuestionnaireItemViewHolderDelegate {
   override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
@@ -121,16 +123,14 @@ class QuestionnaireItemEditTextViewHolderDelegate(
   }
 
   @OptIn(FlowPreview::class)
-  private fun listenToEdits() {
+  override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
     context.lifecycleScope.launch {
       snapshotFlow { editTextMutableState.value }
         .debounce(500.milliseconds)
+        .filter { it != uiInputText(questionnaireViewItem) }
         .collectLatest { handleInput(it, questionnaireViewItem) }
     }
-  }
 
-  override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-    listenToEdits()
     val validationUiMessage = uiValidationMessage(questionnaireViewItem, textInputLayout.context)
     val keyboardOptions =
       when (rawInputType) {
@@ -164,6 +164,7 @@ class QuestionnaireItemEditTextViewHolderDelegate(
         unitText = questionnaireViewItem.questionnaireItem.unit?.code,
         isReadOnly = questionnaireViewItem.questionnaireItem.readOnly,
         keyboardOptions = keyboardOptions,
+        isMultiLine = isMultiLine,
       )
 
     composeView.setContent {

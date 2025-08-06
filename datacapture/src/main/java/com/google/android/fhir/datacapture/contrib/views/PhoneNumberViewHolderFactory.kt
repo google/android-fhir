@@ -26,7 +26,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
 object PhoneNumberViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.edit_text_single_line_view) {
+  QuestionnaireItemViewHolderFactory(R.layout.edit_text_view) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     QuestionnaireItemEditTextViewHolderDelegate(
       InputType.TYPE_CLASS_PHONE,
