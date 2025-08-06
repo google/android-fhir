@@ -17,6 +17,9 @@
 package com.google.android.fhir.datacapture.contrib.views
 
 import android.text.InputType
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemEditTextViewHolderDelegate
@@ -29,7 +32,7 @@ object PhoneNumberViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.edit_text_view) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     QuestionnaireItemEditTextViewHolderDelegate(
-      InputType.TYPE_CLASS_PHONE,
+      KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done),
       uiInputText = { it.answers.singleOrNull()?.valueStringType?.value ?: "" },
       uiValidationMessage = { questionnaireViewItem, context ->
         getValidationErrorMessage(

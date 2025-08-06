@@ -21,6 +21,9 @@ import android.icu.text.DecimalFormat
 import android.os.Build
 import android.text.InputType
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import java.util.Locale
@@ -31,7 +34,7 @@ internal object EditTextIntegerViewHolderFactory :
   EditTextViewHolderFactory(R.layout.edit_text_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     QuestionnaireItemEditTextViewHolderDelegate(
-      InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
+      KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
       uiInputText = {
         val answer = it.answers.singleOrNull()?.valueIntegerType?.value?.toString()
         val draftAnswer = it.draftAnswer?.toString()

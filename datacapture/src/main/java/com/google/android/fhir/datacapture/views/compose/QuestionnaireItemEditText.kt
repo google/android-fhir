@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +41,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.tooling.preview.Preview
 import com.google.android.fhir.datacapture.R
 
 @Composable
@@ -60,6 +62,22 @@ fun QuestionnaireItemEditText(questionnaireTextFieldState: QuestionnaireTextFiel
       UnitText(modifier = Modifier, unitString = questionnaireTextFieldState.unitText)
     }
   }
+}
+
+@Composable
+@Preview(showSystemUi = true)
+fun PreviewQuestionnaireItemEditText() {
+  QuestionnaireItemEditText(QuestionnaireTextFieldState(
+    remember {  mutableStateOf("Input") },
+    onInputValueChange = {},
+    hint = null,
+    helperText = null,
+    isError = false,
+    isReadOnly = false,
+    isMultiLine = false,
+    unitText = "",
+    keyboardOptions = KeyboardOptions())
+  )
 }
 
 @Composable

@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views.factories
 
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.text.KeyboardOptions
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -52,7 +53,7 @@ class EditTextViewHolderFactoryTest {
 
         override fun getQuestionnaireItemViewHolderDelegate() =
           QuestionnaireItemEditTextViewHolderDelegate(
-            DECIMAL_INPUT_TYPE,
+            KeyboardOptions.Default,
             uiInputText = {
               programmaticUpdateCounter += 1
               "$programmaticUpdateCounter"

@@ -66,7 +66,7 @@ internal abstract class EditTextViewHolderFactory(@LayoutRes override val resId:
 }
 
 class QuestionnaireItemEditTextViewHolderDelegate(
-  private val rawInputType: Int,
+  private val keyboardOptions: KeyboardOptions,
   private val uiInputText: (QuestionnaireViewItem) -> String?,
   private val uiValidationMessage: (QuestionnaireViewItem, Context) -> String?,
   private val handleInput: suspend (String, QuestionnaireViewItem) -> Unit,
@@ -100,23 +100,6 @@ class QuestionnaireItemEditTextViewHolderDelegate(
     }
 
     val validationUiMessage = uiValidationMessage(questionnaireViewItem, context)
-    val keyboardOptions =
-      when (rawInputType) {
-        InputType.TYPE_CLASS_PHONE ->
-          KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done)
-        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL ->
-          KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done)
-        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED ->
-          KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done)
-        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES ->
-          KeyboardOptions(
-            keyboardType = KeyboardType.Text,
-            capitalization = KeyboardCapitalization.Sentences,
-            imeAction = ImeAction.Done,
-          )
-        else -> KeyboardOptions.Default
-      }
-
     val composeViewQuestionnaireState =
       QuestionnaireTextFieldState(
         inputText = editTextMutableState,

@@ -17,6 +17,10 @@
 package com.google.android.fhir.datacapture.views.factories
 
 import android.text.InputType
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
@@ -29,7 +33,11 @@ import org.hl7.fhir.r4.model.StringType
  */
 internal fun EditTextStringViewHolderDelegate(multiLine: Boolean = false) =
   QuestionnaireItemEditTextViewHolderDelegate(
-    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
+    KeyboardOptions(
+      keyboardType = KeyboardType.Text,
+      capitalization = KeyboardCapitalization.Sentences,
+      imeAction = ImeAction.Done,
+    ),
     uiInputText = { it.answers.singleOrNull()?.valueStringType?.value ?: "" },
     uiValidationMessage = { questionnaireViewItem, context ->
       getValidationErrorMessage(
