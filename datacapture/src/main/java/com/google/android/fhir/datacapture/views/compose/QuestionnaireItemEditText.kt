@@ -67,16 +67,18 @@ fun QuestionnaireItemEditText(questionnaireTextFieldState: QuestionnaireTextFiel
 @Composable
 @Preview(showSystemUi = true)
 fun PreviewQuestionnaireItemEditText() {
-  QuestionnaireItemEditText(QuestionnaireTextFieldState(
-    remember {  mutableStateOf("Input") },
-    onInputValueChange = {},
-    hint = null,
-    helperText = null,
-    isError = false,
-    isReadOnly = false,
-    isMultiLine = false,
-    unitText = "",
-    keyboardOptions = KeyboardOptions())
+  QuestionnaireItemEditText(
+    QuestionnaireTextFieldState(
+      remember { mutableStateOf("Input") },
+      onInputValueChange = {},
+      hint = null,
+      helperText = null,
+      isError = false,
+      isReadOnly = false,
+      isMultiLine = false,
+      unitText = "",
+      keyboardOptions = KeyboardOptions(),
+    ),
   )
 }
 
@@ -117,6 +119,7 @@ fun OutlinedQuestionnaireItemTextField(
       }
     },
     readOnly = isReadOnly,
+    enabled = !isReadOnly,
     keyboardOptions = keyboardOptions,
     keyboardActions =
       KeyboardActions(

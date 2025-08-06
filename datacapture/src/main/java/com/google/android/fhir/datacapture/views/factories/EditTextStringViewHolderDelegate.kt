@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.text.InputType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -62,5 +61,5 @@ internal fun EditTextStringViewHolderDelegate(multiLine: Boolean = false) =
         questionnaireViewItem.clearAnswer()
       }
     },
-    isMultiLine = multiLine
+    isMultiLine = multiLine,
   )

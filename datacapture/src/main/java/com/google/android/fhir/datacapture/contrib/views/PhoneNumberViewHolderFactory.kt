@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.contrib.views
 
-import android.text.InputType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -28,8 +27,7 @@ import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemView
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
-object PhoneNumberViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.edit_text_view) {
+object PhoneNumberViewHolderFactory : QuestionnaireItemViewHolderFactory(R.layout.edit_text_view) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     QuestionnaireItemEditTextViewHolderDelegate(
       KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done),

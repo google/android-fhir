@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.views.factories
 import android.icu.number.NumberFormatter
 import android.icu.text.DecimalFormat
 import android.os.Build
-import android.text.InputType
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
