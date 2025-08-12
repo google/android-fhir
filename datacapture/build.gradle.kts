@@ -117,7 +117,6 @@ dependencies {
   implementation(libs.androidx.navigation.compose)
   implementation(libs.accompanist.themeadapter.material3)
 
-  androidTestImplementation(platform(libs.androidx.compose.bom))
   androidTestImplementation(libs.androidx.compose.ui.test.junit4)
   debugImplementation(libs.androidx.compose.ui.tooling)
   debugImplementation(libs.androidx.compose.ui.test.manifest)

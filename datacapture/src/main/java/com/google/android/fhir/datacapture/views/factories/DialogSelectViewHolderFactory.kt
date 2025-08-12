@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,10 +48,10 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
 internal object QuestionnaireItemDialogSelectViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.option_select_view) {
+  QuestionnaireItemAndroidViewHolderFactory(R.layout.option_select_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     @SuppressLint("StaticFieldLeak")
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemAndroidViewHolderDelegate {
       private lateinit var holder: DialogSelectViewHolder
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
       private var selectedOptionsJob: Job? = null

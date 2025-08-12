@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.text.InputType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,11 +24,11 @@ import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object EditTextDecimalViewHolderFactory :
-  EditTextViewHolderFactory(R.layout.edit_text_view) {
+internal object EditTextDecimalViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
 
-  override fun getQuestionnaireItemViewHolderDelegate() =
-    QuestionnaireItemEditTextViewHolderDelegate(
+  override fun getQuestionnaireItemViewHolderDelegate():
+    QuestionnaireItemComposeViewHolderDelegate =
+    EditTextViewHolderDelegate(
       KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
       uiInputText = {
         val questionnaireItemViewItemDecimalAnswer =
@@ -66,5 +65,3 @@ internal object EditTextDecimalViewHolderFactory :
       },
     )
 }
-
-const val DECIMAL_INPUT_TYPE = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL

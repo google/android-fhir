@@ -44,15 +44,13 @@ class EditTextViewHolderFactoryTest {
         setTheme(R.style.Theme_Material3_DayNight)
       },
     )
+
   private val testViewHolder =
-    object :
-        EditTextViewHolderFactory(
-          com.google.android.fhir.datacapture.R.layout.edit_text_view,
-        ) {
+    object : QuestionnaireItemComposeViewHolderFactory {
         private var programmaticUpdateCounter = 0
 
         override fun getQuestionnaireItemViewHolderDelegate() =
-          QuestionnaireItemEditTextViewHolderDelegate(
+          EditTextViewHolderDelegate(
             KeyboardOptions.Default,
             uiInputText = {
               programmaticUpdateCounter += 1

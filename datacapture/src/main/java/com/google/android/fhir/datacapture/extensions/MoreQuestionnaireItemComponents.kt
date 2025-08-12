@@ -451,7 +451,8 @@ val List<QuestionnaireItemComponent>.localizedFlyoverAnnotatedString: AnnotatedS
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
           questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
       }
-      ?.localizedTextAnnotatedString
+      ?.textElement
+      ?.localizedTextAnnotatedString()
 
 /**
  * A nested questionnaire item of type display with displayCategory extension with
@@ -549,9 +550,6 @@ enum class MimeType(val value: String) {
   VIDEO("video"),
 }
 
-/** Returns the main MIME type of a MIME type string (e.g. image/png returns image). */
-private fun getMimeType(mimeType: String): String = mimeType.substringBefore("/")
-
 /** Returns true if at least one mime type matches the given type. */
 fun QuestionnaireItemComponent.hasMimeType(type: String): Boolean {
   return mimeTypes.any { it.substringBefore("/") == type }
@@ -595,12 +593,16 @@ internal val QuestionnaireItemComponent.itemMedia: Attachment?
   get() =
     (getExtensionByUrl(EXTENSION_ITEM_MEDIA)?.value as? Attachment)?.takeIf { it.hasContentType() }
 
+/** Returns the main MIME type of a MIME type string (e.g. image/png returns image). */
+internal val Attachment.mimeType: String?
+  get() = contentType?.substringBefore("/")
+
 /* TODO: unify the code path from itemAnswerMedia to use fetchBitmapFromUrl (github.com/google/android-fhir/issues/1876) */
 /** Fetches the Bitmap representation of [Attachment.url]. */
 internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
   if (!hasUrl() || !UrlUtil.isValid(url) || !hasContentType()) return null
 
-  if (getMimeType(contentType) != MimeType.IMAGE.value) return null
+  if (mimeType != MimeType.IMAGE.value) return null
 
   val urlResolver = DataCapture.getConfiguration(context).urlResolver ?: return null
 
@@ -611,7 +613,7 @@ internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
 internal fun Attachment.decodeToBitmap(): Bitmap? {
   if (!hasContentType() || !hasData()) return null
 
-  if (getMimeType(contentType) != MimeType.IMAGE.value) return null
+  if (mimeType != MimeType.IMAGE.value) return null
 
   return data.decodeToBitmap()
 }

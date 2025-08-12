@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,6 @@ import com.google.android.fhir.datacapture.extensions.displayStringSpanned
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.optionExclusive
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
-import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
-import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import kotlinx.coroutines.launch
@@ -42,9 +38,9 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object CheckBoxGroupViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.checkbox_group_view) {
+  QuestionnaireItemAndroidViewHolderFactory(R.layout.checkbox_group_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemAndroidViewHolderDelegate {
       private var appContext: AppCompatActivity? = null
       private lateinit var header: HeaderView
       private lateinit var checkboxGroup: ConstraintLayout
@@ -59,8 +55,11 @@ internal object CheckBoxGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        header.bind(questionnaireViewItem)
-        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
+        header.bind(
+          questionnaireViewItem,
+          showRequiredOrOptionalText = true,
+          displayValidationResult = true,
+        )
         val choiceOrientation =
           questionnaireViewItem.questionnaireItem.choiceOrientation
             ?: ChoiceOrientationTypes.VERTICAL
@@ -82,8 +81,6 @@ internal object CheckBoxGroupViewHolderFactory :
           .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
           .map { it.first }
           .let { flow.referencedIds = it.toIntArray() }
-
-        displayValidationResult(questionnaireViewItem.validationResult)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
@@ -170,16 +167,6 @@ internal object CheckBoxGroupViewHolderFactory :
           }
         checkboxGroup.addView(checkbox)
         flow.addView(checkbox)
-      }
-
-      private fun displayValidationResult(validationResult: ValidationResult) {
-        when (validationResult) {
-          is NotValidated,
-          Valid, -> header.showErrorText(isErrorTextVisible = false)
-          is Invalid -> {
-            header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
-          }
-        }
       }
     }
 }

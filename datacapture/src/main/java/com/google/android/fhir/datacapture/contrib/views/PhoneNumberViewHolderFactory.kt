@@ -19,17 +19,17 @@ package com.google.android.fhir.datacapture.contrib.views
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
-import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemEditTextViewHolderDelegate
-import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderDelegate
-import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.EditTextViewHolderDelegate
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemComposeViewHolderDelegate
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemComposeViewHolderFactory
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
-object PhoneNumberViewHolderFactory : QuestionnaireItemViewHolderFactory(R.layout.edit_text_view) {
-  override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
-    QuestionnaireItemEditTextViewHolderDelegate(
+object PhoneNumberViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
+  override fun getQuestionnaireItemViewHolderDelegate():
+    QuestionnaireItemComposeViewHolderDelegate =
+    EditTextViewHolderDelegate(
       KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done),
       uiInputText = { it.answers.singleOrNull()?.valueStringType?.value ?: "" },
       uiValidationMessage = { questionnaireViewItem, context ->

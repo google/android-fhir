@@ -25,13 +25,13 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
 /**
- * Implementation of [QuestionnaireItemEditTextViewHolderDelegate] used in
- * [EditTextSingleLineViewHolderFactory] and [EditTextMultiLineViewHolderFactory].
+ * Implementation of [EditTextViewHolderDelegate] used in [EditTextSingleLineViewHolderFactory] and
+ * [EditTextMultiLineViewHolderFactory].
  *
  * Any `ViewHolder` containing a `EditText` view that collects text data should use this class.
  */
 internal fun EditTextStringViewHolderDelegate(multiLine: Boolean = false) =
-  QuestionnaireItemEditTextViewHolderDelegate(
+  EditTextViewHolderDelegate(
     KeyboardOptions(
       keyboardType = KeyboardType.Text,
       capitalization = KeyboardCapitalization.Sentences,

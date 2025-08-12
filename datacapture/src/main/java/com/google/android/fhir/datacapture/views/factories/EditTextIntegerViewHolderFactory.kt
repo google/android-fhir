@@ -29,10 +29,10 @@ import java.util.Locale
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object EditTextIntegerViewHolderFactory :
-  EditTextViewHolderFactory(R.layout.edit_text_view) {
-  override fun getQuestionnaireItemViewHolderDelegate() =
-    QuestionnaireItemEditTextViewHolderDelegate(
+internal object EditTextIntegerViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
+  override fun getQuestionnaireItemViewHolderDelegate():
+    QuestionnaireItemComposeViewHolderDelegate =
+    EditTextViewHolderDelegate(
       KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
       uiInputText = {
         val answer = it.answers.singleOrNull()?.valueIntegerType?.value?.toString()
