@@ -28,8 +28,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -42,9 +44,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.android.fhir.datacapture.R
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
@@ -112,17 +115,37 @@ fun OutlinedEditTextFieldItem(
 ) {
   val focusManager = LocalFocusManager.current
   val keyboardController = LocalSoftwareKeyboardController.current
+  var textFieldValue by remember {
+    mutableStateOf(TextFieldValue(text = inputText, selection = TextRange(inputText.length)))
+  }
+  var isFocused by remember { mutableStateOf(false) }
+
+  // Update the local state when the initial inputText changes and the field is not focused
+  LaunchedEffect(inputText) {
+    if (!isFocused && textFieldValue.text != inputText) {
+      textFieldValue =
+        textFieldValue.copy(text = inputText, selection = TextRange(inputText.length))
+    }
+  }
 
   OutlinedTextField(
-    value = inputText,
-    onValueChange = { onInputTextChange.invoke(it) },
+    value = textFieldValue,
+    onValueChange = {
+      textFieldValue = it
+      onInputTextChange(it.text)
+    },
     minLines = if (isMultiLine) 3 else 1,
     singleLine = !isMultiLine,
     modifier =
       modifier
         .onFocusChanged {
+          isFocused = it.isFocused
           if (!it.isFocused) {
             keyboardController?.hide()
+            // Sync with external state on focus loss
+            if (textFieldValue.text != inputText) {
+              onInputTextChange(textFieldValue.text)
+            }
           }
         }
         .testTag(EDIT_TEXT_FIELD_TEST_TAG),
@@ -197,7 +220,7 @@ data class QuestionnaireTextFieldState(
         .onEach { text -> println("FIRST: $text") }
         .drop(1) // Drops the initial value emitted by snapshotFlow
         .onEach { text -> println("After drop => $text") }
-        .debounce(500.milliseconds)
+        .debounce(HANDLE_INPUT_DEBOUNCE_TIME)
         .onEach { text -> println("After debounce => $text") }
         .collectLatest { handleTextInputChange(it) }
     }
@@ -210,3 +233,4 @@ data class QuestionnaireTextFieldState(
 
 const val EDIT_TEXT_FIELD_TEST_TAG = "text_input_edit_text"
 const val UNIT_TEXT_TEST_TAG = "unit_text_view"
+const val HANDLE_INPUT_DEBOUNCE_TIME = 500L
