@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,81 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.factories
+package com.google.android.fhir.datacapture.test.views
 
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.test.IdlingResource
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTextReplacement
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
+import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
+import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.After
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
-class EditTextIntegerViewHolderFactoryTest {
-  private val parent =
-    FrameLayout(
-      Robolectric.buildActivity(AppCompatActivity::class.java).create().get().apply {
-        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      },
-    )
-  private val viewHolder = EditTextIntegerViewHolderFactory.create(parent)
+@RunWith(AndroidJUnit4::class)
+class EditTextIntegerViewHolderFactoryInstrumentedTest {
+
+  @get:Rule
+  val activityScenarioRule: ActivityScenarioRule<TestActivity> =
+    ActivityScenarioRule(TestActivity::class.java)
+
+  @get:Rule val composeTestRule = createEmptyComposeRule()
+
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
+  private lateinit var parent: FrameLayout
+
+  private var pendingTextChange = 0
+  private val handlingTextIdlingResource =
+    object : IdlingResource {
+      override val isIdleNow: Boolean
+        get() = pendingTextChange == 0
+    }
+
+  @Before
+  fun setup() {
+    activityScenarioRule.scenario.onActivity { activity ->
+      parent = FrameLayout(activity)
+      viewHolder = EditTextIntegerViewHolderFactory.create(parent)
+      activity.setContentView(viewHolder.itemView)
+    }
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+
+    composeTestRule.registerIdlingResource(handlingTextIdlingResource)
+  }
+
+  @After
+  fun tearDown() {
+    composeTestRule.unregisterIdlingResource(handlingTextIdlingResource)
+  }
 
   @Test
-  fun `should set questionnaire header`() {
+  fun shouldSetQuestionnaireHeader() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -56,13 +97,34 @@ class EditTextIntegerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
+    // Synchronize
+    composeTestRule.waitForIdle()
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
 
   @Test
-  fun `should set input text`() {
+  fun shouldSetInputText() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = IntegerType(5)
+            },
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("5")
+  }
+
+  @Test
+  fun shouldSetInputTextToEmpty() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -78,97 +140,81 @@ class EditTextIntegerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString(),
-      )
-      .isEqualTo("5")
-  }
-
-  @Test
-  fun `should set input text to empty`() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType(5)
-            },
-          )
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("")
+  }
+
+  @Test
+  fun shouldSetQuestionnaireResponseItemAnswerIfTextIsValid() {
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, result, _ ->
+          answers = result
+          pendingTextChange -= if (pendingTextChange > 0) 1 else 0
         },
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    assertThat(
-        viewHolder.itemView
-          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString(),
       )
-      .isEqualTo("")
-  }
 
-  @Test
-  fun `should set QuestionnaireResponseItemAnswer to empty`() {
-    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, result, _ -> answers = result },
-      )
     viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
-    assertThat(answers).isEmpty()
-  }
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("13").also {
+      pendingTextChange += 1
+    }
+    composeTestRule.waitForIdle()
 
-  @Test
-  fun `should set QuestionnaireResponseItemAnswer if valid text`() {
-    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, result, _ -> answers = result },
-      )
-    viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("13")
     assertThat(answers!!.single().valueIntegerType.value).isEqualTo(13)
   }
 
   @Test
-  fun `should set draft answer if invalid text`() {
+  fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("")
+    composeTestRule.waitForIdle()
+
+    assertThat(questionnaireViewItem.answers).isEmpty()
+  }
+
+  @Test
+  fun shouldSetDraftAnswerIfTextIsInvalid() {
     var draftAnswer: Any? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, result -> draftAnswer = result },
+        answersChangedCallback = { _, _, _, result ->
+          draftAnswer = result
+          pendingTextChange -= if (pendingTextChange > 0) 1 else 0
+        },
       )
     viewHolder.bind(questionnaireViewItem)
-    // The character is the letter O, not the number 0
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("1O2")
+    // The character in 1O2 is the letter O, not the number 0
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("1O2").also {
+      pendingTextChange += 1
+    }
+    composeTestRule.waitForIdle()
     assertThat(draftAnswer as String).isEqualTo("1O2")
   }
 
   @Test
-  fun `displayValidationResult should show no error message`() {
+  fun displayValidationResultShouldShowNoErrorMesssage() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -193,12 +239,11 @@ class EditTextIntegerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isNull()
+    composeTestRule.onNodeWithContentDescription("Error").assertDoesNotExist()
   }
 
   @Test
-  fun `displayValidationResult should show error message`() {
+  fun displayValidationResultShouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -223,12 +268,12 @@ class EditTextIntegerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Minimum value allowed is:2")
+    composeTestRule.onNodeWithContentDescription("Error").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Minimum value allowed is:2").assertIsDisplayed()
   }
 
   @Test
-  fun `hides error textview in the header`() {
+  fun hidesErrorTextviewInTheHeader() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -238,12 +283,11 @@ class EditTextIntegerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
-      .isEqualTo(View.GONE)
+    composeTestRule.onNodeWithTag(ERROR_TEXT_AT_HEADER_TEST_TAG).assertIsNotDisplayed()
   }
 
   @Test
-  fun `bind readOnly should disable view`() {
+  fun bindReadOnlyShouldDisableView() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
@@ -253,14 +297,11 @@ class EditTextIntegerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).isEnabled,
-      )
-      .isFalse()
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertIsDisplayed().assertIsNotEnabled()
   }
 
   @Test
-  fun `shows asterisk`() {
+  fun showAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -274,12 +315,15 @@ class EditTextIntegerViewHolderFactoryTest {
       ),
     )
 
+    // Synchronize
+    composeTestRule.waitForIdle()
+
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question? *")
   }
 
   @Test
-  fun `hide asterisk`() {
+  fun hideAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -293,12 +337,15 @@ class EditTextIntegerViewHolderFactoryTest {
       ),
     )
 
+    // Synchronize
+    composeTestRule.waitForIdle()
+
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
 
   @Test
-  fun `shows required text`() {
+  fun showsRequiredText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -309,17 +356,11 @@ class EditTextIntegerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<TextInputLayout>(R.id.text_input_layout)
-          .helperText
-          .toString(),
-      )
-      .isEqualTo("Required")
+    composeTestRule.onNodeWithText("Required").assertIsDisplayed()
   }
 
   @Test
-  fun `hide required text`() {
+  fun hideRequiredText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -329,13 +370,11 @@ class EditTextIntegerViewHolderFactoryTest {
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false),
       ),
     )
-
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)
-      .isNull()
+    composeTestRule.onNodeWithText("Required").assertDoesNotExist()
   }
 
   @Test
-  fun `shows optional text`() {
+  fun showOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -346,17 +385,11 @@ class EditTextIntegerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<TextInputLayout>(R.id.text_input_layout)
-          .helperText
-          .toString(),
-      )
-      .isEqualTo("Optional")
+    composeTestRule.onNodeWithText("Optional").assertIsDisplayed()
   }
 
   @Test
-  fun `hide optional text`() {
+  fun hideOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -367,12 +400,11 @@ class EditTextIntegerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)
-      .isNull()
+    composeTestRule.onNodeWithText("Optional").assertDoesNotExist()
   }
 
   @Test
-  fun `bind again should remove previous text`() {
+  fun bindAgainShouldRemovePreviousText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -383,14 +415,9 @@ class EditTextIntegerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString(),
-      )
-      .isEqualTo("9999999999")
-
+    composeTestRule
+      .onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG, useUnmergedTree = true)
+      .assertTextEquals("9999999999")
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -400,12 +427,8 @@ class EditTextIntegerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString(),
-      )
-      .isEqualTo("")
+    composeTestRule
+      .onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG, useUnmergedTree = true)
+      .assertTextEquals("")
   }
 }

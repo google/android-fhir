@@ -39,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -147,6 +148,7 @@ internal fun Header(
     // Validation Error
     if (displayValidationResult && validationResult is Invalid) {
       Text(
+        modifier = Modifier.testTag(ERROR_TEXT_AT_HEADER_TEST_TAG),
         text = validationResult.getSingleStringValidationMessage(),
         color = MaterialTheme.colorScheme.error,
         style = MaterialTheme.typography.bodySmall,
@@ -185,6 +187,7 @@ internal fun PrefixQuestionTitle(
     AndroidView(
       factory = {
         TextView(it).apply {
+          id = R.id.question
           movementMethod = LinkMovementMethod.getInstance()
           applyCustomOrDefaultStyle(
             context = it,
@@ -279,3 +282,5 @@ internal fun Help(
     }
   }
 }
+
+const val ERROR_TEXT_AT_HEADER_TEST_TAG = "error_text_at_header"

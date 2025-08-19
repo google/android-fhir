@@ -151,7 +151,11 @@ fun UnitText(modifier: Modifier, unitString: String) {
     modifier = modifier.padding(horizontal = dimensionResource(R.dimen.item_margin_horizontal)),
     contentAlignment = Alignment.Center,
   ) {
-    Text(unitString, style = MaterialTheme.typography.bodyMedium)
+    Text(
+      unitString,
+      style = MaterialTheme.typography.bodyMedium,
+      modifier = Modifier.testTag(UNIT_TEXT_TEST_TAG),
+    )
   }
 }
 
@@ -190,7 +194,7 @@ data class QuestionnaireTextFieldState(
   init {
     coroutineScope.launch {
       snapshotFlow { inputText }
-        .onEach { text -> println(text) }
+        .onEach { text -> println("FIRST: $text") }
         .drop(1) // Drops the initial value emitted by snapshotFlow
         .onEach { text -> println("After drop => $text") }
         .debounce(500.milliseconds)
@@ -204,4 +208,5 @@ data class QuestionnaireTextFieldState(
   }
 }
 
-const val EDIT_TEXT_FIELD_TEST_TAG = "OutlinedEditTextFieldItem_test_tag"
+const val EDIT_TEXT_FIELD_TEST_TAG = "text_input_edit_text"
+const val UNIT_TEXT_TEST_TAG = "unit_text_view"
