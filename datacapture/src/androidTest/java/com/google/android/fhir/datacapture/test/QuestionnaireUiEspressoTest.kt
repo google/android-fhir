@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
@@ -611,13 +612,19 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
+  fun test_add_item_button_does_not_exist_for_non_repeated_groups() {
+    buildFragmentFromQuestionnaire("/component_non_repeated_group.json")
+    onView(withId(R.id.add_item)).check(doesNotExist())
+  }
+
+  @Test
   fun test_repeated_group_is_added() {
     buildFragmentFromQuestionnaire("/component_repeated_group.json")
 
     onView(withId(R.id.questionnaire_edit_recycler_view))
       .perform(
         RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
-          0,
+          1,
           clickChildViewWithId(R.id.add_item),
         ),
       )

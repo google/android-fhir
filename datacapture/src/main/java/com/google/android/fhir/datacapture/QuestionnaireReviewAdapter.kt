@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ internal class QuestionnaireReviewAdapter :
             .inflate(R.layout.pagination_navigation_view, parent, false),
         )
       QuestionnaireEditAdapter.ViewType.Type.REPEATED_GROUP_HEADER -> TODO()
+      QuestionnaireEditAdapter.ViewType.Type.REPEATED_GROUP_ADD_BUTTON -> TODO()
     }
   }
 
@@ -53,6 +54,7 @@ internal class QuestionnaireReviewAdapter :
         holder.bind(item.questionnaireNavigationUIState)
       }
       is QuestionnaireAdapterItem.RepeatedGroupHeader -> TODO()
+      is QuestionnaireAdapterItem.RepeatedGroupAddButton -> TODO()
     }
   }
 
@@ -74,6 +76,7 @@ internal class QuestionnaireReviewAdapter :
         subtype = 0xFFFFFF
       }
       is QuestionnaireAdapterItem.RepeatedGroupHeader -> TODO()
+      is QuestionnaireAdapterItem.RepeatedGroupAddButton -> TODO()
     }
     return QuestionnaireEditAdapter.ViewType.from(type = type, subtype = subtype).viewType
   }

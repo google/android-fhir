@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.RepeatsGroupAddItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewHolderFactory
@@ -78,6 +79,11 @@ internal class QuestionnaireEditAdapter(
           NavigationViewHolder(
             parent.inflate(R.layout.pagination_navigation_view),
           ),
+        )
+      }
+      ViewType.Type.REPEATED_GROUP_ADD_BUTTON -> {
+        ViewHolder.RepeatedGroupAddButtonViewHolder(
+          RepeatsGroupAddItemViewHolder.create(parent),
         )
       }
     }
@@ -138,6 +144,10 @@ internal class QuestionnaireEditAdapter(
         holder as ViewHolder.NavigationHolder
         holder.viewHolder.bind(item.questionnaireNavigationUIState)
       }
+      is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+        holder as ViewHolder.RepeatedGroupAddButtonViewHolder
+        holder.viewHolder.bind(item.item)
+      }
     }
   }
 
@@ -162,6 +172,10 @@ internal class QuestionnaireEditAdapter(
       is QuestionnaireAdapterItem.Navigation -> {
         type = ViewType.Type.NAVIGATION
         subtype = 0xFFFFFF
+      }
+      is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+        type = ViewType.Type.REPEATED_GROUP_ADD_BUTTON
+        subtype = 0
       }
     }
     return ViewType.from(type = type, subtype = subtype).viewType
@@ -194,6 +208,7 @@ internal class QuestionnaireEditAdapter(
     enum class Type {
       QUESTION,
       REPEATED_GROUP_HEADER,
+      REPEATED_GROUP_ADD_BUTTON,
       NAVIGATION,
     }
   }
@@ -296,6 +311,9 @@ internal class QuestionnaireEditAdapter(
       ViewHolder(viewHolder.itemView)
 
     class NavigationHolder(val viewHolder: NavigationViewHolder) : ViewHolder(viewHolder.itemView)
+
+    class RepeatedGroupAddButtonViewHolder(val viewHolder: RepeatsGroupAddItemViewHolder) :
+      ViewHolder(viewHolder.itemView)
   }
 
   internal companion object {
@@ -324,6 +342,10 @@ internal object DiffCallbacks {
               oldItem.index == newItem.index
           }
           is QuestionnaireAdapterItem.Navigation -> newItem is QuestionnaireAdapterItem.Navigation
+          is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+            newItem is QuestionnaireAdapterItem.RepeatedGroupAddButton &&
+              oldItem.item.hasTheSameItem(newItem.item)
+          }
         }
 
       override fun areContentsTheSame(
@@ -362,6 +384,12 @@ internal object DiffCallbacks {
           is QuestionnaireAdapterItem.Navigation -> {
             newItem is QuestionnaireAdapterItem.Navigation &&
               oldItem.questionnaireNavigationUIState == newItem.questionnaireNavigationUIState
+          }
+          is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+            newItem is QuestionnaireAdapterItem.RepeatedGroupAddButton &&
+              oldItem.item.hasTheSameItem(newItem.item) &&
+              oldItem.item.hasTheSameResponse(newItem.item) &&
+              oldItem.item.hasTheSameValidationResult(newItem.item)
           }
         }
     }
