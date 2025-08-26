@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import android.text.Spanned
+import androidx.compose.ui.text.AnnotatedString
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localTime
@@ -119,6 +120,10 @@ internal fun StringType.toCodeType(): CodeType {
 /** Converts StringType to IdType. */
 internal fun StringType.toIdType(): IdType {
   return IdType(value)
+}
+
+internal fun StringType.localizedTextAnnotatedString(): AnnotatedString? {
+  return this.getLocalizedText()?.toAnnotatedString()
 }
 
 /** Converts Coding to CodeType. */

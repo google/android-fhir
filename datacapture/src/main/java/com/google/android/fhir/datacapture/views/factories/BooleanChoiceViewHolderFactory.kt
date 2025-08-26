@@ -28,10 +28,6 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.extensions.choiceOrientation
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
-import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
-import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import kotlinx.coroutines.launch
@@ -62,8 +58,11 @@ internal object BooleanChoiceViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         this.questionnaireViewItem = questionnaireViewItem
-        header.bind(questionnaireViewItem)
-        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
+        header.bind(
+          questionnaireViewItem,
+          showRequiredOrOptionalText = true,
+          displayValidationResult = true,
+        )
         val choiceOrientation =
           questionnaireViewItem.questionnaireItem.choiceOrientation
             ?: ChoiceOrientationTypes.VERTICAL
@@ -132,8 +131,6 @@ internal object BooleanChoiceViewHolderFactory :
             }
           }
         }
-
-        displayValidationResult(questionnaireViewItem.validationResult)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
@@ -155,16 +152,6 @@ internal object BooleanChoiceViewHolderFactory :
             ViewGroup.LayoutParams.WRAP_CONTENT,
             1.0f,
           )
-      }
-
-      private fun displayValidationResult(validationResult: ValidationResult) {
-        when (validationResult) {
-          is NotValidated,
-          Valid, -> header.showErrorText(isErrorTextVisible = false)
-          is Invalid -> {
-            header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
-          }
-        }
       }
     }
 }

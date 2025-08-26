@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,69 +16,50 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.text.Editable
-import android.text.InputType
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
-import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
 /**
- * Implementation of [QuestionnaireItemEditTextViewHolderDelegate] used in
- * [EditTextSingleLineViewHolderFactory] and [EditTextMultiLineViewHolderFactory].
+ * Implementation of [EditTextViewHolderDelegate] used in [EditTextSingleLineViewHolderFactory] and
+ * [EditTextMultiLineViewHolderFactory].
  *
  * Any `ViewHolder` containing a `EditText` view that collects text data should use this class.
  */
-internal class EditTextStringViewHolderDelegate :
-  QuestionnaireItemEditTextViewHolderDelegate(
-    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
-  ) {
-  override suspend fun handleInput(
-    editable: Editable,
-    questionnaireViewItem: QuestionnaireViewItem,
-  ) {
-    val input = getValue(editable.toString())
-    if (input != null) {
-      questionnaireViewItem.setAnswer(input)
-    } else {
-      questionnaireViewItem.clearAnswer()
-    }
-  }
-
-  private fun getValue(
-    text: String,
-  ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
-    return text.let {
-      if (it.isEmpty()) {
-        null
-      } else {
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(StringType(it))
-      }
-    }
-  }
-
-  override fun updateInputTextUI(
-    questionnaireViewItem: QuestionnaireViewItem,
-    textInputEditText: TextInputEditText,
-  ) {
-    val text = questionnaireViewItem.answers.singleOrNull()?.valueStringType?.value ?: ""
-    if ((text != textInputEditText.text.toString())) {
-      textInputEditText.text?.clear()
-      textInputEditText.append(text)
-    }
-  }
-
-  override fun updateValidationTextUI(
-    questionnaireViewItem: QuestionnaireViewItem,
-    textInputLayout: TextInputLayout,
-  ) {
-    textInputLayout.error =
+internal fun EditTextStringViewHolderDelegate(multiLine: Boolean = false) =
+  EditTextViewHolderDelegate(
+    KeyboardOptions(
+      keyboardType = KeyboardType.Text,
+      capitalization = KeyboardCapitalization.Sentences,
+      imeAction = ImeAction.Done,
+    ),
+    uiInputText = { it.answers.singleOrNull()?.valueStringType?.value ?: "" },
+    uiValidationMessage = { questionnaireViewItem, context ->
       getValidationErrorMessage(
-        textInputLayout.context,
+        context,
         questionnaireViewItem,
         questionnaireViewItem.validationResult,
       )
-  }
-}
+    },
+    handleInput = { inputText, questionnaireViewItem ->
+      val input =
+        inputText.let {
+          if (it.isEmpty()) {
+            null
+          } else {
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(StringType(it))
+          }
+        }
+      if (input != null) {
+        questionnaireViewItem.setAnswer(input)
+      } else {
+        questionnaireViewItem.clearAnswer()
+      }
+    },
+    isMultiLine = multiLine,
+  )

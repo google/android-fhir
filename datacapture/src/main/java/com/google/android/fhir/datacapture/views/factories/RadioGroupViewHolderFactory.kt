@@ -31,10 +31,6 @@ import com.google.android.fhir.datacapture.extensions.choiceOrientation
 import com.google.android.fhir.datacapture.extensions.displayStringSpanned
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
-import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
-import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import kotlinx.coroutines.launch
@@ -59,8 +55,11 @@ internal object RadioGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        header.bind(questionnaireViewItem)
-        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
+        header.bind(
+          questionnaireViewItem,
+          showRequiredOrOptionalText = true,
+          displayValidationResult = true,
+        )
         // Keep the Flow layout which is the first child
         radioGroup.removeViews(1, radioGroup.childCount - 1)
         val choiceOrientation =
@@ -81,17 +80,6 @@ internal object RadioGroupViewHolderFactory :
           .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
           .map { it.first }
           .let { flow.referencedIds = it.toIntArray() }
-        displayValidationResult(questionnaireViewItem.validationResult)
-      }
-
-      private fun displayValidationResult(validationResult: ValidationResult) {
-        when (validationResult) {
-          is NotValidated,
-          Valid, -> header.showErrorText(isErrorTextVisible = false)
-          is Invalid -> {
-            header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
-          }
-        }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
