@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 
 internal object DisplayViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.display_view) {
+  QuestionnaireItemAndroidViewHolderFactory(R.layout.display_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemAndroidViewHolderDelegate {
       private lateinit var header: HeaderView
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
 

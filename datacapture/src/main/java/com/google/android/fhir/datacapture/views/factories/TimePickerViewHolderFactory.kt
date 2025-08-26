@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Google LLC
+ * Copyright 2024-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +41,11 @@ import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.TimeType
 
-object TimePickerViewHolderFactory : QuestionnaireItemViewHolderFactory(R.layout.time_picker_view) {
+object TimePickerViewHolderFactory :
+  QuestionnaireItemAndroidViewHolderFactory(R.layout.time_picker_view) {
 
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemAndroidViewHolderDelegate {
       private val TAG = "time-picker"
       private lateinit var context: AppCompatActivity
       private lateinit var header: HeaderView

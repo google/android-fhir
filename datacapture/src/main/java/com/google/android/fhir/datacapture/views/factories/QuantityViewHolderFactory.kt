@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,9 +49,9 @@ import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuantityViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.quantity_view) {
+  QuestionnaireItemAndroidViewHolderFactory(R.layout.quantity_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemAndroidViewHolderDelegate {
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
       private lateinit var header: HeaderView
@@ -67,7 +67,7 @@ internal object QuantityViewHolderFactory :
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         textInputEditText =
-          itemView.findViewById<TextInputEditText?>(R.id.text_input_edit_text).apply {
+          itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).apply {
             setRawInputType(QUANTITY_INPUT_TYPE)
             // Override `setOnEditorActionListener` to avoid crash with `IllegalStateException` if
             // it's not possible to move focus forward.
@@ -99,7 +99,7 @@ internal object QuantityViewHolderFactory :
 
         unitTextInputLayout = itemView.findViewById(R.id.unit_text_input_layout)
         unitAutoCompleteTextView =
-          itemView.findViewById<MaterialAutoCompleteTextView?>(R.id.unit_auto_complete).apply {
+          itemView.findViewById<MaterialAutoCompleteTextView>(R.id.unit_auto_complete).apply {
             onItemClickListener =
               AdapterView.OnItemClickListener { _, _, position, _ ->
                 appContext.lifecycleScope.launch {

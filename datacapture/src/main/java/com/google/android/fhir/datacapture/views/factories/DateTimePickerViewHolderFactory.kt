@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,9 +59,9 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object DateTimePickerViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.date_time_picker_view) {
+  QuestionnaireItemAndroidViewHolderFactory(R.layout.date_time_picker_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemAndroidViewHolderDelegate {
       private lateinit var context: AppCompatActivity
       private lateinit var header: HeaderView
       private lateinit var dateInputLayout: TextInputLayout
