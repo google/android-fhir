@@ -84,12 +84,14 @@ fun Header(
   val questionLocalizedText = appendAsteriskToQuestionText(context, questionnaireViewItem)
   val hintLocalizedText =
     questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned()
+  val itemLocalizedHelpSpanned = questionnaireItem.localizedHelpSpanned
 
   //  This is to avoid an empty row in the questionnaire.
   if (
-    listOf(prefixLocalizedText, questionLocalizedText, hintLocalizedText).any {
-      !it.isNullOrBlank()
-    }
+    listOf(prefixLocalizedText, questionLocalizedText, hintLocalizedText, itemLocalizedHelpSpanned)
+      .any { !it.isNullOrBlank() } ||
+      (showRequiredOrOptionalText && !requiredOptionalText.isNullOrBlank()) ||
+      (displayValidationResult && validationResult is Invalid)
   ) {
     Header(
       prefixLocalizedText = prefixLocalizedText,
@@ -98,7 +100,7 @@ fun Header(
       hintLocalizedText = hintLocalizedText,
       isHelpCardOpen = questionnaireViewItem.isHelpCardOpen,
       isHelpButtonVisible = questionnaireItem.hasHelpButton,
-      helpCardLocalizedText = questionnaireItem.localizedHelpSpanned,
+      helpCardLocalizedText = itemLocalizedHelpSpanned,
       helpButtonOnClick = {
         questionnaireViewItem.helpCardStateChangedCallback(it, questionnaireResponseItem)
       },
@@ -127,7 +129,9 @@ internal fun Header(
 ) {
   Column(
     modifier =
-      Modifier.fillMaxWidth().padding(bottom = dimensionResource(R.dimen.header_padding_bottom)),
+      Modifier.fillMaxWidth()
+        .padding(bottom = dimensionResource(R.dimen.header_padding_bottom))
+        .testTag(HEADER_TAG),
   ) {
     PrefixQuestionTitle(prefixLocalizedText, questionLocalizedText, readCustomStyleName)
 
@@ -168,6 +172,7 @@ internal fun PrefixQuestionTitle(
       AndroidView(
         factory = {
           TextView(it).apply {
+            id = R.id.prefix
             applyCustomOrDefaultStyle(
               context = it,
               view = this,
@@ -225,6 +230,7 @@ internal fun Help(
     AndroidView(
       factory = {
         TextView(it).apply {
+          id = R.id.hint
           movementMethod = LinkMovementMethod.getInstance()
           applyCustomOrDefaultStyle(
             context = it,
@@ -249,6 +255,7 @@ internal fun Help(
         },
         modifier =
           Modifier.padding(start = dimensionResource(R.dimen.help_button_margin_start))
+            .testTag(HELP_BUTTON_TAG)
             .size(
               width = dimensionResource(R.dimen.help_button_width),
               height = dimensionResource(R.dimen.help_button_height),
@@ -263,7 +270,7 @@ internal fun Help(
   }
 
   if (isCardOpen) {
-    Card(modifier = Modifier.padding(top = 8.dp)) {
+    Card(modifier = Modifier.padding(top = 8.dp).testTag(HELP_CARD_TAG)) {
       Column(modifier = Modifier.padding(8.dp)) {
         Text(
           text = stringResource(id = R.string.help),
@@ -273,7 +280,12 @@ internal fun Help(
         )
 
         AndroidView(
-          factory = { TextView(it).apply { movementMethod = LinkMovementMethod.getInstance() } },
+          factory = {
+            TextView(it).apply {
+              id = R.id.helpText
+              movementMethod = LinkMovementMethod.getInstance()
+            }
+          },
           modifier =
             Modifier.padding(horizontal = dimensionResource(R.dimen.help_text_margin_horizontal)),
           update = { it.text = helpCardLocalizedText },
@@ -284,3 +296,6 @@ internal fun Help(
 }
 
 const val ERROR_TEXT_AT_HEADER_TEST_TAG = "error_text_at_header"
+const val HELP_BUTTON_TAG = "helpButton"
+const val HELP_CARD_TAG = "helpCardView"
+const val HEADER_TAG = "headerView"
