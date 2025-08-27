@@ -23,7 +23,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -119,7 +118,6 @@ internal fun OutlinedEditTextFieldItem(
     label = { hint?.let { Text(it) } },
     supportingText = { helperText?.let { Text(it) } },
     isError = isError,
-    colors = OutlinedTextFieldDefaults.colors(),
     trailingIcon = {
       if (isError) {
         Icon(painter = painterResource(R.drawable.error_24px), contentDescription = "Error")

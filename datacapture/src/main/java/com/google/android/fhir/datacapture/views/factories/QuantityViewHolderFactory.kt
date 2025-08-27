@@ -16,216 +16,192 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.content.Context
-import android.text.Editable
-import android.text.InputType
-import android.text.TextWatcher
-import android.view.View
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
-import android.widget.AdapterView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.doAfterTextChanged
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
-import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.itemMedia
+import com.google.android.fhir.datacapture.extensions.localizedFlyoverAnnotatedString
 import com.google.android.fhir.datacapture.extensions.toCoding
-import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.extensions.unitOption
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.material.textfield.MaterialAutoCompleteTextView
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import com.google.android.fhir.datacapture.views.compose.EditTextFieldItem
+import com.google.android.fhir.datacapture.views.compose.EditTextFieldState
+import com.google.android.fhir.datacapture.views.compose.ExposedDropDownMenuBoxItem
+import com.google.android.fhir.datacapture.views.compose.Header
+import com.google.android.fhir.datacapture.views.compose.MediaItem
 import java.math.BigDecimal
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object QuantityViewHolderFactory :
-  QuestionnaireItemAndroidViewHolderFactory(R.layout.quantity_view) {
+internal object QuantityViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemAndroidViewHolderDelegate {
-      override lateinit var questionnaireViewItem: QuestionnaireViewItem
+    object : QuestionnaireItemComposeViewHolderDelegate {
 
-      private lateinit var header: HeaderView
-      protected lateinit var textInputLayout: TextInputLayout
-      private lateinit var textInputEditText: TextInputEditText
-      private lateinit var unitTextInputLayout: TextInputLayout
-      private lateinit var unitAutoCompleteTextView: MaterialAutoCompleteTextView
-      private var textWatcher: TextWatcher? = null
-      private lateinit var appContext: AppCompatActivity
+      @Composable
+      override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
+        val context = LocalContext.current
+        val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
+        val text = remember(questionnaireViewItem) { uiInputText(questionnaireViewItem) }
+        val isReadOnly =
+          remember(questionnaireViewItem) { questionnaireViewItem.questionnaireItem.readOnly }
+        val dropDownOptions =
+          remember(questionnaireViewItem) {
+            unitDropDownOptions(questionnaireViewItem).map { it.toDropDownAnswerOption() }
+          }
+        val selectedOption =
+          remember(questionnaireViewItem) {
+            unitTextCoding(questionnaireViewItem)?.toDropDownAnswerOption()
+          }
 
-      override fun init(itemView: View) {
-        appContext = itemView.context.tryUnwrapContext()!!
-        header = itemView.findViewById(R.id.header)
-        textInputLayout = itemView.findViewById(R.id.text_input_layout)
-        textInputEditText =
-          itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).apply {
-            setRawInputType(QUANTITY_INPUT_TYPE)
-            // Override `setOnEditorActionListener` to avoid crash with `IllegalStateException` if
-            // it's not possible to move focus forward.
-            // See
-            // https://stackoverflow.com/questions/13614101/fatal-crash-focus-search-returned-a-view-that-wasnt-able-to-take-focus/47991577
-            setOnEditorActionListener { view, actionId, _ ->
-              if (actionId != EditorInfo.IME_ACTION_NEXT) {
-                false
-              }
-              view.focusSearch(View.FOCUS_DOWN)?.requestFocus(View.FOCUS_DOWN) ?: false
+        var quantity by
+          remember(questionnaireViewItem) {
+            mutableStateOf(UiQuantity(text, selectedOption?.toCoding()))
+          }
+
+        val validationUiMessage = uiValidationMessage(questionnaireViewItem.validationResult)
+
+        LaunchedEffect(quantity) {
+          coroutineScope.launch { handleInput(questionnaireViewItem, quantity) }
+        }
+
+        val composeViewQuestionnaireState =
+          remember(questionnaireViewItem) {
+            EditTextFieldState(
+              initialInputText = text,
+              handleTextInputChange = { quantity = UiQuantity(it, quantity.unitDropDown) },
+              coroutineScope = coroutineScope,
+              hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverAnnotatedString,
+              helperText = validationUiMessage.takeIf { !it.isNullOrBlank() }
+                  ?: getRequiredOrOptionalText(questionnaireViewItem, context),
+              isError = !validationUiMessage.isNullOrBlank(),
+              isReadOnly = isReadOnly,
+              keyboardOptions =
+                KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
+              isMultiLine = false,
+            )
+          }
+
+        Column(
+          modifier =
+            Modifier.fillMaxWidth()
+              .padding(
+                horizontal = dimensionResource(R.dimen.item_margin_horizontal),
+                vertical = dimensionResource(R.dimen.item_margin_vertical),
+              ),
+        ) {
+          Header(questionnaireViewItem)
+          questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
+
+          Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            EditTextFieldItem(
+              modifier = Modifier.weight(1f),
+              textFieldState = composeViewQuestionnaireState,
+            )
+            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.item_margin_horizontal)))
+            ExposedDropDownMenuBoxItem(
+              modifier = Modifier.weight(1f),
+              enabled = !isReadOnly,
+              selectedOption = selectedOption,
+              options = dropDownOptions,
+            ) { answerOption ->
+              quantity = UiQuantity(quantity.value, answerOption?.toCoding())
             }
-            setOnFocusChangeListener { view, focused ->
-              if (!focused) {
-                (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE)
-                    as InputMethodManager)
-                  .hideSoftInputFromWindow(view.windowToken, 0)
-
-                appContext.lifecycleScope.launch {
-                  // Update answer even if the text box loses focus without any change. This will
-                  // mark
-                  // the
-                  // questionnaire response item as being modified in the view model and trigger
-                  // validation.
-                  handleInput(textInputEditText.editableText, null)
-                }
-              }
-            }
           }
-
-        unitTextInputLayout = itemView.findViewById(R.id.unit_text_input_layout)
-        unitAutoCompleteTextView =
-          itemView.findViewById<MaterialAutoCompleteTextView>(R.id.unit_auto_complete).apply {
-            onItemClickListener =
-              AdapterView.OnItemClickListener { _, _, position, _ ->
-                appContext.lifecycleScope.launch {
-                  handleInput(
-                    null,
-                    questionnaireViewItem.questionnaireItem.unitOption[position],
-                  )
-                }
-              }
-          }
-      }
-
-      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        header.bind(questionnaireViewItem)
-        with(textInputLayout) {
-          hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
-          helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
-        }
-        displayValidationResult(questionnaireViewItem.validationResult)
-
-        textInputEditText.removeTextChangedListener(textWatcher)
-        updateUI()
-
-        textWatcher =
-          textInputEditText.doAfterTextChanged { editable: Editable? ->
-            appContext.lifecycleScope.launch { handleInput(editable!!, null) }
-          }
-      }
-
-      private fun displayValidationResult(validationResult: ValidationResult) {
-        textInputLayout.error =
-          when (validationResult) {
-            is NotValidated,
-            Valid, -> null
-            is Invalid -> validationResult.getSingleStringValidationMessage()
-          }
-      }
-
-      override fun setReadOnly(isReadOnly: Boolean) {
-        textInputLayout.isEnabled = !isReadOnly
-        textInputEditText.isEnabled = !isReadOnly
-        unitTextInputLayout.isEnabled = !isReadOnly
-        unitAutoCompleteTextView.isEnabled = !isReadOnly
-      }
-
-      private suspend fun handleInput(editable: Editable?, unitDropDown: Coding?) {
-        var decimal: BigDecimal? = null
-        var unit: Coding? = null
-
-        // Read decimal value and unit from complete answer
-        questionnaireViewItem.answers.singleOrNull()?.let {
-          val quantity = it.value as Quantity
-          decimal = quantity.value
-          unit = Coding(quantity.system, quantity.code, quantity.unit)
-        }
-
-        // Read decimal value and unit from partial answer
-        questionnaireViewItem.draftAnswer?.let {
-          when (it) {
-            is BigDecimal -> decimal = it
-            is Coding -> unit = it
-          }
-        }
-
-        // Update decimal value and unit
-        editable?.toString()?.let { decimal = it.toBigDecimalOrNull() }
-        unitDropDown?.let { unit = it }
-
-        if (decimal == null && unit == null) {
-          questionnaireViewItem.clearAnswer()
-        } else if (decimal == null) {
-          questionnaireViewItem.setDraftAnswer(unit)
-        } else if (unit == null) {
-          questionnaireViewItem.setDraftAnswer(decimal)
-        } else {
-          questionnaireViewItem.setAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                Quantity(null, decimal!!.toDouble(), unit!!.system, unit!!.code, unit!!.display)
-            },
-          )
         }
       }
 
-      private fun updateUI() {
-        val text =
-          questionnaireViewItem.answers.singleOrNull()?.valueQuantity?.value?.toString()
-            ?: questionnaireViewItem.draftAnswer?.let {
-              if (it is BigDecimal) it.toString() else ""
-            }
-              ?: ""
-        if (isTextUpdatesRequired(text, textInputEditText.text.toString())) {
-          textInputEditText.setText(text)
+      private fun uiValidationMessage(validationResult: ValidationResult): String? =
+        when (validationResult) {
+          is NotValidated,
+          Valid, -> null
+          is Invalid -> validationResult.getSingleStringValidationMessage()
         }
 
+      private suspend fun handleInput(
+        questionnaireViewItem: QuestionnaireViewItem,
+        input: UiQuantity,
+      ) {
+        val currentAnswerQuantity = questionnaireViewItem.answers.singleOrNull()?.valueQuantity
+        val draftAnswer = questionnaireViewItem.draftAnswer
+
+        val decimal =
+          input.value?.toBigDecimalOrNull()
+            ?: (draftAnswer as? BigDecimal) ?: currentAnswerQuantity?.value
         val unit =
-          questionnaireViewItem.answers.singleOrNull()?.valueQuantity?.toCoding()
-            ?: questionnaireViewItem.draftAnswer?.let { if (it is Coding) it else null }
-              ?: questionnaireViewItem.questionnaireItem.initial
-              ?.firstOrNull()
-              ?.valueQuantity
-              ?.toCoding()
-        unitAutoCompleteTextView.setText(unit?.display ?: "")
+          input.unitDropDown ?: ((draftAnswer as? Coding) ?: currentAnswerQuantity?.toCoding())
 
-        val unitAdapter =
-          AnswerOptionDropDownArrayAdapter(
-            appContext,
-            R.layout.drop_down_list_item,
-            questionnaireViewItem.questionnaireItem.unitOption.map {
-              DropDownAnswerOption(it.code, it.display)
-            },
-          )
-        unitAutoCompleteTextView.setAdapter(unitAdapter)
+        when {
+          decimal == null && unit == null -> {
+            questionnaireViewItem.clearAnswer()
+          }
+          decimal == null -> {
+            questionnaireViewItem.setDraftAnswer(unit)
+          }
+          unit == null -> {
+            questionnaireViewItem.setDraftAnswer(decimal)
+          }
+          else -> {
+            questionnaireViewItem.setAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = Quantity(null, decimal.toDouble(), unit.system, unit.code, unit.display)
+              },
+            )
+          }
+        }
       }
 
-      private fun isTextUpdatesRequired(answerText: String, inputText: String): Boolean {
-        if (answerText.isEmpty() && inputText.isEmpty()) {
-          return false
-        }
-        if (answerText.isEmpty() || inputText.isEmpty()) {
-          return true
-        }
-        // Avoid shifting focus by updating text field if the values are the same
-        return answerText.toDouble() != inputText.toDouble()
+      private fun uiInputText(questionnaireViewItem: QuestionnaireViewItem): String {
+        return questionnaireViewItem.answers.singleOrNull()?.valueQuantity?.value?.toString()
+          ?: questionnaireViewItem.draftAnswer?.let { if (it is BigDecimal) it.toString() else "" }
+            ?: ""
       }
+
+      private fun unitTextCoding(questionnaireViewItem: QuestionnaireViewItem) =
+        questionnaireViewItem.answers.singleOrNull()?.valueQuantity?.toCoding()
+          ?: questionnaireViewItem.draftAnswer?.let { it as? Coding }
+            ?: questionnaireViewItem.questionnaireItem.initial
+            ?.firstOrNull()
+            ?.valueQuantity
+            ?.toCoding()
+
+      private fun unitDropDownOptions(questionnaireViewItem: QuestionnaireViewItem): List<Coding> =
+        questionnaireViewItem.questionnaireItem.unitOption
+
+      private fun Coding.toDropDownAnswerOption() =
+        DropDownAnswerOption(answerId = code, answerOptionString = display)
+
+      private fun DropDownAnswerOption.toCoding() =
+        Coding().apply {
+          code = answerId
+          display = answerOptionString
+        }
     }
 }
 
-const val QUANTITY_INPUT_TYPE = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+private data class UiQuantity(val value: String?, val unitDropDown: Coding?)

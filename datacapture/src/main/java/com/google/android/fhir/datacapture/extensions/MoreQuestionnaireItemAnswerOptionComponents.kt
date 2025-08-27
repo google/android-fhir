@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import androidx.core.graphics.drawable.toDrawable
 import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
@@ -63,7 +63,7 @@ fun Questionnaire.QuestionnaireItemAnswerOptionComponent.itemAnswerOptionImage(
           val bitmap = BitmapFactory.decodeByteArray(it.data, 0, it.data.size)
           val imageSize =
             context.resources.getDimensionPixelOffset(R.dimen.item_answer_media_image_size)
-          val drawable: Drawable = BitmapDrawable(context.resources, bitmap)
+          val drawable: Drawable = bitmap.toDrawable(context.resources)
           drawable.setBounds(0, 0, imageSize, imageSize)
           drawable
         }
