@@ -70,10 +70,10 @@ internal object QuantityViewHolderFactory : QuestionnaireItemComposeViewHolderFa
         val text = remember(questionnaireViewItem) { uiInputText(questionnaireViewItem) }
         val isReadOnly =
           remember(questionnaireViewItem) { questionnaireViewItem.questionnaireItem.readOnly }
+        val unitOptions =
+          remember(questionnaireViewItem) { unitDropDownOptions(questionnaireViewItem) }
         val dropDownOptions =
-          remember(questionnaireViewItem) {
-            unitDropDownOptions(questionnaireViewItem).map { it.toDropDownAnswerOption() }
-          }
+          remember(unitOptions) { unitOptions.mapNotNull { it.toDropDownAnswerOption() } }
         val selectedOption =
           remember(questionnaireViewItem) {
             unitTextCoding(questionnaireViewItem)?.toDropDownAnswerOption()
@@ -81,7 +81,7 @@ internal object QuantityViewHolderFactory : QuestionnaireItemComposeViewHolderFa
 
         var quantity by
           remember(questionnaireViewItem) {
-            mutableStateOf(UiQuantity(text, selectedOption?.toCoding()))
+            mutableStateOf(UiQuantity(text, selectedOption?.findCoding(unitOptions)))
           }
 
         val validationUiMessage = uiValidationMessage(questionnaireViewItem.validationResult)
@@ -130,7 +130,7 @@ internal object QuantityViewHolderFactory : QuestionnaireItemComposeViewHolderFa
               selectedOption = selectedOption,
               options = dropDownOptions,
             ) { answerOption ->
-              quantity = UiQuantity(quantity.value, answerOption?.toCoding())
+              quantity = UiQuantity(quantity.value, answerOption?.findCoding(unitOptions))
             }
           }
         }
@@ -194,13 +194,13 @@ internal object QuantityViewHolderFactory : QuestionnaireItemComposeViewHolderFa
         questionnaireViewItem.questionnaireItem.unitOption
 
       private fun Coding.toDropDownAnswerOption() =
-        DropDownAnswerOption(answerId = code, answerOptionString = display)
+        takeIf { it.hasCode() || it.hasDisplay() }
+          ?.let {
+            DropDownAnswerOption(answerId = it.code ?: it.display, answerOptionString = it.display)
+          }
 
-      private fun DropDownAnswerOption.toCoding() =
-        Coding().apply {
-          code = answerId
-          display = answerOptionString
-        }
+      private fun DropDownAnswerOption.findCoding(options: List<Coding>) =
+        options.find { answerId == it.code } ?: options.find { answerId == it.display }
     }
 }
 

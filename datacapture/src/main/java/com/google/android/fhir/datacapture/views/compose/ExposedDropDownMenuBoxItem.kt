@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.testTag
 import androidx.core.graphics.drawable.toBitmap
 import com.google.android.fhir.datacapture.views.factories.DropDownAnswerOption
 
@@ -49,9 +50,10 @@ internal fun ExposedDropDownMenuBoxItem(
   var expanded by remember { mutableStateOf(false) }
   var selectedDropDownAnswerOption by
     remember(selectedOption, options) { mutableStateOf(selectedOption) }
-  val selectedOptionDisplay by remember {
-    derivedStateOf { selectedDropDownAnswerOption?.answerOptionString ?: "" }
-  }
+  val selectedOptionDisplay by
+    remember(selectedDropDownAnswerOption) {
+      derivedStateOf { selectedDropDownAnswerOption?.answerOptionString ?: "" }
+    }
 
   LaunchedEffect(selectedDropDownAnswerOption) {
     onDropDownAnswerOptionSelected(selectedDropDownAnswerOption)
@@ -65,7 +67,9 @@ internal fun ExposedDropDownMenuBoxItem(
     OutlinedTextField(
       value = selectedOptionDisplay,
       onValueChange = {},
-      modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled),
+      modifier =
+        Modifier.testTag(DROP_DOWN_TEXT_FIELD_TAG)
+          .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled),
       readOnly = true,
       enabled = enabled,
       minLines = 1,
@@ -98,3 +102,5 @@ internal fun ExposedDropDownMenuBoxItem(
     }
   }
 }
+
+const val DROP_DOWN_TEXT_FIELD_TAG = "drop_down_text_field"
