@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.factories
+package com.google.android.fhir.datacapture.test.views
 
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -39,7 +39,9 @@ import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_TEXT_FIELD_TAG
 import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
 import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
-import com.google.common.truth.Truth.assertThat
+import com.google.android.fhir.datacapture.views.factories.QuantityViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
+import com.google.common.truth.Truth
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
@@ -84,7 +86,7 @@ class QuantityViewHolderFactoryTest {
     // Synchronize
     composeTestRule.waitForIdle()
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
 
@@ -308,7 +310,7 @@ class QuantityViewHolderFactoryTest {
     // Synchronize
     composeTestRule.waitForIdle()
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question? *")
   }
 
@@ -330,7 +332,7 @@ class QuantityViewHolderFactoryTest {
     // Synchronize
     composeTestRule.waitForIdle()
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
 
