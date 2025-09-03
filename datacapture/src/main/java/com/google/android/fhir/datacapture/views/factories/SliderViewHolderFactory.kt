@@ -19,8 +19,19 @@ package com.google.android.fhir.datacapture.views.factories
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.extensions.sliderStepValue
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -29,31 +40,85 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.ErrorText
+import com.google.android.fhir.datacapture.views.compose.Header
+import com.google.android.fhir.datacapture.views.compose.MediaItem
+import com.google.android.fhir.datacapture.views.compose.SliderItem
 import com.google.android.material.slider.Slider
+import kotlin.math.roundToInt
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
 
-internal object SliderViewHolderFactory :
-  QuestionnaireItemAndroidViewHolderFactory(R.layout.slider_view) {
+internal object SliderViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemAndroidViewHolderDelegate {
+    object : QuestionnaireItemComposeViewHolderDelegate {
       private lateinit var appContext: AppCompatActivity
       private lateinit var header: HeaderView
       private lateinit var slider: Slider
       private lateinit var error: TextView
-      override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
-      override fun init(itemView: View) {
+      @Composable
+      override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
+        val validationMessage =
+          remember(questionnaireViewItem) {
+            displayValidationResult(questionnaireViewItem.validationResult)
+          }
+        val readOnly =
+          remember(questionnaireViewItem) { questionnaireViewItem.questionnaireItem.readOnly }
+        val answer =
+          remember(questionnaireViewItem) { questionnaireViewItem.answers.singleOrNull() }
+        val minValue = remember(answer) { getMinValue(questionnaireViewItem.minAnswerValue) }
+        val maxValue = remember(answer) { getMaxValue(questionnaireViewItem.maxAnswerValue) }
+
+        check(minValue < maxValue) { "minValue $minValue must be smaller than maxValue $maxValue" }
+        val stepSize =
+          remember(questionnaireViewItem) {
+            questionnaireViewItem.questionnaireItem.sliderStepValue ?: SLIDER_DEFAULT_STEP_SIZE
+          }
+        val steps =
+          remember(stepSize, minValue, maxValue) { (maxValue - minValue).div(stepSize).toInt() }
+        val questionnaireViewItemAnswerValue =
+          remember(answer) { answer?.valueIntegerType?.value?.toFloat() ?: minValue }
+        val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
+
+        Column(
+          modifier =
+            Modifier.fillMaxWidth()
+              .padding(
+                horizontal = dimensionResource(R.dimen.item_margin_horizontal),
+                vertical = dimensionResource(R.dimen.item_margin_vertical),
+              ),
+        ) {
+          Header(questionnaireViewItem, showRequiredOrOptionalText = true)
+          questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
+          SliderItem(
+            startPosition = questionnaireViewItemAnswerValue,
+            steps = steps,
+            valueRange = minValue..maxValue,
+            enabled = !readOnly,
+          ) {
+            coroutineScope.launch {
+              questionnaireViewItem.setAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                  .setValue(IntegerType(it.roundToInt())),
+              )
+            }
+          }
+          validationMessage?.let { ErrorText(it) }
+        }
+      }
+
+      fun init(itemView: View) {
         appContext = itemView.context.tryUnwrapContext()!!
         header = itemView.findViewById(R.id.header)
         slider = itemView.findViewById(R.id.slider)
         error = itemView.findViewById(R.id.error)
       }
 
-      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        this.questionnaireViewItem = questionnaireViewItem
+      fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         header.bind(questionnaireViewItem, showRequiredOrOptionalText = true)
         val answer = questionnaireViewItem.answers.singleOrNull()
         val minValue = getMinValue(questionnaireViewItem.minAnswerValue)
@@ -82,19 +147,17 @@ internal object SliderViewHolderFactory :
           }
         }
 
-        displayValidationResult(questionnaireViewItem.validationResult)
+        error.text = displayValidationResult(questionnaireViewItem.validationResult)
       }
 
-      private fun displayValidationResult(validationResult: ValidationResult) {
-        error.text =
-          when (validationResult) {
-            is NotValidated,
-            Valid, -> null
-            is Invalid -> validationResult.getSingleStringValidationMessage()
-          }
-      }
+      private fun displayValidationResult(validationResult: ValidationResult) =
+        when (validationResult) {
+          is NotValidated,
+          Valid, -> null
+          is Invalid -> validationResult.getSingleStringValidationMessage()
+        }
 
-      override fun setReadOnly(isReadOnly: Boolean) {
+      fun setReadOnly(isReadOnly: Boolean) {
         slider.isEnabled = !isReadOnly
       }
     }
