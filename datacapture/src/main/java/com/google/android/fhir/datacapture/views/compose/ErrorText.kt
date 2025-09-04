@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import com.google.android.fhir.datacapture.R
 
@@ -30,6 +31,10 @@ fun ErrorText(validationMessage: String) {
     text = validationMessage,
     style = MaterialTheme.typography.bodySmall,
     color = MaterialTheme.colorScheme.error,
-    modifier = Modifier.padding(start = dimensionResource(R.dimen.error_text_margin_horizontal)),
+    modifier =
+      Modifier.padding(start = dimensionResource(R.dimen.error_text_margin_horizontal))
+        .testTag(ERROR_TEXT_TAG),
   )
 }
+
+const val ERROR_TEXT_TAG = "error_text"

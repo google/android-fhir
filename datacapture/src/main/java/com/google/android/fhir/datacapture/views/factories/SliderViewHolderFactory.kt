@@ -45,7 +45,6 @@ import com.google.android.fhir.datacapture.views.compose.Header
 import com.google.android.fhir.datacapture.views.compose.MediaItem
 import com.google.android.fhir.datacapture.views.compose.SliderItem
 import com.google.android.material.slider.Slider
-import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.IntegerType
@@ -79,7 +78,7 @@ internal object SliderViewHolderFactory : QuestionnaireItemComposeViewHolderFact
             questionnaireViewItem.questionnaireItem.sliderStepValue ?: SLIDER_DEFAULT_STEP_SIZE
           }
         val steps =
-          remember(stepSize, minValue, maxValue) { (maxValue - minValue).div(stepSize).toInt() }
+          remember(stepSize, minValue, maxValue) { (maxValue - minValue).div(stepSize).toInt() - 1 }
         val questionnaireViewItemAnswerValue =
           remember(answer) { answer?.valueIntegerType?.value?.toFloat() ?: minValue }
         val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
@@ -103,7 +102,7 @@ internal object SliderViewHolderFactory : QuestionnaireItemComposeViewHolderFact
             coroutineScope.launch {
               questionnaireViewItem.setAnswer(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(IntegerType(it.roundToInt())),
+                  .setValue(IntegerType(it.toInt())),
               )
             }
           }
