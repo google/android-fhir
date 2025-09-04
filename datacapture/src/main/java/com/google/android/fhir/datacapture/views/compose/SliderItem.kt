@@ -16,9 +16,15 @@
 
 package com.google.android.fhir.datacapture.views.compose
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +32,9 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
 @Composable
@@ -36,10 +45,40 @@ fun SliderItem(
   enabled: Boolean,
   onPositionChanged: (Float) -> Unit,
 ) {
-  var sliderPosition by remember { mutableFloatStateOf(startPosition) }
+  var sliderPosition by remember(startPosition) { mutableFloatStateOf(startPosition) }
+  val interactionSource =
+    remember(startPosition, steps, valueRange, enabled) { MutableInteractionSource() }
+  val isDragged by interactionSource.collectIsDraggedAsState()
 
-  Column {
-    Text(text = sliderPosition.roundToInt().toString())
+  Box {
+    if (isDragged) {
+      Surface(
+        modifier =
+          Modifier.layout { measurable, constraints ->
+            val placeable = measurable.measure(constraints)
+            val sliderWidth = constraints.maxWidth
+            val sliderValueNormalized =
+              (sliderPosition - valueRange.start) / (valueRange.endInclusive - valueRange.start)
+            val textX =
+              (sliderWidth * sliderValueNormalized - placeable.width / 2).coerceIn(
+                0f,
+                (sliderWidth - placeable.width).toFloat(),
+              )
+            val bottomPadding = 16.dp.toPx().roundToInt()
+            layout(placeable.width, placeable.height - bottomPadding) {
+              placeable.placeRelative(textX.roundToInt(), -bottomPadding)
+            }
+          },
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.primary,
+      ) {
+        Text(
+          text = sliderPosition.roundToInt().toString(),
+          color = MaterialTheme.colorScheme.onPrimary,
+          modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+        )
+      }
+    }
 
     Slider(
       value = sliderPosition,
@@ -47,8 +86,11 @@ fun SliderItem(
       onValueChangeFinished = { onPositionChanged(sliderPosition) },
       steps = steps,
       valueRange = valueRange,
-      modifier = Modifier.fillMaxWidth(),
+      interactionSource = interactionSource,
+      modifier = Modifier.padding(top = 16.dp).fillMaxWidth().testTag(SLIDER_TAG),
       enabled = enabled,
     )
   }
 }
+
+const val SLIDER_TAG = "slider"
