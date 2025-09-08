@@ -19,12 +19,19 @@ package com.google.android.fhir.datacapture.test
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.fragment.app.commitNow
 import androidx.recyclerview.widget.RecyclerView
@@ -36,30 +43,29 @@ import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.localDate
+import com.google.android.fhir.datacapture.extensions.localDateTime
 import com.google.android.fhir.datacapture.test.utilities.clickIcon
 import com.google.android.fhir.datacapture.test.utilities.clickOnText
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.android.fhir.datacapture.validation.Valid
+import com.google.android.fhir.datacapture.views.compose.DATE_TEXT_INPUT_FIELD
 import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
 import com.google.android.fhir.datacapture.views.compose.HANDLE_INPUT_DEBOUNCE_TIME
-import com.google.android.fhir.datacapture.views.factories.localDate
-import com.google.android.fhir.datacapture.views.factories.localDateTime
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -285,28 +291,25 @@ class QuestionnaireUiEspressoTest {
     buildFragmentFromQuestionnaire("/component_date_picker.json")
 
     // Add month and day. No need to add slashes as they are added automatically
-    onView(withId(R.id.text_input_edit_text))
-      .perform(ViewActions.click())
-      .perform(ViewActions.typeTextIntoFocusedView("0105"))
-
-    onView(withId(R.id.text_input_layout)).check { view, _ ->
-      val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo("Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)")
-    }
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput("0105")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.Error,
+          "Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)",
+        ),
+      )
   }
 
   @Test
   fun datePicker_shouldSaveInQuestionnaireResponseWhenCorrectDateEntered() {
     buildFragmentFromQuestionnaire("/component_date_picker.json")
 
-    onView(withId(R.id.text_input_edit_text))
-      .perform(ViewActions.click())
-      .perform(ViewActions.typeTextIntoFocusedView("01052005"))
-
-    onView(withId(R.id.text_input_layout)).check { view, _ ->
-      val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo(null)
-    }
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput("01052005")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Error))
 
     runBlocking {
       val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType
@@ -338,11 +341,14 @@ class QuestionnaireUiEspressoTest {
       }
 
     buildFragmentFromQuestionnaire(questionnaire)
-    onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
-    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
+    composeTestRule
+      .onNodeWithContentDescription(context.getString(R.string.select_date))
+      .performClick()
+    composeTestRule
+      .onNode(hasText("OK") and hasAnyAncestor(isDialog()))
+      .assertIsDisplayed()
+      .performClick()
+    composeTestRule.waitForIdle() // Synchronize
 
     val today = DateTimeType.today().valueAsString
 
@@ -385,11 +391,14 @@ class QuestionnaireUiEspressoTest {
       }
 
     buildFragmentFromQuestionnaire(questionnaire)
-    onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
-    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
+    composeTestRule
+      .onNodeWithContentDescription(context.getString(R.string.select_date))
+      .performClick()
+    composeTestRule
+      .onNode(hasText("OK") and hasAnyAncestor(isDialog()))
+      .assertIsDisplayed()
+      .performClick()
+    composeTestRule.waitForIdle() // Synchronize
 
     val maxDateAllowed = maxDate.valueAsString
 
@@ -432,11 +441,14 @@ class QuestionnaireUiEspressoTest {
       }
 
     buildFragmentFromQuestionnaire(questionnaire)
-    onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
-    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
+    composeTestRule
+      .onNodeWithContentDescription(context.getString(R.string.select_date))
+      .performClick()
+    composeTestRule
+      .onNode(hasText("OK") and hasAnyAncestor(isDialog()))
+      .assertIsDisplayed()
+      .performClick()
+    composeTestRule.waitForIdle() // Synchronize
 
     val minDateAllowed = minDate.valueAsString
 
@@ -482,12 +494,14 @@ class QuestionnaireUiEspressoTest {
     buildFragmentFromQuestionnaire(questionnaire)
     val exception =
       Assert.assertThrows(IllegalArgumentException::class.java) {
-        onView(withId(com.google.android.fhir.datacapture.R.id.text_input_layout))
-          .perform(clickIcon(true))
-        onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
-          .inRoot(RootMatchers.isDialog())
-          .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-          .perform(ViewActions.click())
+        composeTestRule
+          .onNodeWithContentDescription(context.getString(R.string.select_date))
+          .performClick()
+        composeTestRule
+          .onNode(hasText("OK") and hasAnyAncestor(isDialog()))
+          .assertIsDisplayed()
+          .performClick()
+        composeTestRule.waitForIdle() // Synchronize
       }
     assertThat(exception.message).isEqualTo("minValue cannot be greater than maxValue")
   }
@@ -551,19 +565,21 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
-  @SdkSuppress(minSdkVersion = 33)
   fun clearAllAnswers_shouldClearDraftAnswer() {
     val questionnaireFragment = buildFragmentFromQuestionnaire("/component_date_picker.json")
     // Add month and day. No need to add slashes as they are added automatically
-    onView(withId(R.id.text_input_edit_text))
-      .perform(ViewActions.click())
-      .perform(ViewActions.typeTextIntoFocusedView("0105"))
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .performTextInput("0105")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("01/05/")
 
     questionnaireFragment.clearAllAnswers()
 
-    onView(withId(R.id.text_input_edit_text)).check { view, _ ->
-      assertThat((view as TextInputEditText).text.toString()).isEmpty()
-    }
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("")
   }
 
   @Test
@@ -801,7 +817,7 @@ class QuestionnaireUiEspressoTest {
       activityScenarioRule.scenario.onActivity { activity ->
         activity.supportFragmentManager.commitNow {
           setReorderingAllowed(true)
-          add(R.id.container_holder, fragment)
+          add(com.google.android.fhir.datacapture.test.R.id.container_holder, fragment)
         }
       }
     }
@@ -819,7 +835,7 @@ class QuestionnaireUiEspressoTest {
     activityScenarioRule.scenario.onActivity { activity ->
       activity.supportFragmentManager.commitNow {
         setReorderingAllowed(true)
-        add(R.id.container_holder, questionnaireFragment)
+        add(com.google.android.fhir.datacapture.test.R.id.container_holder, questionnaireFragment)
       }
     }
   }
@@ -831,8 +847,9 @@ class QuestionnaireUiEspressoTest {
     var testQuestionnaireFragment: QuestionnaireFragment? = null
     activityScenarioRule.scenario.onActivity { activity ->
       testQuestionnaireFragment =
-        activity.supportFragmentManager.findFragmentById(R.id.container_holder)
-          as QuestionnaireFragment
+        activity.supportFragmentManager.findFragmentById(
+          com.google.android.fhir.datacapture.test.R.id.container_holder,
+        ) as QuestionnaireFragment
     }
     return testQuestionnaireFragment!!.getQuestionnaireResponse()
   }

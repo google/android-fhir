@@ -20,8 +20,6 @@ import android.content.Context
 import android.text.Spanned
 import androidx.compose.ui.text.AnnotatedString
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.views.factories.localDate
-import com.google.android.fhir.datacapture.views.factories.localTime
 import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
