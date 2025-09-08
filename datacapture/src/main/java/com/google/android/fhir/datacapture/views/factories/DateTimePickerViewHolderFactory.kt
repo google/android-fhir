@@ -33,6 +33,9 @@ import com.google.android.fhir.datacapture.extensions.getDateSeparator
 import com.google.android.fhir.datacapture.extensions.getLocalizedDatePattern
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
+import com.google.android.fhir.datacapture.extensions.localDate
+import com.google.android.fhir.datacapture.extensions.localDateTime
+import com.google.android.fhir.datacapture.extensions.localTime
 import com.google.android.fhir.datacapture.extensions.parseDate
 import com.google.android.fhir.datacapture.extensions.toLocalizedString
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
@@ -322,29 +325,38 @@ internal object DateTimePickerViewHolderFactory :
 
 private const val TAG_TIME_PICKER = "time-picker"
 
-internal val DateTimeType.localDate
-  get() =
-    LocalDate.of(
-      year,
-      month + 1,
-      day,
-    )
-
-internal val DateTimeType.localTime
-  get() =
-    LocalTime.of(
-      hour,
-      minute,
-      second,
-    )
-
-internal val DateTimeType.localDateTime
-  get() =
-    LocalDateTime.of(
-      year,
-      month + 1,
-      day,
-      hour,
-      minute,
-      second,
-    )
+/**
+ * Format entered date to acceptable date format where 2 digits for day and month, 4 digits for
+ * year.
+ */
+internal fun handleDateFormatAfterTextChange(
+  editable: Editable,
+  canonicalizedDatePattern: String,
+  dateFormatSeparator: Char?,
+  isDeleting: Boolean,
+) {
+  val editableLength = editable.length
+  if (editable.isEmpty()) {
+    return
+  }
+  // restrict date entry upto acceptable date length
+  if (editableLength > canonicalizedDatePattern.length) {
+    editable.replace(canonicalizedDatePattern.length, editableLength, "")
+    return
+  }
+  // handle delete text and separator
+  if (editableLength < canonicalizedDatePattern.length) {
+    // Do not add the separator again if the user has just deleted it.
+    if (!isDeleting && canonicalizedDatePattern[editableLength] == dateFormatSeparator) {
+      // 02 is entered with dd/MM/yyyy so appending / to editable 02/
+      editable.append(dateFormatSeparator)
+    }
+    if (
+      canonicalizedDatePattern[editable.lastIndex] == dateFormatSeparator &&
+        editable[editable.lastIndex] != dateFormatSeparator
+    ) {
+      // Add separator to break different date components, e.g. converting "123" to "12/3"
+      editable.insert(editable.lastIndex, dateFormatSeparator.toString())
+    }
+  }
+}

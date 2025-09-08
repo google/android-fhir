@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@
 package com.google.android.fhir.datacapture.extensions
 
 import android.icu.text.DateFormat
-import com.google.android.fhir.datacapture.views.factories.length
-import com.google.android.fhir.datacapture.views.factories.localDate
+import com.google.android.fhir.datacapture.views.factories.ZONE_ID_UTC
 import java.lang.Character.isLetter
 import java.text.ParseException
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatter
@@ -29,6 +31,10 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
 import java.util.Date
 import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.log10
+import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
 
 /**
  * Returns the first character that is not a letter in the given date pattern string (e.g. "/" for
@@ -129,3 +135,57 @@ internal fun getLocalizedDatePattern(): String {
     Locale.getDefault(),
   )
 }
+
+internal val DateType.localDate
+  get() =
+    if (!this.hasValue()) {
+      null
+    } else {
+      LocalDate.of(
+        year,
+        month + 1,
+        day,
+      )
+    }
+
+internal val LocalDate.dateType
+  get() = DateType(year, monthValue - 1, dayOfMonth)
+
+internal val Date.localDate
+  get() = LocalDate.of(year + 1900, month + 1, date)
+
+fun Long.toLocalDate(): LocalDate = Instant.ofEpochMilli(this).atZone(ZONE_ID_UTC).toLocalDate()
+
+// Count the number of digits in an Integer
+internal fun Int.length() =
+  when (this) {
+    0 -> 1
+    else -> log10(abs(toDouble())).toInt() + 1
+  }
+
+internal val DateTimeType.localDate
+  get() =
+    LocalDate.of(
+      year,
+      month + 1,
+      day,
+    )
+
+internal val DateTimeType.localTime
+  get() =
+    LocalTime.of(
+      hour,
+      minute,
+      second,
+    )
+
+internal val DateTimeType.localDateTime
+  get() =
+    LocalDateTime.of(
+      year,
+      month + 1,
+      day,
+      hour,
+      minute,
+      second,
+    )

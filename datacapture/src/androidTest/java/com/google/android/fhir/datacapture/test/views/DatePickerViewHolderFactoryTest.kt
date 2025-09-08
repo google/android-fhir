@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,42 +14,71 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.factories
+package com.google.android.fhir.datacapture.test.views
 
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.performTextInput
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_FORMAT_URL
+import com.google.android.fhir.datacapture.extensions.toAnnotatedString
+import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.material.textfield.TextInputLayout
+import com.google.android.fhir.datacapture.views.compose.DATE_TEXT_INPUT_FIELD
+import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
+import com.google.android.fhir.datacapture.views.factories.DatePickerViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat
-import java.time.chrono.IsoChronology
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.FormatStyle
 import java.util.Locale
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class DatePickerViewHolderFactoryTest {
-  private val context =
-    Robolectric.buildActivity(AppCompatActivity::class.java).create().get().apply {
-      setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
+  @get:Rule
+  val activityScenarioRule: ActivityScenarioRule<TestActivity> =
+    ActivityScenarioRule(TestActivity::class.java)
+
+  @get:Rule val composeTestRule = createEmptyComposeRule()
+
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
+  private lateinit var parent: FrameLayout
+
+  @Before
+  fun setUp() {
+    activityScenarioRule.scenario.onActivity { activity ->
+      parent = FrameLayout(activity)
+      viewHolder = DatePickerViewHolderFactory.create(parent)
+      activity.setContentView(viewHolder.itemView)
     }
-  private val parent = FrameLayout(context)
-  private val viewHolder = DatePickerViewHolderFactory.create(parent)
+
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+  }
 
   @Test
   fun shouldSetQuestionHeader() {
@@ -61,6 +90,9 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
+
+    // Synchronize
+    composeTestRule.waitForIdle()
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
@@ -77,11 +109,13 @@ class DatePickerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("")
   }
 
   @Test
-  fun `should set text field empty when date field is initialized but answer date value is null`() {
+  fun shouldSetTextFieldEmptyWhenDateFieldIsInitializedButAnswerDateValueIsNull() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -94,10 +128,9 @@ class DatePickerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString(),
-      )
-      .isEqualTo("")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("")
   }
 
   @Test
@@ -115,11 +148,13 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("11/19/2020")
   }
 
   @Test
-  fun `show dateFormat label in lowerCase`() {
+  fun showDateFormatLabelInLowerCase() {
     setLocale(Locale.US)
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -129,13 +164,14 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.dateInputView.hint.toString()).isEqualTo("mm/dd/yyyy")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assertTextEquals("mm/dd/yyyy", includeEditableText = false)
   }
 
   @Test
   fun shouldSetDateInput_localeJp() {
     setLocale(Locale.JAPAN)
-    val viewHolder = DatePickerViewHolderFactory.create(parent)
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -148,7 +184,9 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("2020/11/19")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("2020/11/19")
   }
 
   @Test
@@ -166,11 +204,13 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("11/19/2020")
   }
 
   @Test
-  fun `parse date text input in US locale`() {
+  fun parseDateTextInputInUsLocale() {
     setLocale(Locale.US)
     var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val item =
@@ -182,7 +222,9 @@ class DatePickerViewHolderFactoryTest {
       )
 
     viewHolder.bind(item)
-    viewHolder.dateInputView.text = "11/19/2020"
+    val dateTextInput = "11192020" // is transformed to 11/19/2020 in the date widget
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput(dateTextInput)
+    composeTestRule.waitUntil { answers != null }
 
     val answer = answers!!.single().value as DateType
 
@@ -192,9 +234,8 @@ class DatePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `parse date text input in Japan locale`() {
+  fun parseDateTextInputInJapanLocale() {
     setLocale(Locale.JAPAN)
-    val viewHolder = DatePickerViewHolderFactory.create(parent)
     var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val item =
       QuestionnaireViewItem(
@@ -204,7 +245,8 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, result, _ -> answers = result },
       )
     viewHolder.bind(item)
-    viewHolder.dateInputView.text = "2020/11/19"
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput("20201119")
+    composeTestRule.waitUntil { answers != null }
     val answer = answers!!.single().value as DateType
 
     assertThat(answer.day).isEqualTo(19)
@@ -213,7 +255,7 @@ class DatePickerViewHolderFactoryTest {
   }
 
   @Test
-  fun `clear the answer if date input is invalid`() {
+  fun clearTheAnswerIfDateInputIsInvalid() {
     setLocale(Locale.US)
     var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireItem =
@@ -228,13 +270,22 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, result, _ -> answers = result },
       )
     viewHolder.bind(questionnaireItem)
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("11/19/2020")
+    val dateTextInput = "1119" // transforms to 11/19 in the datePicker widget
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performSemanticsAction(
+      SemanticsActions.SetText,
+    ) {
+      it(dateTextInput.toAnnotatedString())
+    }
+    composeTestRule.waitUntil { answers != null }
 
-    viewHolder.dateInputView.text = "11/19/"
     assertThat(answers!!).isEmpty()
   }
 
   @Test
-  fun `do not clear the text field input for invalid date`() {
+  fun doNotClearTheTextFieldInputForInvalidDate() {
     setLocale(Locale.US)
     val questionnaireItem =
       QuestionnaireViewItem(
@@ -248,13 +299,22 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
     viewHolder.bind(questionnaireItem)
-
-    viewHolder.dateInputView.text = "11/19/"
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("11/19/2020")
+    val dateTextInput = "1119" // transforms to 11/19 in the datePicker widget
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performSemanticsAction(
+      SemanticsActions.SetText,
+    ) {
+      it(dateTextInput.toAnnotatedString())
+    }
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("11/19/")
   }
 
   @Test
-  fun `clear questionnaire response answer on draft answer update`() {
+  fun clearQuestionnaireResponseAnswerOnDraftAnswerUpdate() {
     var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? =
       listOf(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
     setLocale(Locale.US)
@@ -271,15 +331,12 @@ class DatePickerViewHolderFactoryTest {
       )
 
     viewHolder.bind(questionnaireItem)
-    runTest {
-      questionnaireItem.setDraftAnswer("02/07")
-
-      assertThat(answers!!).isEmpty()
-    }
+    runBlocking { questionnaireItem.setDraftAnswer("02/07") }
+    assertThat(answers!!).isEmpty()
   }
 
   @Test
-  fun `clear draft value on an valid answer update`() {
+  fun clearDraftValueOnAnValidAnswerUpdate() {
     val answer =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
         .setValue(DateType(2026, 0, 1))
@@ -300,15 +357,12 @@ class DatePickerViewHolderFactoryTest {
       )
 
     viewHolder.bind(questionnaireItem)
-    runTest {
-      questionnaireItem.setAnswer(answer)
-
-      assertThat(partialValue).isNull()
-    }
+    runBlocking { questionnaireItem.setAnswer(answer) }
+    assertThat(partialValue).isNull()
   }
 
   @Test
-  fun `display partial answer in the text field of recycled items`() {
+  fun displayPartialAnswerInTheTextFieldOfRecycledItems() {
     setLocale(Locale.US)
     var questionnaireItem =
       QuestionnaireViewItem(
@@ -323,7 +377,9 @@ class DatePickerViewHolderFactoryTest {
       )
 
     viewHolder.bind(questionnaireItem)
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("11/19/2020")
 
     questionnaireItem =
       QuestionnaireViewItem(
@@ -331,15 +387,17 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        draftAnswer = "02/07",
+        draftAnswer = "0207",
       )
 
     viewHolder.bind(questionnaireItem)
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("02/07")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("02/07/")
   }
 
   @Test
-  fun `display an answer in the text field of partially answered recycled item`() {
+  fun displayAnAnswerInTheTextFieldOfPartiallyAnsweredRecycledItem() {
     setLocale(Locale.US)
     var questionnaireItem =
       QuestionnaireViewItem(
@@ -347,11 +405,13 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        draftAnswer = "02/07",
+        draftAnswer = "0207",
       )
 
     viewHolder.bind(questionnaireItem)
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("02/07")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("02/07/")
 
     questionnaireItem =
       QuestionnaireViewItem(
@@ -366,7 +426,9 @@ class DatePickerViewHolderFactoryTest {
       )
 
     viewHolder.bind(questionnaireItem)
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("11/19/2020")
   }
 
   @Test
@@ -395,25 +457,37 @@ class DatePickerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Maximum value allowed is:2025-01-01")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.Error,
+          "Maximum value allowed is:2025-01-01",
+        ),
+      )
   }
 
   @Test
-  fun `show dateFormat in lowerCase in the error message`() {
+  fun showDateFormatInLowercaseInTheErrorMessage() {
     val itemViewItem =
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        draftAnswer = "11/19/202",
+        draftAnswer = "1119202",
       )
 
     viewHolder.bind(itemViewItem)
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.Error,
+          "Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)",
+        ),
+      )
   }
 
   @Test
@@ -441,12 +515,13 @@ class DatePickerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isNull()
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Error))
   }
 
   @Test
-  fun `hides error textview in the header`() {
+  fun hidesErrorTextviewInTheHeader() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -456,8 +531,10 @@ class DatePickerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
-      .isEqualTo(View.GONE)
+    composeTestRule
+      .onNodeWithTag(ERROR_TEXT_AT_HEADER_TEST_TAG)
+      .assertIsNotDisplayed()
+      .assertDoesNotExist()
   }
 
   @Test
@@ -471,11 +548,11 @@ class DatePickerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.dateInputView.isEnabled).isFalse()
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).assertIsNotEnabled()
   }
 
   @Test
-  fun `bind multiple times with different QuestionnaireItemViewItem should show proper date`() {
+  fun bindMultipleTimesWithDifferentQuestionnaireItemViewItemShouldShowProperDate() {
     setLocale(Locale.US)
 
     viewHolder.bind(
@@ -490,7 +567,9 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("11/19/2020")
 
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -504,7 +583,9 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2021")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("11/19/2021")
 
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -514,11 +595,13 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.dateInputView.text.toString()).isEmpty()
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("")
   }
 
   @Test
-  fun `should use date format in the entryFormat extension`() {
+  fun shouldUseDateFormatInTheEntryFormatExtension() {
     setLocale(Locale.US)
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -530,11 +613,13 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyy-mm-dd")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assertTextEquals("yyyy-mm-dd", includeEditableText = false)
   }
 
   @Test
-  fun `should set local date input format when entryFormat extension has incorrect format string in Questionnaire`() {
+  fun shouldSetLocalDateInputFormatWhenEntryFormatExtensionHasIncorrectFormatStringInQuestionnaire() {
     setLocale(Locale.US)
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -546,11 +631,13 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo("mm/dd/yyyy")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assertTextEquals("mm/dd/yyyy", includeEditableText = false)
   }
 
   @Test
-  fun `should use date format in the entryFormat extension though date separator is missing`() {
+  fun shouldUseDateFormatInTheEntryFormatExtensionThoughDateSeparatorIsMissing() {
     setLocale(Locale.US)
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -562,11 +649,13 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyymmdd")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assertTextEquals("yyyymmdd", includeEditableText = false)
   }
 
   @Test
-  fun `should use date format in the entryFormat after converting it to SHORT FormatStyle`() {
+  fun shouldUseDateFormatInTheEntryFormatAfterConvertingItToShortFormatStyle() {
     setLocale(Locale.US)
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -578,11 +667,13 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyy mm dd")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assertTextEquals("yyyy mm dd", includeEditableText = false)
   }
 
   @Test
-  fun `should set local date input format when entryFormat extension has empty string in Questionnaire`() {
+  fun shouldSetLocalDateInputFormatWhenEntryFormatExtensionHasEmptyStringInQuestionnaire() {
     setLocale(Locale.US)
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -594,18 +685,13 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    val localeDatePattern =
-      DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-        FormatStyle.SHORT,
-        null,
-        IsoChronology.INSTANCE,
-        Locale.getDefault(),
-      )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo("mm/dd/yyyy")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assertTextEquals("mm/dd/yyyy", includeEditableText = false)
   }
 
   @Test
-  fun `should set local date input format when no entryFormat extension in Questionnaire`() {
+  fun shouldSetLocalDateInputFormatWhenNoEntryFormatExtensionInQuestionnaire() {
     setLocale(Locale.US)
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -615,18 +701,13 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    val localeDatePattern =
-      DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-        FormatStyle.SHORT,
-        null,
-        IsoChronology.INSTANCE,
-        Locale.getDefault(),
-      )
-    assertThat(viewHolder.dateInputView.hint).isEqualTo("mm/dd/yyyy")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assertTextEquals("mm/dd/yyyy", includeEditableText = false)
   }
 
   @Test
-  fun `show asterisk`() {
+  fun showAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -640,12 +721,15 @@ class DatePickerViewHolderFactoryTest {
       ),
     )
 
+    // Synchronize
+    composeTestRule.waitForIdle()
+
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question? *")
   }
 
   @Test
-  fun `hide asterisk`() {
+  fun hideAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -658,13 +742,15 @@ class DatePickerViewHolderFactoryTest {
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false),
       ),
     )
+    // Synchronize
+    composeTestRule.waitForIdle()
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
 
   @Test
-  fun `show required text`() {
+  fun showRequiredText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -675,17 +761,11 @@ class DatePickerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<TextInputLayout>(R.id.text_input_layout)
-          .helperText
-          .toString(),
-      )
-      .isEqualTo("Required")
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).assertTextContains("Required")
   }
 
   @Test
-  fun `hide required text`() {
+  fun hideRequiredText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -696,12 +776,11 @@ class DatePickerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)
-      .isNull()
+    composeTestRule.onNodeWithText("Required").assertIsNotDisplayed().assertDoesNotExist()
   }
 
   @Test
-  fun `shows optional text`() {
+  fun showsOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -712,17 +791,11 @@ class DatePickerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<TextInputLayout>(R.id.text_input_layout)
-          .helperText
-          .toString(),
-      )
-      .isEqualTo("Optional")
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).assertTextContains("Optional")
   }
 
   @Test
-  fun `hide optional text`() {
+  fun hideOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -733,17 +806,11 @@ class DatePickerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)
-      .isNull()
+    composeTestRule.onNodeWithText("Optional").assertIsNotDisplayed().assertDoesNotExist()
   }
 
   private fun setLocale(locale: Locale) {
     Locale.setDefault(locale)
-    context.resources.configuration.setLocale(locale)
+    parent.context.resources.configuration.setLocale(locale)
   }
-
-  private val QuestionnaireItemViewHolder.dateInputView: TextView
-    get() {
-      return itemView.findViewById(R.id.text_input_edit_text)
-    }
 }
