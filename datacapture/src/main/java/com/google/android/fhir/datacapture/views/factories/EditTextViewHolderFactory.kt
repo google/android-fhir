@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,13 +42,13 @@ import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
 
 internal abstract class EditTextViewHolderFactory(@LayoutRes override val resId: Int) :
-  QuestionnaireItemViewHolderFactory(resId) {
+  QuestionnaireItemAndroidViewHolderFactory(resId) {
   abstract override fun getQuestionnaireItemViewHolderDelegate():
     QuestionnaireItemEditTextViewHolderDelegate
 }
 
 abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputType: Int) :
-  QuestionnaireItemViewHolderDelegate {
+  QuestionnaireItemAndroidViewHolderDelegate {
   override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
   private lateinit var context: AppCompatActivity

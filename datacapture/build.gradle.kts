@@ -4,6 +4,7 @@ import java.net.URL
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
+  id(Plugins.BuildPlugins.kotlinCompose)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
   id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
@@ -24,7 +25,10 @@ android {
     consumerProguardFile("proguard-rules.pro")
   }
 
-  buildFeatures { viewBinding = true }
+  buildFeatures {
+    viewBinding = true
+    compose = true
+  }
 
   buildTypes {
     release {
@@ -101,6 +105,21 @@ dependencies {
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.material)
+  implementation(libs.androidx.recyclerview)
+
+  // Androidx Compose
+  implementation(libs.androidx.activity.compose)
+  implementation(platform(libs.androidx.compose.bom))
+  implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.ui.graphics)
+  implementation(libs.androidx.compose.ui.tooling.preview)
+  implementation(libs.androidx.compose.material3)
+  implementation(libs.androidx.navigation.compose)
+  implementation(libs.accompanist.themeadapter.material3)
+
+  androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+  debugImplementation(libs.androidx.compose.ui.tooling)
+  debugImplementation(libs.androidx.compose.ui.test.manifest)
 
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
