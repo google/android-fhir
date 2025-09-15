@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -5202,6 +5202,28 @@ class DatabaseImplTest {
 
     val searchResults = database.search<Task>(searchQuery)
     assertThat(searchResults.size).isEqualTo(980)
+  }
+
+  @Test
+  fun getResources_shouldReturnListOfResources() = runBlocking {
+    val patients = ArrayList<Patient>()
+    patients.add(TEST_PATIENT_1)
+    patients.add(TEST_PATIENT_2)
+    database.insert(*patients.toTypedArray())
+    assertThat(
+        database.selectResources(ResourceType.Patient, TEST_PATIENT_1_ID, TEST_PATIENT_2_ID).size,
+      )
+      .isEqualTo(2)
+  }
+
+  @Test
+  fun getResources_shouldThrowResourceNotFoundExceptionIfAllResourcesNotFound() = runBlocking {
+    val resourceNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { database.selectResources(ResourceType.Patient, "id1", "id2") }
+      }
+    assertThat(resourceNotFoundException.message)
+      .isEqualTo("Resources not found with type Patient and ids id1,id2!")
   }
 
   private companion object {
