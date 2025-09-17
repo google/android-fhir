@@ -21,9 +21,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -36,6 +46,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
@@ -93,8 +104,8 @@ class QuestionnaireFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     val questionnaireEditRecyclerView =
       view.findViewById<RecyclerView>(R.id.questionnaire_edit_recycler_view)
-    val questionnaireReviewRecyclerView =
-      view.findViewById<RecyclerView>(R.id.questionnaire_review_recycler_view)
+    val questionnaireReviewComposeView =
+      view.findViewById<ComposeView>(R.id.questionnaire_review_recycler_view)
     val questionnaireTitle = view.findViewById<TextView>(R.id.questionnaire_title)
 
     // This container frame floats at the bottom of the view to make navigation controls visible at
@@ -139,7 +150,6 @@ class QuestionnaireFragment : Fragment() {
       view.findViewById(R.id.questionnaire_progress_indicator)
     val questionnaireEditAdapter =
       QuestionnaireEditAdapter(questionnaireItemViewHolderFactoryMatchersProvider.get())
-    val questionnaireReviewAdapter = QuestionnaireReviewAdapter()
 
     val reviewModeEditButton =
       view.findViewById<View>(R.id.review_mode_edit_button).apply {
@@ -152,8 +162,11 @@ class QuestionnaireFragment : Fragment() {
     // Animation does work well with views that could gain focus
     questionnaireEditRecyclerView.itemAnimator = null
 
-    questionnaireReviewRecyclerView.adapter = questionnaireReviewAdapter
-    questionnaireReviewRecyclerView.layoutManager = LinearLayoutManager(view.context)
+    questionnaireReviewComposeView.setContent {
+      val questionerStateFlow = viewModel.questionnaireStateFlow.collectAsState()
+
+      QuestionnaireReviewList(questionerStateFlow)
+    }
 
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
@@ -162,10 +175,10 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.ReviewMode -> {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
-            questionnaireReviewAdapter.submitList(
+            /*   questionnaireReviewAdapter.submitList(
               state.items,
-            )
-            questionnaireReviewRecyclerView.visibility = View.VISIBLE
+            )*/
+            questionnaireReviewComposeView.visibility = View.VISIBLE
             reviewModeEditButton.visibility =
               if (displayMode.showEditButton) {
                 View.VISIBLE
@@ -189,7 +202,7 @@ class QuestionnaireFragment : Fragment() {
           }
           is DisplayMode.EditMode -> {
             // Set items
-            questionnaireReviewRecyclerView.visibility = View.GONE
+            questionnaireReviewComposeView.visibility = View.GONE
             questionnaireEditAdapter.submitList(state.items)
             questionnaireEditRecyclerView.visibility = View.VISIBLE
             reviewModeEditButton.visibility = View.GONE
@@ -234,7 +247,7 @@ class QuestionnaireFragment : Fragment() {
             }
           }
           is DisplayMode.InitMode -> {
-            questionnaireReviewRecyclerView.visibility = View.GONE
+            questionnaireReviewComposeView.visibility = View.GONE
             questionnaireEditRecyclerView.visibility = View.GONE
             questionnaireProgressIndicator.visibility = View.GONE
             reviewModeEditButton.visibility = View.GONE
@@ -279,6 +292,43 @@ class QuestionnaireFragment : Fragment() {
           Timber.e(
             "Unknown fragment result $result",
           )
+      }
+    }
+  }
+
+  @Composable
+  private fun QuestionnaireReviewList(questionerStateFlow: State<QuestionnaireState>) {
+    LazyColumn {
+      items(
+        questionerStateFlow.value.items,
+        key = { it.getKey() },
+      ) { item: QuestionnaireAdapterItem ->
+        AndroidView(
+          factory = { context ->
+            val linearLayout = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
+
+            when (item) {
+              is QuestionnaireAdapterItem.Question -> {
+                val viewHolder = ReviewViewHolderFactory.create(linearLayout)
+                viewHolder.bind(item.item)
+                linearLayout.apply { addView(viewHolder.itemView) }
+              }
+              is QuestionnaireAdapterItem.Navigation -> {
+                val viewHolder =
+                  NavigationViewHolder(
+                    LayoutInflater.from(context)
+                      .inflate(R.layout.pagination_navigation_view, null, false),
+                  )
+                viewHolder.bind(item.questionnaireNavigationUIState)
+                linearLayout.apply { addView(viewHolder.itemView) }
+              }
+              is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+                TODO("Not implemented yet")
+              }
+            }
+          },
+          modifier = Modifier.fillMaxWidth(),
+        )
       }
     }
   }
