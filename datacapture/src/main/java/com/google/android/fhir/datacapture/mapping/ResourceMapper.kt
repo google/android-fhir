@@ -21,6 +21,7 @@ import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtensio
 import com.google.android.fhir.datacapture.extensions.initialExpression
 import com.google.android.fhir.datacapture.extensions.initialSelected
 import com.google.android.fhir.datacapture.extensions.logicalId
+import com.google.android.fhir.datacapture.extensions.matches
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
 import com.google.android.fhir.datacapture.extensions.toCodeType
@@ -291,7 +292,13 @@ object ResourceMapper {
         if (questionnaireItem.answerOption.isNotEmpty()) {
           questionnaireItem.answerOption.forEach { answerOption ->
             answerOption.initialSelected =
-              evaluatedExpressionResult.any { answerOption.value.equalsDeep(it) }
+              evaluatedExpressionResult.any { evaluatedItem ->
+                if (answerOption.value is Coding && evaluatedItem is Coding) {
+                  (answerOption.value as Coding).matches(evaluatedItem)
+                } else {
+                  answerOption.value.equalsDeep(evaluatedItem)
+                }
+              }
           }
         } else {
           questionnaireItem.initial =
