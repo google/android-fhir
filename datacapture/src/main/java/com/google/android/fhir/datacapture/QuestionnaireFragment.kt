@@ -175,9 +175,6 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.ReviewMode -> {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
-            /*   questionnaireReviewAdapter.submitList(
-              state.items,
-            )*/
             questionnaireReviewComposeView.visibility = View.VISIBLE
             reviewModeEditButton.visibility =
               if (displayMode.showEditButton) {
