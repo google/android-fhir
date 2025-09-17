@@ -21,9 +21,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -33,9 +47,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.extensions.inflate
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.RepeatedGroupHeaderItemViewHolder
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
@@ -91,8 +107,8 @@ class QuestionnaireFragment : Fragment() {
 
   /** @suppress */
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    val questionnaireEditRecyclerView =
-      view.findViewById<RecyclerView>(R.id.questionnaire_edit_recycler_view)
+    val questionnaireEditComposeView =
+      view.findViewById<ComposeView>(R.id.questionnaire_edit_compose_view)
     val questionnaireReviewRecyclerView =
       view.findViewById<RecyclerView>(R.id.questionnaire_review_recycler_view)
     val questionnaireTitle = view.findViewById<TextView>(R.id.questionnaire_title)
@@ -137,20 +153,13 @@ class QuestionnaireFragment : Fragment() {
     }
     val questionnaireProgressIndicator: LinearProgressIndicator =
       view.findViewById(R.id.questionnaire_progress_indicator)
-    val questionnaireEditAdapter =
-      QuestionnaireEditAdapter(questionnaireItemViewHolderFactoryMatchersProvider.get())
+
     val questionnaireReviewAdapter = QuestionnaireReviewAdapter()
 
     val reviewModeEditButton =
       view.findViewById<View>(R.id.review_mode_edit_button).apply {
         setOnClickListener { viewModel.setReviewMode(false) }
       }
-
-    questionnaireEditRecyclerView.adapter = questionnaireEditAdapter
-    val linearLayoutManager = LinearLayoutManager(view.context)
-    questionnaireEditRecyclerView.layoutManager = linearLayoutManager
-    // Animation does work well with views that could gain focus
-    questionnaireEditRecyclerView.itemAnimator = null
 
     questionnaireReviewRecyclerView.adapter = questionnaireReviewAdapter
     questionnaireReviewRecyclerView.layoutManager = LinearLayoutManager(view.context)
@@ -161,7 +170,7 @@ class QuestionnaireFragment : Fragment() {
         when (val displayMode = state.displayMode) {
           is DisplayMode.ReviewMode -> {
             // Set items
-            questionnaireEditRecyclerView.visibility = View.GONE
+            questionnaireEditComposeView.visibility = View.GONE
             questionnaireReviewAdapter.submitList(
               state.items,
             )
@@ -190,8 +199,21 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.EditMode -> {
             // Set items
             questionnaireReviewRecyclerView.visibility = View.GONE
-            questionnaireEditAdapter.submitList(state.items)
-            questionnaireEditRecyclerView.visibility = View.VISIBLE
+            questionnaireEditComposeView.setContent {
+              val questionerStateFlow = viewModel.questionnaireStateFlow.collectAsState()
+              QuestionnaireEditList(
+                questionerStateFlow,
+                onUpdateProgressIndicator = { currentPage, totalCount ->
+                  questionnaireProgressIndicator.updateProgressIndicator(
+                    calculateProgressPercentage(
+                      count = (currentPage + 1),
+                      totalCount = totalCount,
+                    ),
+                  )
+                }
+              )
+            }
+            questionnaireEditComposeView.visibility = View.VISIBLE
             reviewModeEditButton.visibility = View.GONE
             questionnaireTitle.visibility = View.GONE
 
@@ -215,27 +237,11 @@ class QuestionnaireFragment : Fragment() {
                   totalCount = displayMode.pagination.pages.size,
                 ),
               )
-            } else {
-              questionnaireEditRecyclerView.addOnScrollListener(
-                object : RecyclerView.OnScrollListener() {
-                  override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-                    questionnaireProgressIndicator.updateProgressIndicator(
-                      calculateProgressPercentage(
-                        count =
-                          (linearLayoutManager.findLastVisibleItemPosition() +
-                            1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
-                        totalCount = linearLayoutManager.itemCount,
-                      ),
-                    )
-                  }
-                },
-              )
             }
           }
           is DisplayMode.InitMode -> {
             questionnaireReviewRecyclerView.visibility = View.GONE
-            questionnaireEditRecyclerView.visibility = View.GONE
+            questionnaireEditComposeView.visibility = View.GONE
             questionnaireProgressIndicator.visibility = View.GONE
             reviewModeEditButton.visibility = View.GONE
             bottomNavContainerFrame.visibility = View.GONE
@@ -279,6 +285,67 @@ class QuestionnaireFragment : Fragment() {
           Timber.e(
             "Unknown fragment result $result",
           )
+      }
+    }
+  }
+
+  @Composable
+  private fun QuestionnaireEditList(
+    questionerStateFlow: State<QuestionnaireState>,
+    onUpdateProgressIndicator: (Int, Int) -> Unit,
+  ) {
+    val listState = rememberLazyListState()
+    LaunchedEffect(listState) {
+      snapshotFlow { listState.firstVisibleItemIndex }
+        .collect { firstIndex ->
+          onUpdateProgressIndicator(firstIndex, listState.layoutInfo.totalItemsCount)
+        }
+    }
+    LazyColumn(state = listState) {
+      items(
+        questionerStateFlow.value.items,
+        key = { item ->
+          when (item) {
+            is QuestionnaireAdapterItem.Question -> item.item.questionnaireItem.linkId
+            is QuestionnaireAdapterItem.RepeatedGroupHeader -> "repeated-group-header-${item.index}"
+            is QuestionnaireAdapterItem.Navigation -> "navigation"
+          }
+        },
+      ) { adapterItem: QuestionnaireAdapterItem ->
+        AndroidView(
+          factory = { context ->
+            val linearLayout = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
+
+            when (adapterItem) {
+              is QuestionnaireAdapterItem.Question -> {
+                val viewHolder =
+                  getQuestionnaireItemViewHolder(
+                    parent = linearLayout,
+                    questionnaireViewItem = adapterItem.item,
+                    questionnaireItemViewHolderMatchers =
+                      questionnaireItemViewHolderFactoryMatchersProvider.get(),
+                  )
+                viewHolder.bind(adapterItem.item)
+                linearLayout.apply { addView(viewHolder.itemView) }
+              }
+              is QuestionnaireAdapterItem.Navigation -> {
+                val viewHolder =
+                  NavigationViewHolder(linearLayout.inflate(R.layout.pagination_navigation_view))
+                viewHolder.bind(adapterItem.questionnaireNavigationUIState)
+                linearLayout.apply { addView(viewHolder.itemView) }
+              }
+              is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+                val viewHolder =
+                  RepeatedGroupHeaderItemViewHolder(
+                    linearLayout.inflate(R.layout.repeated_group_instance_header_view),
+                  )
+                viewHolder.bind(adapterItem)
+                linearLayout.apply { addView(viewHolder.itemView) }
+              }
+            }
+          },
+          modifier = Modifier.fillMaxWidth(),
+        )
       }
     }
   }
