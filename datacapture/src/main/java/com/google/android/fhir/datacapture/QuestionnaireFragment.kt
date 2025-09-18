@@ -210,7 +210,7 @@ class QuestionnaireFragment : Fragment() {
                       totalCount = totalCount,
                     ),
                   )
-                }
+                },
               )
             }
             questionnaireEditComposeView.visibility = View.VISIBLE
