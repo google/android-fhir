@@ -3145,6 +3145,175 @@ class ResourceMapperTest {
     }
 
   @Test
+  fun `populate() should select coding answerOption when only display differs`() = runBlocking {
+    val matchingAnswerOption =
+      Coding().apply {
+        system = "http://loinc.org"
+        code = "12345-6"
+        version = "1.0"
+        display = "Answer option display"
+      }
+    val questionnaire =
+      createObservationChoiceQuestionnaire(
+        matchingAnswerOption,
+        Coding().apply {
+          system = "http://loinc.org"
+          code = "65432-1"
+          display = "Fallback display"
+        },
+      )
+
+    val observationCoding =
+      Coding().apply {
+        system = matchingAnswerOption.system
+        code = matchingAnswerOption.code
+        version = matchingAnswerOption.version
+        display = "Observation display"
+      }
+
+    val questionnaireResponse =
+      ResourceMapper.populate(
+        questionnaire,
+        mapOf("observation" to observationWithCoding(observationCoding)),
+      )
+
+    val question = questionnaire.item.single()
+    val selectedOption =
+      question.answerOption.first { (it.value as Coding).code == matchingAnswerOption.code }
+
+    assertThat(selectedOption.initialSelected).isTrue()
+    assertThat(question.answerOption.count { it.initialSelected }).isEqualTo(1)
+
+    val responseItem = questionnaireResponse.item.single()
+    assertThat(responseItem.hasAnswer()).isTrue()
+    val answerCoding = responseItem.answer.single().value as Coding
+    assertThat(answerCoding.code).isEqualTo(matchingAnswerOption.code)
+    assertThat(answerCoding.system).isEqualTo(matchingAnswerOption.system)
+    assertThat(answerCoding.version).isEqualTo(matchingAnswerOption.version)
+    assertThat(answerCoding.display).isEqualTo(matchingAnswerOption.display)
+  }
+
+  @Test
+  fun `populate() should not select coding answerOption when codes differ`() = runBlocking {
+    val matchingAnswerOption =
+      Coding().apply {
+        system = "http://loinc.org"
+        code = "12345-6"
+        version = "1.0"
+        display = "Answer option display"
+      }
+    val questionnaire =
+      createObservationChoiceQuestionnaire(
+        matchingAnswerOption,
+        Coding().apply {
+          system = "http://loinc.org"
+          code = "65432-1"
+          display = "Fallback display"
+        },
+      )
+
+    val questionnaireResponse =
+      ResourceMapper.populate(
+        questionnaire,
+        mapOf(
+          "observation" to
+            observationWithCoding(
+              Coding().apply {
+                system = matchingAnswerOption.system
+                code = "different-code"
+                version = matchingAnswerOption.version
+                display = "Observation display"
+              },
+            ),
+        ),
+      )
+
+    val question = questionnaire.item.single()
+    assertThat(question.answerOption.none { it.initialSelected }).isTrue()
+    assertThat(questionnaireResponse.item.single().hasAnswer()).isFalse()
+  }
+
+  @Test
+  fun `populate() should not select coding answerOption when systems differ`() = runBlocking {
+    val matchingAnswerOption =
+      Coding().apply {
+        system = "http://loinc.org"
+        code = "12345-6"
+        version = "1.0"
+        display = "Answer option display"
+      }
+    val questionnaire =
+      createObservationChoiceQuestionnaire(
+        matchingAnswerOption,
+        Coding().apply {
+          system = "http://loinc.org"
+          code = "65432-1"
+          display = "Fallback display"
+        },
+      )
+
+    val questionnaireResponse =
+      ResourceMapper.populate(
+        questionnaire,
+        mapOf(
+          "observation" to
+            observationWithCoding(
+              Coding().apply {
+                system = "http://snomed.info/sct"
+                code = matchingAnswerOption.code
+                version = matchingAnswerOption.version
+                display = "Observation display"
+              },
+            ),
+        ),
+      )
+
+    val question = questionnaire.item.single()
+    assertThat(question.answerOption.none { it.initialSelected }).isTrue()
+    assertThat(questionnaireResponse.item.single().hasAnswer()).isFalse()
+  }
+
+  @Test
+  fun `populate() should not select coding answerOption when versions differ`() = runBlocking {
+    val matchingAnswerOption =
+      Coding().apply {
+        system = "http://loinc.org"
+        code = "12345-6"
+        version = "1.0"
+        display = "Answer option display"
+      }
+    val questionnaire =
+      createObservationChoiceQuestionnaire(
+        matchingAnswerOption,
+        Coding().apply {
+          system = "http://loinc.org"
+          code = "65432-1"
+          display = "Fallback display"
+        },
+      )
+
+    val questionnaireResponse =
+      ResourceMapper.populate(
+        questionnaire,
+        mapOf(
+          "observation" to
+            observationWithCoding(
+              Coding().apply {
+                system = matchingAnswerOption.system
+                code = matchingAnswerOption.code
+                version = "2.0"
+                display = "Observation display"
+              },
+            ),
+        ),
+      )
+
+    val question = questionnaire.item.single()
+    assertThat(question.answerOption.none { it.initialSelected }).isTrue()
+    assertThat(questionnaireResponse.item.single().hasAnswer()).isFalse()
+  }
+
+  @Test
   fun `populate() should select single answer for non repeating question with answerOption`() =
     runBlocking {
       val questionnaire =
@@ -3595,6 +3764,54 @@ class ResourceMapperTest {
       bundle.entry.find { it.resource.resourceType == ResourceType.Patient }?.resource as Patient
     assertThat(patient.name.first().family).isEqualTo("John Doe")
   }
+
+  private fun createObservationChoiceQuestionnaire(
+    vararg answerOptions: Coding,
+  ): Questionnaire =
+    Questionnaire()
+      .apply {
+        addExtension().apply {
+          url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+          extension =
+            listOf(
+              Extension(
+                "name",
+                Coding(
+                  CODE_SYSTEM_LAUNCH_CONTEXT,
+                  "observation",
+                  "Test Observation",
+                ),
+              ),
+              Extension("type", CodeType("Observation")),
+            )
+        }
+      }
+      .addItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "observation-choice"
+          type = Questionnaire.QuestionnaireItemType.CHOICE
+          extension =
+            listOf(
+              Extension(
+                ITEM_INITIAL_EXPRESSION_URL,
+                Expression().apply {
+                  language = "text/fhirpath"
+                  expression = "%observation.value.coding"
+                },
+              ),
+            )
+          answerOption =
+            answerOptions
+              .map { coding -> Questionnaire.QuestionnaireItemAnswerOptionComponent(coding) }
+              .toMutableList()
+        },
+      )
+
+  private fun observationWithCoding(coding: Coding): Observation =
+    Observation().apply {
+      status = Observation.ObservationStatus.FINAL
+      value = CodeableConcept().apply { this.coding = mutableListOf(coding) }
+    }
 
   private fun readFileFromResourcesAsString(filename: String) =
     readFileFromResources(filename).bufferedReader().use { it.readText() }
