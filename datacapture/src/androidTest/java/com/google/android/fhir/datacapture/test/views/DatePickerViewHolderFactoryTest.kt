@@ -27,6 +27,7 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performSemanticsAction
@@ -549,6 +550,9 @@ class DatePickerViewHolderFactoryTest {
     )
 
     composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).assertIsNotEnabled()
+    composeTestRule
+      .onNodeWithContentDescription(viewHolder.itemView.context.getString(R.string.select_date))
+      .assertIsNotEnabled()
   }
 
   @Test
