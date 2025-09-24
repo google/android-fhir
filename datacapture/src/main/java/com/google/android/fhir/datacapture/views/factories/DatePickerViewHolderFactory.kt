@@ -88,7 +88,9 @@ internal object DatePickerViewHolderFactory : QuestionnaireItemComposeViewHolder
             )
           }
         val questionnaireItemAnswerLocalDate =
-          questionnaireViewItem.answers.singleOrNull()?.valueDateType?.localDate
+          remember(questionnaireViewItem.answers) {
+            questionnaireViewItem.answers.singleOrNull()?.valueDateType?.localDate
+          }
         val questionnaireItemAnswerDateInMillis =
           remember(questionnaireItemAnswerLocalDate) {
             questionnaireItemAnswerLocalDate?.atStartOfDay(ZONE_ID_UTC)?.toInstant()?.toEpochMilli()
