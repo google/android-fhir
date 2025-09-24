@@ -76,6 +76,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
@@ -381,6 +382,23 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       updateAnswerWithAffectedCalculatedExpression(questionnaireItem)
 
       modificationCount.update { it + 1 }
+    }
+
+  /**
+   * Function to dynamically resolve answer options for the AutoComplete component using
+   * [ExternalAnswerValueSetResolver.resolve]
+   */
+  private val autoCompleteAnswerOptionResolver: (String, String?, (List<Coding>) -> Unit) -> Unit =
+    { query, answerValueSet, callback ->
+      viewModelScope.launch {
+        val response =
+          if (externalValueSetResolver != null && answerValueSet != null) {
+            externalValueSetResolver!!.resolve(query, answerValueSet)
+          } else {
+            emptyList()
+          }
+        callback(response)
+      }
     }
 
   private val expressionEvaluator: ExpressionEvaluator =
@@ -943,6 +961,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             validationResult = validationResult,
             answersChangedCallback = answersChangedCallback,
             enabledAnswerOptions = enabledQuestionnaireAnswerOptions,
+            autoCompleteAnswerOptionResolver = autoCompleteAnswerOptionResolver,
             minAnswerValue =
               questionnaireItem.minValueCqfCalculatedValueExpression?.let {
                 expressionEvaluator.evaluateExpressionValue(
@@ -978,6 +997,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               ),
             isHelpCardOpen = isHelpCard && isHelpCardOpen,
             helpCardStateChangedCallback = helpCardStateChangedCallback,
+            //            suggestions = suggestions,
           ),
         )
       add(question)
