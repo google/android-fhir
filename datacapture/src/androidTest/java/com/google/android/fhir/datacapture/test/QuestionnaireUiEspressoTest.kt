@@ -23,6 +23,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.hasAnyAncestor
@@ -78,7 +79,6 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -466,7 +466,7 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
-  fun datePicker_shouldThrowException_whenMinValueRangeIsGreaterThanMaxValueRange() {
+  fun datePicker_shouldProhibitInputWithErrorMessage_whenMinValueRangeIsGreaterThanMaxValueRange() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -490,18 +490,18 @@ class QuestionnaireUiEspressoTest {
       }
 
     buildFragmentFromQuestionnaire(questionnaire)
-    val exception =
-      Assert.assertThrows(IllegalArgumentException::class.java) {
-        composeTestRule
-          .onNodeWithContentDescription(context.getString(R.string.select_date))
-          .performClick()
-        composeTestRule
-          .onNode(hasText("OK") and hasAnyAncestor(isDialog()))
-          .assertIsDisplayed()
-          .performClick()
-        composeTestRule.waitForIdle() // Synchronize
-      }
-    assertThat(exception.message).isEqualTo("minValue cannot be greater than maxValue")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.Error,
+          "minValue cannot be greater than maxValue",
+        ),
+      )
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).assertIsNotEnabled()
+    composeTestRule
+      .onNodeWithContentDescription(context.getString(R.string.select_date))
+      .assertIsNotEnabled()
   }
 
   @Test

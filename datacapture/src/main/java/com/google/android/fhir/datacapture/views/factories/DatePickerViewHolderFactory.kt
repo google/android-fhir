@@ -106,28 +106,34 @@ internal object DatePickerViewHolderFactory : QuestionnaireItemComposeViewHolder
               ?.let { DateInput(it, questionnaireItemAnswerLocalDate) }
               ?: DateInput(display = draftAnswer ?: "", null)
           }
+
+        val selectableDatesResult =
+          remember(questionnaireViewItem) { getSelectableDates(questionnaireViewItem) }
+
+        val selectableDates = remember(selectableDatesResult) { selectableDatesResult.getOrNull() }
+
+        val prohibitInput = remember(selectableDatesResult) { selectableDatesResult.isFailure }
+
         val validationMessage =
-          remember(draftAnswer) {
-            // If the draft answer is set, this means the user has yet to type a parseable answer,
-            // so we display an error.
-            if (!draftAnswer.isNullOrEmpty()) {
-              getValidationErrorMessage(
-                context,
-                questionnaireViewItem,
-                Invalid(
-                  listOf(invalidDateErrorText(context, canonicalizedDatePattern)),
-                ),
-              )
+          remember(draftAnswer, selectableDatesResult) {
+            if (selectableDatesResult.isFailure) {
+              selectableDatesResult.exceptionOrNull()?.localizedMessage
             } else {
+              // If the draft answer is set, this means the user has yet to type a parseable answer,
+              // so we display an error.
               getValidationErrorMessage(
                 context,
                 questionnaireViewItem,
-                questionnaireViewItem.validationResult,
+                if (!draftAnswer.isNullOrEmpty()) {
+                  Invalid(
+                    listOf(invalidDateErrorText(context, canonicalizedDatePattern)),
+                  )
+                } else {
+                  questionnaireViewItem.validationResult
+                },
               )
             }
           }
-        val selectableDates =
-          remember(questionnaireViewItem) { { getSelectableDates(questionnaireViewItem) } }
 
         Column(
           modifier =
@@ -149,7 +155,7 @@ internal object DatePickerViewHolderFactory : QuestionnaireItemComposeViewHolder
             helperText = validationMessage.takeIf { !it.isNullOrBlank() }
                 ?: getRequiredOrOptionalText(questionnaireViewItem, context),
             isError = !validationMessage.isNullOrBlank(),
-            enabled = !questionnaireViewItem.questionnaireItem.readOnly,
+            enabled = !(questionnaireViewItem.questionnaireItem.readOnly || prohibitInput),
             parseStringToLocalDate = { str, pattern -> getLocalDate(str, pattern) },
             onDateInputEntry = {
               val (display, date) = it
@@ -173,15 +179,15 @@ internal object DatePickerViewHolderFactory : QuestionnaireItemComposeViewHolder
 
       private fun getSelectableDates(
         questionnaireViewItem: QuestionnaireViewItem,
-      ): SelectableDates {
+      ): Result<SelectableDates> {
         val min = (questionnaireViewItem.minAnswerValue as? DateType)?.value?.time
         val max = (questionnaireViewItem.maxAnswerValue as? DateType)?.value?.time
 
-        if (min != null && max != null && min > max) {
-          throw IllegalArgumentException("minValue cannot be greater than maxValue")
+        return if (min != null && max != null && min > max) {
+          Result.failure(IllegalArgumentException("minValue cannot be greater than maxValue"))
+        } else {
+          Result.success(selectableDates(min, max))
         }
-
-        return selectableDates(min, max)
       }
 
       /** Set the answer in the [QuestionnaireResponse]. */

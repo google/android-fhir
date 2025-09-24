@@ -63,7 +63,7 @@ internal fun DatePickerItem(
   isError: Boolean,
   enabled: Boolean,
   dateInputFormat: DateInputFormat,
-  selectableDates: () -> SelectableDates,
+  selectableDates: SelectableDates?,
   parseStringToLocalDate: (String, DateFormatPattern) -> LocalDate?,
   onDateInputEntry: (DateInput) -> Unit,
 ) {
@@ -136,7 +136,7 @@ internal fun DatePickerItem(
     visualTransformation = DateVisualTransformation(dateInputFormat),
   )
 
-  if (showDatePickerModal) {
+  if (selectableDates != null && showDatePickerModal) {
     DatePickerModal(
       initialSelectedDateMillis,
       selectableDates,
@@ -159,12 +159,12 @@ internal fun DatePickerItem(
 @Composable
 internal fun DatePickerModal(
   initialSelectedDateMillis: Long?,
-  selectableDates: () -> SelectableDates,
+  selectableDates: SelectableDates,
   onDateSelected: (Long?) -> Unit,
   onDismiss: () -> Unit,
 ) {
   val datePickerState =
-    rememberDatePickerState(initialSelectedDateMillis, selectableDates = selectableDates())
+    rememberDatePickerState(initialSelectedDateMillis, selectableDates = selectableDates)
   val datePickerSelectedDateMillis =
     remember(initialSelectedDateMillis) { initialSelectedDateMillis }
   val confirmEnabled by remember { derivedStateOf { datePickerState.selectedDateMillis != null } }
