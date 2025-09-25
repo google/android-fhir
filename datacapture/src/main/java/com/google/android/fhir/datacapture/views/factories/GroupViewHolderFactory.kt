@@ -29,9 +29,9 @@ import com.google.android.fhir.datacapture.views.GroupHeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 
 internal object GroupViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.group_header_view) {
+  QuestionnaireItemAndroidViewHolderFactory(R.layout.group_header_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemAndroidViewHolderDelegate {
       private lateinit var context: AppCompatActivity
       private lateinit var header: GroupHeaderView
       private lateinit var error: TextView

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,9 +57,9 @@ import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object AttachmentViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.attachment_view) {
+  QuestionnaireItemAndroidViewHolderFactory(R.layout.attachment_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemAndroidViewHolderDelegate {
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var header: HeaderView
       private lateinit var errorTextView: TextView

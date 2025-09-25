@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,10 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
 
-internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.layout.slider_view) {
-  override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
-    object : QuestionnaireItemViewHolderDelegate {
+internal object SliderViewHolderFactory :
+  QuestionnaireItemAndroidViewHolderFactory(R.layout.slider_view) {
+  override fun getQuestionnaireItemViewHolderDelegate() =
+    object : QuestionnaireItemAndroidViewHolderDelegate {
       private lateinit var appContext: AppCompatActivity
       private lateinit var header: HeaderView
       private lateinit var slider: Slider
