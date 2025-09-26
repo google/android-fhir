@@ -31,7 +31,7 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class RepeatsGroupAddItemViewHolderTest {
+class RepeatedGroupAddItemViewHolderTest {
 
   private val parent =
     FrameLayout(
@@ -39,8 +39,8 @@ class RepeatsGroupAddItemViewHolderTest {
         setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
       },
     )
-  private val viewHolder: RepeatsGroupAddItemViewHolder =
-    RepeatsGroupAddItemViewHolder.create(parent)
+  private val viewHolder: RepeatedGroupAddItemViewHolder =
+    RepeatedGroupAddItemViewHolder.create(parent)
 
   @Test
   fun testRepeatedGroupIsReadOnlyDisablesAddButton() {
@@ -57,7 +57,7 @@ class RepeatsGroupAddItemViewHolderTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat((viewHolder.itemView.findViewById<Button>(R.id.add_item).isEnabled)).isFalse()
+    assertThat((viewHolder.itemView.findViewById<Button>(R.id.add_item_to_repeated_group).isEnabled)).isFalse()
   }
 
   @Test
@@ -71,7 +71,7 @@ class RepeatsGroupAddItemViewHolderTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<View>(R.id.add_item).visibility)
+    assertThat(viewHolder.itemView.findViewById<View>(R.id.add_item_to_repeated_group).visibility)
       .isEqualTo(View.VISIBLE)
   }
 
@@ -90,6 +90,6 @@ class RepeatsGroupAddItemViewHolderTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat((viewHolder.itemView.findViewById<Button>(R.id.add_item).isEnabled)).isTrue()
+    assertThat((viewHolder.itemView.findViewById<Button>(R.id.add_item_to_repeated_group).isEnabled)).isTrue()
   }
 }

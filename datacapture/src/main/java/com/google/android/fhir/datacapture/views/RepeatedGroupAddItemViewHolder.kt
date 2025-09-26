@@ -28,12 +28,12 @@ import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-class RepeatsGroupAddItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class RepeatedGroupAddItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
   private var context: AppCompatActivity = itemView.context.tryUnwrapContext()!!
 
   fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-    val addItemButton: Button = itemView.findViewById(R.id.add_item)
+    val addItemButton: Button = itemView.findViewById(R.id.add_item_to_repeated_group)
 
     addItemButton.text =
       itemView.context.getString(
@@ -57,8 +57,8 @@ class RepeatsGroupAddItemViewHolder(itemView: View) : RecyclerView.ViewHolder(it
   companion object {
     val layoutRes = R.layout.add_repeated_item
 
-    fun create(parent: ViewGroup): RepeatsGroupAddItemViewHolder {
-      return RepeatsGroupAddItemViewHolder(
+    fun create(parent: ViewGroup): RepeatedGroupAddItemViewHolder {
+      return RepeatedGroupAddItemViewHolder(
         LayoutInflater.from(parent.context).inflate(layoutRes, parent, false),
       )
     }

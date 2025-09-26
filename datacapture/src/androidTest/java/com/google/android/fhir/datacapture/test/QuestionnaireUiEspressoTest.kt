@@ -614,7 +614,7 @@ class QuestionnaireUiEspressoTest {
   @Test
   fun test_add_item_button_does_not_exist_for_non_repeated_groups() {
     buildFragmentFromQuestionnaire("/component_non_repeated_group.json")
-    onView(withId(R.id.add_item)).check(doesNotExist())
+    onView(withId(R.id.add_item_to_repeated_group)).check(doesNotExist())
   }
 
   @Test
@@ -624,8 +624,8 @@ class QuestionnaireUiEspressoTest {
     onView(withId(R.id.questionnaire_edit_recycler_view))
       .perform(
         RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
-          1,
-          clickChildViewWithId(R.id.add_item),
+          1,  // 'Add item' is in the second row of the recyclerview with group header as the first item
+          clickChildViewWithId(R.id.add_item_to_repeated_group),
         ),
       )
 

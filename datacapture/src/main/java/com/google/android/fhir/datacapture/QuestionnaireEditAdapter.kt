@@ -28,7 +28,7 @@ import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.RepeatsGroupAddItemViewHolder
+import com.google.android.fhir.datacapture.views.RepeatedGroupAddItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewHolderFactory
@@ -83,7 +83,7 @@ internal class QuestionnaireEditAdapter(
       }
       ViewType.Type.REPEATED_GROUP_ADD_BUTTON -> {
         ViewHolder.RepeatedGroupAddButtonViewHolder(
-          RepeatsGroupAddItemViewHolder.create(parent),
+          RepeatedGroupAddItemViewHolder.create(parent),
         )
       }
     }
@@ -312,7 +312,7 @@ internal class QuestionnaireEditAdapter(
 
     class NavigationHolder(val viewHolder: NavigationViewHolder) : ViewHolder(viewHolder.itemView)
 
-    class RepeatedGroupAddButtonViewHolder(val viewHolder: RepeatsGroupAddItemViewHolder) :
+    class RepeatedGroupAddButtonViewHolder(val viewHolder: RepeatedGroupAddItemViewHolder) :
       ViewHolder(viewHolder.itemView)
   }
 

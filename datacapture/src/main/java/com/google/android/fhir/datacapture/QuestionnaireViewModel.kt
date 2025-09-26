@@ -1023,11 +1023,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               questionnaireResponseItemList = nestedResponseItemList,
             ),
           )
+            if (questionnaireItem.isRepeatedGroup) {
+                add(QuestionnaireAdapterItem.RepeatedGroupAddButton(question.item))
+            }
         }
-
-      if (questionnaireItem.isRepeatedGroup) {
-        add(QuestionnaireAdapterItem.RepeatedGroupAddButton(question.item))
-      }
     }
     currentPageItems = items
     return items
