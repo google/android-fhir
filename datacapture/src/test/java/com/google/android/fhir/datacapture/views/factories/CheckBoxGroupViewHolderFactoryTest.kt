@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -616,4 +616,51 @@ class CheckBoxGroupViewHolderFactoryTest {
         },
       )
     }
+
+  @Test
+  fun click_should_Select_Other_CheckboxButton() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = false
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value =
+                Coding().apply {
+                  code = "code-1"
+                  display = "display-1"
+                }
+            },
+          )
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value =
+                Coding().apply {
+                  code = "code-2"
+                  display = "display-2"
+                }
+            },
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value =
+                Coding().apply {
+                  code = "code-1"
+                  display = "display-1"
+                }
+            },
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
+    assertThat((checkBoxGroup.getChildAt(1) as CheckBox).isChecked).isTrue()
+    checkBoxGroup.getChildAt(2).performClick()
+    assertThat((checkBoxGroup.getChildAt(2) as CheckBox).isChecked).isTrue()
+  }
 }
