@@ -75,7 +75,7 @@
         app:layout_constraintTop_toBottomOf="@+id/questionnaire_progress_indicator"
     />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <androidx.compose.ui.platform.ComposeView
         android:id="@+id/questionnaire_review_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
