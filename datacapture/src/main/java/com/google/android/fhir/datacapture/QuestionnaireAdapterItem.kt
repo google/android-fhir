@@ -23,7 +23,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal sealed interface QuestionnaireAdapterItem {
   /** A row for a question in a Questionnaire RecyclerView. */
   data class Question(val item: QuestionnaireViewItem) : QuestionnaireAdapterItem {
-    var id: String = item.questionnaireItem.linkId
+    var id: String? = item.questionnaireItem.linkId
   }
 
   /** A row for a repeated group response instance's header. */

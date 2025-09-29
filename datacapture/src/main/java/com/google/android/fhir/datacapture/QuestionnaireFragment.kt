@@ -327,6 +327,7 @@ class QuestionnaireFragment : Fragment() {
         key = { item ->
           when (item) {
             is QuestionnaireAdapterItem.Question -> item.id
+                ?: throw IllegalStateException("Missing id for the QuestionnaireAdapterItem: $item")
             is QuestionnaireAdapterItem.RepeatedGroupHeader -> item.id
             is QuestionnaireAdapterItem.Navigation -> "navigation"
           }
