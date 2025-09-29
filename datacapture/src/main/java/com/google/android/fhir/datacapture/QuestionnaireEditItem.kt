@@ -51,11 +51,11 @@ fun getQuestionnaireItemViewHolder(
   questionnaireItemViewHolderMatchers:
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher>,
 ): QuestionnaireItemViewHolder {
-  val questionnaireItem = questionnaireViewItem.questionnaireItem
-
   // Find a matching custom widget
   val questionnaireViewHolderFactory =
-    questionnaireItemViewHolderMatchers.find { it.matches(questionnaireItem) }?.factory
+    questionnaireItemViewHolderMatchers
+      .find { it.matches(questionnaireViewItem.questionnaireItem) }
+      ?.factory
       ?: getQuestionnaireItemViewHolderFactory(getItemViewTypeForQuestion(questionnaireViewItem))
   return questionnaireViewHolderFactory.create(parent)
 }

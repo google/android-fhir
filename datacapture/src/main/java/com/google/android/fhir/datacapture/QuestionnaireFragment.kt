@@ -33,13 +33,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
 import androidx.core.os.bundleOf
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
@@ -50,9 +51,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.extensions.inflate
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.RepeatedGroupHeaderItemViewHolder
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import kotlin.uuid.ExperimentalUuidApi
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
 import timber.log.Timber
@@ -289,62 +292,102 @@ class QuestionnaireFragment : Fragment() {
     }
   }
 
+  @OptIn(ExperimentalUuidApi::class)
   @Composable
   private fun QuestionnaireEditList(
     questionerStateFlow: State<QuestionnaireState>,
     onUpdateProgressIndicator: (Int, Int) -> Unit,
   ) {
     val listState = rememberLazyListState()
+    val currentDisplayMode = remember { questionerStateFlow.value.displayMode }
+
     LaunchedEffect(listState) {
-      snapshotFlow { listState.firstVisibleItemIndex }
-        .collect { firstIndex ->
-          onUpdateProgressIndicator(firstIndex, listState.layoutInfo.totalItemsCount)
-        }
+      if (
+        currentDisplayMode is DisplayMode.EditMode && !currentDisplayMode.pagination.isPaginated
+      ) {
+        snapshotFlow {
+            val layoutInfo = listState.layoutInfo
+            val visibleItems = layoutInfo.visibleItemsInfo
+            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val total = layoutInfo.totalItemsCount
+
+            // If all items are visible, we're at 100%
+            if (visibleItems.size >= total && total > 0) {
+              total to total
+            } else {
+              lastVisible + 1 to total
+            }
+          }
+          .collect { (visibleCount, total) -> onUpdateProgressIndicator(visibleCount, total) }
+      }
     }
     LazyColumn(state = listState) {
       items(
         questionerStateFlow.value.items,
         key = { item ->
           when (item) {
-            is QuestionnaireAdapterItem.Question -> item.item.questionnaireItem.linkId
-            is QuestionnaireAdapterItem.RepeatedGroupHeader -> "repeated-group-header-${item.index}"
+            is QuestionnaireAdapterItem.Question -> item.id
+            is QuestionnaireAdapterItem.RepeatedGroupHeader -> item.id
             is QuestionnaireAdapterItem.Navigation -> "navigation"
           }
         },
       ) { adapterItem: QuestionnaireAdapterItem ->
         AndroidView(
           factory = { context ->
-            val linearLayout = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
-
-            when (adapterItem) {
-              is QuestionnaireAdapterItem.Question -> {
-                val viewHolder =
-                  getQuestionnaireItemViewHolder(
-                    parent = linearLayout,
-                    questionnaireViewItem = adapterItem.item,
-                    questionnaireItemViewHolderMatchers =
-                      questionnaireItemViewHolderFactoryMatchersProvider.get(),
-                  )
-                viewHolder.bind(adapterItem.item)
-                linearLayout.apply { addView(viewHolder.itemView) }
-              }
-              is QuestionnaireAdapterItem.Navigation -> {
-                val viewHolder =
-                  NavigationViewHolder(linearLayout.inflate(R.layout.pagination_navigation_view))
-                viewHolder.bind(adapterItem.questionnaireNavigationUIState)
-                linearLayout.apply { addView(viewHolder.itemView) }
-              }
-              is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-                val viewHolder =
-                  RepeatedGroupHeaderItemViewHolder(
-                    linearLayout.inflate(R.layout.repeated_group_instance_header_view),
-                  )
-                viewHolder.bind(adapterItem)
-                linearLayout.apply { addView(viewHolder.itemView) }
+            LinearLayout(context).apply {
+              orientation = LinearLayout.VERTICAL
+              ViewCompat.setNestedScrollingEnabled(this, false)
+              // Build the view using viewHolder factories. To keep the viewHolder accessible
+              // across recompositions, each created view is tagged with its viewHolder.
+              // On recomposition, the views are not recreated—instead, their content is
+              // refreshed by calling viewHolder#bind.
+              when (adapterItem) {
+                is QuestionnaireAdapterItem.Question -> {
+                  val viewHolder =
+                    getQuestionnaireItemViewHolder(
+                      parent = this,
+                      questionnaireViewItem = adapterItem.item,
+                      questionnaireItemViewHolderMatchers =
+                        questionnaireItemViewHolderFactoryMatchersProvider.get(),
+                    )
+                  viewHolder.bind(adapterItem.item)
+                  setTag(R.id.question_view_holder, viewHolder)
+                  addView(viewHolder.itemView)
+                }
+                is QuestionnaireAdapterItem.Navigation -> {
+                  val viewHolder =
+                    NavigationViewHolder(inflate(R.layout.pagination_navigation_view))
+                  viewHolder.bind(adapterItem.questionnaireNavigationUIState)
+                  setTag(R.id.question_view_holder, viewHolder)
+                  addView(viewHolder.itemView)
+                }
+                is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+                  val viewHolder =
+                    RepeatedGroupHeaderItemViewHolder(
+                      inflate(R.layout.repeated_group_instance_header_view),
+                    )
+                  viewHolder.bind(adapterItem)
+                  setTag(R.id.question_view_holder, viewHolder)
+                  addView(viewHolder.itemView)
+                }
               }
             }
           },
           modifier = Modifier.fillMaxWidth(),
+          update = { view ->
+            val viewHolderTag = view.getTag(R.id.question_view_holder)
+            when (viewHolderTag) {
+              is QuestionnaireItemViewHolder ->
+                viewHolderTag.bind((adapterItem as QuestionnaireAdapterItem.Question).item)
+              is NavigationViewHolder ->
+                viewHolderTag.bind(
+                  (adapterItem as QuestionnaireAdapterItem.Navigation)
+                    .questionnaireNavigationUIState,
+                )
+              is RepeatedGroupHeaderItemViewHolder ->
+                viewHolderTag.bind((adapterItem as QuestionnaireAdapterItem.RepeatedGroupHeader))
+            }
+          },
         )
       }
     }
