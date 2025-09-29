@@ -16,26 +16,20 @@
 
 package com.google.android.fhir.datacapture
 
-import androidx.compose.ui.text.capitalize
-import androidx.compose.ui.text.intl.Locale
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /** Various types of rows that can be used in a Questionnaire RecyclerView. */
 internal sealed interface QuestionnaireAdapterItem {
 
-  /** Returns a unique key to identify the item row in a composable list view. */
-  fun getKey(): String
-
   /** A row for a question in a Questionnaire RecyclerView. */
   data class Question(val item: QuestionnaireViewItem) : QuestionnaireAdapterItem {
-    override fun getKey(): String {
-      return item.questionnaireItem.linkId
-    }
+    var id: String? = item.questionnaireItem.linkId
   }
 
   /** A row for a repeated group response instance's header. */
   data class RepeatedGroupHeader(
+    val id: String,
     /** The response index. This is 0-indexed, but should be 1-indexed when rendered in the UI. */
     val index: Int,
     /** Callback that is invoked when the user clicks the delete button. */
@@ -43,16 +37,8 @@ internal sealed interface QuestionnaireAdapterItem {
     /** Responses nested under this header. */
     val responses: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     val title: String,
-  ) : QuestionnaireAdapterItem {
-    override fun getKey(): String {
-      return "RepeatedGroupHeader${title.capitalize(Locale.current)}-$index"
-    }
-  }
+  ) : QuestionnaireAdapterItem
 
   data class Navigation(val questionnaireNavigationUIState: QuestionnaireNavigationUIState) :
-    QuestionnaireAdapterItem {
-    override fun getKey(): String {
-      return "QuestionnaireNavigationUIState"
-    }
-  }
+    QuestionnaireAdapterItem
 }

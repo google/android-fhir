@@ -43,6 +43,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.extensions.inflate
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
@@ -298,29 +299,34 @@ class QuestionnaireFragment : Fragment() {
     LazyColumn {
       items(
         questionerStateFlow.value.items,
-        key = { it.getKey() },
+        key = { item ->
+          when (item) {
+            is QuestionnaireAdapterItem.Question -> item.id
+                ?: throw IllegalStateException("Missing id for the QuestionnaireAdapterItem: $item")
+            is QuestionnaireAdapterItem.RepeatedGroupHeader -> item.id
+            is QuestionnaireAdapterItem.Navigation -> "navigation"
+          }
+        },
       ) { item: QuestionnaireAdapterItem ->
         AndroidView(
           factory = { context ->
-            val linearLayout = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
-
-            when (item) {
-              is QuestionnaireAdapterItem.Question -> {
-                val viewHolder = ReviewViewHolderFactory.create(linearLayout)
-                viewHolder.bind(item.item)
-                linearLayout.apply { addView(viewHolder.itemView) }
-              }
-              is QuestionnaireAdapterItem.Navigation -> {
-                val viewHolder =
-                  NavigationViewHolder(
-                    LayoutInflater.from(context)
-                      .inflate(R.layout.pagination_navigation_view, null, false),
-                  )
-                viewHolder.bind(item.questionnaireNavigationUIState)
-                linearLayout.apply { addView(viewHolder.itemView) }
-              }
-              is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-                TODO("Not implemented yet")
+            LinearLayout(context).apply {
+              orientation = LinearLayout.VERTICAL
+              when (item) {
+                is QuestionnaireAdapterItem.Question -> {
+                  val viewHolder = ReviewViewHolderFactory.create(this)
+                  viewHolder.bind(item.item)
+                  addView(viewHolder.itemView)
+                }
+                is QuestionnaireAdapterItem.Navigation -> {
+                  val viewHolder =
+                    NavigationViewHolder(inflate(R.layout.pagination_navigation_view))
+                  viewHolder.bind(item.questionnaireNavigationUIState)
+                  addView(viewHolder.itemView)
+                }
+                is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+                  TODO("Not implemented yet")
+                }
               }
             }
           },
