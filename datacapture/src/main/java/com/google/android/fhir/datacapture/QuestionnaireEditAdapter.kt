@@ -418,4 +418,25 @@ internal object DiffCallbacks {
           oldItem.item.hasTheSameValidationResult(newItem.item)
       }
     }
+
+  val REVIEW_ITEMS =
+    object : DiffUtil.ItemCallback<ReviewAdapterItem>() {
+      override fun areItemsTheSame(
+        oldItem: ReviewAdapterItem,
+        newItem: ReviewAdapterItem,
+      ): Boolean =
+        ITEMS.areItemsTheSame(
+          oldItem as QuestionnaireAdapterItem,
+          newItem as QuestionnaireAdapterItem
+        )
+
+      override fun areContentsTheSame(
+        oldItem: ReviewAdapterItem,
+        newItem: ReviewAdapterItem,
+      ): Boolean =
+        ITEMS.areContentsTheSame(
+          oldItem as QuestionnaireAdapterItem,
+          newItem as QuestionnaireAdapterItem
+        )
+    }
 }

@@ -57,7 +57,10 @@ class RepeatedGroupAddItemViewHolderTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat((viewHolder.itemView.findViewById<Button>(R.id.add_item_to_repeated_group).isEnabled)).isFalse()
+    assertThat(
+        (viewHolder.itemView.findViewById<Button>(R.id.add_item_to_repeated_group).isEnabled)
+      )
+      .isFalse()
   }
 
   @Test
@@ -90,6 +93,9 @@ class RepeatedGroupAddItemViewHolderTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat((viewHolder.itemView.findViewById<Button>(R.id.add_item_to_repeated_group).isEnabled)).isTrue()
+    assertThat(
+        (viewHolder.itemView.findViewById<Button>(R.id.add_item_to_repeated_group).isEnabled)
+      )
+      .isTrue()
   }
 }

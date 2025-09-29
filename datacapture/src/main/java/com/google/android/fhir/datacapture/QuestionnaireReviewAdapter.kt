@@ -26,20 +26,18 @@ import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFacto
 
 /** List Adapter used to bind answers to [QuestionnaireItemViewHolder] in review mode. */
 internal class QuestionnaireReviewAdapter :
-  ListAdapter<QuestionnaireAdapterItem, RecyclerView.ViewHolder>(
-    DiffCallbacks.ITEMS,
+  ListAdapter<ReviewAdapterItem, RecyclerView.ViewHolder>(
+    DiffCallbacks.REVIEW_ITEMS,
   ) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-    val typedViewType = QuestionnaireEditAdapter.ViewType.parse(viewType)
-    return when (typedViewType.type) {
-      QuestionnaireEditAdapter.ViewType.Type.QUESTION -> ReviewViewHolderFactory.create(parent)
-      QuestionnaireEditAdapter.ViewType.Type.NAVIGATION ->
+    return when (viewType) {
+      VIEW_TYPE_QUESTION -> ReviewViewHolderFactory.create(parent)
+      VIEW_TYPE_NAVIGATION ->
         NavigationViewHolder(
           LayoutInflater.from(parent.context)
             .inflate(R.layout.pagination_navigation_view, parent, false),
         )
-      QuestionnaireEditAdapter.ViewType.Type.REPEATED_GROUP_HEADER -> TODO()
-      QuestionnaireEditAdapter.ViewType.Type.REPEATED_GROUP_ADD_BUTTON -> TODO()
+      else -> throw IllegalStateException("Invalid view type: $viewType")
     }
   }
 
@@ -53,31 +51,18 @@ internal class QuestionnaireReviewAdapter :
         holder as NavigationViewHolder
         holder.bind(item.questionnaireNavigationUIState)
       }
-      is QuestionnaireAdapterItem.RepeatedGroupHeader -> TODO()
-      is QuestionnaireAdapterItem.RepeatedGroupAddButton -> TODO()
     }
   }
 
-  override fun getItemViewType(position: Int): Int {
-    // Because we have multiple Item subtypes, we will pack two ints into the item view type.
-
-    // The first 8 bits will be represented by this type, which is unique for each Item subclass.
-    val type: QuestionnaireEditAdapter.ViewType.Type
-    // The last 24 bits will be represented by this subtype, which will further divide each Item
-    // subclass into more view types.
-    val subtype: Int
+  override fun getItemViewType(position: Int): Int =
     when (getItem(position)) {
-      is QuestionnaireAdapterItem.Question -> {
-        type = QuestionnaireEditAdapter.ViewType.Type.QUESTION
-        subtype = 0xFFFFFF
-      }
-      is QuestionnaireAdapterItem.Navigation -> {
-        type = QuestionnaireEditAdapter.ViewType.Type.NAVIGATION
-        subtype = 0xFFFFFF
-      }
-      is QuestionnaireAdapterItem.RepeatedGroupHeader -> TODO()
-      is QuestionnaireAdapterItem.RepeatedGroupAddButton -> TODO()
+      is QuestionnaireAdapterItem.Question -> VIEW_TYPE_QUESTION
+      is QuestionnaireAdapterItem.Navigation -> VIEW_TYPE_NAVIGATION
+      else -> super.getItemViewType(position)
     }
-    return QuestionnaireEditAdapter.ViewType.from(type = type, subtype = subtype).viewType
+
+  companion object {
+    const val VIEW_TYPE_QUESTION = 10
+    const val VIEW_TYPE_NAVIGATION = 110
   }
 }

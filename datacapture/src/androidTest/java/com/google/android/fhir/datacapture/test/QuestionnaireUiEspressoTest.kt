@@ -624,7 +624,8 @@ class QuestionnaireUiEspressoTest {
     onView(withId(R.id.questionnaire_edit_recycler_view))
       .perform(
         RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
-          1,  // 'Add item' is in the second row of the recyclerview with group header as the first item
+          1, // 'Add item' is in the second row of the recyclerview with group header as the first
+             // item
           clickChildViewWithId(R.id.add_item_to_repeated_group),
         ),
       )
