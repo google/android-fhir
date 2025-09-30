@@ -58,7 +58,7 @@ class RepeatedGroupAddItemViewHolderTest {
       ),
     )
     assertThat(
-        (viewHolder.itemView.findViewById<Button>(R.id.add_item_to_repeated_group).isEnabled)
+        (viewHolder.itemView.findViewById<Button>(R.id.add_item_to_repeated_group).isEnabled),
       )
       .isFalse()
   }
@@ -94,7 +94,7 @@ class RepeatedGroupAddItemViewHolderTest {
       ),
     )
     assertThat(
-        (viewHolder.itemView.findViewById<Button>(R.id.add_item_to_repeated_group).isEnabled)
+        (viewHolder.itemView.findViewById<Button>(R.id.add_item_to_repeated_group).isEnabled),
       )
       .isTrue()
   }

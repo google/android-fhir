@@ -427,7 +427,7 @@ internal object DiffCallbacks {
       ): Boolean =
         ITEMS.areItemsTheSame(
           oldItem as QuestionnaireAdapterItem,
-          newItem as QuestionnaireAdapterItem
+          newItem as QuestionnaireAdapterItem,
         )
 
       override fun areContentsTheSame(
@@ -436,7 +436,7 @@ internal object DiffCallbacks {
       ): Boolean =
         ITEMS.areContentsTheSame(
           oldItem as QuestionnaireAdapterItem,
-          newItem as QuestionnaireAdapterItem
+          newItem as QuestionnaireAdapterItem,
         )
     }
 }
