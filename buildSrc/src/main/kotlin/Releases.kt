@@ -157,8 +157,8 @@ fun Project.publishArtifact(artifact: LibraryArtifact) {
             }
             maven {
               credentials(PasswordCredentials::class)
-              url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-              name = "sonatype"
+              url = uri("https://central.sonatype.com/repository/maven-snapshots")
+              name = "CentralSnapshots"
             }
           }
         }
