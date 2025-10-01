@@ -104,7 +104,8 @@ dependencies {
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
-  implementation(libs.opencds.cqf.fhir.cr)
+  implementation(libs.opencds.cqf.fhir.cr) { exclude(module = "cqf-fhir-cql") }
+  implementation(libs.opencds.cqf.fhir.cql)
   implementation(libs.opencds.cqf.fhir.jackson)
 
   testImplementation(Dependencies.jsonAssert)

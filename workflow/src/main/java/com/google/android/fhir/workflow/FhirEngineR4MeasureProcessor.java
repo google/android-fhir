@@ -11,6 +11,8 @@ import org.opencds.cqf.fhir.cr.measure.MeasureEvaluationOptions;
 import org.opencds.cqf.fhir.cr.measure.common.MeasureEvalType;
 import org.opencds.cqf.fhir.cr.measure.common.SubjectProvider;
 import org.opencds.cqf.fhir.cr.measure.r4.R4MeasureProcessor;
+import org.opencds.cqf.fhir.utility.monad.Either3;
+import org.opencds.cqf.fhir.utility.monad.Eithers;
 
 import java.util.List;
 
@@ -25,5 +27,9 @@ public class FhirEngineR4MeasureProcessor extends R4MeasureProcessor {
 
     public MeasureReport evaluateMeasure(Measure measure, String periodStart, String periodEnd, String reportType, List<String> subjectIds, IBaseBundle additionalData, Parameters parameters, MeasureEvalType evalType) {
         return super.evaluateMeasure(measure, periodStart, periodEnd, reportType, subjectIds, additionalData, parameters, evalType);
+    }
+
+    public MeasureReport evaluateMeasure(Measure measure, String periodStart, String periodEnd, String reportType, List<String> subjectIds, IBaseBundle additionalData, Parameters parameters) {
+        return super.evaluateMeasure(Eithers.forRight3(measure), periodStart,periodEnd,reportType,subjectIds,additionalData,parameters);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@ import org.hl7.fhir.r4.model.Reference
 import org.opencds.cqf.fhir.cql.EvaluationSettings
 import org.opencds.cqf.fhir.cql.LibraryEngine
 import org.opencds.cqf.fhir.cr.measure.MeasureEvaluationOptions
-import org.opencds.cqf.fhir.cr.measure.common.MeasureEvalType
 import org.opencds.cqf.fhir.cr.measure.common.MeasureReportType
 import org.opencds.cqf.fhir.cr.plandefinition.PlanDefinitionProcessor
 import org.opencds.cqf.fhir.utility.monad.Eithers
@@ -162,14 +161,11 @@ internal constructor(
     end: String,
     reportType: String,
     subjectId: String? = null,
-    practitioner: String? = null,
     additionalData: IBaseBundle? = null,
     parameters: Parameters? = null,
   ): MeasureReport {
     val subject =
-      if (!practitioner.isNullOrBlank()) {
-        checkAndAddType(practitioner, "Practitioner")
-      } else if (!subjectId.isNullOrBlank()) {
+      if (!subjectId.isNullOrBlank()) {
         checkAndAddType(subjectId, "Patient")
       } else {
         // List of null is required to run population-level measures
@@ -178,26 +174,15 @@ internal constructor(
 
     val subjectIds = if (subject == null) listOf() else listOf(subject)
 
-    val evalType =
-      MeasureEvalType.fromCode(reportType)
-        .orElse(
-          if (subjectIds.isNotEmpty()) {
-            MeasureEvalType.SUBJECT
-          } else {
-            MeasureEvalType.POPULATION
-          },
-        ) as MeasureEvalType
-
     val report =
       measureProcessor.evaluateMeasure(
-        /* measure = */ measure,
-        /* periodStart = */ start,
-        /* periodEnd = */ end,
-        /* reportType = */ reportType,
-        /* subjectIds = */ subjectIds,
-        /* additionalData = */ additionalData,
-        /* parameters = */ parameters,
-        /* evalType = */ evalType,
+        /*measure =*/ measure,
+        /*periodStart =*/ start,
+        /*periodEnd=*/ end,
+        /*reportType=*/ reportType,
+        /*subjectIds=*/ subjectIds,
+        /*additionalData=*/ additionalData,
+        /*parameters=*/ parameters,
       )
 
     // add subject reference for non-individual reportTypes
