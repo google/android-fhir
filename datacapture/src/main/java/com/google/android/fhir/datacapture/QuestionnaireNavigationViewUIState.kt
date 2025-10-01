@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,11 @@ import androidx.annotation.StringRes
 sealed interface QuestionnaireNavigationViewUIState {
   data object Hidden : QuestionnaireNavigationViewUIState
 
-  data class Enabled(val labelText: String? = null, @StringRes val labelStringRes: Int? = null, val onClickAction: () -> Unit = {}) :
-    QuestionnaireNavigationViewUIState
+  data class Enabled(
+    val labelText: String? = null,
+    @StringRes val labelStringRes: Int? = null,
+    val onClickAction: () -> Unit = {},
+  ) : QuestionnaireNavigationViewUIState
 }
 
 data class QuestionnaireNavigationUIState(

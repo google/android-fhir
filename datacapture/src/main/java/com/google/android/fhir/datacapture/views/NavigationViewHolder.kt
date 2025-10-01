@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,9 @@ class NavigationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       is QuestionnaireNavigationViewUIState.Enabled -> {
         visibility = View.VISIBLE
         isEnabled = true
-        text = navigationViewState.labelText ?: navigationViewState.labelStringRes?.let { context.getString(it) }
+        text =
+          navigationViewState.labelText
+            ?: navigationViewState.labelStringRes?.let { context.getString(it) }
         setOnClickListener { navigationViewState.onClickAction() }
       }
       QuestionnaireNavigationViewUIState.Hidden -> {

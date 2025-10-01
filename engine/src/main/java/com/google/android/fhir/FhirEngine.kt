@@ -66,6 +66,7 @@ interface FhirEngine {
    * [create], the resource created in `FhirEngine` will have the same `id`. If no `id` is
    * specified, `FhirEngine` will generate a UUID as that resource's `id` and include it in the
    * returned list of IDs.
+   *
    * @param resource The FHIR resources to create.
    * @param isLocalOnly - Setting the value to [true] instructs engine that the resource and its
    *   subsequent updates should never be synced to the server.
