@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
 import androidx.core.os.bundleOf
@@ -321,7 +322,7 @@ class QuestionnaireFragment : Fragment() {
           .collect { (visibleCount, total) -> onUpdateProgressIndicator(visibleCount, total) }
       }
     }
-    LazyColumn(state = listState) {
+    LazyColumn(state = listState, modifier = Modifier.testTag(QUESTIONNAIRE_EDIT_LIST)) {
       items(
         questionerStateFlow.value.items,
         key = { item ->
@@ -647,6 +648,9 @@ class QuestionnaireFragment : Fragment() {
      * true.
      */
     internal const val EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON = "show-submit-anyway-button"
+
+    /** Test tag for QuestionnaireEditList */
+    const val QUESTIONNAIRE_EDIT_LIST = "questionnaire_edit_list"
 
     fun builder() = Builder()
   }
