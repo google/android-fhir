@@ -169,10 +169,6 @@ internal object DatePickerViewHolderFactory :
         val min = (questionnaireViewItem.minAnswerValue as? DateType)?.value?.time
         val max = (questionnaireViewItem.maxAnswerValue as? DateType)?.value?.time
 
-        if (min != null && max != null && min > max) {
-          throw IllegalArgumentException("minValue cannot be greater than maxValue")
-        }
-
         val listValidators = ArrayList<DateValidator>()
         min?.let { listValidators.add(DateValidatorPointForward.from(it)) }
         max?.let { listValidators.add(DateValidatorPointBackward.before(it)) }

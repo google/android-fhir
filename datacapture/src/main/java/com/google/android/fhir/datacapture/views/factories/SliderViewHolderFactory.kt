@@ -59,9 +59,6 @@ internal object SliderViewHolderFactory :
         val answer = questionnaireViewItem.answers.singleOrNull()
         val minValue = getMinValue(questionnaireViewItem.minAnswerValue)
         val maxValue = getMaxValue(questionnaireViewItem.maxAnswerValue)
-        if (minValue >= maxValue) {
-          throw IllegalStateException("minValue $minValue must be smaller than maxValue $maxValue")
-        }
 
         with(slider) {
           clearOnChangeListeners()
