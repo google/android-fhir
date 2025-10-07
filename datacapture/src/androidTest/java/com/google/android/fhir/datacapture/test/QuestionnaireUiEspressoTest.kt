@@ -162,7 +162,7 @@ class QuestionnaireUiEspressoTest {
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
         .isEqualTo(1)
 
-      onView(withId(com.google.android.fhir.datacapture.R.id.text_input_edit_text)).check { view, _
+      onView(withId(com.google.android.fhir.datacapture.R.id.text_input_edit_text)).check { view, _,
         ->
         assertThat((view as TextInputEditText).text.toString()).isEqualTo("001")
       }
@@ -187,7 +187,7 @@ class QuestionnaireUiEspressoTest {
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
         .isEqualTo(BigDecimal.valueOf(0.01))
 
-      onView(withId(com.google.android.fhir.datacapture.R.id.text_input_edit_text)).check { view, _
+      onView(withId(com.google.android.fhir.datacapture.R.id.text_input_edit_text)).check { view, _,
         ->
         assertThat((view as TextInputEditText).text.toString()).isEqualTo("0.01")
       }
