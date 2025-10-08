@@ -378,7 +378,7 @@ val QuestionnaireItemComponent.hasHelpButton: Boolean
 
 /** Converts Text with HTML Tag to formatted text. */
 internal fun String.toSpanned(): Spanned {
-  return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
+  return HtmlCompat.fromHtml(this.replace("\n", "<br>"), HtmlCompat.FROM_HTML_MODE_COMPACT)
 }
 
 internal fun Spanned.takeIfNotBlank(): Spanned? = takeIf { it.isNotBlank() }
