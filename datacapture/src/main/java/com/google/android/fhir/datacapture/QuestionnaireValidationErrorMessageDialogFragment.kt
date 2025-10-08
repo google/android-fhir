@@ -33,7 +33,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.takeIfNotBlank
 import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -139,7 +141,11 @@ internal class QuestionnaireValidationErrorViewModel : ViewModel() {
       ?.flattened()
       ?.filter { invalidFields.contains(it.linkId) }
       ?.mapNotNull {
-        if (it.text.isNullOrEmpty()) it.localizedFlyoverSpanned else it.localizedTextSpanned
+        // Use the question text if available, otherwise fall back to the fly-over and then the
+        // prefix.
+        it.localizedTextSpanned?.takeIfNotBlank()
+          ?: it.localizedFlyoverSpanned?.takeIfNotBlank()
+            ?: it.localizedPrefixSpanned?.takeIfNotBlank()
       }
       ?: emptyList()
   }
