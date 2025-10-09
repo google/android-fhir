@@ -35,7 +35,6 @@ import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
-import com.google.android.fhir.datacapture.extensions.takeIfNotBlank
 import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -149,4 +148,6 @@ internal class QuestionnaireValidationErrorViewModel : ViewModel() {
       }
       ?: emptyList()
   }
+
+  private fun Spanned.takeIfNotBlank(): Spanned? = takeIf { it.isNotBlank() }
 }

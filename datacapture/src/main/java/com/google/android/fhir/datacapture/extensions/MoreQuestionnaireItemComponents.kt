@@ -381,8 +381,6 @@ internal fun String.toSpanned(): Spanned {
   return HtmlCompat.fromHtml(this.replace("\n", "<br>"), HtmlCompat.FROM_HTML_MODE_COMPACT)
 }
 
-internal fun Spanned.takeIfNotBlank(): Spanned? = takeIf { it.isNotBlank() }
-
 /**
  * Localized and spanned value of [Questionnaire.QuestionnaireItemComponent.text] if translation is
  * present. Default value otherwise.
