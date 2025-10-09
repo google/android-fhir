@@ -96,7 +96,7 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
           text =
             viewModel
               .getItemsTextWithValidationErrors()
-              .joinToString(separator = "\n") {
+              .joinToString(separator = "<br>") {
                 context.getString(R.string.questionnaire_validation_error_item_text_with_bullet, it)
               }
               .toSpanned()
