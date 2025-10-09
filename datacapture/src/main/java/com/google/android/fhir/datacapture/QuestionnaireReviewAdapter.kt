@@ -62,7 +62,7 @@ internal class QuestionnaireReviewAdapter :
     }
 
   companion object {
-    const val VIEW_TYPE_QUESTION = 10
-    const val VIEW_TYPE_NAVIGATION = 110
+    const val VIEW_TYPE_QUESTION = 1
+    const val VIEW_TYPE_NAVIGATION = 2
   }
 }
