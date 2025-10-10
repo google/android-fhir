@@ -97,7 +97,6 @@ internal fun DatePickerItem(
           } else {
             null
           }
-
         dateInputState = DateInput(it, localDate)
       }
     },
@@ -111,7 +110,7 @@ internal fun DatePickerItem(
             keyboardController?.hide()
           }
         }
-        .semantics { if (isError && !helperText.isNullOrBlank()) error(helperText) },
+        .semantics { if (isError) error(helperText ?: "") },
     supportingText = { helperText?.let { Text(it) } },
     isError = isError,
     trailingIcon = {

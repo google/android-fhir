@@ -45,10 +45,16 @@ import com.google.android.fhir.datacapture.R
 @Composable
 fun TimePickerDialog(
   type: TimeInputMode,
+  initialSelectedHour: Int = 0,
+  initialSelectedMinute: Int = 0,
   onDismiss: () -> Unit,
   onConfirm: (Int, Int) -> Unit,
 ) {
-  val timePickerState = rememberTimePickerState()
+  val timePickerState =
+    rememberTimePickerState(
+      initialHour = initialSelectedHour,
+      initialMinute = initialSelectedMinute,
+    )
   var inputType by remember(type) { mutableStateOf(type) }
 
   AlertDialog(

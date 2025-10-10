@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -73,10 +72,15 @@ object TimePickerViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
           remember(questionnaireViewItem.answers) {
             questionnaireViewItem.answers.singleOrNull()?.valueTimeType?.localTime
           }
-        var questionnaireViewItemLocalTimeAnswerDisplay by
+        val initialTimeForSelection =
           remember(questionnaireViewItemLocalTimeAnswer) {
-            mutableStateOf(questionnaireViewItemLocalTimeAnswer?.toLocalizedString(context))
+            questionnaireViewItemLocalTimeAnswer ?: LocalTime.now()
           }
+        val questionnaireViewItemLocalTimeAnswerDisplay =
+          remember(questionnaireViewItemLocalTimeAnswer) {
+            questionnaireViewItemLocalTimeAnswer?.toLocalizedString(context)
+          }
+
         val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
 
         Column(
@@ -90,14 +94,14 @@ object TimePickerViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
           questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
           TimePickerItem(
             modifier = Modifier.fillMaxWidth(),
-            selectedTime = questionnaireViewItemLocalTimeAnswerDisplay,
+            initialStartTime = initialTimeForSelection,
+            timeSelectedDisplay = questionnaireViewItemLocalTimeAnswerDisplay,
             enabled = !readOnly,
             hint = stringResource(R.string.time),
             supportingHelperText =
               if (!validationMessage.isNullOrBlank()) validationMessage else requiredOptionalText,
             isError = !validationMessage.isNullOrBlank(),
           ) {
-            questionnaireViewItemLocalTimeAnswerDisplay = it.toLocalizedString(context)
             coroutineScope.launch { setQuestionnaireItemViewItemAnswer(questionnaireViewItem, it) }
           }
         }

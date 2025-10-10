@@ -19,29 +19,31 @@ package com.google.android.fhir.datacapture.test
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import androidx.fragment.app.commitNow
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
-import androidx.test.espresso.matcher.RootMatchers
-import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -55,7 +57,6 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.localDate
 import com.google.android.fhir.datacapture.extensions.localDateTime
-import com.google.android.fhir.datacapture.test.utilities.clickIcon
 import com.google.android.fhir.datacapture.test.utilities.clickOnText
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
@@ -63,8 +64,8 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.compose.DATE_TEXT_INPUT_FIELD
 import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
 import com.google.android.fhir.datacapture.views.compose.HANDLE_INPUT_DEBOUNCE_TIME
+import com.google.android.fhir.datacapture.views.compose.TIME_PICKER_INPUT_FIELD
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -231,57 +232,70 @@ class QuestionnaireUiEspressoTest {
     buildFragmentFromQuestionnaire("/component_date_time_picker.json")
 
     // Add month and day. No need to add slashes as they are added automatically
-    onView(withId(R.id.date_input_edit_text))
-      .perform(ViewActions.click())
-      .perform(ViewActions.typeTextIntoFocusedView("0105"))
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("0105")
 
-    onView(withId(R.id.date_input_layout)).check { view, _ ->
-      val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo("Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)")
-    }
-    onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isFalse() }
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.Error,
+          "Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)",
+        ),
+      )
+    composeTestRule.onNodeWithTag(TIME_PICKER_INPUT_FIELD).assertIsNotEnabled()
   }
 
   @Test
   fun dateTimePicker_shouldEnableTimePickerWithCorrectDate_butNotSaveInQuestionnaireResponse() {
     buildFragmentFromQuestionnaire("/component_date_time_picker.json")
 
-    onView(withId(R.id.date_input_edit_text))
-      .perform(ViewActions.click())
-      .perform(ViewActions.typeTextIntoFocusedView("01052005"))
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("01052005")
 
-    onView(withId(R.id.date_input_layout)).check { view, _ ->
-      val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo(null)
-    }
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assert(
+        SemanticsMatcher.keyNotDefined(
+          SemanticsProperties.Error,
+        ),
+      )
+    composeTestRule.onNodeWithTag(TIME_PICKER_INPUT_FIELD).assertIsEnabled()
 
-    onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isTrue() }
-
-    runBlocking {
-      assertThat(getQuestionnaireResponse().item.size).isEqualTo(1)
-      assertThat(getQuestionnaireResponse().item.first().answer.size).isEqualTo(0)
-    }
+    val questionnaireResponse = runBlocking { getQuestionnaireResponse() }
+    assertThat(questionnaireResponse.item.size).isEqualTo(1)
+    assertThat(questionnaireResponse.item.first().answer.size).isEqualTo(1)
+    val answer = questionnaireResponse.item.first().answer.first().valueDateTimeType
+    assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 0, 0))
   }
 
   @Test
   fun dateTimePicker_shouldSetAnswerWhenDateAndTimeAreFilled() {
     buildFragmentFromQuestionnaire("/component_date_time_picker.json")
 
-    onView(withId(R.id.date_input_edit_text))
-      .perform(ViewActions.click())
-      .perform(ViewActions.typeTextIntoFocusedView("01052005"))
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("01052005")
 
-    onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
-    clickOnText("AM")
-    clickOnText("6")
-    clickOnText("10")
-    clickOnText("OK")
+    composeTestRule
+      .onNodeWithTag(TIME_PICKER_INPUT_FIELD)
+      .onChildren()
+      .filterToOne(
+        SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button),
+      )
+      .performClick()
 
-    runBlocking {
-      val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
-      // check Locale
-      assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
-    }
+    composeTestRule.onNodeWithText("AM").performClick()
+    composeTestRule.onNodeWithContentDescription("Select hour", substring = true).performClick()
+    composeTestRule.onNodeWithContentDescription("6 o'clock", substring = true).performClick()
+
+    composeTestRule.onNodeWithContentDescription("Select minutes", substring = true).performClick()
+    composeTestRule.onNodeWithContentDescription("10 minutes", substring = true).performClick()
+
+    composeTestRule.onNodeWithText("OK").performClick()
+    // Synchronize
+    composeTestRule.waitForIdle()
+
+    val questionnaireResponse = runBlocking { getQuestionnaireResponse() }
+    val answer = questionnaireResponse.item.first().answer.first().valueDateTimeType
+    // check Locale
+    assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
   }
 
   @Test
@@ -649,8 +663,7 @@ class QuestionnaireUiEspressoTest {
   @Test
   fun test_repeated_group_is_added() {
     buildFragmentFromQuestionnaire("/component_repeated_group.json")
-    onView(withId(R.id.add_item_to_repeated_group))
-      .perform(ViewActions.click())
+    onView(withId(R.id.add_item_to_repeated_group)).perform(ViewActions.click())
 
     composeTestRule
       .onNodeWithTag(QuestionnaireFragment.QUESTIONNAIRE_EDIT_LIST)
@@ -660,8 +673,7 @@ class QuestionnaireUiEspressoTest {
     onView(withId(R.id.repeated_group_instance_header_title))
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
-    onView(withText(R.string.delete))
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+    onView(withText(R.string.delete)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
   }
 
   @Test
@@ -695,11 +707,9 @@ class QuestionnaireUiEspressoTest {
     onView(withId(R.id.repeated_group_instance_header_title))
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
-    onView(withText(R.string.delete))
-      .perform(ViewActions.click())
+    onView(withText(R.string.delete)).perform(ViewActions.click())
 
-    onView(withText(R.id.repeated_group_instance_header_title))
-      .check(doesNotExist())
+    onView(withText(R.id.repeated_group_instance_header_title)).check(doesNotExist())
   }
 
   private fun buildFragmentFromQuestionnaire(

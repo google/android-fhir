@@ -28,6 +28,7 @@ import java.time.ZoneId
 import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
+import java.time.format.DateTimeParseException
 import java.time.format.FormatStyle
 import java.util.Date
 import java.util.Locale
@@ -108,6 +109,16 @@ internal fun parseDate(text: String, datePattern: String): LocalDate {
     throw ParseException("Year has more than 4 digits.", text.indexOf('y'))
   }
   return localDate
+}
+
+internal fun parseLocalDateOrNull(dateToDisplay: String, pattern: String): LocalDate? {
+  return try {
+    parseDate(dateToDisplay, pattern)
+  } catch (_: ParseException) {
+    null
+  } catch (_: DateTimeParseException) {
+    null
+  }
 }
 
 /**

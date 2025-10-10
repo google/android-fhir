@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
@@ -44,26 +45,30 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.toLocalizedString
 import java.time.LocalTime
 
 @Composable
 internal fun TimePickerItem(
   modifier: Modifier = Modifier,
-  selectedTime: String?,
+  timeSelectedDisplay: String?,
+  initialStartTime: LocalTime,
   enabled: Boolean,
   hint: String,
   supportingHelperText: String?,
   isError: Boolean,
   onTimeChanged: (LocalTime) -> Unit,
 ) {
+  val context = LocalContext.current
   val focusManager = LocalFocusManager.current
   val keyboardController = LocalSoftwareKeyboardController.current
-  var selectedTimeText by remember(selectedTime) { mutableStateOf(selectedTime ?: "") }
+  var selectedTimeTextDisplay by
+    remember(timeSelectedDisplay) { mutableStateOf(timeSelectedDisplay ?: "") }
   var showTimePickerModal by remember { mutableStateOf(false) }
   var timePickerDialogType by remember { mutableStateOf<TimeInputMode>(TimeInputMode.CLOCK) }
 
   OutlinedTextField(
-    value = selectedTimeText,
+    value = selectedTimeTextDisplay,
     onValueChange = {},
     singleLine = true,
     label = { Text(hint) },
@@ -75,9 +80,7 @@ internal fun TimePickerItem(
             keyboardController?.hide()
           }
         }
-        .semantics {
-          if (isError && !supportingHelperText.isNullOrBlank()) error(supportingHelperText)
-        },
+        .semantics { if (isError) error(supportingHelperText ?: "") },
     supportingText = { supportingHelperText?.let { Text(it) } },
     isError = isError,
     trailingIcon = {
@@ -121,11 +124,15 @@ internal fun TimePickerItem(
   )
 
   if (showTimePickerModal) {
-    TimePickerDialog(type = timePickerDialogType, onDismiss = { showTimePickerModal = false }) {
-      hour,
-      min,
+    TimePickerDialog(
+      type = timePickerDialogType,
+      initialSelectedHour = initialStartTime.hour,
+      initialSelectedMinute = initialStartTime.minute,
+      onDismiss = { showTimePickerModal = false },
+    ) { hour, min,
       ->
       val localTime = LocalTime.of(hour, min)
+      selectedTimeTextDisplay = localTime.toLocalizedString(context)
       onTimeChanged(localTime)
     }
   }
@@ -134,7 +141,16 @@ internal fun TimePickerItem(
 @Composable
 @Preview
 fun PreviewTimePickerItem() {
-  TimePickerItem(Modifier, null, true, stringResource(R.string.time), null, false) {}
+  val context = LocalContext.current
+  TimePickerItem(
+    Modifier,
+    null,
+    LocalTime.now(),
+    true,
+    stringResource(R.string.time),
+    null,
+    false,
+  ) {}
 }
 
 const val TIME_PICKER_INPUT_FIELD = "time_picker_text_field"
