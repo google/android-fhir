@@ -38,7 +38,7 @@ import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.extensions.localDate
-import com.google.android.fhir.datacapture.extensions.parseDate
+import com.google.android.fhir.datacapture.extensions.parseLocalDateOrNull
 import com.google.android.fhir.datacapture.extensions.toLocalDate
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -48,10 +48,8 @@ import com.google.android.fhir.datacapture.views.compose.DatePickerItem
 import com.google.android.fhir.datacapture.views.compose.Header
 import com.google.android.fhir.datacapture.views.compose.MediaItem
 import com.google.android.material.datepicker.MaterialDatePicker
-import java.text.ParseException
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.format.DateTimeParseException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.DateType
@@ -158,7 +156,7 @@ internal object DatePickerViewHolderFactory : QuestionnaireItemComposeViewHolder
                 ?: getRequiredOrOptionalText(questionnaireViewItem, context),
             isError = !validationMessage.isNullOrBlank(),
             enabled = !(questionnaireViewItem.questionnaireItem.readOnly || prohibitInput),
-            parseStringToLocalDate = { str, pattern -> getLocalDate(str, pattern) },
+            parseStringToLocalDate = { str, pattern -> parseLocalDateOrNull(str, pattern) },
             onDateInputEntry = {
               val (display, date) = it
               if (date != null) {
@@ -212,21 +210,11 @@ internal object DatePickerViewHolderFactory : QuestionnaireItemComposeViewHolder
         dateToDisplay: String,
         pattern: String,
       ) {
-        val localDate = getLocalDate(dateToDisplay, pattern)
+        val localDate = parseLocalDateOrNull(dateToDisplay, pattern)
         if (localDate != null) {
           setQuestionnaireItemViewItemAnswer(questionnaireViewItem, localDate)
         } else {
           questionnaireViewItem.setDraftAnswer(dateToDisplay)
-        }
-      }
-
-      private fun getLocalDate(dateToDisplay: String, pattern: String): LocalDate? {
-        return try {
-          parseDate(dateToDisplay, pattern)
-        } catch (_: ParseException) {
-          null
-        } catch (_: DateTimeParseException) {
-          null
         }
       }
     }

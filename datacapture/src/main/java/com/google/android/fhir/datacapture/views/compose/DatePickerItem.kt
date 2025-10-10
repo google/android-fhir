@@ -97,7 +97,6 @@ internal fun DatePickerItem(
           } else {
             null
           }
-
         dateInputState = DateInput(it, localDate)
       }
     },
