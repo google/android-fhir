@@ -862,10 +862,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private suspend fun getQuestionnaireAdapterItems(
     questionnaireItemList: List<QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
+    parentIdPrefix: String = "",
   ): List<QuestionnaireAdapterItem> {
     return questionnaireItemList
       .zipByLinkId(questionnaireResponseItemList) { questionnaireItem, questionnaireResponseItem ->
-        getQuestionnaireAdapterItems(questionnaireItem, questionnaireResponseItem)
+        getQuestionnaireAdapterItems(questionnaireItem, questionnaireResponseItem, parentIdPrefix)
       }
       .flatten()
   }
@@ -877,6 +878,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private suspend fun getQuestionnaireAdapterItems(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent,
+    parentIdPrefix: String = "",
   ): List<QuestionnaireAdapterItem> {
     // Hidden questions should not get QuestionnaireItemViewItem instances
     if (questionnaireItem.isHidden) return emptyList()
@@ -937,49 +939,54 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
       val question =
         QuestionnaireAdapterItem.Question(
-          QuestionnaireViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            validationResult = validationResult,
-            answersChangedCallback = answersChangedCallback,
-            enabledAnswerOptions = enabledQuestionnaireAnswerOptions,
-            minAnswerValue =
-              questionnaireItem.minValueCqfCalculatedValueExpression?.let {
-                expressionEvaluator.evaluateExpressionValue(
-                  questionnaireItem,
-                  questionnaireResponseItem,
-                  it,
-                )
-              }
-                ?: questionnaireItem.minValue,
-            maxAnswerValue =
-              questionnaireItem.maxValueCqfCalculatedValueExpression?.let {
-                expressionEvaluator.evaluateExpressionValue(
-                  questionnaireItem,
-                  questionnaireResponseItem,
-                  it,
-                )
-              }
-                ?: questionnaireItem.maxValue,
-            draftAnswer = draftAnswerMap[questionnaireResponseItem],
-            enabledDisplayItems =
-              questionnaireItem.item.filter {
-                it.isDisplayItem &&
-                  enablementEvaluator.evaluate(
-                    it,
+            QuestionnaireViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = validationResult,
+              answersChangedCallback = answersChangedCallback,
+              enabledAnswerOptions = enabledQuestionnaireAnswerOptions,
+              minAnswerValue =
+                questionnaireItem.minValueCqfCalculatedValueExpression?.let {
+                  expressionEvaluator.evaluateExpressionValue(
+                    questionnaireItem,
                     questionnaireResponseItem,
+                    it,
                   )
-              },
-            questionViewTextConfiguration =
-              QuestionTextConfiguration(
-                showAsterisk = showAsterisk,
-                showRequiredText = showRequiredText,
-                showOptionalText = showOptionalText,
-              ),
-            isHelpCardOpen = isHelpCard && isHelpCardOpen,
-            helpCardStateChangedCallback = helpCardStateChangedCallback,
-          ),
-        )
+                }
+                  ?: questionnaireItem.minValue,
+              maxAnswerValue =
+                questionnaireItem.maxValueCqfCalculatedValueExpression?.let {
+                  expressionEvaluator.evaluateExpressionValue(
+                    questionnaireItem,
+                    questionnaireResponseItem,
+                    it,
+                  )
+                }
+                  ?: questionnaireItem.maxValue,
+              draftAnswer = draftAnswerMap[questionnaireResponseItem],
+              enabledDisplayItems =
+                questionnaireItem.item.filter {
+                  it.isDisplayItem &&
+                    enablementEvaluator.evaluate(
+                      it,
+                      questionnaireResponseItem,
+                    )
+                },
+              questionViewTextConfiguration =
+                QuestionTextConfiguration(
+                  showAsterisk = showAsterisk,
+                  showRequiredText = showRequiredText,
+                  showOptionalText = showOptionalText,
+                ),
+              isHelpCardOpen = isHelpCard && isHelpCardOpen,
+              helpCardStateChangedCallback = helpCardStateChangedCallback,
+            ),
+          )
+          .apply {
+            if (parentIdPrefix.isNotEmpty()) {
+              id = "${parentIdPrefix}${questionnaireItem.linkId}"
+            }
+          }
       add(question)
 
       // Add nested questions after the parent item. We need to get the questionnaire items and
@@ -995,20 +1002,41 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       // view model, we create dummy answers for each repeated group. As a result the processing of
       // this case is similar to the case of questions nested under a question.
       // For background, see https://build.fhir.org/questionnaireresponse.html#link.
-      buildList {
-          // Case 1
-          if (!questionnaireItem.isRepeatedGroup) {
-            add(questionnaireResponseItem.item)
-          }
-          // Case 2 and 3
-          addAll(questionnaireResponseItem.answer.map { it.item })
-        }
+
+      // Case 1: Non-repeated group - process nested items directly with current prefix
+      if (!questionnaireItem.isRepeatedGroup && questionnaireResponseItem.item.isNotEmpty()) {
+        addAll(
+          getQuestionnaireAdapterItems(
+            questionnaireItemList = questionnaireItem.item.filterNot { it.isDisplayItem },
+            questionnaireResponseItemList = questionnaireResponseItem.item,
+            parentIdPrefix = parentIdPrefix,
+          ),
+        )
+      }
+
+      // Case 2 and 3: Questions nested under answers (for questions with nested items or repeated
+      // groups)
+      questionnaireResponseItem.answer
+        .map { it.item }
         .forEachIndexed { index, nestedResponseItemList ->
+          val currentIdPrefix =
+            if (!questionnaireItem.isRepeatedGroup) {
+              // Case 2: Questions nested under a question (not a repeated group)
+              if (parentIdPrefix.isEmpty()) {
+                "${index}_${question.item.questionnaireItem.linkId}_"
+              } else {
+                "${parentIdPrefix}${index}_${question.item.questionnaireItem.linkId}_"
+              }
+            } else {
+              // Case 3: Build hierarchical ID prefix for nested repeated groups
+              "${parentIdPrefix}${index}_${question.item.questionnaireItem.linkId}_"
+            }
+
           if (questionnaireItem.isRepeatedGroup) {
             // Case 3
             add(
               QuestionnaireAdapterItem.RepeatedGroupHeader(
-                id = "${index}_${question.item.questionnaireItem.linkId}",
+                id = "${parentIdPrefix}${index}_${question.item.questionnaireItem.linkId}",
                 index = index,
                 onDeleteClicked = { viewModelScope.launch { question.item.removeAnswerAt(index) } },
                 responses = nestedResponseItemList,
@@ -1018,21 +1046,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
           addAll(
             getQuestionnaireAdapterItems(
-                // If nested display item is identified as instructions or flyover, then do not
-                // create
-                // questionnaire state for it.
-                questionnaireItemList = questionnaireItem.item.filterNot { it.isDisplayItem },
-                questionnaireResponseItemList = nestedResponseItemList,
-              )
-              .onEach {
-                // Reset the question id to avoid duplicate keys in LazyColumn composable. The new
-                // id is derived from the the repeated group index, the parent question
-                // questionnaire item linkId and the linkId of the nested questions
-                if (it is QuestionnaireAdapterItem.Question) {
-                  it.id =
-                    "${index}_${question.item.questionnaireItem.linkId}_${it.item.questionnaireItem.linkId}"
-                }
-              },
+              // If nested display item is identified as instructions or flyover, then do not
+              // create questionnaire state for it.
+              questionnaireItemList = questionnaireItem.item.filterNot { it.isDisplayItem },
+              questionnaireResponseItemList = nestedResponseItemList,
+              parentIdPrefix = currentIdPrefix,
+            ),
           )
         }
     }
