@@ -343,6 +343,8 @@ class QuestionnaireFragment : Fragment() {
               // across recompositions, each created view is tagged with its viewHolder.
               // On recomposition, the views are not recreated—instead, their content is
               // refreshed by calling viewHolder#bind.
+              // TODO view holder tagging will not be necessary once the views are fully migrated
+              // compose refer to issue https://github.com/google/android-fhir/issues/2894
               when (adapterItem) {
                 is QuestionnaireAdapterItem.Question -> {
                   val viewHolder =
