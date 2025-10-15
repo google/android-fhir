@@ -2063,6 +2063,199 @@ class ResourceMapperTest {
       .isEqualTo(patientId)
   }
 
+  @Test
+  fun `populate() should tolerate empty expression results for questions with nested items`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "patient", "Patient")),
+                  Extension("type", CodeType("Patient")),
+                )
+            }
+          }
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "patient-contact"
+              type = Questionnaire.QuestionnaireItemType.STRING
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "%patient.contact.given"
+                    },
+                  ),
+                )
+              item =
+                listOf(
+                  Questionnaire.QuestionnaireItemComponent().apply {
+                    linkId = "patient-contact-type"
+                    type = Questionnaire.QuestionnaireItemType.STRING
+                  },
+                )
+            },
+          )
+
+      val questionnaireResponse =
+        ResourceMapper.populate(questionnaire, mapOf("patient" to Patient()))
+
+      val responseItem = questionnaireResponse.item.single()
+      assertThat(responseItem.answer?.isEmpty() ?: true).isTrue()
+    }
+
+  @Test
+  fun `populate() should populate questions nested under non-repeated groups`() = runBlocking {
+    val questionnaire =
+      Questionnaire()
+        .apply {
+          addExtension().apply {
+            url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+            extension =
+              listOf(
+                Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "patient", "Patient")),
+                Extension("type", CodeType("Patient")),
+              )
+          }
+        }
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "demographics"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "patient-name"
+                  type = Questionnaire.QuestionnaireItemType.STRING
+                  extension =
+                    listOf(
+                      Extension(
+                        ITEM_INITIAL_EXPRESSION_URL,
+                        Expression().apply {
+                          language = "text/fhirpath"
+                          expression = "%patient.name.given.first()"
+                        },
+                      ),
+                    )
+                },
+              )
+          },
+        )
+
+    val patient =
+      Patient().apply {
+        name =
+          listOf(
+            HumanName().apply {
+              family = "User"
+              addGiven("Test")
+            },
+          )
+      }
+
+    val questionnaireResponse = ResourceMapper.populate(questionnaire, mapOf("patient" to patient))
+
+    val groupResponse = questionnaireResponse.item.single()
+    val nameResponse = groupResponse.item.single()
+
+    assertThat((nameResponse.answer.single().value as StringType).value).isEqualTo("Test")
+  }
+
+  @Test
+  fun `populate() should populate nested items for each repeating answer`() = runBlocking {
+    val questionnaire =
+      Questionnaire()
+        .apply {
+          addExtension().apply {
+            url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+            extension =
+              listOf(
+                Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "patient", "Patient")),
+                Extension("type", CodeType("Patient")),
+              )
+          }
+        }
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "favorite-colors"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            repeats = true
+            answerOption =
+              listOf(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                  Coding().apply {
+                    system = "http://example.org/colors"
+                    code = "red"
+                    display = "Red"
+                  },
+                ),
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                  Coding().apply {
+                    system = "http://example.org/colors"
+                    code = "blue"
+                    display = "Blue"
+                  },
+                ),
+              )
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "%patient.extension('http://example.org/favorite-color').value"
+                  },
+                ),
+              )
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "color-source"
+                  type = Questionnaire.QuestionnaireItemType.STRING
+                  extension =
+                    listOf(
+                      Extension(
+                        ITEM_INITIAL_EXPRESSION_URL,
+                        Expression().apply {
+                          language = "text/fhirpath"
+                          expression = "%patient.id"
+                        },
+                      ),
+                    )
+                },
+              )
+          },
+        )
+
+    val patient =
+      Patient().apply {
+        id = "patient-1"
+        addExtension(
+          "http://example.org/favorite-color",
+          Coding("http://example.org/colors", "red", "Red"),
+        )
+        addExtension(
+          "http://example.org/favorite-color",
+          Coding("http://example.org/colors", "blue", "Blue"),
+        )
+      }
+
+    val questionnaireResponse = ResourceMapper.populate(questionnaire, mapOf("patient" to patient))
+
+    val answerComponents = questionnaireResponse.item.single().answer
+
+    assertThat(answerComponents.map { (it.value as Coding).code }).containsExactly("red", "blue")
+    answerComponents.forEach { answerComponent ->
+      val nestedResponse = answerComponent.item.single()
+      assertThat((nestedResponse.answer.single().value as StringType).value).isEqualTo("patient-1")
+    }
+  }
+
   private fun createPatientResource(): Patient {
     return Patient().apply {
       active = true
@@ -3177,13 +3370,6 @@ class ResourceMapperTest {
         mapOf("observation" to observationWithCoding(observationCoding)),
       )
 
-    val question = questionnaire.item.single()
-    val selectedOption =
-      question.answerOption.first { (it.value as Coding).code == matchingAnswerOption.code }
-
-    assertThat(selectedOption.initialSelected).isTrue()
-    assertThat(question.answerOption.count { it.initialSelected }).isEqualTo(1)
-
     val responseItem = questionnaireResponse.item.single()
     assertThat(responseItem.hasAnswer()).isTrue()
     val answerCoding = responseItem.answer.single().value as Coding
@@ -3191,6 +3377,52 @@ class ResourceMapperTest {
     assertThat(answerCoding.system).isEqualTo(matchingAnswerOption.system)
     assertThat(answerCoding.version).isEqualTo(matchingAnswerOption.version)
     assertThat(answerCoding.display).isEqualTo(matchingAnswerOption.display)
+  }
+
+  @Test
+  fun `populate() should not mutate questionnaire when populating answers`() = runBlocking {
+    val questionnaire =
+      Questionnaire()
+        .apply {
+          addExtension().apply {
+            url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+            extension =
+              listOf(
+                Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "patient", "Patient")),
+                Extension("type", CodeType("Patient")),
+              )
+          }
+        }
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-first-name"
+            type = Questionnaire.QuestionnaireItemType.STRING
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "%patient.name.first().given.first()"
+                  },
+                ),
+              )
+          },
+        )
+
+    val patient =
+      Patient().apply {
+        name = listOf(HumanName().apply { given = mutableListOf(StringType("Jing")) })
+      }
+
+    val questionnaireResponse = ResourceMapper.populate(questionnaire, mapOf("patient" to patient))
+
+    val question = questionnaire.item.single()
+    assertThat(question.initial).isEmpty()
+    assertThat(question.answerOption.none { it.initialSelected }).isTrue()
+
+    val answer = questionnaireResponse.item.single().answer.single().value as StringType
+    assertThat(answer.value).isEqualTo("Jing")
   }
 
   @Test
@@ -3268,8 +3500,6 @@ class ResourceMapperTest {
         ),
       )
 
-    val question = questionnaire.item.single()
-    assertThat(question.answerOption.none { it.initialSelected }).isTrue()
     assertThat(questionnaireResponse.item.single().hasAnswer()).isFalse()
   }
 
