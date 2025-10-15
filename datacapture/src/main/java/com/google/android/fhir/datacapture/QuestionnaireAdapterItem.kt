@@ -22,7 +22,8 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 /** Various types of rows that can be used in a Questionnaire RecyclerView. */
 internal sealed interface QuestionnaireAdapterItem {
   /** A row for a question in a Questionnaire RecyclerView. */
-  data class Question(val item: QuestionnaireViewItem) : QuestionnaireAdapterItem {
+  data class Question(val item: QuestionnaireViewItem) :
+    QuestionnaireAdapterItem, ReviewAdapterItem {
     var id: String? = item.questionnaireItem.linkId
   }
 
@@ -38,6 +39,12 @@ internal sealed interface QuestionnaireAdapterItem {
     val title: String,
   ) : QuestionnaireAdapterItem
 
+  data class RepeatedGroupAddButton(
+    val item: QuestionnaireViewItem,
+  ) : QuestionnaireAdapterItem
+
   data class Navigation(val questionnaireNavigationUIState: QuestionnaireNavigationUIState) :
-    QuestionnaireAdapterItem
+    QuestionnaireAdapterItem, ReviewAdapterItem
 }
+
+internal sealed interface ReviewAdapterItem
