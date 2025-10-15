@@ -17,10 +17,8 @@
 package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
-import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -29,8 +27,6 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.GroupHeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import kotlinx.coroutines.launch
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object GroupViewHolderFactory :
   QuestionnaireItemAndroidViewHolderFactory(R.layout.group_header_view) {
@@ -39,33 +35,16 @@ internal object GroupViewHolderFactory :
       private lateinit var context: AppCompatActivity
       private lateinit var header: GroupHeaderView
       private lateinit var error: TextView
-      private lateinit var addItemButton: Button
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
       override fun init(itemView: View) {
         context = itemView.context.tryUnwrapContext()!!
         header = itemView.findViewById(R.id.header)
         error = itemView.findViewById(R.id.error)
-        addItemButton = itemView.findViewById(R.id.add_item)
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         header.bind(questionnaireViewItem)
-        addItemButton.text =
-          context.getString(
-            R.string.add_repeated_group_item,
-            questionnaireViewItem.questionText ?: "",
-          )
-        addItemButton.visibility =
-          if (questionnaireViewItem.questionnaireItem.repeats) View.VISIBLE else View.GONE
-        addItemButton.setOnClickListener {
-          context.lifecycleScope.launch {
-            questionnaireViewItem.addAnswer(
-              // Nested items will be added in answerChangedCallback in the QuestionnaireViewModel
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
-            )
-          }
-        }
         displayValidationResult(questionnaireViewItem.validationResult)
       }
 
@@ -81,7 +60,7 @@ internal object GroupViewHolderFactory :
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
-        addItemButton.isEnabled = !isReadOnly
+        // No-op
       }
     }
 }

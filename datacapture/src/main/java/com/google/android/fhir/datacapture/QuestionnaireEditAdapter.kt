@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.RepeatedGroupAddItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewHolderFactory
@@ -78,6 +79,11 @@ internal class QuestionnaireEditAdapter(
           NavigationViewHolder(
             parent.inflate(R.layout.pagination_navigation_view),
           ),
+        )
+      }
+      ViewType.Type.REPEATED_GROUP_ADD_BUTTON -> {
+        ViewHolder.RepeatedGroupAddButtonViewHolder(
+          RepeatedGroupAddItemViewHolder.create(parent),
         )
       }
     }
@@ -138,6 +144,10 @@ internal class QuestionnaireEditAdapter(
         holder as ViewHolder.NavigationHolder
         holder.viewHolder.bind(item.questionnaireNavigationUIState)
       }
+      is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+        holder as ViewHolder.RepeatedGroupAddButtonViewHolder
+        holder.viewHolder.bind(item.item)
+      }
     }
   }
 
@@ -162,6 +172,10 @@ internal class QuestionnaireEditAdapter(
       is QuestionnaireAdapterItem.Navigation -> {
         type = ViewType.Type.NAVIGATION
         subtype = 0xFFFFFF
+      }
+      is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+        type = ViewType.Type.REPEATED_GROUP_ADD_BUTTON
+        subtype = 0
       }
     }
     return ViewType.from(type = type, subtype = subtype).viewType
@@ -194,6 +208,7 @@ internal class QuestionnaireEditAdapter(
     enum class Type {
       QUESTION,
       REPEATED_GROUP_HEADER,
+      REPEATED_GROUP_ADD_BUTTON,
       NAVIGATION,
     }
   }
@@ -296,6 +311,9 @@ internal class QuestionnaireEditAdapter(
       ViewHolder(viewHolder.itemView)
 
     class NavigationHolder(val viewHolder: NavigationViewHolder) : ViewHolder(viewHolder.itemView)
+
+    class RepeatedGroupAddButtonViewHolder(val viewHolder: RepeatedGroupAddItemViewHolder) :
+      ViewHolder(viewHolder.itemView)
   }
 
   internal companion object {
@@ -324,6 +342,10 @@ internal object DiffCallbacks {
               oldItem.index == newItem.index
           }
           is QuestionnaireAdapterItem.Navigation -> newItem is QuestionnaireAdapterItem.Navigation
+          is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+            newItem is QuestionnaireAdapterItem.RepeatedGroupAddButton &&
+              oldItem.item.hasTheSameItem(newItem.item)
+          }
         }
 
       override fun areContentsTheSame(
@@ -363,6 +385,12 @@ internal object DiffCallbacks {
             newItem is QuestionnaireAdapterItem.Navigation &&
               oldItem.questionnaireNavigationUIState == newItem.questionnaireNavigationUIState
           }
+          is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+            newItem is QuestionnaireAdapterItem.RepeatedGroupAddButton &&
+              oldItem.item.hasTheSameItem(newItem.item) &&
+              oldItem.item.hasTheSameResponse(newItem.item) &&
+              oldItem.item.hasTheSameValidationResult(newItem.item)
+          }
         }
     }
 
@@ -389,5 +417,26 @@ internal object DiffCallbacks {
           oldItem.item.hasTheSameResponse(newItem.item) &&
           oldItem.item.hasTheSameValidationResult(newItem.item)
       }
+    }
+
+  val REVIEW_ITEMS =
+    object : DiffUtil.ItemCallback<ReviewAdapterItem>() {
+      override fun areItemsTheSame(
+        oldItem: ReviewAdapterItem,
+        newItem: ReviewAdapterItem,
+      ): Boolean =
+        ITEMS.areItemsTheSame(
+          oldItem as QuestionnaireAdapterItem,
+          newItem as QuestionnaireAdapterItem,
+        )
+
+      override fun areContentsTheSame(
+        oldItem: ReviewAdapterItem,
+        newItem: ReviewAdapterItem,
+      ): Boolean =
+        ITEMS.areContentsTheSame(
+          oldItem as QuestionnaireAdapterItem,
+          newItem as QuestionnaireAdapterItem,
+        )
     }
 }
