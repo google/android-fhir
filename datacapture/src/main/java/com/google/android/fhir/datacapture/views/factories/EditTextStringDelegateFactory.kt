@@ -30,7 +30,7 @@ import org.hl7.fhir.r4.model.StringType
  *
  * Any `ViewHolder` containing a `EditText` view that collects text data should use this class.
  */
-internal fun EditTextStringViewHolderDelegate(multiLine: Boolean = false) =
+internal fun createEditTextStringViewHolderDelegate(multiLine: Boolean = false) =
   EditTextViewHolderDelegate(
     KeyboardOptions(
       keyboardType = KeyboardType.Text,

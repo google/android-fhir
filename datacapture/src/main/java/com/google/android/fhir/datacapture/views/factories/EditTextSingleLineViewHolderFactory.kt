@@ -17,5 +17,5 @@
 package com.google.android.fhir.datacapture.views.factories
 
 internal object EditTextSingleLineViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
-  override fun getQuestionnaireItemViewHolderDelegate() = EditTextStringViewHolderDelegate()
+  override fun getQuestionnaireItemViewHolderDelegate() = createEditTextStringViewHolderDelegate()
 }
