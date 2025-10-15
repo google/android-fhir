@@ -54,8 +54,7 @@ internal object SliderViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         this.questionnaireViewItem = questionnaireViewItem
-        header.bind(questionnaireViewItem)
-        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
+        header.bind(questionnaireViewItem, showRequiredOrOptionalText = true)
         val answer = questionnaireViewItem.answers.singleOrNull()
         val minValue = getMinValue(questionnaireViewItem.minAnswerValue)
         val maxValue = getMaxValue(questionnaireViewItem.maxAnswerValue)

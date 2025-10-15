@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import android.text.Spanned
+import androidx.compose.ui.text.AnnotatedString
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localTime
@@ -147,6 +148,10 @@ internal fun Coding.matches(other: Coding): Boolean {
 
   // All conditions met
   return true
+}
+
+internal fun StringType.localizedTextAnnotatedString(): AnnotatedString? {
+  return this.getLocalizedText()?.toAnnotatedString()
 }
 
 /** Converts Coding to CodeType. */

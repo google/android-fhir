@@ -150,6 +150,59 @@
           ]
         }
       ]
+    },
+    {
+      "linkId": "6",
+      "type": "text",
+      "item": [
+        {
+          "linkId": "6.1",
+          "text": "Enter text (multiline)",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "7",
+      "type": "string",
+      "readOnly": true,
+      "item": [
+        {
+          "linkId": "7.1",
+          "text": "Enter a string (readonly)",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }
