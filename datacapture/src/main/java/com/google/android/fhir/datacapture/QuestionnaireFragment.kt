@@ -163,7 +163,7 @@ class QuestionnaireFragment : Fragment() {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
             questionnaireReviewAdapter.submitList(
-              state.items,
+              state.items.filterIsInstance<ReviewAdapterItem>(),
             )
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
             reviewModeEditButton.visibility =
