@@ -122,6 +122,34 @@ internal fun StringType.toIdType(): IdType {
   return IdType(value)
 }
 
+/**
+ * Checks if two Coding objects match.
+ *
+ * The matching logic is progressive:
+ * 1. Always matches on the [code].
+ * 2. Matches on [system] if the both coding has a system.
+ * 3. Matches on [version] if the both coding has a version.
+ */
+internal fun Coding.matches(other: Coding): Boolean {
+  // Always match on code
+  if (this.code != other.code) {
+    return false
+  }
+
+  // If system exists in both, it must match
+  if (other.hasSystem() && this.hasSystem() && this.system != other.system) {
+    return false
+  }
+
+  // If version exists in both, it must match
+  if (other.hasVersion() && this.hasVersion() && this.version != other.version) {
+    return false
+  }
+
+  // All conditions met
+  return true
+}
+
 internal fun StringType.localizedTextAnnotatedString(): AnnotatedString? {
   return this.getLocalizedText()?.toAnnotatedString()
 }
