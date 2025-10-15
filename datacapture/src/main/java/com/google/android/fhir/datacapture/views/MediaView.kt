@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import com.google.android.fhir.datacapture.extensions.MimeType
 import com.google.android.fhir.datacapture.extensions.decodeToBitmap
 import com.google.android.fhir.datacapture.extensions.fetchBitmapFromUrl
 import com.google.android.fhir.datacapture.extensions.itemMedia
+import com.google.android.fhir.datacapture.extensions.mimeType
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -47,7 +48,7 @@ class MediaView(context: Context, attrs: AttributeSet?) : LinearLayout(context, 
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
     clearImage()
     val attachment = questionnaireItem.itemMedia ?: return
-    val attachmentMimeType = getMimeType(attachment.contentType)
+    val attachmentMimeType = attachment.mimeType
     when {
       attachment.hasData() -> {
         when (attachmentMimeType) {
@@ -99,7 +100,4 @@ class MediaView(context: Context, attrs: AttributeSet?) : LinearLayout(context, 
     Glide.with(context).clear(imageAttachment)
     imageAttachment.visibility = View.GONE
   }
-
-  /** Returns the main MIME type of a MIME type string (e.g. image/png returns image). */
-  private fun getMimeType(mimeType: String): String = mimeType.substringBefore("/")
 }
