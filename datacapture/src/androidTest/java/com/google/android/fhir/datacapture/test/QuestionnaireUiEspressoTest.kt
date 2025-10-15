@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
@@ -611,14 +612,21 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
+  fun test_add_item_button_does_not_exist_for_non_repeated_groups() {
+    buildFragmentFromQuestionnaire("/component_non_repeated_group.json")
+    onView(withId(R.id.add_item_to_repeated_group)).check(doesNotExist())
+  }
+
+  @Test
   fun test_repeated_group_is_added() {
     buildFragmentFromQuestionnaire("/component_repeated_group.json")
 
     onView(withId(R.id.questionnaire_edit_recycler_view))
       .perform(
         RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
-          0,
-          clickChildViewWithId(R.id.add_item),
+          1, // 'Add item' is in the second row of the recyclerview with group header as the first
+          // item
+          clickChildViewWithId(R.id.add_item_to_repeated_group),
         ),
       )
 
@@ -635,6 +643,75 @@ class QuestionnaireUiEspressoTest {
           ),
         )
         .isEqualTo(1)
+    }
+  }
+
+  @Test
+  fun test_repeated_group_adds_multiple_items() {
+    buildFragmentFromQuestionnaire("/component_multiple_repeated_group.json")
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          1, // The add button position is 1 (zero-indexed) after the group's header
+          clickChildViewWithId(R.id.add_item_to_repeated_group),
+        ),
+      )
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          3, // The add button new position becomes 3 (zero-indexed) after the group's header,
+          // repeated item's header and the one item added
+          clickChildViewWithId(R.id.add_item_to_repeated_group),
+        ),
+      )
+
+    onView(ViewMatchers.withId(R.id.questionnaire_edit_recycler_view)).check {
+      view,
+      noViewFoundException,
+      ->
+      if (noViewFoundException != null) {
+        throw noViewFoundException
+      }
+      assertThat(
+          (view as RecyclerView).countChildViewOccurrences(
+            R.id.repeated_group_instance_header_title,
+          ),
+        )
+        .isEqualTo(2)
+    }
+  }
+
+  @Test
+  fun test_repeated_group_adds_items_for_subsequent() {
+    buildFragmentFromQuestionnaire("/component_multiple_repeated_group.json")
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          3, // The add button for the second repeated group is at position 3 (zero-indexed), after
+          // the first group's header (0), the first group's add button (1), and the second
+          // group's header (2)
+          clickChildViewWithId(R.id.add_item_to_repeated_group),
+        ),
+      )
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          5, // The add button for the second group is now at position 5 after adding one item
+          clickChildViewWithId(R.id.add_item_to_repeated_group),
+        ),
+      )
+
+    onView(ViewMatchers.withId(R.id.questionnaire_edit_recycler_view)).check {
+      view,
+      noViewFoundException,
+      ->
+      if (noViewFoundException != null) {
+        throw noViewFoundException
+      }
+      assertThat(
+          (view as RecyclerView).countChildViewOccurrences(
+            R.id.repeated_group_instance_header_title,
+          ),
+        )
+        .isEqualTo(2)
     }
   }
 
