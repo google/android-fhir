@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,71 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.factories
+package com.google.android.fhir.datacapture.test.views
 
-import android.view.View
-import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasAnyDescendant
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasTextExactly
+import androidx.compose.ui.test.isPopup
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.text.AnnotatedString
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.toAnnotatedString
+import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.material.textfield.TextInputLayout
+import com.google.android.fhir.datacapture.views.compose.CLEAR_TEXT_ICON_BUTTON_TAG
+import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_ANSWER_MENU_ITEM_TAG
+import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_TEXT_FIELD_TAG
+import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
+import com.google.android.fhir.datacapture.views.factories.DropDownViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class DropDownViewHolderFactoryTest {
-  private val parent =
-    FrameLayout(
-      Robolectric.buildActivity(AppCompatActivity::class.java).create().get().apply {
-        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      },
-    )
-  private val viewHolder = DropDownViewHolderFactory.create(parent)
+  @get:Rule
+  val activityScenarioRule: ActivityScenarioRule<TestActivity> =
+    ActivityScenarioRule(TestActivity::class.java)
+
+  @get:Rule val composeTestRule = createEmptyComposeRule()
+
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
+
+  @Before
+  fun setUp() {
+    activityScenarioRule.scenario.onActivity { activity ->
+      viewHolder = DropDownViewHolderFactory.create(FrameLayout(activity))
+      activity.setContentView(viewHolder.itemView)
+    }
+
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+  }
 
   @Test
   fun shouldSetQuestionHeader() {
@@ -59,6 +90,9 @@ class DropDownViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
+
+    // Synchronize
+    composeTestRule.waitForIdle()
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
@@ -78,15 +112,18 @@ class DropDownViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    val selectedItem =
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).adapter.getItem(1)
-        as DropDownAnswerOption
-
-    assertThat(selectedItem.answerOptionString).isEqualTo("Test Code")
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
+    composeTestRule
+      .onNode(isPopup())
+      .assert(
+        hasAnyDescendant(
+          hasTestTag(DROP_DOWN_ANSWER_MENU_ITEM_TAG) and hasTextExactly("Test Code"),
+        ),
+      )
   }
 
   @Test
-  fun `should populate dropdown with display for reference value type`() {
+  fun shouldPopulateDropdownWithDisplayForReferenceValueType() {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
         value =
@@ -103,15 +140,18 @@ class DropDownViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    val selectedItem =
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).adapter.getItem(1)
-        as DropDownAnswerOption
-
-    assertThat(selectedItem.answerOptionString).isEqualTo("John Doe")
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
+    composeTestRule
+      .onNode(isPopup())
+      .assert(
+        hasAnyDescendant(
+          hasTestTag(DROP_DOWN_ANSWER_MENU_ITEM_TAG) and hasTextExactly("John Doe"),
+        ),
+      )
   }
 
   @Test
-  fun `should populate dropdown with type and id for reference value type if missing display`() {
+  fun shouldPopulateDropdownWithTypeAndIdForReferenceValueTypeIfMissingDisplay() {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
         value = Reference().apply { reference = "Patient/123" }
@@ -124,11 +164,14 @@ class DropDownViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    val selectedItem =
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).adapter.getItem(1)
-        as DropDownAnswerOption
-
-    assertThat(selectedItem.answerOptionString).isEqualTo("Patient/123")
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
+    composeTestRule
+      .onNode(isPopup())
+      .assert(
+        hasAnyDescendant(
+          hasTestTag(DROP_DOWN_ANSWER_MENU_ITEM_TAG) and hasTextExactly("Patient/123"),
+        ),
+      )
   }
 
   @Test
@@ -145,14 +188,18 @@ class DropDownViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    val selectedItem =
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).adapter.getItem(1)
-        as DropDownAnswerOption
-    assertThat(selectedItem.answerOptionString).isEqualTo("test-code")
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
+    composeTestRule
+      .onNode(isPopup())
+      .assert(
+        hasAnyDescendant(
+          hasTestTag(DROP_DOWN_ANSWER_MENU_ITEM_TAG) and hasTextExactly("test-code"),
+        ),
+      )
   }
 
   @Test
-  fun shouldSetAutoTextViewEmptyIfAnswerNull() {
+  fun shouldSetSelectedTextEmptyIfAnswerNull() {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
         value =
@@ -170,14 +217,18 @@ class DropDownViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).text.toString(),
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.EditableText,
+          AnnotatedString(""),
+        ),
       )
-      .isEqualTo("")
   }
 
   @Test
-  fun shouldAutoCompleteTextViewToDisplayIfAnswerNotNull() {
+  fun shouldSelectedTextToDisplayIfAnswerNotNull() {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
         value =
@@ -213,14 +264,20 @@ class DropDownViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).text.toString(),
+    val context = viewHolder.itemView.context
+    val answerOptionDisplay = answerOption.value.displayString(context)
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.EditableText,
+          answerOptionDisplay.toAnnotatedString(),
+        ),
       )
-      .isEqualTo(answerOption.value.displayString(parent.context))
   }
 
   @Test
-  fun shouldAutoCompleteTextViewToDisplayIfAnswerNotNullAndDisplayMatchesMoreThanOneOption() {
+  fun shouldSelectedTextToDisplayIfAnswerNotNullAndDisplayMatchesMoreThanOneOption() {
     val answerOption1 =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
         value =
@@ -257,10 +314,16 @@ class DropDownViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).text.toString(),
+    val context = viewHolder.itemView.context
+    val answerOption2Display = answerOption2.value.displayString(context)
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.EditableText,
+          answerOption2Display.toAnnotatedString(),
+        ),
       )
-      .isEqualTo(answerOption2.value.displayString(parent.context))
   }
 
   @Test
@@ -273,9 +336,14 @@ class DropDownViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Missing answer for required field.")
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.Error,
+          "Missing answer for required field.",
+        ),
+      )
   }
 
   @Test
@@ -300,13 +368,17 @@ class DropDownViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isNull()
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.keyNotDefined(
+          SemanticsProperties.Error,
+        ),
+      )
   }
 
   @Test
-  fun `hides error textview in the header`() {
+  fun hidesErrorTextviewInTheHeader() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -316,8 +388,7 @@ class DropDownViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
-      .isEqualTo(View.GONE)
+    composeTestRule.onNodeWithTag(ERROR_TEXT_AT_HEADER_TEST_TAG).assertDoesNotExist()
   }
 
   @Test
@@ -339,9 +410,7 @@ class DropDownViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    val clearIcon = viewHolder.itemView.findViewById<ImageView>(R.id.clear_input_icon)
-    assertThat(clearIcon.visibility).isEqualTo(View.GONE)
+    composeTestRule.onNodeWithTag(CLEAR_TEXT_ICON_BUTTON_TAG).assertDoesNotExist()
   }
 
   @Test
@@ -366,8 +435,7 @@ class DropDownViewHolderFactoryTest {
       ),
     )
 
-    val clearIcon = viewHolder.itemView.findViewById<ImageView>(R.id.clear_input_icon)
-    assertThat(clearIcon.visibility).isEqualTo(View.VISIBLE)
+    composeTestRule.onNodeWithTag(CLEAR_TEXT_ICON_BUTTON_TAG).assertIsDisplayed()
   }
 
   @Test
@@ -380,13 +448,11 @@ class DropDownViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).isEnabled)
-      .isFalse()
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).assertIsNotEnabled()
   }
 
   @Test
-  fun `shows asterisk`() {
+  fun showsAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -399,13 +465,15 @@ class DropDownViewHolderFactoryTest {
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true),
       ),
     )
+    // Synchronize
+    composeTestRule.waitForIdle()
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question? *")
   }
 
   @Test
-  fun `hide asterisk`() {
+  fun hideAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -418,13 +486,14 @@ class DropDownViewHolderFactoryTest {
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false),
       ),
     )
-
+    // Synchronize
+    composeTestRule.waitForIdle()
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
 
   @Test
-  fun `shows required text`() {
+  fun showsRequiredText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -435,17 +504,13 @@ class DropDownViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<TextInputLayout>(R.id.text_input_layout)
-          .helperText
-          .toString(),
-      )
-      .isEqualTo("Required")
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assertTextEquals("Required", includeEditableText = false)
   }
 
   @Test
-  fun `hide required text`() {
+  fun hideRequiredText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -456,12 +521,11 @@ class DropDownViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)
-      .isNull()
+    composeTestRule.onNodeWithText("Required", substring = true).assertDoesNotExist()
   }
 
   @Test
-  fun `shows optional text`() {
+  fun showsOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -472,17 +536,13 @@ class DropDownViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<TextInputLayout>(R.id.text_input_layout)
-          .helperText
-          .toString(),
-      )
-      .isEqualTo("Optional")
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assertTextEquals("Optional", includeEditableText = false)
   }
 
   @Test
-  fun `hide optional text`() {
+  fun hideOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -493,7 +553,6 @@ class DropDownViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)
-      .isNull()
+    composeTestRule.onNodeWithText("Optional", substring = true).assertDoesNotExist()
   }
 }
