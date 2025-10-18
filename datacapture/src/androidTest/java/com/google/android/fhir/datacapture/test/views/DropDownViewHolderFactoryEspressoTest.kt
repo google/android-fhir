@@ -16,20 +16,26 @@
 
 package com.google.android.fhir.datacapture.test.views
 
-import android.view.View
 import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
-import android.widget.TextView
-import androidx.test.espresso.Espresso.onData
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasTextExactly
+import androidx.compose.ui.test.isPopup
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.text.AnnotatedString
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.PerformException
-import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.RootMatchers.isPlatformPopup
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
@@ -38,13 +44,14 @@ import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.test.utilities.delayMainThread
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.factories.DropDownAnswerOption
+import com.google.android.fhir.datacapture.views.compose.CLEAR_TEXT_ICON_BUTTON_TAG
+import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_MENU_ITEM_TAG
+import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_TEXT_FIELD_LEADING_ICON_TAG
+import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_TEXT_FIELD_TAG
 import com.google.android.fhir.datacapture.views.factories.DropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.common.truth.Truth.assertThat
-import org.hamcrest.Matchers.instanceOf
-import org.hamcrest.Matchers.`is`
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
@@ -58,12 +65,12 @@ import org.junit.Rule
 import org.junit.Test
 
 class DropDownViewHolderFactoryEspressoTest {
-  @Rule
-  @JvmField
+  @get:Rule
   var activityScenarioRule: ActivityScenarioRule<TestActivity> =
     ActivityScenarioRule(TestActivity::class.java)
 
-  private lateinit var parent: FrameLayout
+  @get:Rule val composeTestRule = createEmptyComposeRule()
+
   private lateinit var viewHolder: QuestionnaireItemViewHolder
   private val itemAnswerMediaExtension =
     Extension().apply {
@@ -80,9 +87,12 @@ class DropDownViewHolderFactoryEspressoTest {
 
   @Before
   fun setup() {
-    activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
-    viewHolder = DropDownViewHolderFactory.create(parent)
-    setTestLayout(viewHolder.itemView)
+    activityScenarioRule.scenario.onActivity { activity ->
+      viewHolder = DropDownViewHolderFactory.create(FrameLayout(activity))
+      activity.setContentView(viewHolder.itemView)
+    }
+
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
   }
 
   @Test
@@ -94,15 +104,23 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    runOnUI {
-      viewHolder.bind(questionnaireViewItem)
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
-    }
 
-    onView(withId(R.id.auto_complete)).perform(delayMainThread())
-    onView(withText("-")).inRoot(isPlatformPopup()).check(matches(isDisplayed())).perform(click())
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
-      .isEqualTo("-")
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
+    composeTestRule
+      .onNode(
+        hasTestTag(DROP_DOWN_MENU_ITEM_TAG) and hasTextExactly("-") and hasAnyAncestor(isPopup()),
+      )
+      .assertIsDisplayed()
+      .performClick()
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.EditableText,
+          AnnotatedString("-"),
+        ),
+      )
     assertThat(questionnaireViewItem.answers).isEmpty()
   }
 
@@ -116,18 +134,25 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
-    runOnUI {
-      viewHolder.bind(questionnaireViewItem)
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
-    }
-
-    onView(withId(R.id.auto_complete)).perform(delayMainThread())
-    onView(withText("Coding 3"))
-      .inRoot(isPlatformPopup())
-      .check(matches(isDisplayed()))
-      .perform(click())
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
-      .isEqualTo("Coding 3")
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
+    composeTestRule
+      .onNode(
+        hasTestTag(DROP_DOWN_MENU_ITEM_TAG) and
+          hasTextExactly("Coding 3") and
+          hasAnyAncestor(isPopup()),
+      )
+      .assertIsDisplayed()
+      .performClick()
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.EditableText,
+          AnnotatedString("Coding 3"),
+        ),
+      )
+    composeTestRule.waitUntil { answerHolder != null }
     assertThat((answerHolder!!.single().value as Coding).display).isEqualTo("Coding 3")
   }
 
@@ -141,28 +166,48 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
-    runOnUI {
-      viewHolder.bind(questionnaireViewItem)
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
-    }
 
-    onView(withId(R.id.auto_complete)).perform(delayMainThread())
-    onView(withText("Coding 3"))
-      .inRoot(isPlatformPopup())
-      .check(matches(isDisplayed()))
-      .perform(click())
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
-      .isEqualTo("Coding 3")
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
-      .isEqualTo("")
-    val autoCompleteTextView =
-      viewHolder.itemView.findViewById(R.id.auto_complete) as MaterialAutoCompleteTextView
-    assertThat(autoCompleteTextView.compoundDrawablesRelative[0]).isNull()
-    assertThat(autoCompleteTextView.compoundDrawablesRelative[1]).isNull()
-    assertThat(autoCompleteTextView.compoundDrawablesRelative[2]).isNull()
-    assertThat(autoCompleteTextView.compoundDrawablesRelative[3]).isNull()
+    composeTestRule
+      .onNode(
+        hasTestTag(DROP_DOWN_MENU_ITEM_TAG) and
+          hasTextExactly("Coding 3") and
+          hasAnyAncestor(isPopup()),
+      )
+      .assertIsDisplayed()
+      .performClick()
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.EditableText,
+          AnnotatedString("Coding 3"),
+        ),
+      )
+    composeTestRule.waitUntil { answerHolder != null }
+    val newQuestionnaireResponseItem = responseOptions().apply { answer = answerHolder }
+    // Bind with QuestionnaireResponse answer updated
+    viewHolder.bind(
+      questionnaireViewItem.copy(questionnaireResponseItem = newQuestionnaireResponseItem),
+    )
+    composeTestRule.onNodeWithTag(CLEAR_TEXT_ICON_BUTTON_TAG).assertIsDisplayed()
+
+    // Rebind initial QuestionnaireViewItem
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.EditableText,
+          AnnotatedString(""),
+        ),
+      )
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_LEADING_ICON_TAG)
+      .assertIsNotDisplayed()
+      .assertDoesNotExist()
   }
 
   @Test
@@ -182,24 +227,33 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
-    runOnUI {
-      viewHolder.bind(questionnaireViewItem)
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
-    }
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
 
-    onView(withId(R.id.auto_complete)).perform(delayMainThread())
-    onView(withText("Coding 3"))
-      .inRoot(isPlatformPopup())
-      .check(matches(isDisplayed()))
-      .perform(click())
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
-      .isEqualTo("Coding 3")
-    val autoCompleteTextView =
-      viewHolder.itemView.findViewById(R.id.auto_complete) as MaterialAutoCompleteTextView
-    assertThat(autoCompleteTextView.compoundDrawablesRelative[0]).isNotNull()
-    assertThat(autoCompleteTextView.compoundDrawablesRelative[1]).isNull()
-    assertThat(autoCompleteTextView.compoundDrawablesRelative[2]).isNull()
-    assertThat(autoCompleteTextView.compoundDrawablesRelative[3]).isNull()
+    composeTestRule
+      .onNode(
+        hasTestTag(DROP_DOWN_MENU_ITEM_TAG) and
+          hasTextExactly("Coding 3") and
+          hasAnyAncestor(isPopup()),
+      )
+      .assertIsDisplayed()
+      .performClick()
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.EditableText,
+          AnnotatedString("Coding 3"),
+        ),
+      )
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_LEADING_ICON_TAG).assertIsDisplayed()
+
+    //    val autoCompleteTextView =
+    //      viewHolder.itemView.findViewById(R.id.auto_complete) as MaterialAutoCompleteTextView
+    //    assertThat(autoCompleteTextView.compoundDrawablesRelative[0]).isNotNull()
+    //    assertThat(autoCompleteTextView.compoundDrawablesRelative[1]).isNull()
+    //    assertThat(autoCompleteTextView.compoundDrawablesRelative[2]).isNull()
+    //    assertThat(autoCompleteTextView.compoundDrawablesRelative[3]).isNull()
   }
 
   @Test
@@ -212,18 +266,26 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
-    runOnUI {
-      viewHolder.bind(questionnaireViewItem)
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
-    }
 
-    onView(withId(R.id.auto_complete)).perform(delayMainThread())
-    onView(withText("Coding 1"))
-      .inRoot(isPlatformPopup())
-      .check(matches(isDisplayed()))
-      .perform(click())
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
-      .isEqualTo("Coding 1")
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
+    composeTestRule
+      .onNode(
+        hasTestTag(DROP_DOWN_MENU_ITEM_TAG) and
+          hasTextExactly("Coding 1") and
+          hasAnyAncestor(isPopup()),
+      )
+      .assertIsDisplayed()
+      .performClick()
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.EditableText,
+          AnnotatedString("Coding 1"),
+        ),
+      )
+    composeTestRule.waitUntil { answerHolder != null }
     assertThat((answerHolder!!.single().value as StringType).valueAsString).isEqualTo("Coding 1")
   }
 
@@ -236,19 +298,12 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    runOnUI {
-      viewHolder.bind(questionnaireViewItem)
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
-    }
 
-    onView(withId(R.id.auto_complete)).perform(delayMainThread())
-    assertThat(
-        viewHolder.itemView
-          .findViewById<MaterialAutoCompleteTextView>(R.id.auto_complete)
-          .adapter
-          .count,
-      )
-      .isEqualTo(6) // +1 cause of '-' menu item
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
+    composeTestRule
+      .onAllNodes(hasTestTag(DROP_DOWN_MENU_ITEM_TAG) and hasAnyAncestor(isPopup()))
+      .assertCountEquals(6) // +1 cause of '-' menu item
   }
 
   @Test
@@ -260,10 +315,8 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    runOnUI {
-      viewHolder.bind(questionnaireViewItem)
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
-    }
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
 
     onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withId(R.id.auto_complete)).perform(typeText("Coding"))
@@ -293,10 +346,8 @@ class DropDownViewHolderFactoryEspressoTest {
 
     val autoComplete = viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
 
-    runOnUI {
-      viewHolder.bind(questionnaireItem)
-      autoComplete.showDropDown()
-    }
+    viewHolder.bind(questionnaireItem)
+    autoComplete.showDropDown()
 
     assertThrows(PerformException::class.java) {
       onView(withId(R.id.auto_complete)).perform(typeText("new text"))
@@ -316,22 +367,24 @@ class DropDownViewHolderFactoryEspressoTest {
         createAnswerOptions(*answerOptions.toTypedArray()),
         responseValueStringOptions(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, answers, _ -> selectedAnswers = answers },
+        answersChangedCallback = { _, _, answers, _ ->
+          println(answers)
+          selectedAnswers = answers
+        },
       )
 
-    val autoComplete = viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
-
-    runOnUI {
-      viewHolder.bind(questionnaireItem)
-      autoComplete.showDropDown()
-    }
-
+    viewHolder.bind(questionnaireItem)
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
     // Test selection flow
-    onView(withText("Coding 1"))
-      .inRoot(isPlatformPopup())
-      .check(matches(isDisplayed()))
-      .perform(click())
-
+    composeTestRule
+      .onNode(
+        hasTestTag(DROP_DOWN_MENU_ITEM_TAG) and
+          hasTextExactly("Coding 1") and
+          hasAnyAncestor(isPopup()),
+      )
+      .assertIsDisplayed()
+      .performClick()
+    composeTestRule.waitForIdle()
     assertThat(selectedAnswers).hasSize(1)
     assertThat((selectedAnswers!!.first().value as StringType).valueAsString).isEqualTo("Coding 1")
 
@@ -344,10 +397,9 @@ class DropDownViewHolderFactoryEspressoTest {
         answersChangedCallback = { _, _, answers, _ -> selectedAnswers = answers },
       )
 
-    runOnUI { viewHolder.bind(questionnaireItem) }
-
-    onView(withId(R.id.clear_input_icon)).perform(click())
-
+    viewHolder.bind(questionnaireItem)
+    composeTestRule.onNodeWithTag(CLEAR_TEXT_ICON_BUTTON_TAG).performClick()
+    composeTestRule.waitForIdle()
     assertThat(selectedAnswers).isEmpty()
   }
 
@@ -360,10 +412,9 @@ class DropDownViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    runOnUI {
-      viewHolder.bind(questionnaireViewItem)
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
-    }
+
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
 
     onView(withId(R.id.auto_complete)).perform(delayMainThread())
     onView(withId(R.id.auto_complete)).perform(typeText("Division"))
@@ -409,32 +460,26 @@ class DropDownViewHolderFactoryEspressoTest {
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
-    runOnUI {
-      viewHolder.bind(questionnaireViewItem)
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
-    }
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
 
-    onView(withId(R.id.auto_complete)).perform(delayMainThread())
-    onData(`is`(instanceOf(DropDownAnswerOption::class.java)))
-      .atPosition(2)
-      .inRoot(isPlatformPopup())
-      .perform(click())
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
-      .isEqualTo("Reference")
+    composeTestRule
+      .onAllNodes(
+        hasTestTag(DROP_DOWN_MENU_ITEM_TAG) and
+          hasTextExactly("Reference") and
+          hasAnyAncestor(isPopup()),
+      )[1] // at position 2
+      .performClick()
+    composeTestRule
+      .onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.EditableText,
+          AnnotatedString("Reference"),
+        ),
+      )
     assertThat((answerHolder!!.single().value as Reference).display).isEqualTo("Reference")
-    assertThat((answerHolder!!.single().value as Reference).id).isEqualTo("ref_2")
-  }
-
-  /** Method to run code snippet on UI/main thread */
-  private fun runOnUI(action: () -> Unit) {
-    activityScenarioRule.scenario.onActivity { action() }
-  }
-
-  /** Method to set content view for test activity */
-  private fun setTestLayout(view: View) {
-    activityScenarioRule.scenario.onActivity { activity -> activity.setContentView(view) }
-    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+    assertThat((answerHolder.single().value as Reference).id).isEqualTo("ref_2")
   }
 
   private fun answerOptions(vararg options: String) =

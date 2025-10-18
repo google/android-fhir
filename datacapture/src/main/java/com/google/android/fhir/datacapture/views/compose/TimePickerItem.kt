@@ -80,9 +80,7 @@ internal fun TimePickerItem(
             keyboardController?.hide()
           }
         }
-        .semantics {
-          if (isError && !supportingHelperText.isNullOrBlank()) error(supportingHelperText)
-        },
+        .semantics { if (isError) error(supportingHelperText ?: "") },
     supportingText = { supportingHelperText?.let { Text(it) } },
     isError = isError,
     trailingIcon = {

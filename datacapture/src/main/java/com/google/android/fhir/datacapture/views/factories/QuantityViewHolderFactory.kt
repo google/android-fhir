@@ -118,7 +118,7 @@ internal object QuantityViewHolderFactory : QuestionnaireItemComposeViewHolderFa
           Header(questionnaireViewItem)
           questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
 
-          Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+          Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
             EditTextFieldItem(
               modifier = Modifier.weight(1f),
               textFieldState = composeViewQuestionnaireState,
@@ -147,14 +147,27 @@ internal object QuantityViewHolderFactory : QuestionnaireItemComposeViewHolderFa
         questionnaireViewItem: QuestionnaireViewItem,
         input: UiQuantity,
       ) {
-        val currentAnswerQuantity = questionnaireViewItem.answers.singleOrNull()?.valueQuantity
-        val draftAnswer = questionnaireViewItem.draftAnswer
+        var decimal: BigDecimal? = null
+        var unit: Coding? = null
 
-        val decimal =
-          input.value?.toBigDecimalOrNull()
-            ?: (draftAnswer as? BigDecimal) ?: currentAnswerQuantity?.value
-        val unit =
-          input.unitDropDown ?: ((draftAnswer as? Coding) ?: currentAnswerQuantity?.toCoding())
+        // Read decimal value and unit from complete answer
+        questionnaireViewItem.answers.singleOrNull()?.let {
+          val quantity = it.value as Quantity
+          decimal = quantity.value
+          unit = quantity.toCoding()
+        }
+
+        // Read decimal value and unit from partial answer
+        questionnaireViewItem.draftAnswer?.let {
+          when (it) {
+            is BigDecimal -> decimal = it
+            is Coding -> unit = it
+          }
+        }
+
+        // Update decimal value and unit
+        input.value?.let { decimal = it.toBigDecimalOrNull() }
+        input.unitDropDown?.let { unit = it }
 
         when {
           decimal == null && unit == null -> {
