@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.material.card.MaterialCardView
 import com.google.common.truth.Truth.assertThat
@@ -340,7 +342,7 @@ class HeaderViewTest {
 
   @Test
   fun `shows error text`() {
-    view.showErrorText("missing answer for required field")
+    view.showErrorText(Invalid(listOf("missing answer for required field")))
     assertThat(view.findViewById<TextView>(R.id.error_text_at_header).text.toString())
       .isEqualTo("missing answer for required field")
     assertThat(view.findViewById<TextView>(R.id.error_text_at_header).visibility)
@@ -348,8 +350,15 @@ class HeaderViewTest {
   }
 
   @Test
-  fun `hides error text`() {
-    view.showErrorText(isErrorTextVisible = false)
+  fun `hides error text when NotValidated`() {
+    view.showErrorText(validationResult = NotValidated)
+    assertThat(view.findViewById<TextView>(R.id.error_text_at_header).visibility)
+      .isEqualTo(View.GONE)
+  }
+
+  @Test
+  fun `hides error text when Valid`() {
+    view.showErrorText(validationResult = NotValidated)
     assertThat(view.findViewById<TextView>(R.id.error_text_at_header).visibility)
       .isEqualTo(View.GONE)
   }

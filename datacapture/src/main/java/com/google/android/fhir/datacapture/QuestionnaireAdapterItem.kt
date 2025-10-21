@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 /** Various types of rows that can be used in a Questionnaire RecyclerView. */
 internal sealed interface QuestionnaireAdapterItem {
   /** A row for a question in a Questionnaire RecyclerView. */
-  data class Question(val item: QuestionnaireViewItem) : QuestionnaireAdapterItem
+  data class Question(val item: QuestionnaireViewItem) :
+    QuestionnaireAdapterItem, ReviewAdapterItem
 
   /** A row for a repeated group response instance's header. */
   data class RepeatedGroupHeader(
@@ -35,6 +36,12 @@ internal sealed interface QuestionnaireAdapterItem {
     val title: String,
   ) : QuestionnaireAdapterItem
 
+  data class RepeatedGroupAddButton(
+    val item: QuestionnaireViewItem,
+  ) : QuestionnaireAdapterItem
+
   data class Navigation(val questionnaireNavigationUIState: QuestionnaireNavigationUIState) :
-    QuestionnaireAdapterItem
+    QuestionnaireAdapterItem, ReviewAdapterItem
 }
+
+internal sealed interface ReviewAdapterItem

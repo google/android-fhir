@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.fromHtml
 import androidx.core.text.HtmlCompat
 import ca.uhn.fhir.util.UrlUtil
 import com.google.android.fhir.datacapture.DataCapture
@@ -381,12 +383,19 @@ internal fun String.toSpanned(): Spanned {
   return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
 }
 
+internal fun String.toAnnotatedString(): AnnotatedString {
+  return AnnotatedString.fromHtml(this)
+}
+
 /**
  * Localized and spanned value of [Questionnaire.QuestionnaireItemComponent.text] if translation is
  * present. Default value otherwise.
  */
 val QuestionnaireItemComponent.localizedTextSpanned: Spanned?
   get() = textElement?.getLocalizedText()?.toSpanned()
+
+val QuestionnaireItemComponent.localizedTextAnnotatedString: AnnotatedString?
+  get() = textElement?.getLocalizedText()?.toAnnotatedString()
 
 /**
  * Localized and spanned value of [Questionnaire.QuestionnaireItemComponent.prefix] if translation
@@ -435,6 +444,15 @@ val List<QuestionnaireItemComponent>.localizedFlyoverSpanned: Spanned?
           questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
       }
       ?.localizedTextSpanned
+
+val List<QuestionnaireItemComponent>.localizedFlyoverAnnotatedString: AnnotatedString?
+  get() =
+    this.firstOrNull { questionnaireItem ->
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+          questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
+      }
+      ?.textElement
+      ?.localizedTextAnnotatedString()
 
 /**
  * A nested questionnaire item of type display with displayCategory extension with
@@ -532,9 +550,6 @@ enum class MimeType(val value: String) {
   VIDEO("video"),
 }
 
-/** Returns the main MIME type of a MIME type string (e.g. image/png returns image). */
-private fun getMimeType(mimeType: String): String = mimeType.substringBefore("/")
-
 /** Returns true if at least one mime type matches the given type. */
 fun QuestionnaireItemComponent.hasMimeType(type: String): Boolean {
   return mimeTypes.any { it.substringBefore("/") == type }
@@ -578,12 +593,16 @@ internal val QuestionnaireItemComponent.itemMedia: Attachment?
   get() =
     (getExtensionByUrl(EXTENSION_ITEM_MEDIA)?.value as? Attachment)?.takeIf { it.hasContentType() }
 
+/** Returns the main MIME type of a MIME type string (e.g. image/png returns image). */
+internal val Attachment.mimeType: String?
+  get() = contentType?.substringBefore("/")
+
 /* TODO: unify the code path from itemAnswerMedia to use fetchBitmapFromUrl (github.com/google/android-fhir/issues/1876) */
 /** Fetches the Bitmap representation of [Attachment.url]. */
 internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
   if (!hasUrl() || !UrlUtil.isValid(url) || !hasContentType()) return null
 
-  if (getMimeType(contentType) != MimeType.IMAGE.value) return null
+  if (mimeType != MimeType.IMAGE.value) return null
 
   val urlResolver = DataCapture.getConfiguration(context).urlResolver ?: return null
 
@@ -594,7 +613,7 @@ internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
 internal fun Attachment.decodeToBitmap(): Bitmap? {
   if (!hasContentType() || !hasData()) return null
 
-  if (getMimeType(contentType) != MimeType.IMAGE.value) return null
+  if (mimeType != MimeType.IMAGE.value) return null
 
   return data.decodeToBitmap()
 }

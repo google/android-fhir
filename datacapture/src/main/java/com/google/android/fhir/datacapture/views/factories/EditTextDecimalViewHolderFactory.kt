@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,71 +16,52 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.text.Editable
-import android.text.InputType
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
-import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object EditTextDecimalViewHolderFactory :
-  EditTextViewHolderFactory(R.layout.edit_text_single_line_view) {
+internal object EditTextDecimalViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
 
-  override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemEditTextViewHolderDelegate(DECIMAL_INPUT_TYPE) {
-      override suspend fun handleInput(
-        editable: Editable,
-        questionnaireViewItem: QuestionnaireViewItem,
-      ) {
-        editable.toString().toDoubleOrNull()?.let {
+  override fun getQuestionnaireItemViewHolderDelegate():
+    QuestionnaireItemComposeViewHolderDelegate =
+    EditTextViewHolderDelegate(
+      KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
+      uiInputText = {
+        val questionnaireItemViewItemDecimalAnswer =
+          it.answers.singleOrNull()?.valueDecimalType?.value?.toString()
+        val draftAnswer = it.draftAnswer?.toString()
+
+        when {
+          questionnaireItemViewItemDecimalAnswer.isNullOrEmpty() && draftAnswer.isNullOrEmpty() ->
+            ""
+          questionnaireItemViewItemDecimalAnswer?.toDoubleOrNull() != null ->
+            questionnaireItemViewItemDecimalAnswer
+          else -> draftAnswer
+        }
+      },
+      uiValidationMessage = { questionnaireViewItem, context ->
+        if (questionnaireViewItem.draftAnswer != null) {
+          context.getString(R.string.decimal_format_validation_error_msg)
+        } else {
+          getValidationErrorMessage(
+            context,
+            questionnaireViewItem,
+            questionnaireViewItem.validationResult,
+          )
+        }
+      },
+      handleInput = { inputText, questionnaireViewItem ->
+        inputText.toDoubleOrNull()?.let {
           questionnaireViewItem.setAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(DecimalType(it.toString())),
           )
         }
-          ?: questionnaireViewItem.setDraftAnswer(editable.toString())
-      }
-
-      override fun updateInputTextUI(
-        questionnaireViewItem: QuestionnaireViewItem,
-        textInputEditText: TextInputEditText,
-      ) {
-        val questionnaireItemViewItemDecimalAnswer =
-          questionnaireViewItem.answers.singleOrNull()?.valueDecimalType?.value?.toString()
-        val draftAnswer = questionnaireViewItem.draftAnswer?.toString()
-
-        if (questionnaireItemViewItemDecimalAnswer.isNullOrEmpty() && draftAnswer.isNullOrEmpty()) {
-          textInputEditText.setText("")
-        } else if (
-          questionnaireItemViewItemDecimalAnswer?.toDoubleOrNull() !=
-            textInputEditText.text.toString().toDoubleOrNull()
-        ) {
-          textInputEditText.setText(questionnaireItemViewItemDecimalAnswer)
-        } else if (draftAnswer != null && draftAnswer != textInputEditText.text.toString()) {
-          textInputEditText.setText(draftAnswer)
-        }
-      }
-
-      override fun updateValidationTextUI(
-        questionnaireViewItem: QuestionnaireViewItem,
-        textInputLayout: TextInputLayout,
-      ) {
-        textInputLayout.error =
-          getValidationErrorMessage(
-            textInputLayout.context,
-            questionnaireViewItem,
-            questionnaireViewItem.validationResult,
-          )
-        // Update error message if draft answer present
-        if (questionnaireViewItem.draftAnswer != null) {
-          textInputLayout.error =
-            textInputLayout.context.getString(R.string.decimal_format_validation_error_msg)
-        }
-      }
-    }
+          ?: questionnaireViewItem.setDraftAnswer(inputText)
+      },
+    )
 }
-
-const val DECIMAL_INPUT_TYPE = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL

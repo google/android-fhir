@@ -87,8 +87,7 @@ internal object AutoCompleteViewHolderFactory :
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        header.bind(questionnaireViewItem)
-        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
+        header.bind(questionnaireViewItem, showRequiredOrOptionalText = true)
         val answerOptionValues =
           questionnaireViewItem.enabledAnswerOptions.map {
             AutoCompleteViewAnswerOption(
