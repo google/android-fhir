@@ -21,6 +21,18 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.core.view.children
 import androidx.core.view.get
 import androidx.core.view.isEmpty
@@ -28,6 +40,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.identifierString
+import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -35,19 +48,22 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.Header
+import com.google.android.fhir.datacapture.views.compose.MediaItem
+import com.google.android.fhir.datacapture.views.compose.MultiAutoCompleteTextItem
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object AutoCompleteViewHolderFactory :
-  QuestionnaireItemAndroidViewHolderFactory(R.layout.edit_text_auto_complete_view) {
+internal object AutoCompleteViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
 
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemAndroidViewHolderDelegate {
+    object : QuestionnaireItemComposeViewHolderDelegate {
       private lateinit var context: AppCompatActivity
       private lateinit var header: HeaderView
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
@@ -56,10 +72,128 @@ internal object AutoCompleteViewHolderFactory :
       private val canHaveMultipleAnswers
         get() = questionnaireViewItem.questionnaireItem.repeats
 
-      override lateinit var questionnaireViewItem: QuestionnaireViewItem
+      lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var errorTextView: TextView
 
-      override fun init(itemView: View) {
+      @Composable
+      override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
+        val context = LocalContext.current
+        val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
+        val canHaveMultipleAnswers =
+          remember(questionnaireViewItem.questionnaireItem) {
+            questionnaireViewItem.questionnaireItem.repeats
+          }
+        val enabledAnswerOptions =
+          remember(questionnaireViewItem.enabledAnswerOptions) {
+            questionnaireViewItem.enabledAnswerOptions.map {
+              DropDownAnswerOption(
+                answerId = it.value.identifierString(context),
+                answerOptionString = it.value.displayString(context),
+              )
+            }
+          }
+        var selectedAnswerOptions by
+          remember(questionnaireViewItem.answers) {
+            mutableStateOf(
+              questionnaireViewItem.answers.map {
+                DropDownAnswerOption(
+                  answerId = it.value.identifierString(context),
+                  answerOptionString = it.value.displayString(context),
+                )
+              },
+            )
+          }
+        val errorTextMessage =
+          remember(questionnaireViewItem.validationResult) {
+            (questionnaireViewItem.validationResult as? Invalid)
+              ?.getSingleStringValidationMessage()
+              ?.takeIf { it.isNotBlank() }
+          }
+        val isReadOnly =
+          remember(questionnaireViewItem.questionnaireItem) {
+            questionnaireViewItem.questionnaireItem.readOnly
+          }
+
+        Column(
+          modifier =
+            Modifier.fillMaxWidth()
+              .padding(
+                horizontal = dimensionResource(R.dimen.item_margin_horizontal),
+                vertical = dimensionResource(R.dimen.item_margin_vertical),
+              ),
+        ) {
+          Header(questionnaireViewItem, showRequiredOrOptionalText = true)
+          questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
+
+          // TODO: Set text gravity using Modifier
+          //                .align(Alignment.BottomCenter)
+          MultiAutoCompleteTextItem(
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isReadOnly,
+            supportingText = errorTextMessage,
+            isError = errorTextMessage.isNullOrBlank().not(),
+            options = enabledAnswerOptions,
+            selectedOptions = selectedAnswerOptions,
+            onNewOptionSelected = { answerOption ->
+              selectedAnswerOptions =
+                if (canHaveMultipleAnswers) {
+                  if (answerOption in selectedAnswerOptions) {
+                    selectedAnswerOptions
+                  } else {
+                    selectedAnswerOptions + answerOption
+                  }
+                } else {
+                  listOf(answerOption)
+                }
+
+              val questionnaireResponseAnswer =
+                questionnaireViewItem.enabledAnswerOptions
+                  .first { it.value.identifierString(context) == answerOption.answerId }
+                  .valueCoding
+                  .let {
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = it
+                    }
+                  }
+
+              val answerNotPresent =
+                questionnaireViewItem.answers.none {
+                  it.value.equalsDeep(questionnaireResponseAnswer.value)
+                }
+              if (answerNotPresent) {
+                coroutineScope.launch {
+                  if (canHaveMultipleAnswers) {
+                    questionnaireViewItem.addAnswer(questionnaireResponseAnswer)
+                  } else {
+                    questionnaireViewItem.setAnswer(questionnaireResponseAnswer)
+                  }
+                }
+              }
+            },
+            onOptionDeselected = { option ->
+              selectedAnswerOptions = selectedAnswerOptions.filterNot { it == option }
+
+              val answerOptionCoding =
+                questionnaireViewItem.enabledAnswerOptions
+                  .first { it.value.identifierString(context) == option.answerId }
+                  .valueCoding
+              coroutineScope.launch {
+                if (canHaveMultipleAnswers) {
+                  questionnaireViewItem.removeAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = answerOptionCoding
+                    },
+                  )
+                } else {
+                  questionnaireViewItem.clearAnswer()
+                }
+              }
+            },
+          )
+        }
+      }
+
+      fun init(itemView: View) {
         context = itemView.context.tryUnwrapContext()!!
         header = itemView.findViewById(R.id.header)
         autoCompleteTextView = itemView.findViewById(R.id.autoCompleteTextView)
@@ -81,12 +215,12 @@ internal object AutoCompleteViewHolderFactory :
                     .valueCoding
               }
 
-            onAnswerSelected(answer)
+            handleAnswerSelection(answer)
             autoCompleteTextView.setText("")
           }
       }
 
-      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
+      fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         header.bind(questionnaireViewItem, showRequiredOrOptionalText = true)
         val answerOptionValues =
           questionnaireViewItem.enabledAnswerOptions.map {
@@ -110,7 +244,7 @@ internal object AutoCompleteViewHolderFactory :
         displayValidationResult(questionnaireViewItem.validationResult)
       }
 
-      override fun setReadOnly(isReadOnly: Boolean) {
+      fun setReadOnly(isReadOnly: Boolean) {
         for (i in 0 until chipContainer.childCount) {
           val view = chipContainer.getChildAt(i)
           view.isEnabled = !isReadOnly
@@ -125,7 +259,7 @@ internal object AutoCompleteViewHolderFactory :
         questionnaireViewItem.answers.map { answer -> addNewChipIfNotPresent(answer) }
       }
 
-      private fun onAnswerSelected(
+      private fun handleAnswerSelection(
         answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ) {
         if (canHaveMultipleAnswers) {
