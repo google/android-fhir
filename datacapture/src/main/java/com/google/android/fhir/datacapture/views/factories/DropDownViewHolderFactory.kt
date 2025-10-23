@@ -38,6 +38,7 @@ import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.identifierString
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.toAnnotatedString
 import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -213,4 +214,6 @@ internal data class DropDownAnswerOption(
   }
 
   fun answerOptionStringSpanned(): Spanned = answerOptionString.toSpanned()
+
+  fun answerOptionAnnotatedString() = answerOptionString.toAnnotatedString()
 }
