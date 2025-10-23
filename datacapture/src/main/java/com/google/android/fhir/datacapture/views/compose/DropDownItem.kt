@@ -20,12 +20,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,19 +43,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.graphics.drawable.toBitmap
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.factories.DropDownAnswerOption
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun ExposedDropDownMenuBoxItem(
+internal fun DropDownItem(
   modifier: Modifier,
   enabled: Boolean,
   labelText: AnnotatedString? = null,
   supportingText: String? = null,
   isError: Boolean = false,
-  showClearIcon: Boolean = false,
   selectedOption: DropDownAnswerOption? = null,
   options: List<DropDownAnswerOption>,
   onDropDownAnswerOptionSelected: (DropDownAnswerOption?) -> Unit,
@@ -84,7 +85,7 @@ internal fun ExposedDropDownMenuBoxItem(
         Modifier.fillMaxWidth()
           .testTag(DROP_DOWN_TEXT_FIELD_TAG)
           .semantics { if (isError) error(supportingText ?: "") }
-          .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled),
+          .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled),
       readOnly = true,
       enabled = enabled,
       minLines = 1,
@@ -101,6 +102,109 @@ internal fun ExposedDropDownMenuBoxItem(
             )
           }
         },
+      trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+    )
+    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+      options.forEach { option ->
+        DropDownAnswerMenuItem(enabled, option) {
+          selectedDropDownAnswerOption = option
+          expanded = false
+        }
+      }
+    }
+  }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun DropDownAnswerMenuItem(
+  enabled: Boolean,
+  answerOption: DropDownAnswerOption,
+  onSelected: () -> Unit,
+) {
+  DropdownMenuItem(
+    modifier = Modifier.testTag(DROP_DOWN_ANSWER_MENU_ITEM_TAG),
+    text = {
+      Text(answerOption.answerOptionAnnotatedString(), style = MaterialTheme.typography.bodyLarge)
+    },
+    leadingIcon =
+      answerOption.answerOptionImage?.let {
+        {
+          Icon(
+            it.toBitmap().asImageBitmap(),
+            contentDescription = answerOption.answerOptionString,
+          )
+        }
+      },
+    enabled = enabled,
+    onClick = { onSelected() },
+    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+  )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun AutoCompleteDropDownItem(
+  modifier: Modifier,
+  enabled: Boolean,
+  labelText: AnnotatedString? = null,
+  supportingText: String? = null,
+  isError: Boolean = false,
+  showClearIcon: Boolean = false,
+  readOnly: Boolean = showClearIcon,
+  selectedOption: DropDownAnswerOption? = null,
+  options: List<DropDownAnswerOption>,
+  onDropDownAnswerOptionSelected: (DropDownAnswerOption?) -> Unit,
+) {
+  var expanded by remember { mutableStateOf(false) }
+  var selectedDropDownAnswerOption by
+    remember(selectedOption, options) { mutableStateOf(selectedOption) }
+  var selectedOptionDisplay by
+    remember(selectedDropDownAnswerOption) {
+      val stringValue = selectedDropDownAnswerOption?.answerOptionString ?: ""
+      mutableStateOf(TextFieldValue(stringValue, selection = TextRange(stringValue.length)))
+    }
+  val filteredOptions =
+    remember(options, selectedOptionDisplay) {
+      options.filter { it.answerOptionString.contains(selectedOptionDisplay.text, true) }
+    }
+
+  LaunchedEffect(selectedDropDownAnswerOption) {
+    onDropDownAnswerOptionSelected(selectedDropDownAnswerOption)
+  }
+
+  ExposedDropdownMenuBox(
+    modifier = modifier,
+    expanded = expanded,
+    onExpandedChange = { expanded = it },
+  ) {
+    OutlinedTextField(
+      value = selectedOptionDisplay,
+      onValueChange = {
+        selectedOptionDisplay = it
+        if (!expanded) expanded = true
+      },
+      modifier =
+        Modifier.fillMaxWidth()
+          .testTag(DROP_DOWN_TEXT_FIELD_TAG)
+          .semantics { if (isError) error(supportingText ?: "") }
+          .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, enabled),
+      readOnly = readOnly,
+      enabled = enabled,
+      minLines = 1,
+      isError = isError,
+      label = { labelText?.let { Text(it) } },
+      supportingText = { supportingText?.let { Text(it) } },
+      leadingIcon =
+        selectedDropDownAnswerOption?.answerOptionImage?.let {
+          {
+            Icon(
+              it.toBitmap().asImageBitmap(),
+              contentDescription = selectedDropDownAnswerOption!!.answerOptionString,
+              modifier = Modifier.testTag(DROP_DOWN_TEXT_FIELD_LEADING_ICON_TAG),
+            )
+          }
+        },
       trailingIcon = {
         Row(verticalAlignment = Alignment.CenterVertically) {
           if (showClearIcon) {
@@ -111,33 +215,26 @@ internal fun ExposedDropDownMenuBoxItem(
               Icon(painterResource(R.drawable.ic_clear), contentDescription = "clear")
             }
           }
-          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+          ExposedDropdownMenuDefaults.TrailingIcon(
+            expanded = expanded,
+            modifier =
+              Modifier.menuAnchor(
+                ExposedDropdownMenuAnchorType.SecondaryEditable,
+                enabled,
+              ),
+          )
         }
       },
     )
-    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-      options.forEach { option ->
-        DropdownMenuItem(
-          modifier = Modifier.testTag(DROP_DOWN_MENU_ITEM_TAG),
-          text = {
-            Text(option.answerOptionAnnotatedString(), style = MaterialTheme.typography.bodyLarge)
-          },
-          leadingIcon =
-            option.answerOptionImage?.let {
-              {
-                Icon(
-                  it.toBitmap().asImageBitmap(),
-                  contentDescription = option.answerOptionString,
-                )
-              }
-            },
-          enabled = enabled,
-          onClick = {
+
+    if (filteredOptions.isNotEmpty()) {
+      ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        filteredOptions.forEach { option ->
+          DropDownAnswerMenuItem(enabled, option) {
             selectedDropDownAnswerOption = option
             expanded = false
-          },
-          contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-        )
+          }
+        }
       }
     }
   }
@@ -146,4 +243,4 @@ internal fun ExposedDropDownMenuBoxItem(
 const val CLEAR_TEXT_ICON_BUTTON_TAG = "clear_field_text"
 const val DROP_DOWN_TEXT_FIELD_TAG = "drop_down_text_field"
 const val DROP_DOWN_TEXT_FIELD_LEADING_ICON_TAG = "drop_down_text_field_leading_icon"
-const val DROP_DOWN_MENU_ITEM_TAG = "drop_down_list_menu_item"
+const val DROP_DOWN_ANSWER_MENU_ITEM_TAG = "drop_down_answer_list_menu_item"

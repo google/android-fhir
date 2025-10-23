@@ -47,9 +47,9 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.DropDownItem
 import com.google.android.fhir.datacapture.views.compose.EditTextFieldItem
 import com.google.android.fhir.datacapture.views.compose.EditTextFieldState
-import com.google.android.fhir.datacapture.views.compose.ExposedDropDownMenuBoxItem
 import com.google.android.fhir.datacapture.views.compose.Header
 import com.google.android.fhir.datacapture.views.compose.MediaItem
 import java.math.BigDecimal
@@ -77,6 +77,7 @@ internal object QuantityViewHolderFactory : QuestionnaireItemComposeViewHolderFa
         val selectedOption =
           remember(questionnaireViewItem) {
             unitTextCoding(questionnaireViewItem)?.toDropDownAnswerOption()
+              ?: dropDownOptions.singleOrNull() // Select if has only one option
           }
 
         var quantity by
@@ -124,7 +125,7 @@ internal object QuantityViewHolderFactory : QuestionnaireItemComposeViewHolderFa
               textFieldState = composeViewQuestionnaireState,
             )
             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.item_margin_horizontal)))
-            ExposedDropDownMenuBoxItem(
+            DropDownItem(
               modifier = Modifier.weight(1f),
               enabled = !isReadOnly,
               selectedOption = selectedOption,

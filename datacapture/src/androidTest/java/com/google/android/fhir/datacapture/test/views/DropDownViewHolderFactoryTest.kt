@@ -45,7 +45,7 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.CLEAR_TEXT_ICON_BUTTON_TAG
-import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_MENU_ITEM_TAG
+import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_ANSWER_MENU_ITEM_TAG
 import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_TEXT_FIELD_TAG
 import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
 import com.google.android.fhir.datacapture.views.factories.DropDownViewHolderFactory
@@ -117,7 +117,7 @@ class DropDownViewHolderFactoryTest {
       .onNode(isPopup())
       .assert(
         hasAnyDescendant(
-          hasTestTag(DROP_DOWN_MENU_ITEM_TAG) and hasTextExactly("Test Code"),
+          hasTestTag(DROP_DOWN_ANSWER_MENU_ITEM_TAG) and hasTextExactly("Test Code"),
         ),
       )
   }
@@ -145,7 +145,7 @@ class DropDownViewHolderFactoryTest {
       .onNode(isPopup())
       .assert(
         hasAnyDescendant(
-          hasTestTag(DROP_DOWN_MENU_ITEM_TAG) and hasTextExactly("John Doe"),
+          hasTestTag(DROP_DOWN_ANSWER_MENU_ITEM_TAG) and hasTextExactly("John Doe"),
         ),
       )
   }
@@ -169,7 +169,7 @@ class DropDownViewHolderFactoryTest {
       .onNode(isPopup())
       .assert(
         hasAnyDescendant(
-          hasTestTag(DROP_DOWN_MENU_ITEM_TAG) and hasTextExactly("Patient/123"),
+          hasTestTag(DROP_DOWN_ANSWER_MENU_ITEM_TAG) and hasTextExactly("Patient/123"),
         ),
       )
   }
@@ -193,7 +193,7 @@ class DropDownViewHolderFactoryTest {
       .onNode(isPopup())
       .assert(
         hasAnyDescendant(
-          hasTestTag(DROP_DOWN_MENU_ITEM_TAG) and hasTextExactly("test-code"),
+          hasTestTag(DROP_DOWN_ANSWER_MENU_ITEM_TAG) and hasTextExactly("test-code"),
         ),
       )
   }
