@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -279,5 +279,93 @@ class MoreTypesTest {
   fun `getValueAsString should return correct value for a Quantity`() {
     val quantity = Quantity(20L)
     assertThat(quantity.getValueAsString(context)).isEqualTo("20")
+  }
+
+  @Test
+  fun codingMatches_sameSystemAndCode_shouldReturnTrue() {
+    val left = Coding("system", "code", "display")
+    val right = Coding("system", "code", "display")
+
+    assertThat(left.matches(right)).isTrue()
+  }
+
+  @Test
+  fun codingMatches_differentDisplays_shouldReturnTrue() {
+    val left = Coding("system", "code", "display")
+    val right = Coding("system", "code", "other display")
+
+    assertThat(left.matches(right)).isTrue()
+  }
+
+  @Test
+  fun codingMatches_differentCodes_shouldReturnFalse() {
+    val left = Coding("system", "code", "display")
+    val right = Coding("system", "other-code", "display")
+
+    assertThat(left.matches(right)).isFalse()
+  }
+
+  @Test
+  fun codingMatches_differentSystems_shouldReturnFalse() {
+    val left = Coding("system", "code", "display")
+    val right = Coding("other-system", "code", "display")
+
+    assertThat(left.matches(right)).isFalse()
+  }
+
+  @Test
+  fun codingMatches_sameVersion_shouldReturnTrue() {
+    val left = Coding("system", "code", "display").apply { version = "1" }
+    val right = Coding("system", "code", "display").apply { version = "1" }
+
+    assertThat(left.matches(right)).isTrue()
+  }
+
+  @Test
+  fun codingMatches_differentVersions_shouldReturnFalse() {
+    val left = Coding("system", "code", "display").apply { version = "1" }
+    val right = Coding("system", "code", "display").apply { version = "2" }
+
+    assertThat(left.matches(right)).isFalse()
+  }
+
+  @Test
+  fun codingMatches_missingSystemOnOneSide_shouldReturnTrue() {
+    val left = Coding(null, "code", "display")
+    val right = Coding("system", "code", "display")
+
+    assertThat(left.matches(right)).isTrue()
+  }
+
+  @Test
+  fun codingMatches_missingVersionOnOneSide_shouldReturnTrue() {
+    val left = Coding("system", "code", "display").apply { version = "1" }
+    val right = Coding("system", "code", "display")
+
+    assertThat(left.matches(right)).isTrue()
+  }
+
+  @Test
+  fun codingMatches_missingDisplayOnOneSide_shouldReturnTrue() {
+    val left = Coding("system", "code", null)
+    val right = Coding("system", "code", "display")
+
+    assertThat(left.matches(right)).isTrue()
+  }
+
+  @Test
+  fun codingMatches_bothMissingSystem_shouldReturnTrue() {
+    val left = Coding(null, "code", "display")
+    val right = Coding(null, "code", "display")
+
+    assertThat(left.matches(right)).isTrue()
+  }
+
+  @Test
+  fun codingMatches_bothMissingDisplay_shouldReturnTrue() {
+    val left = Coding("system", "code", null)
+    val right = Coding("system", "code", null)
+
+    assertThat(left.matches(right)).isTrue()
   }
 }
