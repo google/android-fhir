@@ -16,26 +16,69 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.DEFAULT_SIZE
 import com.google.android.fhir.datacapture.extensions.MimeType
 import com.google.android.fhir.datacapture.extensions.hasMimeType
 import com.google.android.fhir.datacapture.extensions.hasMimeTypeOnly
 import com.google.android.fhir.datacapture.extensions.isGivenSizeOverLimit
+import com.google.android.fhir.datacapture.extensions.itemMedia
+import com.google.android.fhir.datacapture.extensions.maxSizeInBytes
 import com.google.android.fhir.datacapture.extensions.maxSizeInMiBs
 import com.google.android.fhir.datacapture.extensions.mimeTypes
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
@@ -47,20 +90,25 @@ import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.attachment.CameraLauncherFragment
 import com.google.android.fhir.datacapture.views.attachment.OpenDocumentLauncherFragment
+import com.google.android.fhir.datacapture.views.compose.ErrorText
+import com.google.android.fhir.datacapture.views.compose.Header
+import com.google.android.fhir.datacapture.views.compose.MediaItem
 import com.google.android.material.divider.MaterialDivider
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
+import java.math.BigDecimal
 import java.util.Date
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import timber.log.Timber
 
-internal object AttachmentViewHolderFactory :
-  QuestionnaireItemAndroidViewHolderFactory(R.layout.attachment_view) {
+internal object AttachmentViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemAndroidViewHolderDelegate {
-      override lateinit var questionnaireViewItem: QuestionnaireViewItem
+    object : QuestionnaireItemComposeViewHolderDelegate {
+      lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var header: HeaderView
       private lateinit var errorTextView: TextView
       private lateinit var takePhotoButton: Button
@@ -81,7 +129,319 @@ internal object AttachmentViewHolderFactory :
       private lateinit var fileDeleteButton: Button
       private lateinit var context: AppCompatActivity
 
-      override fun init(itemView: View) {
+      @Composable
+      override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
+        val context = LocalContext.current
+        val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
+        val validationResult =
+          remember(questionnaireViewItem.validationResult) {
+            questionnaireViewItem.validationResult
+          }
+        var errorMessage by
+          remember(validationResult) {
+            mutableStateOf((validationResult as? Invalid)?.getSingleStringValidationMessage())
+          }
+        val questionnaireItem =
+          remember(questionnaireViewItem.questionnaireItem) {
+            questionnaireViewItem.questionnaireItem
+          }
+        val readOnly = remember(questionnaireItem) { questionnaireItem.readOnly }
+        val fileMimeTypes =
+          remember(questionnaireItem) { questionnaireItem.mimeTypes.toTypedArray() }
+        var currentAttachment by
+          remember(questionnaireViewItem.answers) {
+            mutableStateOf(questionnaireViewItem.answers.singleOrNull()?.valueAttachment)
+          }
+        val displayTakePhoto =
+          remember(questionnaireItem) { questionnaireItem.hasMimeType(MimeType.IMAGE.value) }
+        val uploadButtonTextResId =
+          remember(questionnaireItem) {
+            when {
+              questionnaireItem.hasMimeTypeOnly(MimeType.AUDIO.value) -> R.string.upload_audio
+              questionnaireItem.hasMimeTypeOnly(MimeType.DOCUMENT.value) -> R.string.upload_document
+              questionnaireItem.hasMimeTypeOnly(MimeType.IMAGE.value) -> R.string.upload_photo
+              questionnaireItem.hasMimeTypeOnly(MimeType.VIDEO.value) -> R.string.upload_video
+              else -> R.string.upload_file
+            }
+          }
+        val uploadButtonIconResId =
+          remember(questionnaireItem) {
+            when {
+              questionnaireItem.hasMimeTypeOnly(MimeType.AUDIO.value) -> R.drawable.ic_audio_file
+              questionnaireItem.hasMimeTypeOnly(MimeType.DOCUMENT.value) ->
+                R.drawable.ic_document_file
+              questionnaireItem.hasMimeTypeOnly(MimeType.IMAGE.value) -> R.drawable.ic_image_file
+              questionnaireItem.hasMimeTypeOnly(MimeType.VIDEO.value) -> R.drawable.ic_video_file
+              else -> R.drawable.ic_file
+            }
+          }
+        var displayUploadedText by
+          remember(questionnaireViewItem.questionnaireItem) { mutableStateOf(false) }
+
+        Column(
+          modifier =
+            Modifier.padding(
+              horizontal = dimensionResource(R.dimen.item_margin_horizontal),
+              vertical = dimensionResource(R.dimen.item_margin_vertical),
+            ),
+        ) {
+          Header(questionnaireViewItem, showRequiredOrOptionalText = true)
+          questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
+
+          errorMessage?.takeIf { it.isNotBlank() }?.let { ErrorText(it) }
+
+          Row(
+            modifier = Modifier.padding(top = dimensionResource(R.dimen.header_margin_bottom)),
+            horizontalArrangement =
+              Arrangement.spacedBy(dimensionResource(R.dimen.attachment_action_button_margin_end)),
+          ) {
+            if (displayTakePhoto) {
+              TakePhotoButton(
+                context,
+                enabled = !readOnly,
+                maxFileSizeLimitInBytes = questionnaireItem.maxSizeInBytes ?: DEFAULT_SIZE,
+                supportedMimeType = questionnaireItem::hasMimeType,
+                onFailure = { errorMessage = it },
+              ) { uri, file ->
+                coroutineScope.launch {
+                  val attachmentMimeTypeWithSubType = context.getMimeTypeFromUri(uri)
+                  val attachmentByteArray = context.readBytesFromUri(uri)
+                  currentAttachment =
+                    Attachment().apply {
+                      contentType = attachmentMimeTypeWithSubType
+                      data = attachmentByteArray
+                      title = file.name
+                      creation = Date()
+                    }
+
+                  val answer =
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = currentAttachment
+                    }
+                  questionnaireViewItem.setAnswer(answer)
+
+                  displayUploadedText = true
+                  //                      todo:
+                  //                      divider.visibility = View.VISIBLE
+                  //                      labelUploaded.visibility = View.VISIBLE
+                  //                      displayPreview(
+                  //                          attachmentType = attachmentMimeType,
+                  //                          attachmentTitle = file.name,
+                  //                          attachmentUri = attachmentUri,
+                  //                      )
+                  //                      displaySnackbarOnUpload(view, attachmentMimeType)
+                  file.delete()
+                }
+              }
+            }
+
+            UploadFileButton(
+              context,
+              enabled = !readOnly,
+              uploadButtonIconResId,
+              uploadButtonTextResId,
+              fileMimeTypes,
+              maxFileSizeLimitInBytes = questionnaireItem.maxSizeInBytes ?: DEFAULT_SIZE,
+              supportedMimeType = questionnaireItem::hasMimeType,
+              onFailure = { errorMessage = it },
+            ) {
+              coroutineScope.launch {
+                val attachmentMimeTypeWithSubType = context.getMimeTypeFromUri(it)
+                val attachmentByteArray = context.readBytesFromUri(it)
+                currentAttachment =
+                  Attachment().apply {
+                    contentType = attachmentMimeTypeWithSubType
+                    data = attachmentByteArray
+                    title = getFileName(context, it)
+                    creation = Date()
+                  }
+
+                val answer =
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = currentAttachment
+                  }
+                questionnaireViewItem.setAnswer(answer)
+
+                displayUploadedText = true
+              }
+            }
+          }
+
+          if (displayUploadedText) {
+            Spacer(
+              modifier = Modifier.height(dimensionResource(R.dimen.attachment_divider_margin_top)),
+            )
+            HorizontalDivider()
+            Spacer(
+              modifier =
+                Modifier.height(dimensionResource(R.dimen.attachment_uploaded_label_margin_top)),
+            )
+            Text(stringResource(R.string.uploaded), style = MaterialTheme.typography.titleSmall)
+          }
+
+          currentAttachment?.let {
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+              modifier = Modifier.testTag(ATTACHMENT_MEDIA_PREVIEW_TAG).fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Row(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                val mimeType = remember(it.contentType) { getMimeType(it.contentType) }
+
+                when (mimeType) {
+                  MimeType.AUDIO.value,
+                  MimeType.DOCUMENT.value,
+                  MimeType.VIDEO.value, -> {
+                    val iconRes =
+                      remember(mimeType) {
+                        when (mimeType) {
+                          MimeType.AUDIO.value -> R.drawable.ic_audio_file
+                          MimeType.DOCUMENT.value -> R.drawable.ic_document_file
+                          MimeType.VIDEO.value -> R.drawable.ic_video_file
+                          else -> R.drawable.ic_file
+                        }
+                      }
+                    Box(
+                      modifier =
+                        Modifier.size(
+                            dimensionResource(
+                              R.dimen
+                                .attachment_preview_photo_and_preview_file_icon_background_width,
+                            ),
+                          )
+                          .background(
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            shape = RoundedCornerShape(8.dp),
+                          ),
+                    ) {
+                      Icon(
+                        painterResource(iconRes),
+                        contentDescription = stringResource(R.string.cd_file_icon_preview),
+                      )
+                    }
+                  }
+                  MimeType.IMAGE.value -> {
+                    val bitmap =
+                      remember(it.data) { BitmapFactory.decodeByteArray(it.data, 0, it.data.size) }
+                    bitmap?.let {
+                      Image(
+                        bitmap = bitmap.asImageBitmap(),
+                        contentDescription = stringResource(R.string.cd_photo_preview),
+                        modifier =
+                          Modifier.size(
+                              dimensionResource(
+                                R.dimen
+                                  .attachment_preview_photo_and_preview_file_icon_background_width,
+                              ),
+                            )
+                            .clip(
+                              RoundedCornerShape(8.dp),
+                            ),
+                        contentScale = ContentScale.Crop,
+                      )
+                    }
+                  }
+                }
+
+                Text(
+                  text = it.title,
+                  style = MaterialTheme.typography.bodyMedium,
+                  modifier = Modifier.weight(1f),
+                )
+              }
+
+              OutlinedButton(
+                onClick = {
+                  currentAttachment = null
+                  displayUploadedText = false
+                  coroutineScope.launch { questionnaireViewItem.clearAnswer() }
+                },
+                enabled = !readOnly,
+              ) {
+                Icon(
+                  painter = painterResource(R.drawable.ic_delete),
+                  tint = MaterialTheme.colorScheme.error,
+                  contentDescription = stringResource(R.string.delete),
+                )
+                Spacer(modifier = Modifier)
+                Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
+              }
+            }
+
+            Spacer(
+              modifier =
+                Modifier.height(dimensionResource(R.dimen.attachment_preview_divider_margin_top)),
+            )
+            HorizontalDivider()
+          }
+        }
+      }
+
+      @Composable
+      private fun UploadFileButton(
+        context: Context,
+        enabled: Boolean,
+        uploadButtonIconResId: Int,
+        uploadButtonTextResId: Int,
+        mimeTypes: Array<String>,
+        maxFileSizeLimitInBytes: BigDecimal,
+        supportedMimeType: (String) -> Boolean,
+        onFailure: (String) -> Unit,
+        onSuccess: (Uri) -> Unit,
+      ) {
+        val bytesInMB = remember { BigDecimal(1048576) }
+        val maxSizeImageLimitErrorMessage =
+          stringResource(
+            R.string.max_size_file_above_limit_validation_error_msg,
+            maxFileSizeLimitInBytes.div(bytesInMB),
+          )
+        val wrongMediaFormatErrorMessage =
+          stringResource(R.string.mime_type_wrong_media_format_validation_error_msg)
+
+        val openDocumentLauncher =
+          rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument(),
+            onResult = { uri ->
+              if (uri == null) {
+                onFailure("Error: No file selected")
+                return@rememberLauncherForActivityResult
+              }
+
+              val attachmentByteArray = context.readBytesFromUri(uri)
+              if (attachmentByteArray.size.toBigDecimal() > maxFileSizeLimitInBytes) {
+                onFailure(maxSizeImageLimitErrorMessage)
+                return@rememberLauncherForActivityResult
+              }
+
+              val attachmentMimeTypeWithSubType = context.getMimeTypeFromUri(uri)
+              val attachmentMimeType = getMimeType(attachmentMimeTypeWithSubType)
+              if (!supportedMimeType(attachmentMimeType)) {
+                onFailure(wrongMediaFormatErrorMessage)
+                return@rememberLauncherForActivityResult
+              }
+
+              onSuccess(uri)
+            },
+          )
+
+        OutlinedButton(modifier = Modifier.testTag(UPLOAD_FILE_BUTTON_TAG), onClick = { openDocumentLauncher.launch(mimeTypes) }, enabled = enabled) {
+          Icon(
+            painterResource(uploadButtonIconResId),
+            contentDescription = stringResource(uploadButtonTextResId),
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(dimensionResource(R.dimen.attachment_action_button_icon_size)),
+          )
+          Spacer(modifier = Modifier)
+          Text(stringResource(uploadButtonTextResId))
+        }
+      }
+
+      fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         errorTextView = itemView.findViewById(R.id.error)
         takePhotoButton = itemView.findViewById(R.id.take_photo)
@@ -103,7 +463,7 @@ internal object AttachmentViewHolderFactory :
         context = itemView.context.tryUnwrapContext()!!
       }
 
-      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
+      fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         this.questionnaireViewItem = questionnaireViewItem
         header.bind(questionnaireViewItem, showRequiredOrOptionalText = true)
         val questionnaireItem = questionnaireViewItem.questionnaireItem
@@ -132,7 +492,7 @@ internal object AttachmentViewHolderFactory :
         }
       }
 
-      override fun setReadOnly(isReadOnly: Boolean) {
+      fun setReadOnly(isReadOnly: Boolean) {
         takePhotoButton.isEnabled = !isReadOnly
         uploadPhotoButton.isEnabled = !isReadOnly
         uploadAudioButton.isEnabled = !isReadOnly
@@ -186,6 +546,95 @@ internal object AttachmentViewHolderFactory :
           else -> {
             uploadFileButton.visibility = View.VISIBLE
           }
+        }
+      }
+
+      @Composable
+      private fun TakePhotoButton(
+        context: Context,
+        enabled: Boolean,
+        maxFileSizeLimitInBytes: BigDecimal,
+        supportedMimeType: (String) -> Boolean,
+        onFailure: (String) -> Unit,
+        onSuccess: (Uri, File) -> Unit,
+      ) {
+        val file = File.createTempFile("IMG_", ".jpeg", context.cacheDir)
+        val attachmentUri by lazy {
+          FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+        }
+
+        val bytesInMB = remember { BigDecimal(1048576) }
+        val mediaNotSavedError = stringResource(R.string.media_not_saved_validation_error_msg)
+        val maxSizeImageLimitErrorMessage =
+          stringResource(
+            R.string.max_size_image_above_limit_validation_error_msg,
+            maxFileSizeLimitInBytes.div(bytesInMB),
+          )
+        val wrongMediaFormatErrorMessage =
+          stringResource(R.string.mime_type_wrong_media_format_validation_error_msg)
+
+        val takePictureLauncher =
+          rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.TakePicture(),
+            onResult = { success ->
+              when {
+                !success -> {
+                  onFailure(mediaNotSavedError)
+                  file.delete()
+                }
+                file.length().toBigDecimal() > maxFileSizeLimitInBytes -> {
+                  onFailure(maxSizeImageLimitErrorMessage)
+                  file.delete()
+                }
+                !supportedMimeType(getMimeType(context.getMimeTypeFromUri(attachmentUri))) -> {
+                  onFailure(wrongMediaFormatErrorMessage)
+                  file.delete()
+                }
+                else -> {
+                  onSuccess(attachmentUri, file)
+                }
+              }
+            },
+          )
+
+        val requestPermissionLauncher =
+          rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+          ) { isGranted: Boolean ->
+            if (isGranted) {
+              Timber.d("Camera permission granted")
+              takePictureLauncher.launch(attachmentUri)
+            } else {
+              Timber.d("Camera permission not granted")
+              onFailure("Camera permission not granted")
+            }
+          }
+
+        val launcherAction = {
+          if (
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+              PackageManager.PERMISSION_GRANTED
+          ) {
+            takePictureLauncher.launch(attachmentUri)
+          } else {
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+          }
+        }
+
+        OutlinedButton(
+          modifier = Modifier.testTag(TAKE_PHOTO_BUTTON_TAG),
+          onClick = { launcherAction.invoke() },
+          enabled = enabled,
+        ) {
+          val takePhotoText = stringResource(R.string.take_photo)
+          Icon(
+            painterResource(R.drawable.ic_camera),
+            tint = MaterialTheme.colorScheme.primary,
+            contentDescription = takePhotoText,
+            modifier = Modifier.size(dimensionResource(R.dimen.attachment_action_button_icon_size)),
+          )
+          Spacer(modifier = Modifier)
+          Text(takePhotoText)
         }
       }
 
@@ -279,7 +728,7 @@ internal object AttachmentViewHolderFactory :
             return@setFragmentResultListener
           }
 
-          val attachmentTitle = getFileName(attachmentUri)
+          val attachmentTitle = getFileName(context, attachmentUri)
           val answer =
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
@@ -439,7 +888,7 @@ internal object AttachmentViewHolderFactory :
         displayValidationResult(Invalid(listOf(context.getString(textResource, *formatArgs))))
       }
 
-      private fun getFileName(uri: Uri): String {
+      private fun getFileName(context: Context, uri: Uri): String {
         var fileName = ""
         val columns = arrayOf(OpenableColumns.DISPLAY_NAME)
         context.contentResolver.query(uri, columns, null, null, null)?.use { cursor ->
@@ -465,3 +914,7 @@ private fun Context.readBytesFromUri(uri: Uri): ByteArray {
 private fun Context.getMimeTypeFromUri(uri: Uri): String {
   return contentResolver.getType(uri) ?: "*/*"
 }
+
+const val TAKE_PHOTO_BUTTON_TAG = "TakePhotoButton"
+const val UPLOAD_FILE_BUTTON_TAG = "UploadFileButton"
+const val ATTACHMENT_MEDIA_PREVIEW_TAG = "photo_preview"
