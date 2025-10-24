@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,7 +179,7 @@ internal class EnabledAnswerOptionsEvaluator(
           }
       } else {
         // Ask the client to provide the answers from an external expanded Valueset.
-        externalValueSetResolver?.resolve(uri)?.map { coding ->
+        externalValueSetResolver?.resolve(uri, null)?.map { coding ->
           Questionnaire.QuestionnaireItemAnswerOptionComponent(coding.copy())
         }
       }

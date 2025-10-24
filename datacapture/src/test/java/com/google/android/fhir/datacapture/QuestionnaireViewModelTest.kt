@@ -5030,7 +5030,7 @@ class QuestionnaireViewModelTest {
       DataCaptureConfig(
         valueSetResolverExternal =
           object : ExternalAnswerValueSetResolver {
-            override suspend fun resolve(uri: String): List<Coding> {
+            override suspend fun resolve(uri: String, query: String?): List<Coding> {
               return if (uri == CODE_SYSTEM_YES_NO) {
                 listOf(
                   Coding().apply {
