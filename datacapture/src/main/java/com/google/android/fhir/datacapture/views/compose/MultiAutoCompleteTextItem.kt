@@ -16,30 +16,40 @@
 
 package com.google.android.fhir.datacapture.views.compose
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.factories.DropDownAnswerOption
@@ -64,57 +74,114 @@ internal fun MultiAutoCompleteTextItem(
       options.filter { it.answerOptionString.contains(autoCompleteText.text, true) }
     }
 
+  // Track the height of the chip container to add padding to text field
+  var chipContainerHeight by remember { mutableIntStateOf(0) }
+  val density = LocalDensity.current
+  val chipMargin = dimensionResource(R.dimen.auto_complete_chip_margin)
+  val chipMarginBottom = dimensionResource(R.dimen.auto_complete_chip_margin_bottom)
+
+  val interactionSource = remember { MutableInteractionSource() }
+  val colors = OutlinedTextFieldDefaults.colors()
+  val contentPadding =
+    remember(chipContainerHeight, selectedOptions.size) {
+      PaddingValues(
+        start = 16.dp,
+        top =
+          if (selectedOptions.isNotEmpty()) {
+            with(density) { chipContainerHeight.toDp() } + 16.dp
+          } else {
+            16.dp
+          },
+        end = 16.dp,
+        bottom = 16.dp,
+      )
+    }
+
   ExposedDropdownMenuBox(
     modifier = modifier,
     expanded = expanded,
     onExpandedChange = { expanded = it },
   ) {
-    OutlinedTextField(
-      value = autoCompleteText,
-      onValueChange = {
-        autoCompleteText = it
-        if (!expanded && autoCompleteText.text.isNotBlank()) expanded = true
-      },
-      modifier =
-        Modifier.fillMaxWidth()
-          .testTag(MULTI_AUTO_COMPLETE_TEXT_FIELD_TAG)
-          .semantics { if (isError) error(supportingText ?: "") }
-          .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, enabled),
-      enabled = enabled,
-      isError = isError,
-      label = { labelText?.let { Text(it) } },
-      supportingText = { supportingText?.let { Text(it) } },
-    )
+    Box {
+      // Text field fills the parent and has content padding for chips
+      BasicTextField(
+        value = autoCompleteText,
+        onValueChange = {
+          autoCompleteText = it
+          if (!expanded && autoCompleteText.text.isNotBlank()) expanded = true
+        },
+        modifier =
+          Modifier.fillMaxWidth()
+            .testTag(MULTI_AUTO_COMPLETE_TEXT_FIELD_TAG)
+            .semantics { if (isError) error(supportingText ?: "") }
+            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, enabled),
+        enabled = enabled,
+        textStyle = TextStyle.Default,
+        cursorBrush = SolidColor(colors.cursorColor),
+        interactionSource = interactionSource,
+        decorationBox = { innerTextField ->
+          OutlinedTextFieldDefaults.DecorationBox(
+            value = autoCompleteText.text,
+            innerTextField = innerTextField,
+            enabled = enabled,
+            singleLine = false,
+            visualTransformation = VisualTransformation.None,
+            interactionSource = interactionSource,
+            isError = isError,
+            label = labelText?.let { { Text(it) } },
+            supportingText = supportingText?.let { { Text(it) } },
+            colors = colors,
+            contentPadding = contentPadding,
+            container = {
+              OutlinedTextFieldDefaults.Container(
+                enabled = enabled,
+                isError = isError,
+                interactionSource = interactionSource,
+                colors = colors,
+              )
+            },
+          )
+        },
+      )
 
-    if (filteredOptions.isNotEmpty()) {
-      ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-        filteredOptions.forEach { option ->
-          DropDownAnswerMenuItem(enabled, option) {
-            expanded = false
-            autoCompleteText = TextFieldValue("") // Reset autoComplete text to empty
-            onNewOptionSelected(option)
+      // Chips overlay at the top of the text field
+      if (selectedOptions.isNotEmpty()) {
+        FlowRow(
+          modifier =
+            Modifier.fillMaxWidth()
+              .padding(chipMargin)
+              .padding(bottom = chipMarginBottom)
+              .onSizeChanged { size -> chipContainerHeight = size.height },
+          horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+          selectedOptions.forEach {
+            InputChip(
+              selected = false,
+              modifier = Modifier.testTag(MULTI_AUTO_COMPLETE_INPUT_CHIP_TAG),
+              enabled = enabled,
+              onClick = { onOptionDeselected(it) },
+              label = { Text(it.answerOptionAnnotatedString()) },
+              trailingIcon = {
+                Icon(
+                  painterResource(R.drawable.ic_clear),
+                  contentDescription = "Remove ${it.answerOptionString}",
+                )
+              },
+            )
           }
         }
       }
     }
 
-    FlowRow(
-      modifier =
-        Modifier.padding(dimensionResource(R.dimen.auto_complete_chip_margin))
-          .padding(bottom = dimensionResource(R.dimen.auto_complete_chip_margin_bottom)),
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-      selectedOptions.forEach {
-        InputChip(
-          selected = false,
-          modifier = Modifier.testTag(MULTI_AUTO_COMPLETE_INPUT_CHIP_TAG),
-          enabled = enabled,
-          onClick = { onOptionDeselected(it) },
-          label = { Text(it.answerOptionAnnotatedString()) },
-          trailingIcon = {
-            Icon(painterResource(R.drawable.ic_clear), contentDescription = "Close")
-          },
-        )
+    if (filteredOptions.isNotEmpty()) {
+      ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        filteredOptions.forEach { option ->
+          DropDownAnswerMenuItem(enabled, option) {
+            autoCompleteText = TextFieldValue("") // Reset autoComplete text to empty
+            onNewOptionSelected(option)
+            expanded = false
+          }
+        }
       }
     }
   }
