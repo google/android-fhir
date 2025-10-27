@@ -82,11 +82,13 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
             as InputMethodManager)
           .hideSoftInputFromWindow(view.windowToken, 0)
 
-        context.lifecycleScope.launch {
+        // TODO ignore the code snippet below for now, it causes unnecessary recompositions in
+        //  the lazy column used to render questionnaire fields
+        /*context.lifecycleScope.launch {
           // Update answer even if the text box loses focus without any change. This will mark the
           // questionnaire response item as being modified in the view model and trigger validation.
           handleInput(textInputEditText.editableText, questionnaireViewItem)
-        }
+        }*/
       }
     }
   }

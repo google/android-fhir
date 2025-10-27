@@ -40,6 +40,7 @@ internal sealed interface QuestionnaireAdapterItem {
   ) : QuestionnaireAdapterItem
 
   data class RepeatedGroupAddButton(
+    var id: String?,
     val item: QuestionnaireViewItem,
   ) : QuestionnaireAdapterItem
 

@@ -1056,7 +1056,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
 
       if (questionnaireItem.isRepeatedGroup) {
-        add(QuestionnaireAdapterItem.RepeatedGroupAddButton(question.item))
+        add(
+          QuestionnaireAdapterItem.RepeatedGroupAddButton(
+            id = "${parentIdPrefix}${question.item.questionnaireItem.linkId}_add_btn",
+            item = question.item,
+          ),
+        )
       }
     }
     currentPageItems = items
