@@ -57,10 +57,10 @@ import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemView
 import com.google.android.fhir.datacapture.views.factories.RepeatedGroupHeaderItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import kotlin.uuid.ExperimentalUuidApi
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
 import timber.log.Timber
-import kotlin.uuid.ExperimentalUuidApi
 
 /**
  * A [Fragment] for displaying FHIR Questionnaires and getting user responses as FHIR
@@ -163,7 +163,6 @@ class QuestionnaireFragment : Fragment() {
       view.findViewById<View>(R.id.review_mode_edit_button).apply {
         setOnClickListener { viewModel.setReviewMode(false) }
       }
-
 
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
