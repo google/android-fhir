@@ -29,8 +29,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.viewinterop.AndroidView
@@ -172,9 +170,7 @@ class QuestionnaireFragment : Fragment() {
             questionnaireEditRecyclerView.visibility = View.GONE
 
             questionnaireReviewComposeView.visibility = View.VISIBLE
-            questionnaireReviewComposeView.setContent {
-              QuestionnaireReviewList(state.items)
-            }
+            questionnaireReviewComposeView.setContent { QuestionnaireReviewList(state.items) }
             reviewModeEditButton.visibility =
               if (displayMode.showEditButton) {
                 View.VISIBLE
@@ -300,11 +296,11 @@ class QuestionnaireFragment : Fragment() {
         key = { item ->
           when (item) {
             is QuestionnaireAdapterItem.Question -> item.id
-              ?: throw IllegalStateException("Missing id for the Question: $item")
+                ?: throw IllegalStateException("Missing id for the Question: $item")
             is QuestionnaireAdapterItem.RepeatedGroupHeader -> item.id
             is QuestionnaireAdapterItem.Navigation -> "navigation"
             is QuestionnaireAdapterItem.RepeatedGroupAddButton -> item.id
-              ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
+                ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
           }
         },
       ) { item: QuestionnaireAdapterItem ->
