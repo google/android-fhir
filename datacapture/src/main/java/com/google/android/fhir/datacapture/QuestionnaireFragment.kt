@@ -44,8 +44,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
@@ -57,11 +55,12 @@ import com.google.android.fhir.datacapture.views.RepeatedGroupAddItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.RepeatedGroupHeaderItemViewHolder
+import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import kotlin.uuid.ExperimentalUuidApi
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
 import timber.log.Timber
+import kotlin.uuid.ExperimentalUuidApi
 
 /**
  * A [Fragment] for displaying FHIR Questionnaires and getting user responses as FHIR
@@ -115,8 +114,8 @@ class QuestionnaireFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     val questionnaireEditComposeView =
       view.findViewById<ComposeView>(R.id.questionnaire_edit_compose_view)
-    val questionnaireReviewRecyclerView =
-      view.findViewById<RecyclerView>(R.id.questionnaire_review_recycler_view)
+    val questionnaireReviewComposeView =
+      view.findViewById<ComposeView>(R.id.questionnaire_review_recycler_view)
     val questionnaireTitle = view.findViewById<TextView>(R.id.questionnaire_title)
 
     // This container frame floats at the bottom of the view to make navigation controls visible at
@@ -160,15 +159,11 @@ class QuestionnaireFragment : Fragment() {
     val questionnaireProgressIndicator: LinearProgressIndicator =
       view.findViewById(R.id.questionnaire_progress_indicator)
 
-    val questionnaireReviewAdapter = QuestionnaireReviewAdapter()
-
     val reviewModeEditButton =
       view.findViewById<View>(R.id.review_mode_edit_button).apply {
         setOnClickListener { viewModel.setReviewMode(false) }
       }
 
-    questionnaireReviewRecyclerView.adapter = questionnaireReviewAdapter
-    questionnaireReviewRecyclerView.layoutManager = LinearLayoutManager(view.context)
 
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
@@ -176,11 +171,11 @@ class QuestionnaireFragment : Fragment() {
         when (val displayMode = state.displayMode) {
           is DisplayMode.ReviewMode -> {
             // Set items
+
+            questionnaireReviewComposeView.visibility = View.VISIBLE
+            questionnaireReviewComposeView.setContent { QuestionnaireReviewList(state.items) }
             questionnaireEditComposeView.visibility = View.GONE
-            questionnaireReviewAdapter.submitList(
-              state.items.filterIsInstance<ReviewAdapterItem>(),
-            )
-            questionnaireReviewRecyclerView.visibility = View.VISIBLE
+
             reviewModeEditButton.visibility =
               if (displayMode.showEditButton) {
                 View.VISIBLE
@@ -204,7 +199,7 @@ class QuestionnaireFragment : Fragment() {
           }
           is DisplayMode.EditMode -> {
             // Set items
-            questionnaireReviewRecyclerView.visibility = View.GONE
+            questionnaireReviewComposeView.visibility = View.GONE
             questionnaireEditComposeView.setContent {
               QuestionnaireEditList(
                 items = state.items,
@@ -246,7 +241,7 @@ class QuestionnaireFragment : Fragment() {
             }
           }
           is DisplayMode.InitMode -> {
-            questionnaireReviewRecyclerView.visibility = View.GONE
+            questionnaireReviewComposeView.visibility = View.GONE
             questionnaireEditComposeView.visibility = View.GONE
             questionnaireProgressIndicator.visibility = View.GONE
             reviewModeEditButton.visibility = View.GONE
@@ -422,6 +417,53 @@ class QuestionnaireFragment : Fragment() {
             }
           },
           onReset = { view -> view.setTag(R.id.question_view_holder, null) },
+        )
+      }
+    }
+  }
+
+  @Composable
+  private fun QuestionnaireReviewList(items: List<QuestionnaireAdapterItem>) {
+    LazyColumn {
+      items(
+        items = items,
+        key = { item ->
+          when (item) {
+            is QuestionnaireAdapterItem.Question -> item.id
+                ?: throw IllegalStateException("Missing id for the Question: $item")
+            is QuestionnaireAdapterItem.RepeatedGroupHeader -> item.id
+            is QuestionnaireAdapterItem.Navigation -> "navigation"
+            is QuestionnaireAdapterItem.RepeatedGroupAddButton -> item.id
+                ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
+          }
+        },
+      ) { item: QuestionnaireAdapterItem ->
+        AndroidView(
+          factory = { context ->
+            LinearLayout(context).apply {
+              orientation = LinearLayout.VERTICAL
+              when (item) {
+                is QuestionnaireAdapterItem.Question -> {
+                  val viewHolder = ReviewViewHolderFactory.create(this)
+                  viewHolder.bind(item.item)
+                  addView(viewHolder.itemView)
+                }
+                is QuestionnaireAdapterItem.Navigation -> {
+                  val viewHolder =
+                    NavigationViewHolder(inflate(R.layout.pagination_navigation_view))
+                  viewHolder.bind(item.questionnaireNavigationUIState)
+                  addView(viewHolder.itemView)
+                }
+                is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+                  TODO("Not implemented yet")
+                }
+                is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+                  TODO("Not implemented yet")
+                }
+              }
+            }
+          },
+          modifier = Modifier.fillMaxWidth(),
         )
       }
     }
