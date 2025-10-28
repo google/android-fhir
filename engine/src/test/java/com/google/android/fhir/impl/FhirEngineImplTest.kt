@@ -95,6 +95,31 @@ class FhirEngineImplTest {
   }
 
   @Test
+  fun create_isLocalOnlyTrue_shouldCreateResourceWithoutFlaggingLocalChange() = runBlocking {
+    val totalLocalChangesPatient2 =
+      fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_2_ID).size
+    fhirEngine.create(TEST_PATIENT_2, isLocalOnly = true)
+    assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
+    assertThat(fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_2_ID).size)
+      .isEqualTo(totalLocalChangesPatient2)
+  }
+
+  @Test
+  fun createAll_isLocalOnlyTrue_shouldCreateResourceWithoutFlaggingLocalChange() = runBlocking {
+    val totalLocalChangesPatient1 =
+      fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_1_ID).size
+    val totalLocalChangesPatient2 =
+      fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_2_ID).size
+    fhirEngine.create(TEST_PATIENT_1, TEST_PATIENT_2, isLocalOnly = true)
+    assertResourceEquals(TEST_PATIENT_1, fhirEngine.get<Patient>(TEST_PATIENT_1_ID))
+    assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
+    assertThat(fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_1_ID).size)
+      .isEqualTo(totalLocalChangesPatient1)
+    assertThat(fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_2_ID).size)
+      .isEqualTo(totalLocalChangesPatient2)
+  }
+
+  @Test
   fun create_resourceWithoutId_shouldCreateResourceWithAssignedId() = runBlocking {
     val patient =
       Patient().apply {
