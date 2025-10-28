@@ -163,12 +163,6 @@ class QuestionnaireFragment : Fragment() {
     // Animation does work well with views that could gain focus
     questionnaireEditRecyclerView.itemAnimator = null
 
-    questionnaireReviewComposeView.setContent {
-      val questionerStateFlow = viewModel.questionnaireStateFlow.collectAsState()
-
-      QuestionnaireReviewList(questionerStateFlow)
-    }
-
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.questionnaireStateFlow.collect { state ->
@@ -176,7 +170,11 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.ReviewMode -> {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
+
             questionnaireReviewComposeView.visibility = View.VISIBLE
+            questionnaireReviewComposeView.setContent {
+              QuestionnaireReviewList(state.items)
+            }
             reviewModeEditButton.visibility =
               if (displayMode.showEditButton) {
                 View.VISIBLE
@@ -295,16 +293,18 @@ class QuestionnaireFragment : Fragment() {
   }
 
   @Composable
-  private fun QuestionnaireReviewList(questionerStateFlow: State<QuestionnaireState>) {
+  private fun QuestionnaireReviewList(items: List<QuestionnaireAdapterItem>) {
     LazyColumn {
       items(
-        questionerStateFlow.value.items,
+        items = items,
         key = { item ->
           when (item) {
             is QuestionnaireAdapterItem.Question -> item.id
-                ?: throw IllegalStateException("Missing id for the QuestionnaireAdapterItem: $item")
+              ?: throw IllegalStateException("Missing id for the Question: $item")
             is QuestionnaireAdapterItem.RepeatedGroupHeader -> item.id
             is QuestionnaireAdapterItem.Navigation -> "navigation"
+            is QuestionnaireAdapterItem.RepeatedGroupAddButton -> item.id
+              ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
           }
         },
       ) { item: QuestionnaireAdapterItem ->
@@ -325,6 +325,9 @@ class QuestionnaireFragment : Fragment() {
                   addView(viewHolder.itemView)
                 }
                 is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+                  TODO("Not implemented yet")
+                }
+                is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
                   TODO("Not implemented yet")
                 }
               }

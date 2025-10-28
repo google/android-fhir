@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.app.Dialog
 import android.os.Bundle
+import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
@@ -32,6 +33,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -93,7 +96,7 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
           text =
             viewModel
               .getItemsTextWithValidationErrors()
-              .joinToString(separator = "\n") {
+              .joinToString(separator = "<br>") {
                 context.getString(R.string.questionnaire_validation_error_item_text_with_bullet, it)
               }
               .toSpanned()
@@ -129,14 +132,22 @@ internal class QuestionnaireValidationErrorViewModel : ViewModel() {
   }
 
   /** @return Texts associated with the failing [Questionnaire.QuestionnaireItemComponent]s. */
-  fun getItemsTextWithValidationErrors(): List<String> {
+  fun getItemsTextWithValidationErrors(): List<Spanned> {
     val invalidFields =
       validation?.filterValues { it.filterIsInstance<Invalid>().isNotEmpty() } ?: emptyMap()
     return questionnaire
       ?.item
       ?.flattened()
       ?.filter { invalidFields.contains(it.linkId) }
-      ?.map { if (it.text.isNullOrEmpty()) it.localizedFlyoverSpanned.toString() else it.text }
+      ?.mapNotNull {
+        // Use the question text if available, otherwise fall back to the fly-over and then the
+        // prefix.
+        it.localizedTextSpanned?.takeIfNotBlank()
+          ?: it.localizedFlyoverSpanned?.takeIfNotBlank()
+            ?: it.localizedPrefixSpanned?.takeIfNotBlank()
+      }
       ?: emptyList()
   }
+
+  private fun Spanned.takeIfNotBlank(): Spanned? = takeIf { it.isNotBlank() }
 }

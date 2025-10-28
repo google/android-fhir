@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,13 @@ package com.google.android.fhir.datacapture.test
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTextInput
 import androidx.fragment.app.commitNow
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -26,8 +33,8 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
@@ -47,6 +54,8 @@ import com.google.android.fhir.datacapture.test.utilities.clickOnText
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.android.fhir.datacapture.validation.Valid
+import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
+import com.google.android.fhir.datacapture.views.compose.HANDLE_INPUT_DEBOUNCE_TIME
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localDateTime
 import com.google.android.material.progressindicator.LinearProgressIndicator
@@ -58,7 +67,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
@@ -73,10 +83,11 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireUiEspressoTest {
 
-  @Rule
-  @JvmField
-  var activityScenarioRule: ActivityScenarioRule<TestActivity> =
+  @get:Rule
+  val activityScenarioRule: ActivityScenarioRule<TestActivity> =
     ActivityScenarioRule(TestActivity::class.java)
+
+  @get:Rule val composeTestRule = createEmptyComposeRule()
 
   private lateinit var parent: FrameLayout
   private val parser: IParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
@@ -141,10 +152,13 @@ class QuestionnaireUiEspressoTest {
   fun integerTextEdit_inputOutOfRange_shouldShowError() {
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("12345678901"))
-    onView(withId(R.id.text_input_layout)).check { view, _ ->
-      val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo("Number must be between -2,147,483,648 and 2,147,483,647")
+    runBlocking {
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("12345678901")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
+      composeTestRule
+        .onNodeWithText("Number must be between -2,147,483,648 and 2,147,483,647")
+        .assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Error").assertIsDisplayed()
     }
   }
 
@@ -155,18 +169,18 @@ class QuestionnaireUiEspressoTest {
     // e.g whether 000001 or 1 is input, the answer saved will be 1.
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
 
-    runTest {
-      onView(withId(R.id.text_input_edit_text)).perform(typeText("0"))
+    runBlocking {
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("0")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
         .isEqualTo(0)
 
-      onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("01")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
         .isEqualTo(1)
 
-      onView(withId(R.id.text_input_edit_text)).check { view, _ ->
-        assertThat((view as TextInputEditText).text.toString()).isEqualTo("001")
-      }
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("001")
 
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
         .isEqualTo(1)
@@ -177,18 +191,18 @@ class QuestionnaireUiEspressoTest {
   fun decimalTextEdit_typingZeroBeforeAnyIntegerShouldKeepZeroDisplayed() {
     buildFragmentFromQuestionnaire("/text_questionnaire_decimal.json")
 
-    runTest {
-      onView(withId(R.id.text_input_edit_text)).perform(typeText("0."))
+    runBlocking {
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("0.")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
         .isEqualTo(BigDecimal.valueOf(0.0))
 
-      onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("01")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
         .isEqualTo(BigDecimal.valueOf(0.01))
 
-      onView(withId(R.id.text_input_edit_text)).check { view, _ ->
-        assertThat((view as TextInputEditText).text.toString()).isEqualTo("0.01")
-      }
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("0.01")
 
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
         .isEqualTo(BigDecimal.valueOf(0.01))
@@ -199,10 +213,12 @@ class QuestionnaireUiEspressoTest {
   fun decimalTextEdit_typingInvalidTextShouldShowError() {
     buildFragmentFromQuestionnaire("/text_questionnaire_decimal.json")
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("1.1.1.1"))
+    runBlocking {
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("1.1.1.1")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
 
-    onView(withId(R.id.text_input_layout)).check { view, _ ->
-      assertThat((view as TextInputLayout).error).isEqualTo("Invalid number")
+      composeTestRule.onNodeWithText("Invalid number").assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Error").assertIsDisplayed()
     }
   }
 
@@ -237,7 +253,7 @@ class QuestionnaireUiEspressoTest {
 
     onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isTrue() }
 
-    runTest {
+    runBlocking {
       assertThat(getQuestionnaireResponse().item.size).isEqualTo(1)
       assertThat(getQuestionnaireResponse().item.first().answer.size).isEqualTo(0)
     }
@@ -257,7 +273,7 @@ class QuestionnaireUiEspressoTest {
     clickOnText("10")
     clickOnText("OK")
 
-    runTest {
+    runBlocking {
       val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
       // check Locale
       assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
@@ -292,7 +308,7 @@ class QuestionnaireUiEspressoTest {
       assertThat(actualError).isEqualTo(null)
     }
 
-    runTest {
+    runBlocking {
       val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType
       assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
     }
@@ -330,7 +346,7 @@ class QuestionnaireUiEspressoTest {
 
     val today = DateTimeType.today().valueAsString
 
-    runTest {
+    runBlocking {
       val answer =
         getQuestionnaireResponse().item.first().answer.first().valueDateType.valueAsString
       assertThat(answer).isEqualTo(today)
@@ -377,7 +393,7 @@ class QuestionnaireUiEspressoTest {
 
     val maxDateAllowed = maxDate.valueAsString
 
-    runTest {
+    runBlocking {
       val validationResult =
         QuestionnaireResponseValidator.validateQuestionnaireResponse(
           questionnaire,
@@ -424,7 +440,7 @@ class QuestionnaireUiEspressoTest {
 
     val minDateAllowed = minDate.valueAsString
 
-    runTest {
+    runBlocking {
       val validationResult =
         QuestionnaireResponseValidator.validateQuestionnaireResponse(
           questionnaire,
@@ -611,14 +627,21 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
+  fun test_add_item_button_does_not_exist_for_non_repeated_groups() {
+    buildFragmentFromQuestionnaire("/component_non_repeated_group.json")
+    onView(withId(R.id.add_item_to_repeated_group)).check(doesNotExist())
+  }
+
+  @Test
   fun test_repeated_group_is_added() {
     buildFragmentFromQuestionnaire("/component_repeated_group.json")
 
     onView(withId(R.id.questionnaire_edit_recycler_view))
       .perform(
         RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
-          0,
-          clickChildViewWithId(R.id.add_item),
+          1, // 'Add item' is in the second row of the recyclerview with group header as the first
+          // item
+          clickChildViewWithId(R.id.add_item_to_repeated_group),
         ),
       )
 
@@ -635,6 +658,75 @@ class QuestionnaireUiEspressoTest {
           ),
         )
         .isEqualTo(1)
+    }
+  }
+
+  @Test
+  fun test_repeated_group_adds_multiple_items() {
+    buildFragmentFromQuestionnaire("/component_multiple_repeated_group.json")
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          1, // The add button position is 1 (zero-indexed) after the group's header
+          clickChildViewWithId(R.id.add_item_to_repeated_group),
+        ),
+      )
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          3, // The add button new position becomes 3 (zero-indexed) after the group's header,
+          // repeated item's header and the one item added
+          clickChildViewWithId(R.id.add_item_to_repeated_group),
+        ),
+      )
+
+    onView(ViewMatchers.withId(R.id.questionnaire_edit_recycler_view)).check {
+      view,
+      noViewFoundException,
+      ->
+      if (noViewFoundException != null) {
+        throw noViewFoundException
+      }
+      assertThat(
+          (view as RecyclerView).countChildViewOccurrences(
+            R.id.repeated_group_instance_header_title,
+          ),
+        )
+        .isEqualTo(2)
+    }
+  }
+
+  @Test
+  fun test_repeated_group_adds_items_for_subsequent() {
+    buildFragmentFromQuestionnaire("/component_multiple_repeated_group.json")
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          3, // The add button for the second repeated group is at position 3 (zero-indexed), after
+          // the first group's header (0), the first group's add button (1), and the second
+          // group's header (2)
+          clickChildViewWithId(R.id.add_item_to_repeated_group),
+        ),
+      )
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          5, // The add button for the second group is now at position 5 after adding one item
+          clickChildViewWithId(R.id.add_item_to_repeated_group),
+        ),
+      )
+
+    onView(ViewMatchers.withId(R.id.questionnaire_edit_recycler_view)).check {
+      view,
+      noViewFoundException,
+      ->
+      if (noViewFoundException != null) {
+        throw noViewFoundException
+      }
+      assertThat(
+          (view as RecyclerView).countChildViewOccurrences(
+            R.id.repeated_group_instance_header_title,
+          ),
+        )
+        .isEqualTo(2)
     }
   }
 
