@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import com.google.android.fhir.datacapture.R
-
-internal object EditTextMultiLineViewHolderFactory :
-  EditTextViewHolderFactory(R.layout.edit_text_multi_line_view) {
-  override fun getQuestionnaireItemViewHolderDelegate() = EditTextStringViewHolderDelegate()
+internal object EditTextMultiLineViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
+  override fun getQuestionnaireItemViewHolderDelegate() =
+    createEditTextStringViewHolderDelegate(multiLine = true)
 }

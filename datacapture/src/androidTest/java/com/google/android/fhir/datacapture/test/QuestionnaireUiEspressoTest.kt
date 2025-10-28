@@ -20,14 +20,15 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.printToLog
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTextInput
 import androidx.fragment.app.commitNow
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.matcher.RootMatchers
@@ -46,20 +47,18 @@ import com.google.android.fhir.datacapture.test.utilities.clickOnText
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.android.fhir.datacapture.validation.Valid
+import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
+import com.google.android.fhir.datacapture.views.compose.HANDLE_INPUT_DEBOUNCE_TIME
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localDateTime
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.Calendar
-import java.util.Date
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
-import org.hamcrest.core.AllOf.allOf
+import org.hamcrest.Matchers.allOf
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -69,6 +68,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.Calendar
+import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireUiEspressoTest {
@@ -138,11 +142,13 @@ class QuestionnaireUiEspressoTest {
   fun integerTextEdit_inputOutOfRange_shouldShowError() {
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
 
-    onView(withId(com.google.android.fhir.datacapture.R.id.text_input_edit_text))
-      .perform(typeText("12345678901"))
-    onView(withId(com.google.android.fhir.datacapture.R.id.text_input_layout)).check { view, _ ->
-      val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo("Number must be between -2,147,483,648 and 2,147,483,647")
+    runBlocking {
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("12345678901")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
+      composeTestRule
+        .onNodeWithText("Number must be between -2,147,483,648 and 2,147,483,647")
+        .assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Error").assertIsDisplayed()
     }
   }
 
@@ -153,21 +159,18 @@ class QuestionnaireUiEspressoTest {
     // e.g whether 000001 or 1 is input, the answer saved will be 1.
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
 
-    runTest {
-      onView(withId(com.google.android.fhir.datacapture.R.id.text_input_edit_text))
-        .perform(typeText("0"))
+    runBlocking {
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("0")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
         .isEqualTo(0)
 
-      onView(withId(com.google.android.fhir.datacapture.R.id.text_input_edit_text))
-        .perform(typeText("01"))
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("01")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
         .isEqualTo(1)
 
-      onView(withId(com.google.android.fhir.datacapture.R.id.text_input_edit_text)).check { view, _,
-        ->
-        assertThat((view as TextInputEditText).text.toString()).isEqualTo("001")
-      }
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("001")
 
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
         .isEqualTo(1)
@@ -178,21 +181,18 @@ class QuestionnaireUiEspressoTest {
   fun decimalTextEdit_typingZeroBeforeAnyIntegerShouldKeepZeroDisplayed() {
     buildFragmentFromQuestionnaire("/text_questionnaire_decimal.json")
 
-    runTest {
-      onView(withId(com.google.android.fhir.datacapture.R.id.text_input_edit_text))
-        .perform(typeText("0."))
+    runBlocking {
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("0.")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
         .isEqualTo(BigDecimal.valueOf(0.0))
 
-      onView(withId(com.google.android.fhir.datacapture.R.id.text_input_edit_text))
-        .perform(typeText("01"))
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("01")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
         .isEqualTo(BigDecimal.valueOf(0.01))
 
-      onView(withId(com.google.android.fhir.datacapture.R.id.text_input_edit_text)).check { view, _,
-        ->
-        assertThat((view as TextInputEditText).text.toString()).isEqualTo("0.01")
-      }
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("0.01")
 
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
         .isEqualTo(BigDecimal.valueOf(0.01))
@@ -203,11 +203,12 @@ class QuestionnaireUiEspressoTest {
   fun decimalTextEdit_typingInvalidTextShouldShowError() {
     buildFragmentFromQuestionnaire("/text_questionnaire_decimal.json")
 
-    onView(withId(com.google.android.fhir.datacapture.R.id.text_input_edit_text))
-      .perform(typeText("1.1.1.1"))
+    runBlocking {
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("1.1.1.1")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
 
-    onView(withId(com.google.android.fhir.datacapture.R.id.text_input_layout)).check { view, _ ->
-      assertThat((view as TextInputLayout).error).isEqualTo("Invalid number")
+      composeTestRule.onNodeWithText("Invalid number").assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Error").assertIsDisplayed()
     }
   }
 
@@ -246,7 +247,7 @@ class QuestionnaireUiEspressoTest {
       assertThat(view.isEnabled).isTrue()
     }
 
-    runTest {
+    runBlocking {
       assertThat(getQuestionnaireResponse().item.size).isEqualTo(1)
       assertThat(getQuestionnaireResponse().item.first().answer.size).isEqualTo(0)
     }
@@ -267,7 +268,7 @@ class QuestionnaireUiEspressoTest {
     clickOnText("10")
     clickOnText("OK")
 
-    runTest {
+    runBlocking {
       val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
       // check Locale
       assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
@@ -302,7 +303,7 @@ class QuestionnaireUiEspressoTest {
       assertThat(actualError).isEqualTo(null)
     }
 
-    runTest {
+    runBlocking {
       val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType
       assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
     }
@@ -341,7 +342,7 @@ class QuestionnaireUiEspressoTest {
 
     val today = DateTimeType.today().valueAsString
 
-    runTest {
+    runBlocking {
       val answer =
         getQuestionnaireResponse().item.first().answer.first().valueDateType.valueAsString
       assertThat(answer).isEqualTo(today)
@@ -389,7 +390,7 @@ class QuestionnaireUiEspressoTest {
 
     val maxDateAllowed = maxDate.valueAsString
 
-    runTest {
+    runBlocking {
       val validationResult =
         QuestionnaireResponseValidator.validateQuestionnaireResponse(
           questionnaire,
@@ -437,7 +438,7 @@ class QuestionnaireUiEspressoTest {
 
     val minDateAllowed = minDate.valueAsString
 
-    runTest {
+    runBlocking {
       val validationResult =
         QuestionnaireResponseValidator.validateQuestionnaireResponse(
           questionnaire,
@@ -645,7 +646,6 @@ class QuestionnaireUiEspressoTest {
   @Test
   fun test_repeated_group_is_added() {
     buildFragmentFromQuestionnaire("/component_repeated_group.json")
-    composeTestRule.onRoot().printToLog("ComposableHierarchy")
     onView(withId(com.google.android.fhir.datacapture.R.id.add_item_to_repeated_group))
       .perform(ViewActions.click())
 
@@ -696,7 +696,7 @@ class QuestionnaireUiEspressoTest {
       .perform(ViewActions.click())
 
     onView(withText(com.google.android.fhir.datacapture.R.id.repeated_group_instance_header_title))
-      .check(ViewAssertions.doesNotExist())
+      .check(doesNotExist())
   }
 
   private fun buildFragmentFromQuestionnaire(

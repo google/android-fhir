@@ -18,13 +18,16 @@ package com.google.android.fhir.datacapture.views
 
 import android.content.Context
 import android.text.Spanned
+import androidx.compose.ui.text.AnnotatedString
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.isHelpCode
+import com.google.android.fhir.datacapture.extensions.localizedTextAnnotatedString
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.maxValue
 import com.google.android.fhir.datacapture.extensions.minValue
+import com.google.android.fhir.datacapture.extensions.toAnnotatedString
 import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -212,6 +215,11 @@ data class QuestionnaireViewItem(
    */
   val questionText: Spanned? by lazy {
     questionnaireResponseItem.text?.toSpanned() ?: questionnaireItem.localizedTextSpanned
+  }
+
+  val questionTextAnnotatedString: AnnotatedString? by lazy {
+    questionnaireResponseItem.text?.toAnnotatedString()
+      ?: questionnaireItem.textElement.localizedTextAnnotatedString()
   }
 
   /**
