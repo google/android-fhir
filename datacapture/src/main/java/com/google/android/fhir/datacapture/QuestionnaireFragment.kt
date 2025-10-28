@@ -21,43 +21,27 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
 import androidx.core.os.bundleOf
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
-import com.google.android.fhir.datacapture.extensions.inflate
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
-import com.google.android.fhir.datacapture.views.RepeatedGroupAddItemViewHolder
-import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
-import com.google.android.fhir.datacapture.views.factories.RepeatedGroupHeaderItemViewHolder
-import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import kotlin.uuid.ExperimentalUuidApi
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
 import timber.log.Timber
@@ -165,86 +149,90 @@ class QuestionnaireFragment : Fragment() {
       }
 
     // Listen to updates from the view model.
-    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-      viewModel.questionnaireStateFlow.collect { state ->
-        when (val displayMode = state.displayMode) {
-          is DisplayMode.ReviewMode -> {
-            // Set items
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+        viewModel.questionnaireStateFlow.collect { state ->
+          when (val displayMode = state.displayMode) {
+            is DisplayMode.ReviewMode -> {
+              // Set items
 
-            questionnaireReviewComposeView.visibility = View.VISIBLE
-            questionnaireReviewComposeView.setContent { QuestionnaireReviewList(state.items) }
-            questionnaireEditComposeView.visibility = View.GONE
+              questionnaireReviewComposeView.visibility = View.VISIBLE
+              questionnaireReviewComposeView.setContent { QuestionnaireReviewList(state.items) }
+              questionnaireEditComposeView.visibility = View.GONE
 
-            reviewModeEditButton.visibility =
-              if (displayMode.showEditButton) {
-                View.VISIBLE
+              reviewModeEditButton.visibility =
+                if (displayMode.showEditButton) {
+                  View.VISIBLE
+                } else {
+                  View.GONE
+                }
+              questionnaireTitle.visibility = View.VISIBLE
+              questionnaireTitle.text = getString(R.string.questionnaire_review_mode_title)
+
+              // Set bottom navigation
+              if (state.bottomNavItem != null) {
+                bottomNavContainerFrame.visibility = View.VISIBLE
+                NavigationViewHolder(bottomNavContainerFrame)
+                  .bind(state.bottomNavItem.questionnaireNavigationUIState)
               } else {
-                View.GONE
+                bottomNavContainerFrame.visibility = View.GONE
               }
-            questionnaireTitle.visibility = View.VISIBLE
-            questionnaireTitle.text = getString(R.string.questionnaire_review_mode_title)
 
-            // Set bottom navigation
-            if (state.bottomNavItem != null) {
-              bottomNavContainerFrame.visibility = View.VISIBLE
-              NavigationViewHolder(bottomNavContainerFrame)
-                .bind(state.bottomNavItem.questionnaireNavigationUIState)
-            } else {
+              // Hide progress indicator
+              questionnaireProgressIndicator.visibility = View.GONE
+            }
+            is DisplayMode.EditMode -> {
+              // Set items
+              questionnaireReviewComposeView.visibility = View.GONE
+              questionnaireEditComposeView.setContent {
+                QuestionnaireEditList(
+                  items = state.items,
+                  displayMode = displayMode,
+                  questionnaireItemViewHolderMatchers =
+                    questionnaireItemViewHolderFactoryMatchersProvider.get(),
+                  onUpdateProgressIndicator = { currentPage, totalCount ->
+                    questionnaireProgressIndicator.updateProgressIndicator(
+                      calculateProgressPercentage(
+                        count = (currentPage + 1),
+                        totalCount = totalCount,
+                      ),
+                    )
+                  },
+                )
+              }
+              questionnaireEditComposeView.visibility = View.VISIBLE
+              reviewModeEditButton.visibility = View.GONE
+              questionnaireTitle.visibility = View.GONE
+
+              // Set bottom navigation
+              if (state.bottomNavItem != null) {
+                bottomNavContainerFrame.visibility = View.VISIBLE
+                NavigationViewHolder(bottomNavContainerFrame)
+                  .bind(state.bottomNavItem.questionnaireNavigationUIState)
+              } else {
+                bottomNavContainerFrame.visibility = View.GONE
+              }
+
+              // Set progress indicator
+              questionnaireProgressIndicator.visibility = View.VISIBLE
+              if (displayMode.pagination.isPaginated) {
+                questionnaireProgressIndicator.updateProgressIndicator(
+                  calculateProgressPercentage(
+                    count =
+                      (displayMode.pagination.currentPageIndex +
+                        1), // incremented by 1 due to initialPageIndex starts with 0.
+                    totalCount = displayMode.pagination.pages.size,
+                  ),
+                )
+              }
+            }
+            is DisplayMode.InitMode -> {
+              questionnaireReviewComposeView.visibility = View.GONE
+              questionnaireEditComposeView.visibility = View.GONE
+              questionnaireProgressIndicator.visibility = View.GONE
+              reviewModeEditButton.visibility = View.GONE
               bottomNavContainerFrame.visibility = View.GONE
             }
-
-            // Hide progress indicator
-            questionnaireProgressIndicator.visibility = View.GONE
-          }
-          is DisplayMode.EditMode -> {
-            // Set items
-            questionnaireReviewComposeView.visibility = View.GONE
-            questionnaireEditComposeView.setContent {
-              QuestionnaireEditList(
-                items = state.items,
-                displayMode = displayMode,
-                onUpdateProgressIndicator = { currentPage, totalCount ->
-                  questionnaireProgressIndicator.updateProgressIndicator(
-                    calculateProgressPercentage(
-                      count = (currentPage + 1),
-                      totalCount = totalCount,
-                    ),
-                  )
-                },
-              )
-            }
-            questionnaireEditComposeView.visibility = View.VISIBLE
-            reviewModeEditButton.visibility = View.GONE
-            questionnaireTitle.visibility = View.GONE
-
-            // Set bottom navigation
-            if (state.bottomNavItem != null) {
-              bottomNavContainerFrame.visibility = View.VISIBLE
-              NavigationViewHolder(bottomNavContainerFrame)
-                .bind(state.bottomNavItem.questionnaireNavigationUIState)
-            } else {
-              bottomNavContainerFrame.visibility = View.GONE
-            }
-
-            // Set progress indicator
-            questionnaireProgressIndicator.visibility = View.VISIBLE
-            if (displayMode.pagination.isPaginated) {
-              questionnaireProgressIndicator.updateProgressIndicator(
-                calculateProgressPercentage(
-                  count =
-                    (displayMode.pagination.currentPageIndex +
-                      1), // incremented by 1 due to initialPageIndex starts with 0.
-                  totalCount = displayMode.pagination.pages.size,
-                ),
-              )
-            }
-          }
-          is DisplayMode.InitMode -> {
-            questionnaireReviewComposeView.visibility = View.GONE
-            questionnaireEditComposeView.visibility = View.GONE
-            questionnaireProgressIndicator.visibility = View.GONE
-            reviewModeEditButton.visibility = View.GONE
-            bottomNavContainerFrame.visibility = View.GONE
           }
         }
       }
@@ -285,185 +273,6 @@ class QuestionnaireFragment : Fragment() {
           Timber.e(
             "Unknown fragment result $result",
           )
-      }
-    }
-  }
-
-  @OptIn(ExperimentalUuidApi::class)
-  @Composable
-  private fun QuestionnaireEditList(
-    items: List<QuestionnaireAdapterItem>,
-    displayMode: DisplayMode,
-    onUpdateProgressIndicator: (Int, Int) -> Unit,
-  ) {
-    val listState = rememberLazyListState()
-    LaunchedEffect(listState) {
-      if (displayMode is DisplayMode.EditMode && !displayMode.pagination.isPaginated) {
-        snapshotFlow {
-            val layoutInfo = listState.layoutInfo
-            val visibleItems = layoutInfo.visibleItemsInfo
-            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            val total = layoutInfo.totalItemsCount
-
-            // If all items are visible, we're at 100%
-            if (visibleItems.size >= total && total > 0) {
-              total to total
-            } else {
-              lastVisible + 1 to total
-            }
-          }
-          .collect { (visibleCount, total) -> onUpdateProgressIndicator(visibleCount, total) }
-      }
-    }
-    LazyColumn(state = listState, modifier = Modifier.testTag(QUESTIONNAIRE_EDIT_LIST)) {
-      items(
-        items = items,
-        key = { item ->
-          when (item) {
-            is QuestionnaireAdapterItem.Question -> item.id
-                ?: throw IllegalStateException("Missing id for the Question: $item")
-            is QuestionnaireAdapterItem.RepeatedGroupHeader -> item.id
-            is QuestionnaireAdapterItem.Navigation -> "navigation"
-            is QuestionnaireAdapterItem.RepeatedGroupAddButton -> item.id
-                ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
-          }
-        },
-      ) { adapterItem: QuestionnaireAdapterItem ->
-        AndroidView(
-          factory = { context ->
-            LinearLayout(context).apply {
-              orientation = LinearLayout.VERTICAL
-              ViewCompat.setNestedScrollingEnabled(this, false)
-            }
-          },
-          modifier = Modifier.fillMaxWidth(),
-          update = { view ->
-            val existingViewHolder = view.getTag(R.id.question_view_holder)
-
-            val createViews =
-              when {
-                existingViewHolder == null -> true
-                adapterItem is QuestionnaireAdapterItem.Question &&
-                  existingViewHolder !is QuestionnaireItemViewHolder -> true
-                adapterItem is QuestionnaireAdapterItem.Navigation &&
-                  existingViewHolder !is NavigationViewHolder -> true
-                adapterItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
-                  existingViewHolder !is RepeatedGroupHeaderItemViewHolder -> true
-                adapterItem is QuestionnaireAdapterItem.RepeatedGroupAddButton &&
-                  existingViewHolder !is RepeatedGroupAddItemViewHolder -> true
-                else -> false
-              }
-
-            if (createViews) {
-              view.removeAllViews()
-              when (adapterItem) {
-                is QuestionnaireAdapterItem.Question -> {
-                  val viewHolder =
-                    getQuestionnaireItemViewHolder(
-                      parent = view,
-                      questionnaireViewItem = adapterItem.item,
-                      questionnaireItemViewHolderMatchers =
-                        questionnaireItemViewHolderFactoryMatchersProvider.get(),
-                    )
-                  view.setTag(R.id.question_view_holder, viewHolder)
-                  view.addView(viewHolder.itemView)
-                  viewHolder.bind(adapterItem.item)
-                }
-                is QuestionnaireAdapterItem.Navigation -> {
-                  val viewHolder =
-                    NavigationViewHolder(view.inflate(R.layout.pagination_navigation_view))
-                  view.setTag(R.id.question_view_holder, viewHolder)
-                  view.addView(viewHolder.itemView)
-                  viewHolder.bind(adapterItem.questionnaireNavigationUIState)
-                }
-                is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-                  val viewHolder =
-                    RepeatedGroupHeaderItemViewHolder(
-                      view.inflate(R.layout.repeated_group_instance_header_view),
-                    )
-                  view.setTag(R.id.question_view_holder, viewHolder)
-                  view.addView(viewHolder.itemView)
-                  viewHolder.bind(adapterItem)
-                }
-                is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
-                  val viewHolder =
-                    RepeatedGroupAddItemViewHolder(
-                      view.inflate(R.layout.add_repeated_item),
-                    )
-                  view.setTag(R.id.question_view_holder, viewHolder)
-                  view.addView(viewHolder.itemView)
-                  viewHolder.bind(adapterItem.item)
-                }
-              }
-            } else {
-              // Update existing view holder
-              when (adapterItem) {
-                is QuestionnaireAdapterItem.Question -> {
-                  (existingViewHolder as QuestionnaireItemViewHolder).bind(adapterItem.item)
-                }
-                is QuestionnaireAdapterItem.Navigation -> {
-                  (existingViewHolder as NavigationViewHolder).bind(
-                    adapterItem.questionnaireNavigationUIState,
-                  )
-                }
-                is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-                  (existingViewHolder as RepeatedGroupHeaderItemViewHolder).bind(adapterItem)
-                }
-                is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
-                  (existingViewHolder as RepeatedGroupAddItemViewHolder).bind(adapterItem.item)
-                }
-              }
-            }
-          },
-          onReset = { view -> view.setTag(R.id.question_view_holder, null) },
-        )
-      }
-    }
-  }
-
-  @Composable
-  private fun QuestionnaireReviewList(items: List<QuestionnaireAdapterItem>) {
-    LazyColumn {
-      items(
-        items = items,
-        key = { item ->
-          when (item) {
-            is QuestionnaireAdapterItem.Question -> item.id
-                ?: throw IllegalStateException("Missing id for the Question: $item")
-            is QuestionnaireAdapterItem.RepeatedGroupHeader -> item.id
-            is QuestionnaireAdapterItem.Navigation -> "navigation"
-            is QuestionnaireAdapterItem.RepeatedGroupAddButton -> item.id
-                ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
-          }
-        },
-      ) { item: QuestionnaireAdapterItem ->
-        AndroidView(
-          factory = { context ->
-            LinearLayout(context).apply {
-              orientation = LinearLayout.VERTICAL
-              when (item) {
-                is QuestionnaireAdapterItem.Question -> {
-                  val viewHolder = ReviewViewHolderFactory.create(this)
-                  viewHolder.bind(item.item)
-                  addView(viewHolder.itemView)
-                }
-                is QuestionnaireAdapterItem.Navigation -> {
-                  val viewHolder =
-                    NavigationViewHolder(inflate(R.layout.pagination_navigation_view))
-                  viewHolder.bind(item.questionnaireNavigationUIState)
-                  addView(viewHolder.itemView)
-                }
-                is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-                  TODO("Not implemented yet")
-                }
-                is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
-                  TODO("Not implemented yet")
-                }
-              }
-            }
-          },
-          modifier = Modifier.fillMaxWidth(),
-        )
       }
     }
   }

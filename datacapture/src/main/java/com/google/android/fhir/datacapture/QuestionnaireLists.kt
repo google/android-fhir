@@ -17,12 +17,26 @@
 package com.google.android.fhir.datacapture
 
 import android.view.ViewGroup
-import com.google.android.fhir.datacapture.QuestionnaireEditAdapter.Companion.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG
-import com.google.android.fhir.datacapture.QuestionnaireEditAdapter.Companion.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN
+import android.widget.LinearLayout
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.ViewCompat
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.QUESTIONNAIRE_EDIT_LIST
 import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFactory
+import com.google.android.fhir.datacapture.extensions.inflate
 import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
+import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.RepeatedGroupAddItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewHolderFactory
@@ -41,11 +55,199 @@ import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDial
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.RepeatedGroupHeaderItemViewHolder
+import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.SliderViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.TimePickerViewHolderFactory
+import kotlin.uuid.ExperimentalUuidApi
 import org.hl7.fhir.r4.model.Questionnaire
 
-fun getQuestionnaireItemViewHolder(
+// Choice questions are rendered as dialogs if they have at least this many options
+const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG = 10
+
+// Choice questions are rendered as radio group if number of options less than this constant
+const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN = 4
+
+@OptIn(ExperimentalUuidApi::class)
+@Composable
+internal fun QuestionnaireEditList(
+  items: List<QuestionnaireAdapterItem>,
+  displayMode: DisplayMode,
+  questionnaireItemViewHolderMatchers:
+    List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher>,
+  onUpdateProgressIndicator: (Int, Int) -> Unit,
+) {
+  val listState = rememberLazyListState()
+  LaunchedEffect(listState) {
+    if (displayMode is DisplayMode.EditMode && !displayMode.pagination.isPaginated) {
+      snapshotFlow {
+          val layoutInfo = listState.layoutInfo
+          val visibleItems = layoutInfo.visibleItemsInfo
+          val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+          val total = layoutInfo.totalItemsCount
+
+          // If all items are visible, we're at 100%
+          if (visibleItems.size >= total && total > 0) {
+            total to total
+          } else {
+            lastVisible + 1 to total
+          }
+        }
+        .collect { (visibleCount, total) -> onUpdateProgressIndicator(visibleCount, total) }
+    }
+  }
+  LazyColumn(state = listState, modifier = Modifier.testTag(QUESTIONNAIRE_EDIT_LIST)) {
+    items(
+      items = items,
+      key = { item ->
+        when (item) {
+          is QuestionnaireAdapterItem.Question -> item.id
+              ?: throw IllegalStateException("Missing id for the Question: $item")
+          is QuestionnaireAdapterItem.RepeatedGroupHeader -> item.id
+          is QuestionnaireAdapterItem.Navigation -> "navigation"
+          is QuestionnaireAdapterItem.RepeatedGroupAddButton -> item.id
+              ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
+        }
+      },
+    ) { adapterItem: QuestionnaireAdapterItem ->
+      AndroidView(
+        factory = { context ->
+          LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            ViewCompat.setNestedScrollingEnabled(this, false)
+          }
+        },
+        modifier = Modifier.fillMaxWidth(),
+        update = { view ->
+          val existingViewHolder = view.getTag(R.id.question_view_holder)
+
+          val createViews =
+            when {
+              existingViewHolder == null -> true
+              adapterItem is QuestionnaireAdapterItem.Question &&
+                existingViewHolder !is QuestionnaireItemViewHolder -> true
+              adapterItem is QuestionnaireAdapterItem.Navigation &&
+                existingViewHolder !is NavigationViewHolder -> true
+              adapterItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
+                existingViewHolder !is RepeatedGroupHeaderItemViewHolder -> true
+              adapterItem is QuestionnaireAdapterItem.RepeatedGroupAddButton &&
+                existingViewHolder !is RepeatedGroupAddItemViewHolder -> true
+              else -> false
+            }
+
+          if (createViews) {
+            view.removeAllViews()
+            when (adapterItem) {
+              is QuestionnaireAdapterItem.Question -> {
+                val viewHolder =
+                  getQuestionnaireItemViewHolder(
+                    parent = view,
+                    questionnaireViewItem = adapterItem.item,
+                    questionnaireItemViewHolderMatchers = questionnaireItemViewHolderMatchers,
+                  )
+                view.setTag(R.id.question_view_holder, viewHolder)
+                view.addView(viewHolder.itemView)
+                viewHolder.bind(adapterItem.item)
+              }
+              is QuestionnaireAdapterItem.Navigation -> {
+                val viewHolder =
+                  NavigationViewHolder(view.inflate(R.layout.pagination_navigation_view))
+                view.setTag(R.id.question_view_holder, viewHolder)
+                view.addView(viewHolder.itemView)
+                viewHolder.bind(adapterItem.questionnaireNavigationUIState)
+              }
+              is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+                val viewHolder =
+                  RepeatedGroupHeaderItemViewHolder(
+                    view.inflate(R.layout.repeated_group_instance_header_view),
+                  )
+                view.setTag(R.id.question_view_holder, viewHolder)
+                view.addView(viewHolder.itemView)
+                viewHolder.bind(adapterItem)
+              }
+              is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+                val viewHolder =
+                  RepeatedGroupAddItemViewHolder(
+                    view.inflate(R.layout.add_repeated_item),
+                  )
+                view.setTag(R.id.question_view_holder, viewHolder)
+                view.addView(viewHolder.itemView)
+                viewHolder.bind(adapterItem.item)
+              }
+            }
+          } else {
+            // Update existing view holder
+            when (adapterItem) {
+              is QuestionnaireAdapterItem.Question -> {
+                (existingViewHolder as QuestionnaireItemViewHolder).bind(adapterItem.item)
+              }
+              is QuestionnaireAdapterItem.Navigation -> {
+                (existingViewHolder as NavigationViewHolder).bind(
+                  adapterItem.questionnaireNavigationUIState,
+                )
+              }
+              is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+                (existingViewHolder as RepeatedGroupHeaderItemViewHolder).bind(adapterItem)
+              }
+              is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+                (existingViewHolder as RepeatedGroupAddItemViewHolder).bind(adapterItem.item)
+              }
+            }
+          }
+        },
+        onReset = { view -> view.setTag(R.id.question_view_holder, null) },
+      )
+    }
+  }
+}
+
+@Composable
+internal fun QuestionnaireReviewList(items: List<QuestionnaireAdapterItem>) {
+  LazyColumn {
+    items(
+      items = items,
+      key = { item ->
+        when (item) {
+          is QuestionnaireAdapterItem.Question -> item.id
+              ?: throw IllegalStateException("Missing id for the Question: $item")
+          is QuestionnaireAdapterItem.RepeatedGroupHeader -> item.id
+          is QuestionnaireAdapterItem.Navigation -> "navigation"
+          is QuestionnaireAdapterItem.RepeatedGroupAddButton -> item.id
+              ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
+        }
+      },
+    ) { item: QuestionnaireAdapterItem ->
+      AndroidView(
+        factory = { context ->
+          LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            when (item) {
+              is QuestionnaireAdapterItem.Question -> {
+                val viewHolder = ReviewViewHolderFactory.create(this)
+                viewHolder.bind(item.item)
+                addView(viewHolder.itemView)
+              }
+              is QuestionnaireAdapterItem.Navigation -> {
+                val viewHolder = NavigationViewHolder(inflate(R.layout.pagination_navigation_view))
+                viewHolder.bind(item.questionnaireNavigationUIState)
+                addView(viewHolder.itemView)
+              }
+              is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+                TODO("Not implemented yet")
+              }
+              is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+                TODO("Not implemented yet")
+              }
+            }
+          }
+        },
+        modifier = Modifier.fillMaxWidth(),
+      )
+    }
+  }
+}
+
+private fun getQuestionnaireItemViewHolder(
   parent: ViewGroup,
   questionnaireViewItem: QuestionnaireViewItem,
   questionnaireItemViewHolderMatchers:
