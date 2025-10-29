@@ -47,9 +47,9 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.DropDownItem
 import com.google.android.fhir.datacapture.views.compose.EditTextFieldItem
 import com.google.android.fhir.datacapture.views.compose.EditTextFieldState
-import com.google.android.fhir.datacapture.views.compose.ExposedDropDownMenuBoxItem
 import com.google.android.fhir.datacapture.views.compose.Header
 import com.google.android.fhir.datacapture.views.compose.MediaItem
 import java.math.BigDecimal
@@ -77,6 +77,7 @@ internal object QuantityViewHolderFactory : QuestionnaireItemComposeViewHolderFa
         val selectedOption =
           remember(questionnaireViewItem) {
             unitTextCoding(questionnaireViewItem)?.toDropDownAnswerOption()
+              ?: dropDownOptions.singleOrNull() // Select if has only one option
           }
 
         var quantity by
@@ -118,16 +119,17 @@ internal object QuantityViewHolderFactory : QuestionnaireItemComposeViewHolderFa
           Header(questionnaireViewItem)
           questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
 
-          Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+          Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
             EditTextFieldItem(
               modifier = Modifier.weight(1f),
               textFieldState = composeViewQuestionnaireState,
             )
             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.item_margin_horizontal)))
-            ExposedDropDownMenuBoxItem(
+            DropDownItem(
               modifier = Modifier.weight(1f),
               enabled = !isReadOnly,
               selectedOption = selectedOption,
+              isError = !validationUiMessage.isNullOrBlank(),
               options = dropDownOptions,
             ) { answerOption ->
               quantity = UiQuantity(quantity.value, answerOption?.findCoding(unitOptions))
@@ -147,14 +149,27 @@ internal object QuantityViewHolderFactory : QuestionnaireItemComposeViewHolderFa
         questionnaireViewItem: QuestionnaireViewItem,
         input: UiQuantity,
       ) {
-        val currentAnswerQuantity = questionnaireViewItem.answers.singleOrNull()?.valueQuantity
-        val draftAnswer = questionnaireViewItem.draftAnswer
+        var decimal: BigDecimal? = null
+        var unit: Coding? = null
 
-        val decimal =
-          input.value?.toBigDecimalOrNull()
-            ?: (draftAnswer as? BigDecimal) ?: currentAnswerQuantity?.value
-        val unit =
-          input.unitDropDown ?: ((draftAnswer as? Coding) ?: currentAnswerQuantity?.toCoding())
+        // Read decimal value and unit from complete answer
+        questionnaireViewItem.answers.singleOrNull()?.let {
+          val quantity = it.value as Quantity
+          decimal = quantity.value
+          unit = quantity.toCoding()
+        }
+
+        // Read decimal value and unit from partial answer
+        questionnaireViewItem.draftAnswer?.let {
+          when (it) {
+            is BigDecimal -> decimal = it
+            is Coding -> unit = it
+          }
+        }
+
+        // Update decimal value and unit
+        input.value?.let { decimal = it.toBigDecimalOrNull() }
+        input.unitDropDown?.let { unit = it }
 
         when {
           decimal == null && unit == null -> {

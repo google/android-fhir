@@ -28,14 +28,14 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_TEXT_FIELD_TAG
-import com.google.android.fhir.datacapture.views.compose.ExposedDropDownMenuBoxItem
+import com.google.android.fhir.datacapture.views.compose.DropDownItem
 import com.google.android.fhir.datacapture.views.factories.DropDownAnswerOption
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ExposedDropDownMenuBoxItemTest {
+class DropDownItemTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -51,7 +51,7 @@ class ExposedDropDownMenuBoxItemTest {
       )
 
     composeTestRule.setContent {
-      ExposedDropDownMenuBoxItem(
+      DropDownItem(
         modifier = Modifier,
         enabled = true,
         options = listOf(testDropDownAnswerOption),
