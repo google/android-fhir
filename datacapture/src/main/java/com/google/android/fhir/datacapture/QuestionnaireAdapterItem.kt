@@ -23,10 +23,13 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal sealed interface QuestionnaireAdapterItem {
   /** A row for a question in a Questionnaire RecyclerView. */
   data class Question(val item: QuestionnaireViewItem) :
-    QuestionnaireAdapterItem, ReviewAdapterItem
+    QuestionnaireAdapterItem, ReviewAdapterItem {
+    var id: String? = item.questionnaireItem.linkId
+  }
 
   /** A row for a repeated group response instance's header. */
   data class RepeatedGroupHeader(
+    val id: String,
     /** The response index. This is 0-indexed, but should be 1-indexed when rendered in the UI. */
     val index: Int,
     /** Callback that is invoked when the user clicks the delete button. */
@@ -37,6 +40,7 @@ internal sealed interface QuestionnaireAdapterItem {
   ) : QuestionnaireAdapterItem
 
   data class RepeatedGroupAddButton(
+    var id: String?,
     val item: QuestionnaireViewItem,
   ) : QuestionnaireAdapterItem
 

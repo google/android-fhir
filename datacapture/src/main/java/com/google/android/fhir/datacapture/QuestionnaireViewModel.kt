@@ -1008,6 +1008,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             // Case 3
             add(
               QuestionnaireAdapterItem.RepeatedGroupHeader(
+                id = "${index}_${question.item.questionnaireItem.linkId}",
                 index = index,
                 onDeleteClicked = { viewModelScope.launch { question.item.removeAnswerAt(index) } },
                 responses = nestedResponseItemList,
@@ -1017,16 +1018,31 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
           addAll(
             getQuestionnaireAdapterItems(
-              // If nested display item is identified as instructions or flyover, then do not create
-              // questionnaire state for it.
-              questionnaireItemList = questionnaireItem.item.filterNot { it.isDisplayItem },
-              questionnaireResponseItemList = nestedResponseItemList,
-            ),
+                // If nested display item is identified as instructions or flyover, then do not
+                // create
+                // questionnaire state for it.
+                questionnaireItemList = questionnaireItem.item.filterNot { it.isDisplayItem },
+                questionnaireResponseItemList = nestedResponseItemList,
+              )
+              .onEach {
+                // Reset the question id to avoid duplicate keys in LazyColumn composable. The new
+                // id is derived from the the repeated group index, the parent question
+                // questionnaire item linkId and the linkId of the nested questions
+                if (it is QuestionnaireAdapterItem.Question) {
+                  it.id =
+                    "${index}_${question.item.questionnaireItem.linkId}_${it.item.questionnaireItem.linkId}"
+                }
+              },
           )
         }
 
       if (questionnaireItem.isRepeatedGroup) {
-        add(QuestionnaireAdapterItem.RepeatedGroupAddButton(question.item))
+        add(
+          QuestionnaireAdapterItem.RepeatedGroupAddButton(
+            id = "${question.item.questionnaireItem.linkId}_add_btn",
+            item = question.item,
+          ),
+        )
       }
     }
     currentPageItems = items
