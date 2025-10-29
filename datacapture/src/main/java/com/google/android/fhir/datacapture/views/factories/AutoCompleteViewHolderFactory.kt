@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,10 +44,10 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object AutoCompleteViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.edit_text_auto_complete_view) {
+  QuestionnaireItemAndroidViewHolderFactory(R.layout.edit_text_auto_complete_view) {
 
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemAndroidViewHolderDelegate {
       private lateinit var context: AppCompatActivity
       private lateinit var header: HeaderView
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
@@ -87,8 +87,7 @@ internal object AutoCompleteViewHolderFactory :
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        header.bind(questionnaireViewItem)
-        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
+        header.bind(questionnaireViewItem, showRequiredOrOptionalText = true)
         val answerOptionValues =
           questionnaireViewItem.enabledAnswerOptions.map {
             AutoCompleteViewAnswerOption(

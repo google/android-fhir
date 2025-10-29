@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,17 +138,18 @@ class DemoQuestionnaireFragment : Fragment() {
       if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) == null) {
         childFragmentManager.commit {
           setReorderingAllowed(true)
-          val questionnaireFragment =
-            QuestionnaireFragment.builder()
-              .apply {
-                setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
-                  ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory
-                    .LOCATION_WIDGET_PROVIDER,
-                )
-                setQuestionnaire(args.questionnaireJsonStringKey!!)
-              }
-              .build()
-          add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
+          val questionnaireFragmentBuilder =
+            QuestionnaireFragment.builder().apply {
+              setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
+                ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory
+                  .LOCATION_WIDGET_PROVIDER,
+              )
+              setQuestionnaire(args.questionnaireJsonStringKey!!)
+            }
+          LayoutListViewModel.questionnaireLambdaMap[args.questionnaireLambdaKey ?: ""]!!.invoke(
+            questionnaireFragmentBuilder,
+          )
+          add(R.id.container, questionnaireFragmentBuilder.build(), QUESTIONNAIRE_FRAGMENT_TAG)
         }
       }
     }

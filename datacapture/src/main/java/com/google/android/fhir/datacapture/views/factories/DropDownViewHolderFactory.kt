@@ -50,9 +50,9 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import timber.log.Timber
 
 internal object DropDownViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.drop_down_view) {
+  QuestionnaireItemAndroidViewHolderFactory(R.layout.drop_down_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemAndroidViewHolderDelegate {
       private lateinit var header: HeaderView
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView

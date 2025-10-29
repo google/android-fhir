@@ -4665,6 +4665,7 @@ class QuestionnaireViewModelTest {
               is QuestionnaireAdapterItem.Question -> it.item.questionnaireItem.linkId
               is QuestionnaireAdapterItem.RepeatedGroupHeader -> "RepeatedGroupHeader:${it.index}"
               is QuestionnaireAdapterItem.Navigation -> TODO()
+              is QuestionnaireAdapterItem.RepeatedGroupAddButton -> "Add repeated group item"
             }
           },
         )
@@ -4676,6 +4677,7 @@ class QuestionnaireViewModelTest {
           "RepeatedGroupHeader:1",
           "nested-item-a",
           "another-nested-item-a",
+          "Add repeated group item",
           "repeated-group-b",
           "RepeatedGroupHeader:0",
           "nested-item-b",
@@ -4683,6 +4685,7 @@ class QuestionnaireViewModelTest {
           "RepeatedGroupHeader:1",
           "nested-item-b",
           "another-nested-item-b",
+          "Add repeated group item",
         )
         .inOrder()
 
@@ -4916,16 +4919,21 @@ class QuestionnaireViewModelTest {
 
       val viewModel = createQuestionnaireViewModel(questionnaire)
       viewModel.runViewModelBlocking {
-        viewModel.getQuestionnaireItemViewItemList().single().asQuestion().apply {
-          this.answersChangedCallback(
-            this.questionnaireItem,
-            this.getQuestionnaireResponseItem(),
-            listOf(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
-            ),
-            null,
-          )
-        }
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .filterIsInstance<QuestionnaireAdapterItem.Question>()
+          .single()
+          .asQuestion()
+          .apply {
+            this.answersChangedCallback(
+              this.questionnaireItem,
+              this.getQuestionnaireResponseItem(),
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
+              ),
+              null,
+            )
+          }
 
         assertThat(
             viewModel

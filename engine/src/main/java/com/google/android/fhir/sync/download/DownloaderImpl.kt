@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,16 +45,18 @@ internal class DownloaderImpl(
     var downloadedResourcesCount = 0
     var request = downloadWorkManager.getNextRequest()
     while (request != null) {
-      try {
-        resourceTypeToDownload = request.toResourceType()
-        downloadWorkManager.processResponse(dataSource.download(request)).toList().let {
-          downloadedResourcesCount += it.size
-          emit(DownloadState.Success(it, totalResourcesToDownloadCount, downloadedResourcesCount))
+      val downloadState =
+        try {
+          resourceTypeToDownload = request.toResourceType()
+          downloadWorkManager.processResponse(dataSource.download(request)).toList().let {
+            downloadedResourcesCount += it.size
+            DownloadState.Success(it, totalResourcesToDownloadCount, downloadedResourcesCount)
+          }
+        } catch (exception: Exception) {
+          Timber.e(exception)
+          DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception))
         }
-      } catch (exception: Exception) {
-        Timber.e(exception)
-        emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
-      }
+      emit(downloadState)
       request = downloadWorkManager.getNextRequest()
     }
   }

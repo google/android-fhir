@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
+import com.google.android.fhir.datacapture.QuestionnaireFragment
 
 class LayoutListViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
@@ -34,19 +35,27 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
     @DrawableRes val iconId: Int,
     @StringRes val textId: Int,
     val questionnaireFileName: String,
+    val questionnaireLambdaKey: String,
   ) {
     DEFAULT(
       R.drawable.ic_defaultlayout,
       R.string.layout_name_default_text,
       "layout_default.json",
+      "",
     ),
     PAGINATED(
       R.drawable.ic_paginatedlayout,
       R.string.layout_name_paginated,
       "layout_paginated.json",
+      "",
     ),
-    REVIEW(R.drawable.ic_reviewlayout, R.string.layout_name_review, ""),
-    READ_ONLY(R.drawable.ic_readonlylayout, R.string.layout_name_read_only, ""),
+    REVIEW(
+      R.drawable.ic_reviewlayout,
+      R.string.layout_name_review,
+      "layout_review.json",
+      "showreviewpagefirstandbeforesubmit",
+    ),
+    READ_ONLY(R.drawable.ic_readonlylayout, R.string.layout_name_read_only, "", ""),
   }
 
   fun isDefaultLayout(context: Context, title: String) =
@@ -54,4 +63,20 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
 
   fun isPaginatedLayout(context: Context, title: String) =
     context.getString(Layout.PAGINATED.textId) == title
+
+  companion object {
+    val questionnaireLambdaMap: Map<String, QuestionnaireFragment.Builder.() -> Unit> =
+      mapOf(
+        "" to
+          {
+            showReviewPageFirst(false)
+            showReviewPageBeforeSubmit(false)
+          },
+        "showreviewpagefirstandbeforesubmit" to
+          {
+            showReviewPageFirst(true)
+            showReviewPageBeforeSubmit(true)
+          },
+      )
+  }
 }
