@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,9 +44,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.QuestionItemDefaultStyle
 import com.google.android.fhir.datacapture.extensions.StyleUrl
 import com.google.android.fhir.datacapture.extensions.appendAsteriskToQuestionText
 import com.google.android.fhir.datacapture.extensions.applyCustomOrDefaultStyle
@@ -135,14 +136,16 @@ internal fun Header(
   ) {
     PrefixQuestionTitle(prefixLocalizedText, questionLocalizedText, readCustomStyleName)
 
-    Help(
-      hintLocalizedText,
-      readCustomStyleName,
-      isHelpCardOpen,
-      isHelpButtonVisible,
-      helpButtonOnClick,
-      helpCardLocalizedText,
-    )
+    if (!hintLocalizedText.isNullOrBlank() || isHelpButtonVisible || isHelpCardOpen) {
+      Help(
+        hintLocalizedText,
+        readCustomStyleName,
+        isHelpCardOpen,
+        isHelpButtonVisible,
+        helpButtonOnClick,
+        helpCardLocalizedText,
+      )
+    }
 
     // Required/Optional Text
     if (showRequiredOrOptionalText && !requiredOptionalText.isNullOrBlank()) {
@@ -224,28 +227,31 @@ internal fun Help(
   var isCardOpen by remember { mutableStateOf(isHelpCardInitiallyOpen) }
 
   Row(
-    modifier = Modifier.padding(vertical = dimensionResource(R.dimen.help_container_margin_top)),
+    modifier = Modifier.padding(top = dimensionResource(R.dimen.help_container_margin_top)),
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    AndroidView(
-      factory = {
-        TextView(it).apply {
-          id = R.id.hint
-          movementMethod = LinkMovementMethod.getInstance()
-          applyCustomOrDefaultStyle(
-            context = it,
-            view = this,
-            customStyleName =
-              readCustomStyleName(
-                StyleUrl.SUBTITLE_TEXT_VIEW,
-              ),
-            defaultStyleResId =
-              getStyleResIdFromAttribute(it, R.attr.questionnaireSubtitleTextStyle),
-          )
-        }
-      },
-      update = { it.text = hintLocalizedText },
-    )
+    hintLocalizedText?.let {
+      AndroidView(
+        modifier = Modifier.weight(0.7f),
+        factory = {
+          TextView(it).apply {
+            id = R.id.hint
+            movementMethod = LinkMovementMethod.getInstance()
+            applyCustomOrDefaultStyle(
+              context = it,
+              view = this,
+              customStyleName =
+                readCustomStyleName(
+                  StyleUrl.SUBTITLE_TEXT_VIEW,
+                ),
+              defaultStyleResId =
+                getStyleResIdFromAttribute(it, R.attr.questionnaireSubtitleTextStyle),
+            )
+          }
+        },
+        update = { it.text = hintLocalizedText },
+      )
+    }
 
     if (isHelpButtonVisible) {
       IconButton(
@@ -254,8 +260,10 @@ internal fun Help(
           helpButtonOnClick(isCardOpen)
         },
         modifier =
-          Modifier.padding(start = dimensionResource(R.dimen.help_button_margin_start))
+          Modifier.padding(dimensionResource(R.dimen.help_icon_padding))
+            .padding(start = dimensionResource(R.dimen.help_button_margin_start))
             .testTag(HELP_BUTTON_TAG)
+            .weight(0.3f)
             .size(
               width = dimensionResource(R.dimen.help_button_width),
               height = dimensionResource(R.dimen.help_button_height),
@@ -270,12 +278,22 @@ internal fun Help(
   }
 
   if (isCardOpen) {
-    Card(modifier = Modifier.padding(top = 8.dp).testTag(HELP_CARD_TAG)) {
-      Column(modifier = Modifier.padding(8.dp)) {
+    Card(
+      modifier =
+        Modifier.padding(top = dimensionResource(R.dimen.help_card_margin_top))
+          .testTag(HELP_CARD_TAG),
+      colors =
+        CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    ) {
+      Column {
         Text(
           text = stringResource(id = R.string.help),
           modifier =
-            Modifier.padding(horizontal = dimensionResource(R.dimen.help_header_margin_horizontal)),
+            Modifier.padding(horizontal = dimensionResource(R.dimen.help_header_margin_horizontal))
+              .padding(
+                top = dimensionResource(R.dimen.help_header_margin_top),
+                bottom = dimensionResource(R.dimen.help_header_margin_bottom),
+              ),
           style = MaterialTheme.typography.titleSmall,
         )
 
@@ -284,10 +302,18 @@ internal fun Help(
             TextView(it).apply {
               id = R.id.helpText
               movementMethod = LinkMovementMethod.getInstance()
+
+              QuestionItemDefaultStyle()
+                .applyStyle(
+                  context,
+                  this,
+                  getStyleResIdFromAttribute(it, R.attr.questionnaireHelpTextStyle),
+                )
             }
           },
           modifier =
-            Modifier.padding(horizontal = dimensionResource(R.dimen.help_text_margin_horizontal)),
+            Modifier.padding(horizontal = dimensionResource(R.dimen.help_text_margin_horizontal))
+              .padding(bottom = dimensionResource(R.dimen.help_text_margin_bottom)),
           update = { it.text = helpCardLocalizedText },
         )
       }
