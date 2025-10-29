@@ -49,6 +49,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.questionnaireViewModelCoroutineContext
 import com.google.android.fhir.datacapture.test.utilities.clickIcon
 import com.google.android.fhir.datacapture.test.utilities.clickOnText
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -78,10 +79,18 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TestRule
+import org.junit.runner.Description
 import org.junit.runner.RunWith
+import org.junit.runners.model.Statement
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireUiEspressoTest {
+
+  @Rule
+  @JvmField
+  var questionnaireViewModelCoroutineContextIdlerRule =
+    QuestionnaireViewModelCoroutineContextIdlerRule()
 
   @get:Rule
   val activityScenarioRule: ActivityScenarioRule<TestActivity> =
@@ -836,4 +845,20 @@ class QuestionnaireUiEspressoTest {
     }
     return testQuestionnaireFragment!!.getQuestionnaireResponse()
   }
+}
+
+class QuestionnaireViewModelCoroutineContextIdlerRule : TestRule {
+  override fun apply(base: Statement?, description: Description?): Statement =
+    object : Statement() {
+      override fun evaluate() {
+        val espressoTrackedDispatcherDefault = EspressoTrackedDispatcher(Dispatchers.Default)
+        questionnaireViewModelCoroutineContext = espressoTrackedDispatcherDefault
+        try {
+          base?.evaluate()
+        } finally {
+          espressoTrackedDispatcherDefault.cleanUp()
+          questionnaireViewModelCoroutineContext = Dispatchers.Default
+        }
+      }
+    }
 }
