@@ -1,8 +1,8 @@
 import Dependencies.removeIncompatibleDependencies
 
 plugins {
-  id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.kotlinAndroid)
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
 }
 
 android {

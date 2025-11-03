@@ -2,12 +2,12 @@ import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
 plugins {
-  id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.kotlinCompose)
-  id(Plugins.BuildPlugins.mavenPublish)
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.kotlin.compose)
+  `maven-publish`
   jacoco
-  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
+  alias(libs.plugins.dokka)
 }
 
 publishArtifact(Releases.DataCapture)

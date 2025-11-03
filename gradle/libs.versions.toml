@@ -67,6 +67,14 @@ xerces = "2.12.2"
 xml-unit = "2.9.1"
 zxing = "3.4.1"
 jacoco = "0.8.10"
+android-gradle-plugin = "8.9.2"
+benchmark-plugin = "1.4.0-rc01"
+fladle = "0.17.4"
+ksp-plugin = "2.1.20-2.0.1"
+navigation-safe-args = "2.6.0"
+ruler = "1.2.1"
+spotless = "4.17.0"
+dokka = "1.9.20"
 
 [libraries]
 accompanist-themeadapter-material3 = { module = "com.google.accompanist:accompanist-themeadapter-material3", version.ref = "accompanist-themeadapter-material3"}
@@ -177,3 +185,16 @@ zxing = { module = "com.google.zxing:core", version.ref = "zxing" }
 androidx-tracing = ["androidx-tracing-tracing", "androidx-tracing-tracing-android", "androidx-tracing-tracing-ktx"]
 
 [plugins]
+android-application = { id = "com.android.application" }
+android-library = { id = "com.android.library" }
+android-test = { id = "com.android.test" }
+androidx-benchmark = { id = "androidx.benchmark" }
+androidx-navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin" }
+fladle = { id = "com.osacky.fladle" }
+kotlin-android = { id = "org.jetbrains.kotlin.android" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization" }
+ksp = { id = "com.google.devtools.ksp" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+ruler = { id = "com.spotify.ruler" }
+spotless = { id = "com.diffplug.spotless" }

@@ -1,10 +1,11 @@
 import Dependencies.removeIncompatibleDependencies
 
 plugins {
-  id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.mavenPublish)
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
+  `maven-publish`
   jacoco
+  alias(libs.plugins.dokka)
 }
 
 publishArtifact(Releases.Contrib.LocationWidget)

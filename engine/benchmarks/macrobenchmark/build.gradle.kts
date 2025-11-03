@@ -1,6 +1,6 @@
 plugins {
-  id(Plugins.BuildPlugins.androidTest)
-  id(Plugins.BuildPlugins.kotlinAndroid)
+  alias(libs.plugins.android.test)
+  alias(libs.plugins.kotlin.android)
 }
 
 android {

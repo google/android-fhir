@@ -1,7 +1,7 @@
 plugins {
-  id(Plugins.BuildPlugins.application)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.navSafeArgs)
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.androidx.navigation.safeargs)
 }
 
 configureRuler()

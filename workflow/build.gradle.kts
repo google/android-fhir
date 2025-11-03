@@ -3,11 +3,11 @@ import java.net.URL
 import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 
 plugins {
-  id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.mavenPublish)
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
+  `maven-publish`
   jacoco
-  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
+  alias(libs.plugins.dokka)
 }
 
 publishArtifact(Releases.Workflow)

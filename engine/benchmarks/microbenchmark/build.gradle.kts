@@ -1,7 +1,7 @@
 plugins {
-  id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.benchmark)
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.androidx.benchmark)
 }
 
 android {
