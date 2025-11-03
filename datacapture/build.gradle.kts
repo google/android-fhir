@@ -19,7 +19,7 @@ android {
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
     consumerProguardFile("proguard-rules.pro")
@@ -85,16 +85,16 @@ dependencies {
   androidTestImplementation(libs.kotlinx.coroutines.test)
   androidTestImplementation(libs.truth)
 
-  api(Dependencies.HapiFhir.structuresR4)
+  api(libs.hapi.fhir.structures.r4)
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-  implementation(Dependencies.HapiFhir.guavaCaching)
-  implementation(Dependencies.HapiFhir.validation) {
+  implementation(libs.hapi.fhir.caching.guava)
+  implementation(libs.hapi.fhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
   }
-  implementation(Dependencies.timber)
+  implementation(libs.timber)
   implementation(libs.android.fhir.common)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.constraintlayout)
@@ -121,9 +121,9 @@ dependencies {
   debugImplementation(libs.androidx.compose.ui.tooling)
   debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-  testImplementation(Dependencies.mockitoInline)
-  testImplementation(Dependencies.mockitoKotlin)
-  testImplementation(Dependencies.robolectric)
+  testImplementation(libs.mockito.inline)
+  testImplementation(libs.mockito.kotlin)
+  testImplementation(libs.robolectric)
   testImplementation(project(":knowledge")) {
     exclude(group = "com.google.android.fhir", module = "engine")
   }

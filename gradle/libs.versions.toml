@@ -40,6 +40,33 @@ material = "1.12.0"
 opencds-cqf-fhir = "3.8.0"
 truth = "1.1.5"
 uiautomator = "2.3.0"
+desugarJdkLibs = "2.0.3"
+fhir-ucum = "1.0.3"
+guava = "32.1.3-android"
+hapi-fhir = "6.8.0"
+hapi-fhir-core = "6.0.22"
+robolectric = "4.10.3"
+apache-commons-compress = "1.21"
+http = "4.11.0"
+jackson = "2.13.5"
+jackson-core = "2.15.2"
+json-tools-patch = "1.13"
+json-assert = "1.5.1"
+mlkit-barcode-scanning = "16.1.1"
+mlkit-object-detection = "16.2.3"
+mlkit-object-detection-custom = "16.3.1"
+mockito-inline = "4.0.0"
+mockito-kotlin = "3.2.0"
+nimbus = "9.31"
+play-services-location = "21.0.1"
+retrofit = "2.9.0"
+sqlcipher = "4.5.4"
+timber = "5.0.1"
+woodstox = "6.5.1"
+xerces = "2.12.2"
+xml-unit = "2.9.1"
+zxing = "3.4.1"
+jacoco = "0.8.10"
 
 [libraries]
 accompanist-themeadapter-material3 = { module = "com.google.accompanist:accompanist-themeadapter-material3", version.ref = "accompanist-themeadapter-material3"}
@@ -109,6 +136,42 @@ opencds-cqf-fhir-cr = { module = "org.opencds.cqf.fhir:cqf-fhir-cr", version.ref
 opencds-cqf-fhir-jackson = { module = "org.opencds.cqf.fhir:cqf-fhir-jackson", version.ref = "opencds-cqf-fhir" }
 opencds-cqf-fhir-utility = { module = "org.opencds.cqf.fhir:cqf-fhir-utility", version.ref = "opencds-cqf-fhir" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
+fhir-ucum = { module = "org.fhir:ucum", version.ref = "fhir-ucum" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+hapi-fhir-structures-r4 = { module = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4", version.ref = "hapi-fhir" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+apache-commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "apache-commons-compress" }
+desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdkLibs" }
+hapi-fhir-caching-guava = { module = "ca.uhn.hapi.fhir:hapi-fhir-caching-guava", version.ref = "hapi-fhir" }
+hapi-fhir-core-convertors = { module = "ca.uhn.hapi.fhir:org.hl7.fhir.convertors", version.ref = "hapi-fhir-core" }
+hapi-fhir-validation = { module = "ca.uhn.hapi.fhir:hapi-fhir-validation", version.ref = "hapi-fhir" }
+hapi-fhir-validation-r4 = { module = "ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4", version.ref = "hapi-fhir" }
+http = { module = "com.squareup.okhttp3:okhttp", version.ref = "http" }
+http-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "http" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson-core" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
+jackson-module-jaxb-annotations = { module = "com.fasterxml.jackson.module:jackson-module-jaxb-annotations", version.ref = "jackson" }
+json-assert = { module = "org.skyscreamer:jsonassert", version.ref = "json-assert" }
+json-tools-patch = { module = "com.github.java-json-tools:json-patch", version.ref = "json-tools-patch" }
+mlkit-barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkit-barcode-scanning" }
+mlkit-obj-detection = { module = "com.google.mlkit:object-detection", version.ref = "mlkit-object-detection" }
+mlkit-obj-detection-custom = { module = "com.google.mlkit:object-detection-custom", version.ref = "mlkit-object-detection-custom" }
+mock-web-server = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "http" }
+mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito-inline" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
+nimbus = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbus" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+sqlcipher = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlcipher" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+woodstox = { module = "com.fasterxml.woodstox:woodstox-core", version.ref = "woodstox" }
+xerces = { module = "xerces:xercesImpl", version.ref = "xerces" }
+xml-unit = { module = "org.xmlunit:xmlunit-core", version.ref = "xml-unit" }
+zxing = { module = "com.google.zxing:core", version.ref = "zxing" }
 
 [bundles]
 androidx-tracing = ["androidx-tracing-tracing", "androidx-tracing-tracing-android", "androidx-tracing-tracing-ktx"]

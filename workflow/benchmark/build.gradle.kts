@@ -11,7 +11,7 @@ android {
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = Dependencies.androidBenchmarkRunner
+    testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
   }
 
   testBuildType = "release"
@@ -78,7 +78,7 @@ dependencies {
   }
   androidTestImplementation(project(":workflow-testing"))
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->

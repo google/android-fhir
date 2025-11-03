@@ -22,7 +22,7 @@ android {
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.knowledge"
   }
@@ -83,27 +83,27 @@ dependencies {
   androidTestImplementation(libs.kotlinx.coroutines.test)
   androidTestImplementation(libs.truth)
 
-  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
-  api(Dependencies.HapiFhir.guavaCaching)
+  api(libs.hapi.fhir.structures.r4) { exclude(module = "junit") }
+  api(libs.hapi.fhir.caching.guava)
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.core)
-  implementation(Dependencies.timber)
-  implementation(Dependencies.http)
-  implementation(Dependencies.HapiFhir.fhirCoreConvertors)
-  implementation(Dependencies.apacheCommonsCompress)
+  implementation(libs.timber)
+  implementation(libs.http)
+  implementation(libs.hapi.fhir.core.convertors)
+  implementation(libs.apache.commons.compress)
   implementation(libs.androidx.lifecycle.livedata)
   implementation(libs.androidx.room.room)
   implementation(libs.androidx.room.runtime)
 
   ksp(libs.androidx.room.compiler)
 
-  testImplementation(Dependencies.mockitoInline)
-  testImplementation(Dependencies.mockitoKotlin)
-  testImplementation(Dependencies.mockWebServer)
-  testImplementation(Dependencies.robolectric)
+  testImplementation(libs.mockito.inline)
+  testImplementation(libs.mockito.kotlin)
+  testImplementation(libs.mock.web.server)
+  testImplementation(libs.robolectric)
   testImplementation(libs.androidx.arch.core.testing)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)

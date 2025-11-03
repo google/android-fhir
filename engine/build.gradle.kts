@@ -38,7 +38,7 @@ android {
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
     consumerProguardFile("proguard-rules.pro")
@@ -97,29 +97,29 @@ dependencies {
   androidTestImplementation(libs.junit)
   androidTestImplementation(libs.truth)
 
-  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+  api(libs.hapi.fhir.structures.r4) { exclude(module = "junit") }
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
   // We have removed the dependency on Caffeine from HAPI due to conflicts with android
   // Guava Caching must be individually loaded instead.
-  implementation(Dependencies.HapiFhir.guavaCaching)
+  implementation(libs.hapi.fhir.caching.guava)
   // Validation to load system types into FhirPath's Context
   // The loading happens via a ResourceStream in XML and thus
   // XML parsers are also necessary.
-  implementation(Dependencies.HapiFhir.validationR4)
-  implementation(Dependencies.HapiFhir.validation) {
+  implementation(libs.hapi.fhir.validation.r4)
+  implementation(libs.hapi.fhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
   }
-  implementation(Dependencies.Retrofit.coreRetrofit)
-  implementation(Dependencies.guava)
-  implementation(Dependencies.httpInterceptor)
-  implementation(Dependencies.jsonToolsPatch)
-  implementation(Dependencies.sqlcipher)
-  implementation(Dependencies.timber)
-  implementation(Dependencies.woodstox)
-  implementation(Dependencies.xerces)
+  implementation(libs.retrofit)
+  implementation(libs.guava)
+  implementation(libs.http.interceptor)
+  implementation(libs.json.tools.patch)
+  implementation(libs.sqlcipher)
+  implementation(libs.timber)
+  implementation(libs.woodstox)
+  implementation(libs.xerces)
   implementation(libs.android.fhir.common)
   implementation(libs.androidx.datastore.preferences)
   implementation(libs.androidx.lifecycle.livedata)
@@ -132,11 +132,11 @@ dependencies {
 
   ksp(libs.androidx.room.compiler)
 
-  testImplementation(Dependencies.jsonAssert)
-  testImplementation(Dependencies.mockitoInline)
-  testImplementation(Dependencies.mockitoKotlin)
-  testImplementation(Dependencies.mockWebServer)
-  testImplementation(Dependencies.robolectric)
+  testImplementation(libs.json.assert)
+  testImplementation(libs.mockito.inline)
+  testImplementation(libs.mockito.kotlin)
+  testImplementation(libs.mock.web.server)
+  testImplementation(libs.robolectric)
   testImplementation(libs.androidx.arch.core.testing)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.androidx.work.testing)

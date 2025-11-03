@@ -15,7 +15,7 @@ android {
     targetSdk = Sdk.TARGET_SDK
     versionCode = Releases.Catalog.versionCode
     versionName = Releases.Catalog.versionName
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
   buildFeatures { viewBinding = true }
@@ -44,7 +44,7 @@ dependencies {
   androidTestImplementation(libs.androidx.test.espresso.core)
   androidTestImplementation(libs.androidx.test.ext.junit)
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.constraintlayout)

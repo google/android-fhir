@@ -16,7 +16,7 @@ android {
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
   }
@@ -64,17 +64,17 @@ dependencies {
   androidTestImplementation(libs.truth)
 
   implementation(project(":datacapture"))
-  implementation(Dependencies.playServicesLocation)
-  implementation(Dependencies.timber)
+  implementation(libs.play.services.location)
+  implementation(libs.timber)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.core)
   implementation(libs.androidx.fragment)
   implementation(libs.kotlinx.coroutines.playservices)
   implementation(libs.material)
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-  testImplementation(Dependencies.robolectric)
+  testImplementation(libs.robolectric)
   testImplementation(libs.androidx.fragment.testing)
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)

@@ -9,7 +9,7 @@ android {
 
   defaultConfig {
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles("consumer-rules.pro")
   }
 
@@ -36,23 +36,23 @@ dependencies {
   androidTestImplementation(libs.androidx.test.espresso.core)
   androidTestImplementation(libs.androidx.test.ext.junit)
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-  implementation(Dependencies.Retrofit.coreRetrofit)
-  implementation(Dependencies.Retrofit.gsonConverter)
-  implementation(Dependencies.httpInterceptor)
-  implementation(Dependencies.zxing)
-  implementation(Dependencies.nimbus)
-  implementation(Dependencies.timber)
+  implementation(libs.retrofit)
+  implementation(libs.retrofit.converter.gson)
+  implementation(libs.http.interceptor)
+  implementation(libs.zxing)
+  implementation(libs.nimbus)
+  implementation(libs.timber)
   implementation(libs.android.fhir.engine)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.core)
   implementation(libs.material)
 
-  testImplementation(Dependencies.robolectric)
-  testImplementation(Dependencies.mockitoKotlin)
-  testImplementation(Dependencies.mockitoInline)
-  testImplementation(Dependencies.mockWebServer)
+  testImplementation(libs.robolectric)
+  testImplementation(libs.mockito.kotlin)
+  testImplementation(libs.mockito.inline)
+  testImplementation(libs.mock.web.server)
   testImplementation(libs.junit)
   testImplementation(libs.kotlinx.coroutines.test)
   testImplementation(libs.truth)

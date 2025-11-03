@@ -19,7 +19,7 @@ android {
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.workflow"
   }
@@ -78,10 +78,10 @@ afterEvaluate { configureFirebaseTestLabForLibraries() }
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-  androidTestImplementation(Dependencies.jsonAssert)
-  androidTestImplementation(Dependencies.xmlUnit)
+  androidTestImplementation(libs.json.assert)
+  androidTestImplementation(libs.xml.unit)
   androidTestImplementation(libs.androidx.test.core)
   androidTestImplementation(libs.androidx.test.ext.junit)
   androidTestImplementation(libs.androidx.test.ext.junit.ktx)
@@ -92,12 +92,12 @@ dependencies {
   androidTestImplementation(libs.truth)
   androidTestImplementation(project(":workflow-testing"))
 
-  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
-  api(Dependencies.HapiFhir.guavaCaching)
+  api(libs.hapi.fhir.structures.r4) { exclude(module = "junit") }
+  api(libs.hapi.fhir.caching.guava)
 
-  implementation(Dependencies.HapiFhir.guavaCaching)
-  implementation(Dependencies.timber)
-  implementation(Dependencies.xerces)
+  implementation(libs.hapi.fhir.caching.guava)
+  implementation(libs.timber)
+  implementation(libs.xerces)
   implementation(libs.android.fhir.engine) { exclude(module = "truth") }
   implementation(libs.android.fhir.knowledge)
   implementation(libs.androidx.core)
@@ -107,9 +107,9 @@ dependencies {
   implementation(libs.opencds.cqf.fhir.cr)
   implementation(libs.opencds.cqf.fhir.jackson)
 
-  testImplementation(Dependencies.jsonAssert)
-  testImplementation(Dependencies.robolectric)
-  testImplementation(Dependencies.xmlUnit)
+  testImplementation(libs.json.assert)
+  testImplementation(libs.robolectric)
+  testImplementation(libs.xml.unit)
   testImplementation(libs.androidx.room.room)
   testImplementation(libs.androidx.room.runtime)
   testImplementation(libs.androidx.test.core)

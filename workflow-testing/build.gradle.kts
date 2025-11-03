@@ -20,9 +20,9 @@ dependencies {
   compileOnly(libs.opencds.cqf.fhir.utility)
   compileOnly(project(":engine")) { exclude(module = "truth") }
 
-  compileOnly(Dependencies.jsonAssert)
-  compileOnly(Dependencies.woodstox)
-  compileOnly(Dependencies.xmlUnit)
+  compileOnly(libs.json.assert)
+  compileOnly(libs.woodstox)
+  compileOnly(libs.xml.unit)
   compileOnly(libs.junit)
   compileOnly(libs.truth)
 

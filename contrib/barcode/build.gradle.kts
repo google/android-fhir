@@ -16,7 +16,7 @@ android {
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
   }
@@ -55,7 +55,7 @@ android {
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  androidTestImplementation(Dependencies.mockitoInline)
+  androidTestImplementation(libs.mockito.inline)
   androidTestImplementation(libs.androidx.fragment.testing)
   androidTestImplementation(libs.androidx.test.core)
   androidTestImplementation(libs.androidx.test.ext.junit)
@@ -64,21 +64,21 @@ dependencies {
   androidTestImplementation(libs.androidx.test.runner)
   androidTestImplementation(libs.truth)
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
   implementation(project(":datacapture"))
-  implementation(Dependencies.Mlkit.barcodeScanning)
-  implementation(Dependencies.Mlkit.objectDetection)
-  implementation(Dependencies.Mlkit.objectDetectionCustom)
-  implementation(Dependencies.timber)
+  implementation(libs.mlkit.barcode.scanning)
+  implementation(libs.mlkit.obj.detection)
+  implementation(libs.mlkit.obj.detection.custom)
+  implementation(libs.timber)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.core)
   implementation(libs.androidx.fragment)
   implementation(libs.material)
 
-  testImplementation(Dependencies.mockitoInline)
-  testImplementation(Dependencies.mockitoKotlin)
-  testImplementation(Dependencies.robolectric)
+  testImplementation(libs.mockito.inline)
+  testImplementation(libs.mockito.kotlin)
+  testImplementation(libs.robolectric)
   testImplementation(libs.androidx.fragment.testing)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
