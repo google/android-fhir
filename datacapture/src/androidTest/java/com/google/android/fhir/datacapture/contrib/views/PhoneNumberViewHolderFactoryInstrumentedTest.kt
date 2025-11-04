@@ -31,8 +31,6 @@ import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.fhir.datacapture.QuestionnaireEditAdapter
-import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -81,25 +79,6 @@ class PhoneNumberViewHolderFactoryInstrumentedTest {
   @After
   fun tearDown() {
     composeTestRule.unregisterIdlingResource(handlingTextIdlingResource)
-  }
-
-  @Test
-  fun createViewHolder_phoneNumberViewHolderFactory_returnsViewHolder() {
-    val questionnaireEditAdapter = QuestionnaireEditAdapter()
-    val viewHolderFromAdapter =
-      questionnaireEditAdapter.createViewHolder(
-        parent,
-        QuestionnaireEditAdapter.ViewType.from(
-            type = QuestionnaireEditAdapter.ViewType.Type.QUESTION,
-            subtype = QuestionnaireViewHolderType.PHONE_NUMBER.value,
-          )
-          .viewType,
-      ) as QuestionnaireEditAdapter.ViewHolder.QuestionHolder
-
-    assertThat(
-        viewHolderFromAdapter.holder.itemView.visibility,
-      )
-      .isEqualTo(View.VISIBLE)
   }
 
   @Test
