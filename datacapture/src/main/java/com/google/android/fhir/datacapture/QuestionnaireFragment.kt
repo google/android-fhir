@@ -27,7 +27,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,6 +36,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -124,12 +124,10 @@ class QuestionnaireFragment : Fragment() {
 
     return ComposeView(themedContext).apply {
       setContent {
-        MaterialTheme {
-          QuestionnaireScreen(
-            viewModel = viewModel,
-            matchersProvider = questionnaireItemViewHolderFactoryMatchersProvider,
-          )
-        }
+        QuestionnaireScreen(
+          viewModel = viewModel,
+          matchersProvider = questionnaireItemViewHolderFactoryMatchersProvider,
+        )
       }
     }
   }
@@ -546,6 +544,7 @@ private fun QuestionnaireScreen(
           state = questionnaireState,
           displayMode = displayMode,
           matchersProvider = matchersProvider,
+          bottomNavItem = questionnaireState.bottomNavItem,
         )
       }
       is DisplayMode.ReviewMode -> {
@@ -553,18 +552,9 @@ private fun QuestionnaireScreen(
           state = questionnaireState,
           displayMode = displayMode,
           onEditClick = { viewModel.setReviewMode(false) },
+          bottomNavItem = questionnaireState.bottomNavItem,
         )
       }
-    }
-
-    if (
-      questionnaireState.bottomNavItem != null &&
-        questionnaireState.displayMode !is DisplayMode.InitMode
-    ) {
-      BottomNavigationContainer(
-        navigationItem = questionnaireState.bottomNavItem!!,
-        modifier = Modifier.align(Alignment.BottomCenter),
-      )
     }
   }
 }
@@ -574,19 +564,42 @@ private fun EditModeContent(
   state: QuestionnaireState,
   displayMode: DisplayMode.EditMode,
   matchersProvider: QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatchersProvider,
+  bottomNavItem: QuestionnaireAdapterItem.Navigation?,
 ) {
-  Column(modifier = Modifier.fillMaxSize()) {
-    QuestionnaireProgressIndicator(
-      displayMode = displayMode,
-      modifier = Modifier.fillMaxWidth(),
-    )
+  var progress by remember { mutableIntStateOf(0) }
 
-    QuestionnaireEditList(
-      items = state.items,
-      displayMode = displayMode,
-      questionnaireItemViewHolderMatchers = matchersProvider.get(),
-      onUpdateProgressIndicator = { _, _ -> },
-    )
+  LaunchedEffect(displayMode) {
+    if (displayMode.pagination.isPaginated) {
+      progress =
+        calculateProgressPercentage(
+          count = displayMode.pagination.currentPageIndex + 1,
+          totalCount = displayMode.pagination.pages.size,
+        )
+    }
+  }
+  Scaffold(
+    topBar = {
+      LinearProgressIndicator(
+        progress = { progress / 100f },
+        modifier = Modifier.height(4.dp).fillMaxWidth(),
+      )
+    },
+    bottomBar = {
+      if (bottomNavItem != null) {
+        BottomNavigationContainer(bottomNavItem)
+      }
+    },
+  ) { innerPadding ->
+    Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+      QuestionnaireEditList(
+        items = state.items,
+        displayMode = displayMode,
+        questionnaireItemViewHolderMatchers = matchersProvider.get(),
+        onUpdateProgressIndicator = { currentPage, totalCount ->
+          progress = calculateProgressPercentage(count = (currentPage + 1), totalCount = totalCount)
+        },
+      )
+    }
   }
 }
 
@@ -595,15 +608,25 @@ private fun ReviewModeContent(
   state: QuestionnaireState,
   displayMode: DisplayMode.ReviewMode,
   onEditClick: () -> Unit,
+  bottomNavItem: QuestionnaireAdapterItem.Navigation?,
 ) {
-  Column(modifier = Modifier.fillMaxSize()) {
-    QuestionnaireTitleBar(
-      showEditButton = displayMode.showEditButton,
-      onEditClick = onEditClick,
-      modifier = Modifier.fillMaxWidth(),
-    )
-
-    QuestionnaireReviewList(items = state.items)
+  Scaffold(
+    topBar = {
+      QuestionnaireTitleBar(
+        showEditButton = displayMode.showEditButton,
+        onEditClick = onEditClick,
+        modifier = Modifier.fillMaxWidth(),
+      )
+    },
+    bottomBar = {
+      if (bottomNavItem != null) {
+        BottomNavigationContainer(bottomNavItem)
+      }
+    },
+  ) { innerPadding ->
+    Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+      QuestionnaireReviewList(items = state.items)
+    }
   }
 }
 
@@ -633,31 +656,6 @@ fun QuestionnaireTitleBar(
       }
     }
   }
-}
-
-@Composable
-private fun QuestionnaireProgressIndicator(
-  displayMode: DisplayMode.EditMode,
-  modifier: Modifier = Modifier,
-) {
-  var progress by remember { mutableIntStateOf(0) }
-
-  LaunchedEffect(displayMode) {
-    progress =
-      if (displayMode.pagination.isPaginated) {
-        calculateProgressPercentage(
-          count = displayMode.pagination.currentPageIndex + 1,
-          totalCount = displayMode.pagination.pages.size,
-        )
-      } else {
-        0
-      }
-  }
-
-  LinearProgressIndicator(
-    progress = { progress / 100f },
-    modifier = modifier.height(4.dp),
-  )
 }
 
 @Composable
