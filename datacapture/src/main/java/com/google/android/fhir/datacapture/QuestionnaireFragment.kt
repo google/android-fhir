@@ -47,7 +47,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -60,8 +59,10 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
@@ -471,6 +472,9 @@ class QuestionnaireFragment : Fragment() {
      */
     internal const val EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON = "show-submit-anyway-button"
 
+    /** Test tag for QuestionnaireEditList */
+    const val QUESTIONNAIRE_EDIT_LIST = "questionnaire_edit_list"
+
     fun builder() = Builder()
   }
 
@@ -577,11 +581,11 @@ private fun EditModeContent(
       modifier = Modifier.fillMaxWidth(),
     )
 
-    EditRecyclerViewContainer(
+    QuestionnaireEditList(
       items = state.items,
-      matchersProvider = matchersProvider,
       displayMode = displayMode,
-      modifier = Modifier.fillMaxWidth().weight(1f),
+      questionnaireItemViewHolderMatchers = matchersProvider.get(),
+      onUpdateProgressIndicator = { _, _ -> },
     )
   }
 }
@@ -599,10 +603,7 @@ private fun ReviewModeContent(
       modifier = Modifier.fillMaxWidth(),
     )
 
-    ReviewRecyclerViewContainer(
-      items = state.items,
-      modifier = Modifier.fillMaxWidth().weight(1f),
-    )
+    QuestionnaireReviewList(items = state.items)
   }
 }
 
@@ -656,56 +657,6 @@ private fun QuestionnaireProgressIndicator(
   LinearProgressIndicator(
     progress = { progress / 100f },
     modifier = modifier.height(4.dp),
-  )
-}
-
-@Composable
-private fun EditRecyclerViewContainer(
-  items: List<QuestionnaireAdapterItem>,
-  matchersProvider: QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatchersProvider,
-  displayMode: DisplayMode.EditMode,
-  modifier: Modifier = Modifier,
-) {
-  LocalContext.current
-  val adapter = remember { QuestionnaireEditAdapter(matchersProvider.get()) }
-
-  LaunchedEffect(items) { adapter.submitList(items) }
-
-  AndroidView(
-    factory = { ctx ->
-      RecyclerView(ctx).apply {
-        this.adapter = adapter
-        val linearLayoutManager = LinearLayoutManager(ctx)
-        layoutManager = linearLayoutManager
-        // Animation does not work well with views that could gain focus
-        itemAnimator = null
-
-        if (!displayMode.pagination.isPaginated) {
-          addOnScrollListener(object : RecyclerView.OnScrollListener() {})
-        }
-      }
-    },
-    modifier = modifier,
-  )
-}
-
-@Composable
-private fun ReviewRecyclerViewContainer(
-  items: List<QuestionnaireAdapterItem>,
-  modifier: Modifier = Modifier,
-) {
-  val adapter = remember { QuestionnaireReviewAdapter() }
-
-  LaunchedEffect(items) { adapter.submitList(items) }
-
-  AndroidView(
-    factory = { context ->
-      RecyclerView(context).apply {
-        this.adapter = adapter
-        layoutManager = LinearLayoutManager(context)
-      }
-    },
-    modifier = modifier,
   )
 }
 

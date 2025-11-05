@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
-import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -166,71 +165,5 @@ class GroupViewHolderFactoryTest {
 
     assertThat(viewHolder.itemView.findViewById<GroupHeaderView>(R.id.header).visibility)
       .isEqualTo(View.GONE)
-  }
-
-  @Test
-  fun repeatingGroup_shouldHaveAddItemButtonVisible() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { repeats = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    assertThat(viewHolder.itemView.findViewById<View>(R.id.add_item).visibility)
-      .isEqualTo(View.VISIBLE)
-  }
-
-  @Test
-  fun nonRepeatingGroup_shouldHaveAddItemButtonGone() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { repeats = false },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    assertThat(viewHolder.itemView.findViewById<View>(R.id.add_item).visibility)
-      .isEqualTo(View.GONE)
-  }
-
-  @Test
-  fun `test repeated group is read only view`() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          text = "Question?"
-          type = Questionnaire.QuestionnaireItemType.GROUP
-          repeats = true
-          readOnly = true
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-    assertThat((viewHolder.itemView.findViewById<Button>(R.id.add_item).isEnabled)).isFalse()
-  }
-
-  @Test
-  fun `test repeated group is not read only`() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          text = "Question?"
-          type = Questionnaire.QuestionnaireItemType.GROUP
-          repeats = true
-          readOnly = false
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-    assertThat((viewHolder.itemView.findViewById<Button>(R.id.add_item).isEnabled)).isTrue()
   }
 }
