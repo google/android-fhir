@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Google LLC
+ * Copyright 2024-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,7 @@ import com.google.android.fhir.datacapture.R
  *
  * If the custom style resource name is valid, it applies the custom style to the view. If the
  * custom style resource name is not valid or not found, it falls back to applying the default style
- * defined by the given style resource ID. It sets the view's tag to resourceId to indicate that the
- * custom style has been applied.
+ * defined by the given style resource ID.
  *
  * @param context the context used to access resources.
  * @param view the view to which the style should be applied.
@@ -46,7 +45,6 @@ internal fun applyCustomOrDefaultStyle(
   val customStyleResId = customStyleName?.let { getStyleResIdByName(context, it) } ?: 0
   when {
     customStyleResId != 0 -> {
-      view.tag = customStyleResId
       QuestionItemCustomStyle().applyStyle(context, view, customStyleResId)
     }
     defaultStyleResId != 0 -> {
@@ -58,11 +56,6 @@ internal fun applyCustomOrDefaultStyle(
 /**
  * Applies the default style to the given view if the default style has not already been applied.
  *
- * This function checks the `view`'s tag to determine if a style has been previously applied. If the
- * tag is an integer, it will apply the default style specified by `defaultStyleResId`. After
- * applying the style, it resets the view's tag to `null` to indicate that the default style has
- * been applied.
- *
  * @param context The context used to access resources and themes.
  * @param view The view to which the default style will be applied.
  * @param defaultStyleResId The resource ID of the default style to apply.
@@ -72,10 +65,7 @@ private fun applyDefaultStyleIfNotApplied(
   view: View,
   defaultStyleResId: Int,
 ) {
-  (view.tag as? Int)?.let {
-    QuestionItemDefaultStyle().applyStyle(context, view, defaultStyleResId)
-    view.tag = null
-  }
+  QuestionItemDefaultStyle().applyStyle(context, view, defaultStyleResId)
 }
 
 /**
