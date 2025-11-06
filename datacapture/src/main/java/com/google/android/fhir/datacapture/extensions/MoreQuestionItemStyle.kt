@@ -48,7 +48,7 @@ internal fun applyCustomOrDefaultStyle(
       QuestionItemCustomStyle().applyStyle(context, view, customStyleResId)
     }
     defaultStyleResId != 0 -> {
-      applyDefaultStyleIfNotApplied(context, view, defaultStyleResId)
+      applyDefaultStyle(context, view, defaultStyleResId)
     }
   }
 }
@@ -60,7 +60,7 @@ internal fun applyCustomOrDefaultStyle(
  * @param view The view to which the default style will be applied.
  * @param defaultStyleResId The resource ID of the default style to apply.
  */
-private fun applyDefaultStyleIfNotApplied(
+private fun applyDefaultStyle(
   context: Context,
   view: View,
   defaultStyleResId: Int,
