@@ -109,7 +109,11 @@ dependencies {
   implementation(libs.androidx.sqlite)
   implementation(libs.androidx.work.runtime)
   implementation(libs.guava)
+  // We have removed the dependency on Caffeine from HAPI due to conflicts with android
+  // Guava Caching must be individually loaded instead.
   implementation(libs.hapi.fhir.caching.guava)
+  // Validation to load system types into FhirPath's Context. The loading happens via a
+  // ResourceStream in XML and thus XML parsers are also necessary.
   implementation(libs.hapi.fhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
