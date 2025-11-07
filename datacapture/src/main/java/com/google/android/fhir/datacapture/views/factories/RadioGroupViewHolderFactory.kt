@@ -16,140 +16,131 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.RadioButton
-import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.helper.widget.Flow
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.children
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.AnnotatedString
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.extensions.choiceOrientation
-import com.google.android.fhir.datacapture.extensions.displayStringSpanned
+import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
-import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
-import com.google.android.fhir.datacapture.views.HeaderView
+import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.ChoiceRadioButton
+import com.google.android.fhir.datacapture.views.compose.Header
+import com.google.android.fhir.datacapture.views.compose.MediaItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object RadioGroupViewHolderFactory :
-  QuestionnaireItemAndroidViewHolderFactory(R.layout.radio_group_view) {
+internal object RadioGroupViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemAndroidViewHolderDelegate {
-      private lateinit var appContext: AppCompatActivity
-      private lateinit var header: HeaderView
-      private lateinit var radioGroup: ConstraintLayout
-      private lateinit var flow: Flow
-      override lateinit var questionnaireViewItem: QuestionnaireViewItem
+    object : QuestionnaireItemComposeViewHolderDelegate {
 
-      override fun init(itemView: View) {
-        appContext = itemView.context.tryUnwrapContext()!!
-        header = itemView.findViewById(R.id.header)
-        radioGroup = itemView.findViewById(R.id.radio_group)
-        flow = itemView.findViewById(R.id.flow)
-      }
-
-      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        header.bind(
-          questionnaireViewItem,
-          showRequiredOrOptionalText = true,
-          displayValidationResult = true,
-        )
-        // Keep the Flow layout which is the first child
-        radioGroup.removeViews(1, radioGroup.childCount - 1)
-        val choiceOrientation =
-          questionnaireViewItem.questionnaireItem.choiceOrientation
-            ?: ChoiceOrientationTypes.VERTICAL
-        when (choiceOrientation) {
-          ChoiceOrientationTypes.HORIZONTAL -> {
-            flow.setOrientation(Flow.HORIZONTAL)
-            flow.setWrapMode(Flow.WRAP_CHAIN)
+      @Composable
+      override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
+        val context = LocalContext.current
+        val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
+        val readOnly =
+          remember(questionnaireViewItem) { questionnaireViewItem.questionnaireItem.readOnly }
+        val choiceOrientationType =
+          remember(questionnaireViewItem) {
+            questionnaireViewItem.questionnaireItem.choiceOrientation
+              ?: ChoiceOrientationTypes.VERTICAL
           }
-          ChoiceOrientationTypes.VERTICAL -> {
-            flow.setOrientation(Flow.VERTICAL)
-            flow.setWrapMode(Flow.WRAP_NONE)
-          }
-        }
-        questionnaireViewItem.enabledAnswerOptions
-          .map { answerOption -> View.generateViewId() to answerOption }
-          .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
-          .map { it.first }
-          .let { flow.referencedIds = it.toIntArray() }
-      }
-
-      override fun setReadOnly(isReadOnly: Boolean) {
-        // The Flow layout has index 0. The radio button indices start from 1.
-        for (i in 1 until radioGroup.childCount) {
-          val view = radioGroup.getChildAt(i)
-          view.isEnabled = !isReadOnly
-        }
-      }
-
-      private fun populateViewWithAnswerOption(
-        viewId: Int,
-        answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
-        choiceOrientation: ChoiceOrientationTypes,
-      ) {
-        val radioButtonItem =
-          LayoutInflater.from(radioGroup.context).inflate(R.layout.radio_button, null)
-        var isCurrentlySelected = questionnaireViewItem.isAnswerOptionSelected(answerOption)
-        val radioButton =
-          radioButtonItem.findViewById<RadioButton>(R.id.radio_button).apply {
-            id = viewId
-            text = answerOption.value.displayStringSpanned(header.context)
-            setCompoundDrawablesRelative(
-              answerOption.itemAnswerOptionImage(radioGroup.context),
-              null,
-              null,
-              null,
+        val enabledAnswerOptions =
+          remember(questionnaireViewItem) { questionnaireViewItem.enabledAnswerOptions }
+        var selectedAnswerOption by
+          remember(questionnaireViewItem) {
+            mutableStateOf(
+              enabledAnswerOptions.singleOrNull {
+                questionnaireViewItem.isAnswerOptionSelected(it)
+              },
             )
-            layoutParams =
-              ViewGroup.LayoutParams(
-                when (choiceOrientation) {
-                  ChoiceOrientationTypes.HORIZONTAL -> ViewGroup.LayoutParams.WRAP_CONTENT
-                  ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
-                },
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-              )
-            isChecked = isCurrentlySelected
-            setOnClickListener { radioButton ->
-              appContext.lifecycleScope.launch {
-                isCurrentlySelected = !isCurrentlySelected
-                when (isCurrentlySelected) {
-                  true -> {
-                    updateAnswer(answerOption)
-                    val buttons = radioGroup.children.asIterable().filterIsInstance<RadioButton>()
-                    buttons.forEach { button -> uncheckIfNotButtonId(radioButton.id, button) }
-                  }
-                  false -> {
-                    questionnaireViewItem.clearAnswer()
-                    (radioButton as RadioButton).isChecked = false
-                  }
+          }
+
+        @Suppress("LocalVariableName")
+        val AnswerOptionRadioButtons: @Composable (Modifier) -> Unit = { modifier ->
+          enabledAnswerOptions.forEach {
+            val labelText = remember(it) { AnnotatedString(it.value.displayString(context)) }
+            ChoiceRadioButton(
+              label = labelText,
+              selected = it == selectedAnswerOption,
+              enabled = !readOnly,
+              modifier = modifier.testTag(RADIO_OPTION_TAG),
+              image = it.itemAnswerOptionImage(context),
+            ) {
+              coroutineScope.launch {
+                if (selectedAnswerOption != it) {
+                  selectedAnswerOption = it
+                  questionnaireViewItem.setAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = it.value
+                    },
+                  )
+                } else {
+                  selectedAnswerOption = null
+                  questionnaireViewItem.clearAnswer()
                 }
               }
             }
           }
-        radioGroup.addView(radioButton)
-        flow.addView(radioButton)
-      }
+        }
 
-      private fun uncheckIfNotButtonId(checkedId: Int, button: RadioButton) {
-        if (button.id != checkedId) button.isChecked = false
-      }
+        Column(
+          modifier =
+            Modifier.fillMaxWidth()
+              .padding(
+                horizontal = dimensionResource(R.dimen.item_margin_horizontal),
+                vertical = dimensionResource(R.dimen.item_margin_vertical),
+              ),
+        ) {
+          Header(
+            questionnaireViewItem,
+            showRequiredOrOptionalText = true,
+            displayValidationResult = true,
+          )
+          questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
 
-      private suspend fun updateAnswer(
-        answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
-      ) {
-        questionnaireViewItem.setAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = answerOption.value
-          },
-        )
+          when (choiceOrientationType) {
+            ChoiceOrientationTypes.HORIZONTAL -> {
+              FlowRow(
+                modifier = Modifier.selectableGroup().fillMaxWidth(),
+                horizontalArrangement =
+                  Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_horizontal)),
+                verticalArrangement =
+                  Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_vertical)),
+              ) {
+                AnswerOptionRadioButtons(Modifier.weight(1f))
+              }
+            }
+            ChoiceOrientationTypes.VERTICAL -> {
+              Column(
+                modifier = Modifier.selectableGroup().fillMaxWidth(),
+                verticalArrangement =
+                  Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_vertical)),
+              ) {
+                AnswerOptionRadioButtons(Modifier.fillMaxWidth())
+              }
+            }
+          }
+        }
       }
     }
 }
+
+const val RADIO_OPTION_TAG = "radio_group_option"

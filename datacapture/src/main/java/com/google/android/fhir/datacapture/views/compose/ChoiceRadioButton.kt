@@ -16,14 +16,17 @@
 
 package com.google.android.fhir.datacapture.views.compose
 
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -31,17 +34,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
 import com.google.android.fhir.datacapture.R
 
 @Composable
 internal fun ChoiceRadioButton(
-  label: String,
+  label: AnnotatedString,
   selected: Boolean,
   enabled: Boolean,
   modifier: Modifier = Modifier,
+  image: Drawable? = null,
   onClick: () -> Unit,
 ) {
   val backgroundColor =
@@ -97,6 +105,15 @@ internal fun ChoiceRadioButton(
       onClick = null,
       enabled = enabled,
     )
+    // Display image
+    image?.let { drawable ->
+      Spacer(modifier = Modifier.width(8.dp))
+      Icon(
+        bitmap = drawable.toBitmap().asImageBitmap(),
+        contentDescription = null,
+        modifier = Modifier.testTag(CHOICE_RADIO_BUTTON_IMAGE_TAG).size(24.dp),
+      )
+    }
     Spacer(
       modifier =
         Modifier.width(dimensionResource(R.dimen.option_item_between_text_and_icon_padding)),
@@ -104,8 +121,9 @@ internal fun ChoiceRadioButton(
     Text(
       text = label,
       color = textColor,
-      modifier = Modifier.padding(start = dimensionResource(R.dimen.item_margin_horizontal)),
     )
     Spacer(modifier = Modifier.width(dimensionResource(R.dimen.option_item_after_text_padding)))
   }
 }
+
+const val CHOICE_RADIO_BUTTON_IMAGE_TAG = "radio_button_option_icon"

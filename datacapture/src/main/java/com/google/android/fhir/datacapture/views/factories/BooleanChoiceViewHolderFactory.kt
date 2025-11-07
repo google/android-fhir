@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.extensions.choiceOrientation
@@ -68,7 +69,7 @@ internal object BooleanChoiceViewHolderFactory : QuestionnaireItemComposeViewHol
         @Suppress("LocalVariableName")
         val YesChoiceRadioButton: @Composable (Modifier) -> Unit = {
           ChoiceRadioButton(
-            label = stringResource(R.string.yes),
+            label = AnnotatedString(stringResource(R.string.yes)),
             selected = selectedChoiceState == true,
             enabled = !readOnly,
             modifier = it.testTag(YES_CHOICE_RADIO_BUTTON_TAG),
@@ -92,7 +93,7 @@ internal object BooleanChoiceViewHolderFactory : QuestionnaireItemComposeViewHol
         @Suppress("LocalVariableName")
         val NoChoiceRadioButton: @Composable (Modifier) -> Unit = {
           ChoiceRadioButton(
-            label = stringResource(R.string.no),
+            label = AnnotatedString(stringResource(R.string.no)),
             selected = selectedChoiceState == false,
             enabled = !readOnly,
             modifier = it.testTag(NO_CHOICE_RADIO_BUTTON_TAG),
@@ -135,6 +136,8 @@ internal object BooleanChoiceViewHolderFactory : QuestionnaireItemComposeViewHol
                 modifier = Modifier.selectableGroup().fillMaxWidth(),
                 horizontalArrangement =
                   Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_horizontal)),
+                verticalArrangement =
+                  Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_vertical)),
               ) {
                 YesChoiceRadioButton(Modifier.weight(1f))
                 NoChoiceRadioButton(Modifier.weight(1f))

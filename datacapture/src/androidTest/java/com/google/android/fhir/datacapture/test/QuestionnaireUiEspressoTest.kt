@@ -95,6 +95,8 @@ class QuestionnaireUiEspressoTest {
   fun shouldDisplayReviewButtonWhenNoMorePagesToDisplay() {
     buildFragmentFromQuestionnaire("/paginated_questionnaire_with_dependent_answer.json", true)
 
+    // synchronize
+    composeTestRule.waitForIdle()
     onView(withId(com.google.android.fhir.datacapture.R.id.review_mode_button))
       .check(
         ViewAssertions.matches(
@@ -102,13 +104,19 @@ class QuestionnaireUiEspressoTest {
         ),
       )
 
-    clickOnText("Yes")
+    composeTestRule.onNodeWithText("Yes").performClick()
+
+    // synchronize
+    composeTestRule.waitForIdle()
     onView(withId(com.google.android.fhir.datacapture.R.id.review_mode_button))
       .check(
         ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
       )
 
-    clickOnText("No")
+    composeTestRule.onNodeWithText("No").performClick()
+
+    // synchronize
+    composeTestRule.waitForIdle()
     onView(withId(com.google.android.fhir.datacapture.R.id.review_mode_button))
       .check(
         ViewAssertions.matches(
@@ -542,7 +550,7 @@ class QuestionnaireUiEspressoTest {
       assertThat(view).isNull()
     }
 
-    onView(CoreMatchers.allOf(withText("First Option"))).perform(ViewActions.click())
+    composeTestRule.onNodeWithText("First Option").performClick()
 
     onView(CoreMatchers.allOf(withText("Option Date"))).check { view, _ ->
       assertThat(view).isNull()
