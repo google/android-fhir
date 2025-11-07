@@ -101,25 +101,6 @@ dependencies {
 
   coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-  // We have removed the dependency on Caffeine from HAPI due to conflicts with android
-  // Guava Caching must be individually loaded instead.
-  implementation(libs.hapi.fhir.caching.guava)
-  // Validation to load system types into FhirPath's Context
-  // The loading happens via a ResourceStream in XML and thus
-  // XML parsers are also necessary.
-  implementation(libs.hapi.fhir.validation.r4)
-  implementation(libs.hapi.fhir.validation) {
-    exclude(module = "commons-logging")
-    exclude(module = "httpclient")
-  }
-  implementation(libs.retrofit)
-  implementation(libs.guava)
-  implementation(libs.http.interceptor)
-  implementation(libs.json.tools.patch)
-  implementation(libs.sqlcipher)
-  implementation(libs.timber)
-  implementation(libs.woodstox)
-  implementation(libs.xerces)
   implementation(libs.android.fhir.common)
   implementation(libs.androidx.datastore.preferences)
   implementation(libs.androidx.lifecycle.livedata)
@@ -127,22 +108,36 @@ dependencies {
   implementation(libs.androidx.room.runtime)
   implementation(libs.androidx.sqlite)
   implementation(libs.androidx.work.runtime)
+  implementation(libs.guava)
+  implementation(libs.hapi.fhir.caching.guava)
+  implementation(libs.hapi.fhir.validation) {
+    exclude(module = "commons-logging")
+    exclude(module = "httpclient")
+  }
+  implementation(libs.hapi.fhir.validation.r4)
+  implementation(libs.http.interceptor)
+  implementation(libs.json.tools.patch)
   implementation(libs.kotlin.stdlib)
+  implementation(libs.retrofit)
+  implementation(libs.sqlcipher)
+  implementation(libs.timber)
   implementation(libs.truth)
+  implementation(libs.woodstox)
+  implementation(libs.xerces)
 
   ksp(libs.androidx.room.compiler)
 
-  testImplementation(libs.json.assert)
-  testImplementation(libs.mockito.inline)
-  testImplementation(libs.mockito.kotlin)
-  testImplementation(libs.mock.web.server)
-  testImplementation(libs.robolectric)
   testImplementation(libs.androidx.arch.core.testing)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.androidx.work.testing)
+  testImplementation(libs.json.assert)
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)
   testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.mock.web.server)
+  testImplementation(libs.mockito.inline)
+  testImplementation(libs.mockito.kotlin)
+  testImplementation(libs.robolectric)
   testImplementation(libs.truth)
 
   constraints {

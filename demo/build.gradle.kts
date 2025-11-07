@@ -43,7 +43,6 @@ dependencies {
 
   coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-  implementation(libs.timber)
   implementation(libs.androidx.activity)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.constraintlayout)
@@ -60,6 +59,7 @@ dependencies {
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.material)
+  implementation(libs.timber)
   implementation(project(":datacapture")) {
     exclude(group = "com.google.android.fhir", module = "engine")
   }

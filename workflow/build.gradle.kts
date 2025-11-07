@@ -78,46 +78,46 @@ afterEvaluate { configureFirebaseTestLabForLibraries() }
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  coreLibraryDesugaring(libs.desugar.jdk.libs)
-
-  androidTestImplementation(libs.json.assert)
-  androidTestImplementation(libs.xml.unit)
   androidTestImplementation(libs.androidx.test.core)
   androidTestImplementation(libs.androidx.test.ext.junit)
   androidTestImplementation(libs.androidx.test.ext.junit.ktx)
   androidTestImplementation(libs.androidx.test.runner)
   androidTestImplementation(libs.androidx.work.testing)
+  androidTestImplementation(libs.json.assert)
   androidTestImplementation(libs.junit)
   androidTestImplementation(libs.logback.android)
   androidTestImplementation(libs.truth)
+  androidTestImplementation(libs.xml.unit)
   androidTestImplementation(project(":workflow-testing"))
 
-  api(libs.hapi.fhir.structures.r4) { exclude(module = "junit") }
   api(libs.hapi.fhir.caching.guava)
+  api(libs.hapi.fhir.structures.r4) { exclude(module = "junit") }
 
-  implementation(libs.hapi.fhir.caching.guava)
-  implementation(libs.timber)
-  implementation(libs.xerces)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
+
   implementation(libs.android.fhir.engine) { exclude(module = "truth") }
   implementation(libs.android.fhir.knowledge)
   implementation(libs.androidx.core)
+  implementation(libs.hapi.fhir.caching.guava)
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.opencds.cqf.fhir.cr)
   implementation(libs.opencds.cqf.fhir.jackson)
+  implementation(libs.timber)
+  implementation(libs.xerces)
 
-  testImplementation(libs.json.assert)
-  testImplementation(libs.robolectric)
-  testImplementation(libs.xml.unit)
   testImplementation(libs.androidx.room.room)
   testImplementation(libs.androidx.room.runtime)
   testImplementation(libs.androidx.test.core)
+  testImplementation(libs.json.assert)
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.robolectric)
   testImplementation(libs.truth)
-  testImplementation(project(":workflow-testing"))
+  testImplementation(libs.xml.unit)
   testImplementation(project(":knowledge"))
+  testImplementation(project(":workflow-testing"))
 
   configurations.all {
     if (name.contains("test", ignoreCase = true)) {

@@ -27,10 +27,10 @@ dependencies {
 
   implementation(libs.fhir.ucum)
 
-  testImplementation(libs.robolectric)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.robolectric)
   testImplementation(libs.truth)
 
   constraints {

@@ -15,16 +15,15 @@ android {
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
+  compileOnly(libs.json.assert)
+  compileOnly(libs.junit)
   compileOnly(libs.opencds.cqf.fhir.cr)
   compileOnly(libs.opencds.cqf.fhir.jackson)
   compileOnly(libs.opencds.cqf.fhir.utility)
-  compileOnly(project(":engine")) { exclude(module = "truth") }
-
-  compileOnly(libs.json.assert)
+  compileOnly(libs.truth)
   compileOnly(libs.woodstox)
   compileOnly(libs.xml.unit)
-  compileOnly(libs.junit)
-  compileOnly(libs.truth)
+  compileOnly(project(":engine")) { exclude(module = "truth") }
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->

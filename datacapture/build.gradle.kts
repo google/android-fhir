@@ -71,12 +71,13 @@ configurations {
 }
 
 dependencies {
-  androidTestImplementation(libs.androidx.test.espresso.core)
+  androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+  androidTestImplementation(libs.androidx.test.core)
   androidTestImplementation(libs.androidx.test.espresso.contrib) {
     // build fails with error "Duplicate class found" (org.checkerframework.checker.*)
     exclude(group = "org.checkerframework", module = "checker")
   }
-  androidTestImplementation(libs.androidx.test.core)
+  androidTestImplementation(libs.androidx.test.espresso.core)
   androidTestImplementation(libs.androidx.test.ext.junit)
   androidTestImplementation(libs.androidx.test.ext.junit.ktx)
   androidTestImplementation(libs.androidx.test.rules)
@@ -89,50 +90,47 @@ dependencies {
 
   coreLibraryDesugaring(libs.desugar.jdk.libs)
 
+  implementation(libs.accompanist.themeadapter.material3)
+  implementation(libs.android.fhir.common)
+  implementation(libs.androidx.activity.compose)
+  implementation(libs.androidx.appcompat)
+  implementation(libs.androidx.compose.material3)
+  implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.ui.graphics)
+  implementation(libs.androidx.compose.ui.tooling.preview)
+  implementation(libs.androidx.constraintlayout)
+  implementation(libs.androidx.core)
+  implementation(libs.androidx.fragment)
+  implementation(libs.androidx.lifecycle.viewmodel)
+  implementation(libs.androidx.navigation.compose)
+  implementation(libs.androidx.recyclerview)
+  implementation(libs.glide)
   implementation(libs.hapi.fhir.caching.guava)
   implementation(libs.hapi.fhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
   }
-  implementation(libs.timber)
-  implementation(libs.android.fhir.common)
-  implementation(libs.androidx.appcompat)
-  implementation(libs.androidx.constraintlayout)
-  implementation(libs.androidx.core)
-  implementation(libs.androidx.fragment)
-  implementation(libs.androidx.lifecycle.viewmodel)
-  implementation(libs.glide)
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.material)
-  implementation(libs.androidx.recyclerview)
-
-  // Androidx Compose
-  implementation(libs.androidx.activity.compose)
   implementation(platform(libs.androidx.compose.bom))
-  implementation(libs.androidx.compose.ui)
-  implementation(libs.androidx.compose.ui.graphics)
-  implementation(libs.androidx.compose.ui.tooling.preview)
-  implementation(libs.androidx.compose.material3)
-  implementation(libs.androidx.navigation.compose)
-  implementation(libs.accompanist.themeadapter.material3)
+  implementation(libs.timber)
 
-  androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-  debugImplementation(libs.androidx.compose.ui.tooling)
   debugImplementation(libs.androidx.compose.ui.test.manifest)
+  debugImplementation(libs.androidx.compose.ui.tooling)
 
-  testImplementation(libs.mockito.inline)
-  testImplementation(libs.mockito.kotlin)
-  testImplementation(libs.robolectric)
-  testImplementation(project(":knowledge")) {
-    exclude(group = "com.google.android.fhir", module = "engine")
-  }
-  testImplementation(libs.androidx.test.core)
   testImplementation(libs.androidx.fragment.testing)
+  testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)
   testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.mockito.inline)
+  testImplementation(libs.mockito.kotlin)
+  testImplementation(libs.robolectric)
   testImplementation(libs.truth)
+  testImplementation(project(":knowledge")) {
+    exclude(group = "com.google.android.fhir", module = "engine")
+  }
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->

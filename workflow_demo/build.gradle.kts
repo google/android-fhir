@@ -51,6 +51,7 @@ dependencies {
   androidTestImplementation(libs.androidx.test.ext.junit)
 
   compileOnly(libs.opencds.cqf.fhir.cr)
+
   coreLibraryDesugaring(libs.desugar.jdk.libs)
 
   implementation(libs.androidx.appcompat)

@@ -83,31 +83,31 @@ dependencies {
   androidTestImplementation(libs.kotlinx.coroutines.test)
   androidTestImplementation(libs.truth)
 
-  api(libs.hapi.fhir.structures.r4) { exclude(module = "junit") }
   api(libs.hapi.fhir.caching.guava)
+  api(libs.hapi.fhir.structures.r4) { exclude(module = "junit") }
 
   coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-  implementation(libs.kotlin.stdlib)
-  implementation(libs.kotlinx.coroutines.core)
-  implementation(libs.timber)
-  implementation(libs.http)
-  implementation(libs.hapi.fhir.core.convertors)
   implementation(libs.apache.commons.compress)
   implementation(libs.androidx.lifecycle.livedata)
   implementation(libs.androidx.room.room)
   implementation(libs.androidx.room.runtime)
+  implementation(libs.hapi.fhir.core.convertors)
+  implementation(libs.http)
+  implementation(libs.kotlin.stdlib)
+  implementation(libs.kotlinx.coroutines.core)
+  implementation(libs.timber)
 
   ksp(libs.androidx.room.compiler)
 
-  testImplementation(libs.mockito.inline)
-  testImplementation(libs.mockito.kotlin)
-  testImplementation(libs.mock.web.server)
-  testImplementation(libs.robolectric)
   testImplementation(libs.androidx.arch.core.testing)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
   testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.mock.web.server)
+  testImplementation(libs.mockito.inline)
+  testImplementation(libs.mockito.kotlin)
+  testImplementation(libs.robolectric)
   testImplementation(libs.truth)
 
   constraints {

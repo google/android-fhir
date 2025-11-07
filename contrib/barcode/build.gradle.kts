@@ -56,33 +56,33 @@ android {
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  androidTestImplementation(libs.mockito.inline)
   androidTestImplementation(libs.androidx.fragment.testing)
   androidTestImplementation(libs.androidx.test.core)
   androidTestImplementation(libs.androidx.test.ext.junit)
   androidTestImplementation(libs.androidx.test.ext.junit.ktx)
   androidTestImplementation(libs.androidx.test.rules)
   androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.mockito.inline)
   androidTestImplementation(libs.truth)
 
   coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-  implementation(project(":datacapture"))
-  implementation(libs.mlkit.barcode.scanning)
-  implementation(libs.mlkit.obj.detection)
-  implementation(libs.mlkit.obj.detection.custom)
-  implementation(libs.timber)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.core)
   implementation(libs.androidx.fragment)
   implementation(libs.material)
+  implementation(libs.mlkit.barcode.scanning)
+  implementation(libs.mlkit.obj.detection)
+  implementation(libs.mlkit.obj.detection.custom)
+  implementation(libs.timber)
+  implementation(project(":datacapture"))
 
-  testImplementation(libs.mockito.inline)
-  testImplementation(libs.mockito.kotlin)
-  testImplementation(libs.robolectric)
   testImplementation(libs.androidx.fragment.testing)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.mockito.inline)
+  testImplementation(libs.mockito.kotlin)
+  testImplementation(libs.robolectric)
   testImplementation(libs.truth)
 }

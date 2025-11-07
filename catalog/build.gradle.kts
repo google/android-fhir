@@ -54,11 +54,10 @@ dependencies {
   implementation(libs.androidx.navigation.ui)
   implementation(libs.kotlin.stdlib)
   implementation(libs.material)
-
-  implementation(project(path = ":datacapture"))
-  implementation(project(path = ":engine"))
   implementation(project(path = ":contrib:barcode"))
   implementation(project(path = ":contrib:locationwidget"))
+  implementation(project(path = ":datacapture"))
+  implementation(project(path = ":engine"))
 
   testImplementation(libs.junit)
 }
