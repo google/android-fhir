@@ -47,7 +47,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object CheckBoxGroupViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
+internal object CheckBoxGroupComposeViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemComposeViewHolderDelegate {
 
@@ -64,6 +64,7 @@ internal object CheckBoxGroupViewHolderFactory : QuestionnaireItemComposeViewHol
           }
         val enabledAnswerOptions =
           remember(questionnaireViewItem) { questionnaireViewItem.enabledAnswerOptions }
+
         // Track selected answer options as a set
         var selectedAnswerOptions by
           remember(questionnaireViewItem) {
@@ -79,16 +80,24 @@ internal object CheckBoxGroupViewHolderFactory : QuestionnaireItemComposeViewHol
           enabledAnswerOptions.forEach { answerOption ->
             val labelText =
               remember(answerOption) { AnnotatedString(answerOption.value.displayString(context)) }
+            val isChecked = answerOption in selectedAnswerOptions
 
             ChoiceCheckbox(
               label = labelText,
-              checked = answerOption in selectedAnswerOptions,
+              checked = isChecked,
               enabled = !readOnly,
               modifier = modifier.testTag(CHECKBOX_OPTION_TAG),
               image = answerOption.itemAnswerOptionImage(context),
             ) { checked ->
               coroutineScope.launch {
                 if (checked) {
+                  // Add the answer
+                  val newAnswers = questionnaireViewItem.answers.toMutableList()
+                  newAnswers +=
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = answerOption.value
+                    }
+
                   if (answerOption.optionExclusive) {
                     // If this answer option has optionExclusive extension, deselect other options
                     selectedAnswerOptions = setOf(answerOption)
@@ -97,25 +106,19 @@ internal object CheckBoxGroupViewHolderFactory : QuestionnaireItemComposeViewHol
                         value = answerOption.value
                       },
                     )
-                    return@launch
-                  }
+                  } else {
+                    // Deselect any optionExclusive answer options
+                    val exclusiveOptions =
+                      enabledAnswerOptions.filter { it.optionExclusive }.toSet()
+                    selectedAnswerOptions =
+                      (selectedAnswerOptions - exclusiveOptions) + answerOption
 
-                  // Deselect any optionExclusive answer options
-                  val exclusiveOptions = enabledAnswerOptions.filter { it.optionExclusive }.toSet()
-                  selectedAnswerOptions = (selectedAnswerOptions - exclusiveOptions) + answerOption
-
-                  // Add the answer
-                  val answers =
-                    questionnaireViewItem.answers +
-                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                        value = answerOption.value
-                      }
-                  // Remove exclusive options from answers
-                  val newAnswers =
-                    answers.filterNot { answer ->
+                    // Remove exclusive options from answers
+                    newAnswers.removeIf { answer ->
                       exclusiveOptions.any { it.value.equalsDeep(answer.value) }
                     }
-                  questionnaireViewItem.setAnswer(*newAnswers.toTypedArray())
+                    questionnaireViewItem.setAnswer(*newAnswers.toTypedArray())
+                  }
                 } else {
                   // Remove the answer
                   selectedAnswerOptions = selectedAnswerOptions - answerOption
@@ -171,3 +174,5 @@ internal object CheckBoxGroupViewHolderFactory : QuestionnaireItemComposeViewHol
       }
     }
 }
+
+const val CHECKBOX_OPTION_TAG = "checkbox_group_option"
