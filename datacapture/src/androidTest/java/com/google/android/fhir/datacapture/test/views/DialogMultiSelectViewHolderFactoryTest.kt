@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
@@ -47,7 +48,7 @@ import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.DialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.StringSubject
@@ -63,8 +64,10 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
-class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
+@RunWith(AndroidJUnit4::class)
+class DialogMultiSelectViewHolderFactoryTest {
   @Rule
   @JvmField
   var activityScenarioRule: ActivityScenarioRule<TestActivity> =
@@ -76,7 +79,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   @Before
   fun setup() {
     activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
-    viewHolder = QuestionnaireItemDialogSelectViewHolderFactory.create(parent)
+    viewHolder = DialogSelectViewHolderFactory.create(parent)
     setTestLayout(viewHolder.itemView)
   }
 
@@ -538,7 +541,6 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  @SdkSuppress(minSdkVersion = 33)
   fun selectOther_clickAddAnotherAnswer_selectExclusive_shouldHideAddAnotherAnswerWithEditText() {
     val questionnaireItem =
       answerOptions(
@@ -783,6 +785,114 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error,
       )
       .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  fun emptyResponseOptions_showNoneSelected() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        answerOptions(false, "Coding 1", "Coding 2"),
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString(),
+      )
+      .isEqualTo("")
+  }
+
+  @Test
+  fun selectedResponseOptions_showSelectedOptions() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        answerOptions(false, "Coding 1", "Coding 2", "Coding 3"),
+        responseOptions(
+          "Coding 1",
+          "Coding 3",
+        ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString(),
+      )
+      .isEqualTo("Coding 1, Coding 3")
+  }
+
+  @Test
+  fun displayValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "1"
+          required = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = Invalid(listOf("Missing answer for required field.")),
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error,
+      )
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "1"
+          required = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "display" }
+            },
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Coding().apply { display = "display" }
+            },
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error,
+      )
+      .isNull()
+  }
+
+  @Test
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "1"
+          readOnly = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
+          .isEnabled,
+      )
+      .isFalse()
   }
 
   /** Method to run code snippet on UI/main thread */

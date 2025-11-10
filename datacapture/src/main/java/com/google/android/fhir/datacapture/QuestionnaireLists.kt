@@ -43,6 +43,7 @@ import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewHold
 import com.google.android.fhir.datacapture.views.factories.CheckBoxGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.DatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.DateTimePickerViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.DialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.DisplayViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.DropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewHolderFactory
@@ -51,7 +52,6 @@ import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineView
 import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.GroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuantityViewHolderFactory
-import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewHolderFactory
@@ -282,7 +282,7 @@ private fun getQuestionnaireItemViewHolderFactory(
       QuestionnaireViewHolderType.QUANTITY -> QuantityViewHolderFactory
       QuestionnaireViewHolderType.CHECK_BOX_GROUP -> CheckBoxGroupViewHolderFactory
       QuestionnaireViewHolderType.AUTO_COMPLETE -> AutoCompleteViewHolderFactory
-      QuestionnaireViewHolderType.DIALOG_SELECT -> QuestionnaireItemDialogSelectViewHolderFactory
+      QuestionnaireViewHolderType.DIALOG_SELECT -> DialogSelectViewHolderFactory
       QuestionnaireViewHolderType.SLIDER -> SliderViewHolderFactory
       QuestionnaireViewHolderType.PHONE_NUMBER -> PhoneNumberViewHolderFactory
       QuestionnaireViewHolderType.ATTACHMENT -> AttachmentViewHolderFactory
