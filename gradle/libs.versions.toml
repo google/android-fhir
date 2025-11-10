@@ -5,6 +5,8 @@ accompanist-themeadapter-material3 = "0.36.0"
 android-fhir-common = "0.1.0-alpha05"
 android-fhir-engine = "0.1.0-beta05"
 android-fhir-knowledge = "0.1.0-beta01"
+android-gradle-plugin = "8.9.2"
+apache-commons-compress = "1.21"
 androidx-activity = "1.7.2"
 androidx-activity-compose = "1.11.0"
 androidx-appcompat = "1.6.1"
@@ -30,16 +32,49 @@ androidx-test-rules = "1.5.0"
 androidx-test-runner = "1.5.0"
 androidx-tracing = "1.3.0"
 androidx-work = "2.8.1"
+benchmark-plugin = "1.4.0-rc01"
+desugarJdkLibs = "2.0.3"
+dokka = "1.9.20"
+fhir-ucum = "1.0.3"
+fladle = "0.17.4"
 glide = "4.16.0"
+guava = "32.1.3-android"
+hapi-fhir = "6.8.0"
+hapi-fhir-core = "6.0.22"
+http = "4.11.0"
+jacoco = "0.8.10"
+jackson = "2.13.5"
+jackson-core = "2.15.2"
+json-assert = "1.5.1"
+json-tools-patch = "1.13"
 junit = "4.13.2"
 kotlin = "2.1.20"
 kotlinx-coroutines = "1.8.1"
 kotlinx-serialization-json = "1.8.1"
+ksp-plugin = "2.1.20-2.0.1"
 logback-android = "3.0.0"
 material = "1.12.0"
+mlkit-barcode-scanning = "16.1.1"
+mlkit-object-detection = "16.2.3"
+mlkit-object-detection-custom = "16.3.1"
+mockito-inline = "4.0.0"
+mockito-kotlin = "3.2.0"
+navigation-safe-args = "2.6.0"
+nimbus = "9.31"
 opencds-cqf-fhir = "3.8.0"
+play-services-location = "21.0.1"
+retrofit = "2.9.0"
+robolectric = "4.10.3"
+ruler = "1.2.1"
+spotless = "4.17.0"
+sqlcipher = "4.5.4"
+timber = "5.0.1"
 truth = "1.1.5"
 uiautomator = "2.3.0"
+woodstox = "6.5.1"
+xerces = "2.12.2"
+xml-unit = "2.9.1"
+zxing = "3.4.1"
 
 [libraries]
 accompanist-themeadapter-material3 = { module = "com.google.accompanist:accompanist-themeadapter-material3", version.ref = "accompanist-themeadapter-material3"}
@@ -109,8 +144,57 @@ opencds-cqf-fhir-cr = { module = "org.opencds.cqf.fhir:cqf-fhir-cr", version.ref
 opencds-cqf-fhir-jackson = { module = "org.opencds.cqf.fhir:cqf-fhir-jackson", version.ref = "opencds-cqf-fhir" }
 opencds-cqf-fhir-utility = { module = "org.opencds.cqf.fhir:cqf-fhir-utility", version.ref = "opencds-cqf-fhir" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
+fhir-ucum = { module = "org.fhir:ucum", version.ref = "fhir-ucum" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+hapi-fhir-structures-r4 = { module = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4", version.ref = "hapi-fhir" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+apache-commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "apache-commons-compress" }
+desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdkLibs" }
+hapi-fhir-caching-guava = { module = "ca.uhn.hapi.fhir:hapi-fhir-caching-guava", version.ref = "hapi-fhir" }
+hapi-fhir-core-convertors = { module = "ca.uhn.hapi.fhir:org.hl7.fhir.convertors", version.ref = "hapi-fhir-core" }
+hapi-fhir-validation = { module = "ca.uhn.hapi.fhir:hapi-fhir-validation", version.ref = "hapi-fhir" }
+hapi-fhir-validation-r4 = { module = "ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4", version.ref = "hapi-fhir" }
+http = { module = "com.squareup.okhttp3:okhttp", version.ref = "http" }
+http-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "http" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson-core" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
+jackson-module-jaxb-annotations = { module = "com.fasterxml.jackson.module:jackson-module-jaxb-annotations", version.ref = "jackson" }
+json-assert = { module = "org.skyscreamer:jsonassert", version.ref = "json-assert" }
+json-tools-patch = { module = "com.github.java-json-tools:json-patch", version.ref = "json-tools-patch" }
+mlkit-barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkit-barcode-scanning" }
+mlkit-obj-detection = { module = "com.google.mlkit:object-detection", version.ref = "mlkit-object-detection" }
+mlkit-obj-detection-custom = { module = "com.google.mlkit:object-detection-custom", version.ref = "mlkit-object-detection-custom" }
+mock-web-server = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "http" }
+mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito-inline" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
+nimbus = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbus" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+sqlcipher = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlcipher" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+woodstox = { module = "com.fasterxml.woodstox:woodstox-core", version.ref = "woodstox" }
+xerces = { module = "xerces:xercesImpl", version.ref = "xerces" }
+xml-unit = { module = "org.xmlunit:xmlunit-core", version.ref = "xml-unit" }
+zxing = { module = "com.google.zxing:core", version.ref = "zxing" }
 
 [bundles]
 androidx-tracing = ["androidx-tracing-tracing", "androidx-tracing-tracing-android", "androidx-tracing-tracing-ktx"]
 
 [plugins]
+android-application = { id = "com.android.application" }
+android-library = { id = "com.android.library" }
+android-test = { id = "com.android.test" }
+androidx-benchmark = { id = "androidx.benchmark" }
+androidx-navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+fladle = { id = "com.osacky.fladle" }
+kotlin-android = { id = "org.jetbrains.kotlin.android" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization" }
+ksp = { id = "com.google.devtools.ksp" }
+ruler = { id = "com.spotify.ruler" }
+spotless = { id = "com.diffplug.spotless" }
