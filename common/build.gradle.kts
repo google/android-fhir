@@ -1,9 +1,10 @@
 import Dependencies.removeIncompatibleDependencies
 
 plugins {
-  id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.mavenPublish)
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.dokka)
+  `maven-publish`
   jacoco
 }
 
@@ -22,14 +23,14 @@ android {
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  api(Dependencies.HapiFhir.structuresR4)
+  api(libs.hapi.fhir.structures.r4)
 
-  implementation(Dependencies.fhirUcum)
+  implementation(libs.fhir.ucum)
 
-  testImplementation(Dependencies.robolectric)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.robolectric)
   testImplementation(libs.truth)
 
   constraints {
