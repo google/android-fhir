@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.error
@@ -156,20 +157,35 @@ internal fun AutoCompleteDropDownItem(
   options: List<DropDownAnswerOption>,
   onDropDownAnswerOptionSelected: (DropDownAnswerOption?) -> Unit,
 ) {
+  val focusManager = LocalFocusManager.current
   var expanded by remember { mutableStateOf(false) }
   var selectedDropDownAnswerOption by
     remember(selectedOption, options) { mutableStateOf(selectedOption) }
+
+  // Track if change is from user typing
+  var isUserTyping by remember(options) { mutableStateOf(false) }
+
   var selectedOptionDisplay by
     remember(selectedDropDownAnswerOption) {
+      isUserTyping = false // Reset when option is selected
       val stringValue = selectedDropDownAnswerOption?.answerOptionString ?: ""
       mutableStateOf(TextFieldValue(stringValue, selection = TextRange(stringValue.length)))
     }
+
+  // Only filter when user is actively typing
   val filteredOptions =
-    remember(options, selectedOptionDisplay) {
-      options.filter { it.answerOptionString.contains(selectedOptionDisplay.text, true) }
+    remember(options, selectedOptionDisplay, isUserTyping) {
+      if (isUserTyping) {
+        options.filter { it.answerOptionString.contains(selectedOptionDisplay.text, true) }
+      } else {
+        options // Show all options when not typing
+      }
     }
 
   LaunchedEffect(selectedDropDownAnswerOption) {
+    if (selectedDropDownAnswerOption != null) {
+      focusManager.clearFocus()
+    }
     onDropDownAnswerOptionSelected(selectedDropDownAnswerOption)
   }
 
@@ -181,6 +197,7 @@ internal fun AutoCompleteDropDownItem(
     OutlinedTextField(
       value = selectedOptionDisplay,
       onValueChange = {
+        isUserTyping = true // Mark as user typing
         selectedOptionDisplay = it
         if (!expanded) expanded = true
       },
