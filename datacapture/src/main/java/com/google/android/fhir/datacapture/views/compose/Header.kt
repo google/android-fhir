@@ -149,7 +149,11 @@ internal fun Header(
 
     // Required/Optional Text
     if (showRequiredOrOptionalText && !requiredOptionalText.isNullOrBlank()) {
-      Text(text = requiredOptionalText, style = MaterialTheme.typography.bodyMedium)
+      Text(
+        text = requiredOptionalText,
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier.testTag(REQUIRED_OPTIONAL_HEADER_TEXT_TAG),
+      )
     }
 
     // Validation Error
@@ -322,6 +326,7 @@ internal fun Help(
 }
 
 const val ERROR_TEXT_AT_HEADER_TEST_TAG = "error_text_at_header"
+const val REQUIRED_OPTIONAL_HEADER_TEXT_TAG = "required_optional_header_text"
 const val HELP_BUTTON_TAG = "helpButton"
 const val HELP_CARD_TAG = "helpCardView"
 const val HEADER_TAG = "headerView"
