@@ -20,10 +20,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.google.android.fhir.datacapture.R
@@ -83,7 +81,7 @@ internal object SliderViewHolderFactory : QuestionnaireItemComposeViewHolderFact
           Header(questionnaireViewItem, showRequiredOrOptionalText = true)
           questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
           SliderItem(
-            startPosition = questionnaireViewItemAnswerValue,
+            position = questionnaireViewItemAnswerValue,
             steps = steps,
             valueRange = minValue..maxValue,
             enabled = !readOnly,
