@@ -1,10 +1,11 @@
 import Dependencies.removeIncompatibleDependencies
 
 plugins {
-  id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.mavenPublish)
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
+  `maven-publish`
   jacoco
+  alias(libs.plugins.dokka)
 }
 
 publishArtifact(Releases.Contrib.LocationWidget)
@@ -16,7 +17,7 @@ android {
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
   }
@@ -63,20 +64,20 @@ dependencies {
   androidTestImplementation(libs.androidx.test.runner)
   androidTestImplementation(libs.truth)
 
-  implementation(project(":datacapture"))
-  implementation(Dependencies.playServicesLocation)
-  implementation(Dependencies.timber)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
+
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.core)
   implementation(libs.androidx.fragment)
   implementation(libs.kotlinx.coroutines.playservices)
   implementation(libs.material)
+  implementation(libs.play.services.location)
+  implementation(libs.timber)
+  implementation(project(":datacapture"))
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-
-  testImplementation(Dependencies.robolectric)
   testImplementation(libs.androidx.fragment.testing)
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.robolectric)
   testImplementation(libs.truth)
 }

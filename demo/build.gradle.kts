@@ -1,7 +1,7 @@
 plugins {
-  id(Plugins.BuildPlugins.application)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.navSafeArgs)
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.androidx.navigation.safeargs)
 }
 
 configureRuler()
@@ -15,7 +15,7 @@ android {
     targetSdk = Sdk.TARGET_SDK
     versionCode = Releases.Demo.versionCode
     versionName = Releases.Demo.versionName
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
     release {
@@ -41,9 +41,8 @@ dependencies {
   androidTestImplementation(libs.androidx.test.espresso.core)
   androidTestImplementation(libs.androidx.test.ext.junit)
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-  implementation(Dependencies.timber)
   implementation(libs.androidx.activity)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.constraintlayout)
@@ -60,6 +59,7 @@ dependencies {
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.material)
+  implementation(libs.timber)
   implementation(project(":datacapture")) {
     exclude(group = "com.google.android.fhir", module = "engine")
   }
