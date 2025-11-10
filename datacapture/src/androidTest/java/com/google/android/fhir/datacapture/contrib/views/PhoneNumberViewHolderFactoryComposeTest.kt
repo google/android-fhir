@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.test.views
+package com.google.android.fhir.datacapture.contrib.views
 
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
@@ -35,11 +35,8 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
-import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
-import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
@@ -53,7 +50,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class EditTextMultiLineViewHolderFactoryInstrumentedTest {
+class PhoneNumberViewHolderFactoryComposeTest {
 
   @get:Rule
   val activityScenarioRule: ActivityScenarioRule<TestActivity> =
@@ -61,8 +58,8 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
 
   @get:Rule val composeTestRule = createEmptyComposeRule()
 
-  private lateinit var viewHolder: QuestionnaireItemViewHolder
   private lateinit var parent: FrameLayout
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
 
   private var pendingTextChange = 0
   private val handlingTextIdlingResource =
@@ -72,14 +69,10 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
     }
 
   @Before
-  fun setup() {
-    activityScenarioRule.scenario.onActivity { activity ->
-      parent = FrameLayout(activity)
-      viewHolder = EditTextMultiLineViewHolderFactory.create(parent)
-      activity.setContentView(viewHolder.itemView)
-    }
-    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-
+  fun setUp() {
+    activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
+    viewHolder = PhoneNumberViewHolderFactory.create(parent)
+    setTestLayout(viewHolder.itemView)
     composeTestRule.registerIdlingResource(handlingTextIdlingResource)
   }
 
@@ -89,7 +82,7 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun shouldSetQuestionnaireHeader() {
+  fun shouldSetTextViewText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -109,19 +102,19 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
   fun shouldSetInputText() {
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("Answer")
+              value = StringType("+12345678910")
             },
-          )
-        },
+          ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("Answer")
+
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("+12345678910")
   }
 
   @Test
@@ -129,18 +122,16 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("Answer")
+              value = StringType("+12345678910")
             },
-          )
-        },
+          ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -155,25 +146,25 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
 
   @Test
   fun shouldSetQuestionnaireResponseItemAnswer() {
-    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> = emptyList()
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, result, _ ->
-          answers = result
+        answersChangedCallback = { _, _, newAnswers, _ ->
+          answers = newAnswers
           pendingTextChange -= if (pendingTextChange > 0) 1 else 0
         },
       )
-
     viewHolder.bind(questionnaireViewItem)
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("Answer").also {
-      pendingTextChange += 1
-    }
-    composeTestRule.waitForIdle()
+    composeTestRule
+      .onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG)
+      .performTextReplacement("+12345678910")
+      .also { pendingTextChange += 1 }
 
-    assertThat(answers!!.single().valueStringType.value).isEqualTo("Answer")
+    composeTestRule.waitForIdle()
+    assertThat(answers.single().valueStringType.value).isEqualTo("+12345678910")
   }
 
   @Test
@@ -185,9 +176,9 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
+
     viewHolder.bind(questionnaireViewItem)
     composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("")
-    composeTestRule.waitForIdle()
 
     assertThat(questionnaireViewItem.answers).isEmpty()
   }
@@ -221,22 +212,17 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/minLength"
-            setValue(IntegerType("10"))
-          }
-        },
+        Questionnaire.QuestionnaireItemComponent().apply { maxLength = 10 },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("hello")
+              value = StringType("+1234567891011")
             },
           )
         },
         validationResult =
           Invalid(
-            listOf("The minimum number of characters that are permitted in the answer is: 10"),
+            listOf("The maximum number of characters that are permitted in the answer is: 10"),
           ),
         answersChangedCallback = { _, _, _, _ -> },
       ),
@@ -244,26 +230,12 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
 
     composeTestRule.onNodeWithContentDescription("Error").assertIsDisplayed()
     composeTestRule
-      .onNodeWithText("The minimum number of characters that are permitted in the answer is: 10")
+      .onNodeWithText("The maximum number of characters that are permitted in the answer is: 10")
       .assertIsDisplayed()
   }
 
   @Test
-  fun hidesErrorTextviewInTheHeader() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    composeTestRule.onNodeWithTag(ERROR_TEXT_AT_HEADER_TEST_TAG).assertIsNotDisplayed()
-  }
-
-  @Test
-  fun bindReadOnlyShouldDisableView() {
+  fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
@@ -272,110 +244,12 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertIsDisplayed().assertIsNotEnabled()
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertIsNotEnabled()
   }
 
-  @Test
-  fun showAsterisk() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          text = "Question?"
-          required = true
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true),
-      ),
-    )
-
-    // Synchronize
-    composeTestRule.waitForIdle()
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
-      .isEqualTo("Question? *")
-  }
-
-  @Test
-  fun hideAsterisk() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          text = "Question?"
-          required = true
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false),
-      ),
-    )
-
-    // Synchronize
-    composeTestRule.waitForIdle()
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
-      .isEqualTo("Question?")
-  }
-
-  @Test
-  fun showsRequiredText() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true),
-      ),
-    )
-
-    composeTestRule.onNodeWithText("Required").assertIsDisplayed()
-  }
-
-  @Test
-  fun hideRequiredText() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false),
-      ),
-    )
-    composeTestRule.onNodeWithText("Required").assertDoesNotExist()
-  }
-
-  @Test
-  fun showOptionalText() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true),
-      ),
-    )
-
-    composeTestRule.onNodeWithText("Optional").assertIsDisplayed()
-  }
-
-  @Test
-  fun hideOptionalText() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false),
-      ),
-    )
-
-    composeTestRule.onNodeWithText("Optional").assertDoesNotExist()
+  /** Method to set content view for test activity */
+  private fun setTestLayout(view: View) {
+    activityScenarioRule.scenario.onActivity { activity -> activity.setContentView(view) }
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
   }
 }

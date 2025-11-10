@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.test.views
 
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -26,6 +27,7 @@ import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -33,26 +35,28 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_TEXT_FIELD_TAG
 import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
 import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
-import com.google.android.fhir.datacapture.views.factories.QuantityViewHolderFactory
+import com.google.android.fhir.datacapture.views.compose.UNIT_TEXT_TEST_TAG
+import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
-import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class QuantityViewHolderFactoryTest {
+class EditTextDecimalViewHolderFactoryComposeTest {
 
   @get:Rule
   val activityScenarioRule: ActivityScenarioRule<TestActivity> =
@@ -61,19 +65,34 @@ class QuantityViewHolderFactoryTest {
   @get:Rule val composeTestRule = createEmptyComposeRule()
 
   private lateinit var viewHolder: QuestionnaireItemViewHolder
+  private lateinit var parent: FrameLayout
 
-  @Before
-  fun setUp() {
-    activityScenarioRule.scenario.onActivity { activity ->
-      viewHolder = QuantityViewHolderFactory.create(FrameLayout(activity))
-      activity.setContentView(viewHolder.itemView)
+  private var pendingTextChange = 0
+  private val handlingTextIdlingResource =
+    object : IdlingResource {
+      override val isIdleNow: Boolean
+        get() = pendingTextChange == 0
     }
 
+  @Before
+  fun setup() {
+    activityScenarioRule.scenario.onActivity { activity ->
+      parent = FrameLayout(activity)
+      viewHolder = EditTextDecimalViewHolderFactory.create(parent)
+      activity.setContentView(viewHolder.itemView)
+    }
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+
+    composeTestRule.registerIdlingResource(handlingTextIdlingResource)
+  }
+
+  @After
+  fun tearDown() {
+    composeTestRule.unregisterIdlingResource(handlingTextIdlingResource)
   }
 
   @Test
-  fun shouldSetQuestionText() {
+  fun shouldSetQuestionnaireHeader() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -82,23 +101,22 @@ class QuantityViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
     // Synchronize
     composeTestRule.waitForIdle()
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
 
   @Test
-  fun shouldSetInputDecimalValue() {
+  fun shouldSetInputText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Quantity().apply { value = BigDecimal("5") }
+              value = DecimalType("1.1")
             },
           )
         },
@@ -106,19 +124,18 @@ class QuantityViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("5")
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("1.1")
   }
 
   @Test
-  fun shouldClearInputDecimalValue() {
+  fun shouldSetInputTextToEmpty() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Quantity().apply { value = BigDecimal("5") }
+              value = DecimalType("1.1")
             },
           )
         },
@@ -126,7 +143,6 @@ class QuantityViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("5")
 
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -136,61 +152,27 @@ class QuantityViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
+
     composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("")
   }
 
   @Test
-  fun shouldSetUnitValue() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Quantity().apply { unit = "kg" }
-            },
-          )
-        },
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).assertTextEquals("kg")
-  }
-
-  @Test
-  fun shouldSetUnitValueFromInitialWhenAnswerIsMissing() {
+  fun shouldSetUnitText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          addInitial(
-            Questionnaire.QuestionnaireItemInitialComponent(
-              Quantity().apply {
-                this.unit = "kg"
-                this.code = "kilo"
-              },
-            ),
+          type = Questionnaire.QuestionnaireItemType.DECIMAL
+          addExtension(
+            Extension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
+              setValue(Coding().apply { code = "kg" })
+            },
           )
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).assertTextEquals("kg")
-  }
-
-  @Test
-  fun shouldClearUnitValue() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Quantity().apply { unit = "kg" }
+              value = DecimalType("1.1")
             },
           )
         },
@@ -199,8 +181,33 @@ class QuantityViewHolderFactoryTest {
       ),
     )
 
-    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).assertTextEquals("kg")
+    composeTestRule.onNodeWithTag(UNIT_TEXT_TEST_TAG).assertTextEquals("kg")
+  }
 
+  @Test
+  fun shouldClearUnitText() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          type = Questionnaire.QuestionnaireItemType.DECIMAL
+          addExtension(
+            Extension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
+              setValue(Coding().apply { code = "kg" })
+            },
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DecimalType("1.1")
+            },
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -210,37 +217,91 @@ class QuantityViewHolderFactoryTest {
       ),
     )
 
-    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).assertTextEquals("")
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("")
   }
 
   @Test
-  fun shouldDisplayErrorMessageInValidationResult() {
-    viewHolder.bind(
+  fun shouldSetQuestionnaireResponseItemAnswerIfTextIsValid() {
+    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    val questionnaireViewItem =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = Invalid(listOf("Missing answer for required field.")),
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, result, _ ->
+          answers = result
+          pendingTextChange -= if (pendingTextChange > 0) 1 else 0
+        },
+      )
 
-    composeTestRule.onNodeWithContentDescription("Error").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Missing answer for required field.").assertIsDisplayed()
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("1.1").also {
+      pendingTextChange += 1
+    }
+    composeTestRule.waitForIdle()
+
+    assertThat(answers!!.single().valueDecimalType.value).isEqualTo(BigDecimal.valueOf(1.1))
   }
 
   @Test
-  fun shouldDisplayNoErrorMessageWhenValidationResultIsValid() {
+  fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("")
+    composeTestRule.waitForIdle()
+
+    assertThat(questionnaireViewItem.answers).isEmpty()
+  }
+
+  @Test
+  fun shouldSetDraftAnswerIfTextIsInvalid() {
+    var draftAnswer: Any? = null
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, result ->
+          draftAnswer = result
+          pendingTextChange -= if (pendingTextChange > 0) 1 else 0
+        },
+      )
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("1.1.1.1").also {
+      pendingTextChange += 1
+    }
+    composeTestRule.waitForIdle()
+    assertThat(draftAnswer as String).isEqualTo("1.1.1.1")
+  }
+
+  @Test
+  fun displayValidationResultShouldShowNoErrorMesssage() {
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue(DecimalType("2.2"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue(DecimalType("4.4"))
+          }
+        },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Quantity(22.5)
+              value = DecimalType("3.3")
             },
           )
         },
-        validationResult = Valid,
+        validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
@@ -249,35 +310,37 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
-  fun shouldDisableTextInputInReadOnlyMode() {
+  fun displayValidationResultShouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue(DecimalType("2.1"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue(DecimalType("4.2"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DecimalType("1.1")
+            },
+          )
+        },
+        validationResult = Invalid(listOf("Minimum value allowed is:2.1")),
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
 
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertIsNotEnabled()
+    composeTestRule.onNodeWithContentDescription("Error").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Minimum value allowed is:2.1").assertIsDisplayed()
   }
 
   @Test
-  fun shouldDisableUnitInputInReadOnlyMode() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).assertIsNotEnabled()
-  }
-
-  @Test
-  fun shouldAlwaysHideErrorTextviewInTheHeader() {
+  fun hidesErrorTextviewInTheHeader() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -287,14 +350,25 @@ class QuantityViewHolderFactoryTest {
       ),
     )
 
-    composeTestRule
-      .onNodeWithTag(ERROR_TEXT_AT_HEADER_TEST_TAG)
-      .assertIsNotDisplayed()
-      .assertDoesNotExist()
+    composeTestRule.onNodeWithTag(ERROR_TEXT_AT_HEADER_TEST_TAG).assertIsNotDisplayed()
   }
 
   @Test
-  fun shouldShowAsterisk() {
+  fun bindReadOnlyShouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertIsDisplayed().assertIsNotEnabled()
+  }
+
+  @Test
+  fun showAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -307,15 +381,16 @@ class QuantityViewHolderFactoryTest {
         questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true),
       ),
     )
+
     // Synchronize
     composeTestRule.waitForIdle()
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question? *")
   }
 
   @Test
-  fun shouldHideAsterisk() {
+  fun hideAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -332,12 +407,12 @@ class QuantityViewHolderFactoryTest {
     // Synchronize
     composeTestRule.waitForIdle()
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
 
   @Test
-  fun shouldShowRequiredText() {
+  fun showsRequiredText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -352,7 +427,7 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
-  fun shouldHideRequiredText() {
+  fun hideRequiredText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -362,12 +437,11 @@ class QuantityViewHolderFactoryTest {
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false),
       ),
     )
-
     composeTestRule.onNodeWithText("Required").assertDoesNotExist()
   }
 
   @Test
-  fun shouldShowOptionalText() {
+  fun showOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -382,7 +456,7 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
-  fun shouldHideOptionalText() {
+  fun hideOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -394,5 +468,34 @@ class QuantityViewHolderFactoryTest {
     )
 
     composeTestRule.onNodeWithText("Optional").assertDoesNotExist()
+  }
+
+  @Test
+  fun bindAgainShouldRemovePreviousText() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        draftAnswer = "1.1.1.1",
+      ),
+    )
+
+    composeTestRule
+      .onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG, useUnmergedTree = true)
+      .assertTextEquals("1.1.1.1")
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    composeTestRule
+      .onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG, useUnmergedTree = true)
+      .assertTextEquals("")
   }
 }
