@@ -16,32 +16,57 @@
 
 package com.google.android.fhir.datacapture
 
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.FrameLayout
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
 import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
 import timber.log.Timber
@@ -66,10 +91,24 @@ class QuestionnaireFragment : Fragment() {
   @VisibleForTesting
   val questionnaireItemViewHolderFactoryMatchersProvider:
     QuestionnaireItemViewHolderFactoryMatchersProvider by lazy {
-    requireArguments().getString(EXTRA_MATCHERS_FACTORY)?.let {
-      DataCapture.getConfiguration(requireContext())
-        .questionnaireItemViewHolderFactoryMatchersProviderFactory
-        ?.get(it)
+    requireArguments().getString(EXTRA_MATCHERS_FACTORY)?.let { factoryKey ->
+      val provider =
+        DataCapture.getConfiguration(requireContext())
+          .questionnaireItemViewHolderFactoryMatchersProviderFactory
+          ?.get(factoryKey)
+
+      provider?.let {
+        object : QuestionnaireItemViewHolderFactoryMatchersProvider() {
+          override fun get(): List<QuestionnaireItemViewHolderFactoryMatcher> {
+            return it.get().map { matcher ->
+              QuestionnaireItemViewHolderFactoryMatcher(
+                factory = matcher.factory,
+                matches = matcher.matches,
+              )
+            }
+          }
+        }
+      }
     }
       ?: EmptyQuestionnaireItemViewHolderFactoryMatchersProviderImpl
   }
@@ -80,163 +119,65 @@ class QuestionnaireFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?,
   ): View {
-    inflater.context.obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
-      val themeId =
-        it.getResourceId(
-          // Use the custom questionnaire theme if it is specified
-          R.styleable.QuestionnaireTheme_questionnaire_theme,
-          // Otherwise, use the default questionnaire theme
-          R.style.Theme_Questionnaire,
+    val themeId = getQuestionnaireThemeId(inflater.context)
+    val themedContext = ContextThemeWrapper(inflater.context, themeId)
+
+    return ComposeView(themedContext).apply {
+      setContent {
+        QuestionnaireScreen(
+          viewModel = viewModel,
+          matchersProvider = questionnaireItemViewHolderFactoryMatchersProvider,
         )
-      return inflater
-        .cloneInContext(ContextThemeWrapper(inflater.context, themeId))
-        .inflate(R.layout.questionnaire_fragment, container, false)
+      }
     }
   }
 
   /** @suppress */
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    val questionnaireEditComposeView =
-      view.findViewById<ComposeView>(R.id.questionnaire_edit_compose_view)
-    val questionnaireReviewComposeView =
-      view.findViewById<ComposeView>(R.id.questionnaire_review_recycler_view)
-    val questionnaireTitle = view.findViewById<TextView>(R.id.questionnaire_title)
+    super.onViewCreated(view, savedInstanceState)
+    setupViewModelCallbacks()
+    setupFragmentResultListeners()
+  }
 
-    // This container frame floats at the bottom of the view to make navigation controls visible at
-    // all times when the user scrolls. Use
-    // [QuestionnaireFragment.Builder.setShowNavigationInDefaultLongScroll] to disable this.
-    val bottomNavContainerFrame = view.findViewById<View>(R.id.bottom_nav_container_frame)
-
+  private fun setupViewModelCallbacks() {
     viewModel.setOnCancelButtonClickListener {
       QuestionnaireCancelDialogFragment()
         .show(requireActivity().supportFragmentManager, QuestionnaireCancelDialogFragment.TAG)
     }
+
     viewModel.setOnSubmitButtonClickListener {
       lifecycleScope.launch {
         viewModel.validateQuestionnaireAndUpdateUI().let { validationMap ->
           if (validationMap.values.flatten().filterIsInstance<Invalid>().isEmpty()) {
             setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
           } else {
-            val errorViewModel: QuestionnaireValidationErrorViewModel by activityViewModels()
-            errorViewModel.setQuestionnaireAndValidation(viewModel.questionnaire, validationMap)
-            val validationErrorMessageDialog = QuestionnaireValidationErrorMessageDialogFragment()
-            if (requireArguments().containsKey(EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON)) {
-              validationErrorMessageDialog.arguments =
-                Bundle().apply {
-                  putBoolean(
-                    EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON,
-                    requireArguments()
-                      .getBoolean(
-                        EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON,
-                      ),
-                  )
-                }
-            }
-            validationErrorMessageDialog.show(
-              requireActivity().supportFragmentManager,
-              QuestionnaireValidationErrorMessageDialogFragment.TAG,
-            )
+            showValidationErrorDialog(validationMap)
           }
         }
       }
     }
-    val questionnaireProgressIndicator: LinearProgressIndicator =
-      view.findViewById(R.id.questionnaire_progress_indicator)
+  }
 
-    val reviewModeEditButton =
-      view.findViewById<View>(R.id.review_mode_edit_button).apply {
-        setOnClickListener { viewModel.setReviewMode(false) }
-      }
-
-    // Listen to updates from the view model.
-    viewLifecycleOwner.lifecycleScope.launch {
-      viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-        viewModel.questionnaireStateFlow.collect { state ->
-          when (val displayMode = state.displayMode) {
-            is DisplayMode.ReviewMode -> {
-              // Set items
-
-              questionnaireReviewComposeView.visibility = View.VISIBLE
-              questionnaireReviewComposeView.setContent { QuestionnaireReviewList(state.items) }
-              questionnaireEditComposeView.visibility = View.GONE
-
-              reviewModeEditButton.visibility =
-                if (displayMode.showEditButton) {
-                  View.VISIBLE
-                } else {
-                  View.GONE
-                }
-              questionnaireTitle.visibility = View.VISIBLE
-              questionnaireTitle.text = getString(R.string.questionnaire_review_mode_title)
-
-              // Set bottom navigation
-              if (state.bottomNavItem != null) {
-                bottomNavContainerFrame.visibility = View.VISIBLE
-                NavigationViewHolder(bottomNavContainerFrame)
-                  .bind(state.bottomNavItem.questionnaireNavigationUIState)
-              } else {
-                bottomNavContainerFrame.visibility = View.GONE
-              }
-
-              // Hide progress indicator
-              questionnaireProgressIndicator.visibility = View.GONE
-            }
-            is DisplayMode.EditMode -> {
-              // Set items
-              questionnaireReviewComposeView.visibility = View.GONE
-              questionnaireEditComposeView.setContent {
-                QuestionnaireEditList(
-                  items = state.items,
-                  displayMode = displayMode,
-                  questionnaireItemViewHolderMatchers =
-                    questionnaireItemViewHolderFactoryMatchersProvider.get(),
-                  onUpdateProgressIndicator = { currentPage, totalCount ->
-                    questionnaireProgressIndicator.updateProgressIndicator(
-                      calculateProgressPercentage(
-                        count = (currentPage + 1),
-                        totalCount = totalCount,
-                      ),
-                    )
-                  },
-                )
-              }
-              questionnaireEditComposeView.visibility = View.VISIBLE
-              reviewModeEditButton.visibility = View.GONE
-              questionnaireTitle.visibility = View.GONE
-
-              // Set bottom navigation
-              if (state.bottomNavItem != null) {
-                bottomNavContainerFrame.visibility = View.VISIBLE
-                NavigationViewHolder(bottomNavContainerFrame)
-                  .bind(state.bottomNavItem.questionnaireNavigationUIState)
-              } else {
-                bottomNavContainerFrame.visibility = View.GONE
-              }
-
-              // Set progress indicator
-              questionnaireProgressIndicator.visibility = View.VISIBLE
-              if (displayMode.pagination.isPaginated) {
-                questionnaireProgressIndicator.updateProgressIndicator(
-                  calculateProgressPercentage(
-                    count =
-                      (displayMode.pagination.currentPageIndex +
-                        1), // incremented by 1 due to initialPageIndex starts with 0.
-                    totalCount = displayMode.pagination.pages.size,
-                  ),
-                )
-              }
-            }
-            is DisplayMode.InitMode -> {
-              questionnaireReviewComposeView.visibility = View.GONE
-              questionnaireEditComposeView.visibility = View.GONE
-              questionnaireProgressIndicator.visibility = View.GONE
-              reviewModeEditButton.visibility = View.GONE
-              bottomNavContainerFrame.visibility = View.GONE
-            }
-          }
+  private fun showValidationErrorDialog(validationMap: Map<String, List<ValidationResult>>) {
+    val errorViewModel: QuestionnaireValidationErrorViewModel by activityViewModels()
+    errorViewModel.setQuestionnaireAndValidation(viewModel.questionnaire, validationMap)
+    val validationErrorMessageDialog = QuestionnaireValidationErrorMessageDialogFragment()
+    if (requireArguments().containsKey(EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON)) {
+      validationErrorMessageDialog.arguments =
+        Bundle().apply {
+          putBoolean(
+            EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON,
+            requireArguments().getBoolean(EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON),
+          )
         }
-      }
     }
+    validationErrorMessageDialog.show(
+      requireActivity().supportFragmentManager,
+      QuestionnaireValidationErrorMessageDialogFragment.TAG,
+    )
+  }
+
+  private fun setupFragmentResultListeners() {
     requireActivity().supportFragmentManager.setFragmentResultListener(
       QuestionnaireValidationErrorMessageDialogFragment.RESULT_CALLBACK,
       viewLifecycleOwner,
@@ -251,12 +192,10 @@ class QuestionnaireFragment : Fragment() {
         QuestionnaireValidationErrorMessageDialogFragment.RESULT_VALUE_SUBMIT -> {
           setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
         }
-        else ->
-          Timber.e(
-            "Unknown fragment result $result",
-          )
+        else -> Timber.e("Unknown fragment result $result")
       }
     }
+
     /** Listen to Button Clicks from the Cancel Dialog */
     requireActivity().supportFragmentManager.setFragmentResultListener(
       QuestionnaireCancelDialogFragment.REQUEST_KEY,
@@ -269,17 +208,18 @@ class QuestionnaireFragment : Fragment() {
         QuestionnaireCancelDialogFragment.RESULT_YES -> {
           setFragmentResult(CANCEL_REQUEST_KEY, Bundle.EMPTY)
         }
-        else ->
-          Timber.e(
-            "Unknown fragment result $result",
-          )
+        else -> Timber.e("Unknown fragment result $result")
       }
     }
   }
 
-  /** Calculates the progress percentage from given [count] and [totalCount] values. */
-  internal fun calculateProgressPercentage(count: Int, totalCount: Int): Int {
-    return if (totalCount == 0) 0 else (count * 100 / totalCount)
+  private fun getQuestionnaireThemeId(context: Context): Int {
+    return context.obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
+      it.getResourceId(
+        R.styleable.QuestionnaireTheme_questionnaire_theme,
+        R.style.Theme_Questionnaire,
+      )
+    }
   }
 
   /**
@@ -292,7 +232,6 @@ class QuestionnaireFragment : Fragment() {
 
   /** Helper to create [QuestionnaireFragment] with appropriate [Bundle] arguments. */
   class Builder {
-
     private val args = mutableListOf<Pair<String, Any>>()
 
     /**
@@ -588,14 +527,156 @@ class QuestionnaireFragment : Fragment() {
   }
 }
 
-/**
- * Updates the [LinearProgressIndicator] progress with given value.
- *
- * This method will also set max value of [LinearProgressIndicator] to 100.
- *
- * @param progress The new progress [Integer] value between 0 to 100.
- */
-internal fun LinearProgressIndicator.updateProgressIndicator(progress: Int) {
-  setProgress(progress)
-  max = 100
+@Composable
+private fun QuestionnaireScreen(
+  viewModel: QuestionnaireViewModel,
+  matchersProvider: QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatchersProvider,
+) {
+  val questionnaireState by viewModel.questionnaireStateFlow.collectAsStateWithLifecycle()
+
+  Box(modifier = Modifier.fillMaxSize()) {
+    when (val displayMode = questionnaireState.displayMode) {
+      is DisplayMode.InitMode -> {
+        // Empty state - nothing to show
+      }
+      is DisplayMode.EditMode -> {
+        EditModeContent(
+          state = questionnaireState,
+          displayMode = displayMode,
+          matchersProvider = matchersProvider,
+          bottomNavItem = questionnaireState.bottomNavItem,
+        )
+      }
+      is DisplayMode.ReviewMode -> {
+        ReviewModeContent(
+          state = questionnaireState,
+          displayMode = displayMode,
+          onEditClick = { viewModel.setReviewMode(false) },
+          bottomNavItem = questionnaireState.bottomNavItem,
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun EditModeContent(
+  state: QuestionnaireState,
+  displayMode: DisplayMode.EditMode,
+  matchersProvider: QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatchersProvider,
+  bottomNavItem: QuestionnaireAdapterItem.Navigation?,
+) {
+  var progress by remember { mutableIntStateOf(0) }
+
+  LaunchedEffect(displayMode) {
+    if (displayMode.pagination.isPaginated) {
+      progress =
+        calculateProgressPercentage(
+          count = displayMode.pagination.currentPageIndex + 1,
+          totalCount = displayMode.pagination.pages.size,
+        )
+    }
+  }
+  Scaffold(
+    topBar = {
+      LinearProgressIndicator(
+        progress = { progress / 100f },
+        modifier = Modifier.height(4.dp).fillMaxWidth(),
+      )
+    },
+    bottomBar = {
+      if (bottomNavItem != null) {
+        BottomNavigationContainer(bottomNavItem)
+      }
+    },
+  ) { innerPadding ->
+    Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+      QuestionnaireEditList(
+        items = state.items,
+        displayMode = displayMode,
+        questionnaireItemViewHolderMatchers = matchersProvider.get(),
+        onUpdateProgressIndicator = { currentPage, totalCount ->
+          progress = calculateProgressPercentage(count = (currentPage + 1), totalCount = totalCount)
+        },
+      )
+    }
+  }
+}
+
+@Composable
+private fun ReviewModeContent(
+  state: QuestionnaireState,
+  displayMode: DisplayMode.ReviewMode,
+  onEditClick: () -> Unit,
+  bottomNavItem: QuestionnaireAdapterItem.Navigation?,
+) {
+  Scaffold(
+    topBar = {
+      QuestionnaireTitleBar(
+        showEditButton = displayMode.showEditButton,
+        onEditClick = onEditClick,
+        modifier = Modifier.fillMaxWidth(),
+      )
+    },
+    bottomBar = {
+      if (bottomNavItem != null) {
+        BottomNavigationContainer(bottomNavItem)
+      }
+    },
+  ) { innerPadding ->
+    Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+      QuestionnaireReviewList(items = state.items)
+    }
+  }
+}
+
+@Composable
+fun QuestionnaireTitleBar(
+  showEditButton: Boolean,
+  onEditClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  Row(
+    modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+    horizontalArrangement = Arrangement.SpaceBetween,
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(
+      text = stringResource(R.string.questionnaire_review_mode_title),
+      style = MaterialTheme.typography.titleLarge,
+      modifier = Modifier.weight(1f),
+    )
+
+    if (showEditButton) {
+      IconButton(onClick = onEditClick) {
+        Icon(
+          painter = painterResource(R.drawable.ic_outline_edit_24),
+          contentDescription = "Edit",
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun BottomNavigationContainer(
+  navigationItem: QuestionnaireAdapterItem.Navigation,
+  modifier: Modifier = Modifier,
+) {
+  AndroidView(
+    factory = { context ->
+      FrameLayout(context).apply {
+        LayoutInflater.from(context).inflate(R.layout.pagination_navigation_view, this, true)
+      }
+    },
+    update = { view ->
+      NavigationViewHolder(view).bind(navigationItem.questionnaireNavigationUIState)
+    },
+    modifier = modifier.fillMaxWidth(),
+  )
+}
+
+/** Calculates the progress percentage from given [count] and [totalCount] values. */
+private fun calculateProgressPercentage(count: Int, totalCount: Int): Int {
+  return if (totalCount == 0) 0 else (count * 100 / totalCount)
 }
