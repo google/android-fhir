@@ -25,6 +25,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.fragment.app.commitNow
 import androidx.test.espresso.Espresso.onView
@@ -49,6 +50,8 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValid
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
 import com.google.android.fhir.datacapture.views.compose.HANDLE_INPUT_DEBOUNCE_TIME
+import com.google.android.fhir.datacapture.views.factories.NO_CHOICE_RADIO_BUTTON_TAG
+import com.google.android.fhir.datacapture.views.factories.YES_CHOICE_RADIO_BUTTON_TAG
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localDateTime
 import com.google.android.material.progressindicator.LinearProgressIndicator
@@ -92,6 +95,8 @@ class QuestionnaireUiEspressoTest {
   fun shouldDisplayReviewButtonWhenNoMorePagesToDisplay() {
     buildFragmentFromQuestionnaire("/paginated_questionnaire_with_dependent_answer.json", true)
 
+    // synchronize
+    composeTestRule.waitForIdle()
     onView(withId(com.google.android.fhir.datacapture.R.id.review_mode_button))
       .check(
         ViewAssertions.matches(
@@ -99,13 +104,19 @@ class QuestionnaireUiEspressoTest {
         ),
       )
 
-    clickOnText("Yes")
+    composeTestRule.onNodeWithText("Yes").performClick()
+
+    // synchronize
+    composeTestRule.waitForIdle()
     onView(withId(com.google.android.fhir.datacapture.R.id.review_mode_button))
       .check(
         ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
       )
 
-    clickOnText("No")
+    composeTestRule.onNodeWithText("No").performClick()
+
+    // synchronize
+    composeTestRule.waitForIdle()
     onView(withId(com.google.android.fhir.datacapture.R.id.review_mode_button))
       .check(
         ViewAssertions.matches(
@@ -494,14 +505,14 @@ class QuestionnaireUiEspressoTest {
   fun displayItems_shouldGetEnabled_withAnswerChoice() {
     buildFragmentFromQuestionnaire("/questionnaire_with_enabled_display_items.json")
 
-    onView(withId(com.google.android.fhir.datacapture.R.id.hint)).check { view, _ ->
-      val hintVisibility = (view as TextView).visibility
-      assertThat(hintVisibility).isEqualTo(View.GONE)
-    }
+    // Synchronize
+    composeTestRule.waitForIdle()
+    onView(withId(com.google.android.fhir.datacapture.R.id.hint)).check(doesNotExist())
 
-    onView(withId(com.google.android.fhir.datacapture.R.id.yes_radio_button))
-      .perform(ViewActions.click())
+    composeTestRule.onNodeWithTag(YES_CHOICE_RADIO_BUTTON_TAG).performClick()
 
+    // Synchronize
+    composeTestRule.waitForIdle()
     onView(withId(com.google.android.fhir.datacapture.R.id.hint)).check { view, _ ->
       val hintVisibility = (view as TextView).visibility
       val hintText = view.text.toString()
@@ -509,9 +520,10 @@ class QuestionnaireUiEspressoTest {
       assertThat(hintText).isEqualTo("Text when yes is selected")
     }
 
-    onView(withId(com.google.android.fhir.datacapture.R.id.no_radio_button))
-      .perform(ViewActions.click())
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).performClick()
 
+    // Synchronize
+    composeTestRule.waitForIdle()
     onView(withId(com.google.android.fhir.datacapture.R.id.hint)).check { view, _ ->
       val hintVisibility = (view as TextView).visibility
       val hintText = view.text.toString()
@@ -519,13 +531,11 @@ class QuestionnaireUiEspressoTest {
       assertThat(hintText).isEqualTo("Text when no is selected")
     }
 
-    onView(withId(com.google.android.fhir.datacapture.R.id.no_radio_button))
-      .perform(ViewActions.click())
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).performClick()
 
-    onView(withId(com.google.android.fhir.datacapture.R.id.hint)).check { view, _ ->
-      val hintVisibility = (view as TextView).visibility
-      assertThat(hintVisibility).isEqualTo(View.GONE)
-    }
+    // Synchronize
+    composeTestRule.waitForIdle()
+    onView(withId(com.google.android.fhir.datacapture.R.id.hint)).check(doesNotExist())
   }
 
   @Test
@@ -540,7 +550,7 @@ class QuestionnaireUiEspressoTest {
       assertThat(view).isNull()
     }
 
-    onView(CoreMatchers.allOf(withText("First Option"))).perform(ViewActions.click())
+    composeTestRule.onNodeWithText("First Option").performClick()
 
     onView(CoreMatchers.allOf(withText("Option Date"))).check { view, _ ->
       assertThat(view).isNull()
