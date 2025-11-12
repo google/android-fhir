@@ -154,21 +154,27 @@ internal object DatePickerViewHolderFactory :
       }
 
       private fun buildMaterialDatePicker(localDate: LocalDate?): MaterialDatePicker<Long> {
-        val selectedDateMillis =
-          localDate?.atStartOfDay(ZONE_ID_UTC)?.toInstant()?.toEpochMilli()
-            ?: MaterialDatePicker.todayInUtcMilliseconds()
+        val minDateInMillis =
+          (questionnaireViewItem.minAnswerValue as? DateType)
+            ?.value
+            ?.localDate
+            ?.atStartOfDay(
+              ZONE_ID_UTC,
+            )
+            ?.toInstant()
+            ?.toEpochMilli()
+            ?: localDate?.atStartOfDay(ZONE_ID_UTC)?.toInstant()?.toEpochMilli()
+              ?: MaterialDatePicker.todayInUtcMilliseconds()
+        val maxDateInMillis = (questionnaireViewItem.maxAnswerValue as? DateType)?.value?.time
+        val calendarConstraints = getCalenderConstraint(minDateInMillis, maxDateInMillis)
 
         return MaterialDatePicker.Builder.datePicker()
           .setTitleText(R.string.select_date)
-          .setSelection(selectedDateMillis)
-          .setCalendarConstraints(getCalenderConstraint())
+          .setCalendarConstraints(calendarConstraints)
           .build()
       }
 
-      private fun getCalenderConstraint(): CalendarConstraints {
-        val min = (questionnaireViewItem.minAnswerValue as? DateType)?.value?.time
-        val max = (questionnaireViewItem.maxAnswerValue as? DateType)?.value?.time
-
+      private fun getCalenderConstraint(min: Long?, max: Long?): CalendarConstraints {
         if (min != null && max != null && min > max) {
           throw IllegalArgumentException("minValue cannot be greater than maxValue")
         }
