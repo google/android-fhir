@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -201,6 +201,17 @@ internal abstract class ResourceDao {
         WHERE resourceId = :resourceId AND resourceType = :resourceType""",
   )
   abstract suspend fun getResource(resourceId: String, resourceType: ResourceType): String?
+
+  @Query(
+    """
+        SELECT serializedResource
+        FROM ResourceEntity
+        WHERE resourceId IN (:resourceIds) AND resourceType = :resourceType""",
+  )
+  abstract suspend fun getResources(
+    vararg resourceIds: String,
+    resourceType: ResourceType,
+  ): List<String>?
 
   @Query(
     """
