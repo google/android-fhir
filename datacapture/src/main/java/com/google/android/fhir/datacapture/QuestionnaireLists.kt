@@ -18,15 +18,28 @@ package com.google.android.fhir.datacapture
 
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.ViewCompat
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.QUESTIONNAIRE_EDIT_LIST
@@ -56,7 +69,6 @@ import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemView
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.RepeatedGroupHeaderItemViewHolder
-import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.SliderViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.TimePickerViewHolderFactory
 import kotlin.uuid.ExperimentalUuidApi
@@ -217,33 +229,165 @@ internal fun QuestionnaireReviewList(items: List<QuestionnaireAdapterItem>) {
         }
       },
     ) { item: QuestionnaireAdapterItem ->
-      AndroidView(
-        factory = { context ->
-          LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            when (item) {
-              is QuestionnaireAdapterItem.Question -> {
-                val viewHolder = ReviewViewHolderFactory.create(this)
-                viewHolder.bind(item.item)
-                addView(viewHolder.itemView)
-              }
-              is QuestionnaireAdapterItem.Navigation -> {
-                val viewHolder = NavigationViewHolder(inflate(R.layout.pagination_navigation_view))
-                viewHolder.bind(item.questionnaireNavigationUIState)
-                addView(viewHolder.itemView)
-              }
-              is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-                TODO("Not implemented yet")
-              }
-              is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
-                TODO("Not implemented yet")
+      when (item) {
+        is QuestionnaireAdapterItem.Question -> {
+          QuestionnaireReviewItem(
+            questionnaireViewItem = item.item,
+            modifier = Modifier.fillMaxWidth(),
+          )
+        }
+        is QuestionnaireAdapterItem.Navigation -> {
+          QuestionnaireBottomNavigation(
+            navigationState = item.questionnaireNavigationUIState,
+            modifier = Modifier.fillMaxWidth(),
+          )
+        }
+        is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+          // TODO("Not implemented yet")
+        }
+        is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+          // TODO("Not implemented yet")
+        }
+      }
+    }
+  }
+}
+
+@Composable
+private fun QuestionnaireReviewItem(
+  questionnaireViewItem: QuestionnaireViewItem,
+  modifier: Modifier = Modifier,
+) {
+  Column(
+    modifier = modifier.padding(horizontal = 16.dp, vertical = 16.dp),
+  ) {
+    // Header section with prefix, question, and hint
+    val hasPrefix = questionnaireViewItem.questionnaireItem.prefix?.isNotEmpty() == true
+    val hasQuestion = questionnaireViewItem.questionText?.isNotEmpty() == true
+    val hasHint = questionnaireViewItem.enabledDisplayItems.any { it.text?.isNotEmpty() == true }
+
+    if (hasPrefix || hasQuestion || hasHint) {
+      Column {
+        // Question with optional prefix
+        if (hasPrefix || hasQuestion) {
+          val questionText = buildString {
+            if (hasPrefix) {
+              append(questionnaireViewItem.questionnaireItem.prefix ?: "")
+              if (hasQuestion) append(" ")
+            }
+            if (hasQuestion) {
+              append(questionnaireViewItem.questionText?.toString() ?: "")
+            }
+          }
+
+          Text(
+            text = questionText,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(bottom = 4.dp),
+          )
+        }
+
+        // Hint/instructions. Should we show the hint instructions?
+        /*if (hasHint) {
+          questionnaireViewItem.enabledDisplayItems.forEach { displayItem ->
+            displayItem.text?.let { hintText ->
+              if (hintText.isNotEmpty()) {
+                Text(
+                  text = hintText,
+                  style = MaterialTheme.typography.bodyMedium,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  modifier = Modifier.padding(bottom = 8.dp),
+                )
               }
             }
           }
-        },
-        modifier = Modifier.fillMaxWidth(),
-      )
+        }*/
+      }
     }
+
+    // Flyover text
+    questionnaireViewItem.enabledDisplayItems.forEach { displayItem ->
+      displayItem.extension?.forEach { ext ->
+        if (ext.url == "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory") {
+          ext.value?.primitiveValue()?.let { flyoverText ->
+            if (flyoverText.isNotEmpty()) {
+              Text(
+                text = flyoverText,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp),
+              )
+            }
+          }
+        }
+      }
+    }
+
+    // Answer section (only for non-group, non-display items)
+    when (questionnaireViewItem.questionnaireItem.type) {
+      Questionnaire.QuestionnaireItemType.GROUP,
+      Questionnaire.QuestionnaireItemType.DISPLAY, -> {
+        // No answer display for groups and display items
+      }
+      else -> {
+        val answerText =
+          questionnaireViewItem.answers.joinToString(", ") { answer ->
+            when {
+              answer.hasValueStringType() -> answer.valueStringType.value
+              answer.hasValueIntegerType() -> answer.valueIntegerType.value.toString()
+              answer.hasValueDecimalType() -> answer.valueDecimalType.value.toString()
+              answer.hasValueBooleanType() -> if (answer.valueBooleanType.value) "Yes" else "No"
+              answer.hasValueDateType() -> answer.valueDateType.valueAsString
+              answer.hasValueTimeType() -> answer.valueTimeType.valueAsString
+              answer.hasValueDateTimeType() -> answer.valueDateTimeType.valueAsString
+              answer.hasValueQuantity() -> answer.valueQuantity.value.toString()
+              answer.hasValueCoding() -> answer.valueCoding.display ?: answer.valueCoding.code
+              else -> ""
+            }
+          }
+
+        if (answerText.isNotEmpty()) {
+          Text(
+            text = answerText,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+          )
+        }
+
+        // Error display
+        if (
+          questionnaireViewItem.validationResult
+            is com.google.android.fhir.datacapture.validation.Invalid
+        ) {
+          Row(
+            modifier = Modifier.padding(top = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Icon(
+              imageVector = Icons.Default.Warning,
+              contentDescription = "Error",
+              tint = MaterialTheme.colorScheme.error,
+            )
+            Text(
+              text = questionnaireViewItem.validationResult.getSingleStringValidationMessage(),
+              style = MaterialTheme.typography.bodyMedium,
+              color = MaterialTheme.colorScheme.error,
+            )
+          }
+        }
+      }
+    }
+
+    // Divider
+    HorizontalDivider(
+      modifier = Modifier.padding(top = 16.dp),
+      color = MaterialTheme.colorScheme.outlineVariant,
+      thickness = 0.5.dp,
+    )
   }
 }
 
