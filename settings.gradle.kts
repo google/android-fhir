@@ -72,3 +72,4 @@ include(
 )
 
 include(":workflow_demo")
+include(":datacapture-kmp")

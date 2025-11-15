@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ Copyright 2021 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources>
+    <!-- Styles for widgets.   -->
+
+    <!--   Style for group type question header layout. -->
+    <attr name="questionnaireGroupTypeHeaderStyle" format="reference" />
+
+    <!--   Style for group type question text. -->
+    <attr name="questionnaireGroupTypeQuestionTextStyle" format="reference" />
+
+    <!--   Style for question header layout. -->
+    <attr name="questionnaireQuestionHeaderStyle" format="reference" />
+
+    <!--   Style for question text. -->
+    <attr name="questionnaireQuestionTextStyle" format="reference" />
+
+    <!--   Style for subtitle text. -->
+    <attr name="questionnaireSubtitleTextStyle" format="reference" />
+
+    <!--   Style for help header. -->
+    <attr name="questionnaireHelpHeaderStyle" format="reference" />
+
+    <!--   Style for help text. -->
+    <attr name="questionnaireHelpTextStyle" format="reference" />
+
+    <!--   Style for help button -->
+    <attr name="questionnaireHelpButtonStyle" format="reference" />
+
+    <!--   Style for media image -->
+    <attr name="questionnaireMediaImageStyle" format="reference" />
+
+    <!--   Style for question text in review mode -->
+    <attr name="questionnaireReviewModeQuestionTextStyle" format="reference" />
+
+    <!--   Style for answer text in review mode -->
+    <attr name="questionnaireReviewModeAnswerTextStyle" format="reference" />
+
+    <!--   Style for not answered text in review mode -->
+    <attr
+        name="questionnaireReviewModeNotAnsweredTextStyle"
+        format="reference"
+    />
+
+    <!--   Style for item divider in review mode -->
+    <attr name="questionnaireReviewModeItemDividerStyle" format="reference" />
+
+    <!--   Style for answer text. -->
+    <attr name="questionnaireAnswerTextStyle" format="reference" />
+
+    <!--   Style for bottom navigation container. -->
+    <attr name="questionnaireBottomNavContainerStyle" format="reference" />
+
+    <!--   Style for bottom navigation container divider. -->
+    <attr
+        name="questionnaireBottomNavContainerDividerStyle"
+        format="reference"
+    />
+
+    <!--   Style for radio buttons. -->
+    <attr name="questionnaireRadioButtonStyle" format="reference" />
+
+    <!--   Style for checkbox buttons. -->
+    <attr name="questionnaireCheckBoxStyle" format="reference" />
+
+    <!--   Style for item text appears in dropDown view list. -->
+    <attr name="questionnaireDropDownTextStyle" format="reference" />
+
+    <!--   Style for text appears in dropDown autocomplete textView. -->
+    <attr name="questionnaireDropDownSelectedTextStyle" format="reference" />
+
+    <!--   Style for dropDown view layout. -->
+    <attr name="questionnaireDropdownLayoutStyle" format="reference" />
+
+    <!--   Style for outline box in textInput layout. -->
+    <attr name="questionnaireTextInputLayoutStyle" format="reference" />
+
+    <!--   Style for textInputEditText view. -->
+    <attr name="questionnaireTextInputEditTextStyle" format="reference" />
+
+    <!--   Style for multiline textInputEditText view. -->
+    <attr
+        name="questionnaireMultiLineTextInputEditTextStyle"
+        format="reference"
+    />
+
+    <!--   Style for chip view. -->
+    <attr name="questionnaireChipStyle" format="reference" />
+
+    <!--   Style for dialog title text in modal view. -->
+    <attr name="questionnaireDialogTitleStyle" format="reference" />
+
+    <!--   Style for positive and negative dialog buttons in modal view. -->
+    <attr name="questionnaireDialogButtonStyle" format="reference" />
+
+    <!--   Style for add another answer button in modal view. -->
+    <attr name="questionnaireAddAnotherAnswerButtonStyle" format="reference" />
+
+    <!--   Style for error text. -->
+    <attr name="questionnaireErrorTextStyle" format="reference" />
+
+    <!--   Styles for navigation.  -->
+
+    <!--   Style for previous and next buttons in paginated layout. -->
+    <attr name="questionnaireButtonStyle" format="reference" />
+
+    <!--   Style for submit button. -->
+    <attr name="questionnaireSubmitButtonStyle" format="reference" />
+
+    <!--   Style for cancel button. -->
+    <attr name="questionnaireCancelButtonStyle" format="reference" />
+ 
+    <!--   Style for edit button. -->
+    <attr name="questionnaireEditButtonStyle" format="reference" />
+
+    <!--   Style for Add another repeated group item button. -->
+    <attr name="questionnaireAddRepeatedGroupButtonStyle" format="reference" />
+    <!--   Style for Delete repeated group item button. -->
+    <attr
+        name="questionnaireDeleteRepeatedGroupButtonStyle"
+        format="reference"
+    />
+
+    <!--   Style for validation error dialog title text in modal view. -->
+    <attr name="questionnaireValidationDialogTitleStyle" format="reference" />
+
+    <!--   Style for validation error dialog body text in modal view. -->
+    <attr name="questionnaireValidationDialogBodyStyle" format="reference" />
+
+    <!--   Style for validation error positive and negative dialog buttons in modal view. -->
+    <attr name="questionnaireValidationDialogButtonStyle" format="reference" />
+
+    <!--   Style for Linear Progress Indicator. -->
+    <attr name="questionnaireLinearProgressIndicatorStyle" format="reference" />
+
+    <!--   Style for attachment take photo button. -->
+    <attr
+        name="questionnaireAttachmentTakePhotoButtonStyle"
+        format="reference"
+    />
+
+    <!--   Style for attachment divider. -->
+    <attr name="questionnaireAttachmentDividerStyle" format="reference" />
+
+    <!--   Style for attachment uploaded label. -->
+    <attr name="questionnaireAttachmentUploadedLabelStyle" format="reference" />
+
+    <!--   Style for attachment upload button. -->
+    <attr name="questionnaireAttachmentUploadButtonStyle" format="reference" />
+
+    <!--   Style for attachment delete button. -->
+    <attr name="questionnaireAttachmentDeleteButtonStyle" format="reference" />
+
+    <!--   Style for attachment preview photo shape appearance. -->
+    <attr
+        name="questionnaireShapeAppearanceAttachmentPreviewPhotoStyle"
+        format="reference"
+    />
+
+    <!--   Style for attachment preview icon. -->
+    <attr name="questionnaireAttachmentPreviewIconStyle" format="reference" />
+
+    <!--   Style for attachment preview icon background. -->
+    <attr
+        name="questionnaireAttachmentPreviewIconBackgroundStyle"
+        format="reference"
+    />
+
+    <!--   Style for attachment preview title. -->
+    <attr name="questionnaireAttachmentPreviewTitleStyle" format="reference" />
+
+    <!--  Style for questionnaire title  -->
+    <attr name="questionnaireTitleStyle" format="reference" />
+
+    <declare-styleable name="QuestionnaireTheme">
+        <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must
+             extend Theme.Questionnaire. If unspecified, Theme.Questionnaire will be used. -->
+        <attr name="questionnaire_theme" format="reference" />
+    </declare-styleable>
+
+    <!--
+        Declare custom styleable attributes for QuestionnaireCustomStyle.
+        These attributes can be used to customize the appearance of views in the questionnaire.
+    -->
+    <declare-styleable name="QuestionnaireCustomStyle">
+        <!--
+            Specifies the text appearance for the questionnaire text.
+            This should be a reference to a text appearance style resource.
+            Example: @style/TextAppearance.AppCompat.Headline
+        -->
+        <attr name="questionnaire_textAppearance" format="reference" />
+
+        <!--
+            Specifies the background for the questionnaire item.
+            This can be a reference to a drawable resource or a color value.
+            Example: @color/background_color or #FFFFFF
+        -->
+        <attr name="questionnaire_background" format="reference|color" />
+    </declare-styleable>
+</resources>
