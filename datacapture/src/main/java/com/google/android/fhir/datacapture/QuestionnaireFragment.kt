@@ -34,6 +34,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
@@ -157,7 +158,9 @@ class QuestionnaireFragment : Fragment() {
               // Set items
 
               questionnaireReviewComposeView.visibility = View.VISIBLE
-              questionnaireReviewComposeView.setContent { QuestionnaireReviewList(state.items) }
+              questionnaireReviewComposeView.setContent {
+                Mdc3Theme { QuestionnaireReviewList(state.items) }
+              }
               questionnaireEditComposeView.visibility = View.GONE
 
               reviewModeEditButton.visibility =
@@ -185,20 +188,22 @@ class QuestionnaireFragment : Fragment() {
               // Set items
               questionnaireReviewComposeView.visibility = View.GONE
               questionnaireEditComposeView.setContent {
-                QuestionnaireEditList(
-                  items = state.items,
-                  displayMode = displayMode,
-                  questionnaireItemViewHolderMatchers =
-                    questionnaireItemViewHolderFactoryMatchersProvider.get(),
-                  onUpdateProgressIndicator = { currentPage, totalCount ->
-                    questionnaireProgressIndicator.updateProgressIndicator(
-                      calculateProgressPercentage(
-                        count = (currentPage + 1),
-                        totalCount = totalCount,
-                      ),
-                    )
-                  },
-                )
+                Mdc3Theme {
+                  QuestionnaireEditList(
+                    items = state.items,
+                    displayMode = displayMode,
+                    questionnaireItemViewHolderMatchers =
+                      questionnaireItemViewHolderFactoryMatchersProvider.get(),
+                    onUpdateProgressIndicator = { currentPage, totalCount ->
+                      questionnaireProgressIndicator.updateProgressIndicator(
+                        calculateProgressPercentage(
+                          count = (currentPage + 1),
+                          totalCount = totalCount,
+                        ),
+                      )
+                    },
+                  )
+                }
               }
               questionnaireEditComposeView.visibility = View.VISIBLE
               reviewModeEditButton.visibility = View.GONE

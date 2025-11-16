@@ -36,7 +36,7 @@ import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.RepeatedGroupAddItemViewHolder
+import com.google.android.fhir.datacapture.views.compose.RepeatedGroupAddItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewHolderFactory
@@ -109,94 +109,88 @@ internal fun QuestionnaireEditList(
               ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
         }
       },
+      contentType = { it::class.simpleName },
     ) { adapterItem: QuestionnaireAdapterItem ->
-      AndroidView(
-        factory = { context ->
-          LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            ViewCompat.setNestedScrollingEnabled(this, false)
-          }
-        },
-        modifier = Modifier.fillMaxWidth(),
-        update = { view ->
-          val existingViewHolder = view.getTag(R.id.question_view_holder)
+      when (adapterItem) {
+        is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+          RepeatedGroupAddItem(adapterItem.item)
+        }
+        else -> {
+          AndroidView(
+            factory = { context ->
+              LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                ViewCompat.setNestedScrollingEnabled(this, false)
+              }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            update = { view ->
+              val existingViewHolder = view.getTag(R.id.question_view_holder)
 
-          val createViews =
-            when {
-              existingViewHolder == null -> true
-              adapterItem is QuestionnaireAdapterItem.Question &&
-                existingViewHolder !is QuestionnaireItemViewHolder -> true
-              adapterItem is QuestionnaireAdapterItem.Navigation &&
-                existingViewHolder !is NavigationViewHolder -> true
-              adapterItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
-                existingViewHolder !is RepeatedGroupHeaderItemViewHolder -> true
-              adapterItem is QuestionnaireAdapterItem.RepeatedGroupAddButton &&
-                existingViewHolder !is RepeatedGroupAddItemViewHolder -> true
-              else -> false
-            }
+              val createViews =
+                when {
+                  existingViewHolder == null -> true
+                  adapterItem is QuestionnaireAdapterItem.Question &&
+                    existingViewHolder !is QuestionnaireItemViewHolder -> true
+                  adapterItem is QuestionnaireAdapterItem.Navigation &&
+                    existingViewHolder !is NavigationViewHolder -> true
+                  adapterItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
+                    existingViewHolder !is RepeatedGroupHeaderItemViewHolder -> true
+                  else -> false
+                }
 
-          if (createViews) {
-            view.removeAllViews()
-            when (adapterItem) {
-              is QuestionnaireAdapterItem.Question -> {
-                val viewHolder =
-                  getQuestionnaireItemViewHolder(
-                    parent = view,
-                    questionnaireViewItem = adapterItem.item,
-                    questionnaireItemViewHolderMatchers = questionnaireItemViewHolderMatchers,
-                  )
-                view.setTag(R.id.question_view_holder, viewHolder)
-                view.addView(viewHolder.itemView)
-                viewHolder.bind(adapterItem.item)
+              if (createViews) {
+                view.removeAllViews()
+                when {
+                  adapterItem is QuestionnaireAdapterItem.Question -> {
+                    val viewHolder =
+                      getQuestionnaireItemViewHolder(
+                        parent = view,
+                        questionnaireViewItem = adapterItem.item,
+                        questionnaireItemViewHolderMatchers = questionnaireItemViewHolderMatchers,
+                      )
+                    view.setTag(R.id.question_view_holder, viewHolder)
+                    view.addView(viewHolder.itemView)
+                    viewHolder.bind(adapterItem.item)
+                  }
+                  adapterItem is QuestionnaireAdapterItem.Navigation -> {
+                    val viewHolder =
+                      NavigationViewHolder(view.inflate(R.layout.pagination_navigation_view))
+                    view.setTag(R.id.question_view_holder, viewHolder)
+                    view.addView(viewHolder.itemView)
+                    viewHolder.bind(adapterItem.questionnaireNavigationUIState)
+                  }
+                  adapterItem is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+                    val viewHolder =
+                      RepeatedGroupHeaderItemViewHolder(
+                        view.inflate(R.layout.repeated_group_instance_header_view),
+                      )
+                    view.setTag(R.id.question_view_holder, viewHolder)
+                    view.addView(viewHolder.itemView)
+                    viewHolder.bind(adapterItem)
+                  }
+                }
+              } else {
+                // Update existing view holder
+                when {
+                  adapterItem is QuestionnaireAdapterItem.Question -> {
+                    (existingViewHolder as QuestionnaireItemViewHolder).bind(adapterItem.item)
+                  }
+                  adapterItem is QuestionnaireAdapterItem.Navigation -> {
+                    (existingViewHolder as NavigationViewHolder).bind(
+                      adapterItem.questionnaireNavigationUIState,
+                    )
+                  }
+                  adapterItem is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+                    (existingViewHolder as RepeatedGroupHeaderItemViewHolder).bind(adapterItem)
+                  }
+                }
               }
-              is QuestionnaireAdapterItem.Navigation -> {
-                val viewHolder =
-                  NavigationViewHolder(view.inflate(R.layout.pagination_navigation_view))
-                view.setTag(R.id.question_view_holder, viewHolder)
-                view.addView(viewHolder.itemView)
-                viewHolder.bind(adapterItem.questionnaireNavigationUIState)
-              }
-              is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-                val viewHolder =
-                  RepeatedGroupHeaderItemViewHolder(
-                    view.inflate(R.layout.repeated_group_instance_header_view),
-                  )
-                view.setTag(R.id.question_view_holder, viewHolder)
-                view.addView(viewHolder.itemView)
-                viewHolder.bind(adapterItem)
-              }
-              is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
-                val viewHolder =
-                  RepeatedGroupAddItemViewHolder(
-                    view.inflate(R.layout.add_repeated_item),
-                  )
-                view.setTag(R.id.question_view_holder, viewHolder)
-                view.addView(viewHolder.itemView)
-                viewHolder.bind(adapterItem.item)
-              }
-            }
-          } else {
-            // Update existing view holder
-            when (adapterItem) {
-              is QuestionnaireAdapterItem.Question -> {
-                (existingViewHolder as QuestionnaireItemViewHolder).bind(adapterItem.item)
-              }
-              is QuestionnaireAdapterItem.Navigation -> {
-                (existingViewHolder as NavigationViewHolder).bind(
-                  adapterItem.questionnaireNavigationUIState,
-                )
-              }
-              is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-                (existingViewHolder as RepeatedGroupHeaderItemViewHolder).bind(adapterItem)
-              }
-              is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
-                (existingViewHolder as RepeatedGroupAddItemViewHolder).bind(adapterItem.item)
-              }
-            }
-          }
-        },
-        onReset = { view -> view.setTag(R.id.question_view_holder, null) },
-      )
+            },
+            onReset = { view -> view.setTag(R.id.question_view_holder, null) },
+          )
+        }
+      }
     }
   }
 }

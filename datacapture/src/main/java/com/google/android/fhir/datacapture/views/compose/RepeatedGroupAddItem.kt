@@ -18,32 +18,54 @@ package com.google.android.fhir.datacapture.views.compose
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-/**
- * Composable for the "Add" button for repeated group items. This is the Compose equivalent of
- * [RepeatedGroupAddItemViewHolder].
- */
+/** Composable for the "Add" button for repeated group items. */
 @Composable
 fun RepeatedGroupAddItem(questionnaireViewItem: QuestionnaireViewItem) {
-  val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
-  val questionText = questionnaireViewItem.questionText?.toString() ?: ""
-  val buttonText = context.getString(R.string.add_repeated_group_item, questionText)
+  val questionText =
+    remember(questionnaireViewItem) { questionnaireViewItem.questionText?.toString() ?: "" }
+  val isQuestionnaireViewItemRepeatedGroup =
+    remember(questionnaireViewItem.questionnaireItem.repeats) {
+      questionnaireViewItem.questionnaireItem.repeats
+    }
+  val isEnabled =
+    remember(questionnaireViewItem.questionnaireItem.readOnly) {
+      !questionnaireViewItem.questionnaireItem.readOnly
+    }
+  val color =
+    if (isEnabled) {
+      MaterialTheme.colorScheme.primary
+    } else {
+      MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+    }
 
-  if (questionnaireViewItem.questionnaireItem.repeats) {
+  val buttonText = stringResource(R.string.add_repeated_group_item, questionText)
+
+  if (isQuestionnaireViewItemRepeatedGroup) {
     Column(
       modifier = Modifier.fillMaxWidth(),
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -58,12 +80,21 @@ fun RepeatedGroupAddItem(questionnaireViewItem: QuestionnaireViewItem) {
             )
           }
         },
-        enabled = !questionnaireViewItem.questionnaireItem.readOnly,
+        enabled = isEnabled,
         modifier = Modifier.testTag(ADD_REPEATED_GROUP_BUTTON_TAG),
+        shape = RoundedCornerShape(4.dp),
+        border = ButtonDefaults.outlinedButtonBorder(isEnabled).copy(brush = SolidColor(color)),
+        contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
       ) {
+        Icon(
+          painter = painterResource(R.drawable.add_24px),
+          contentDescription = ADD_REPEATED_GROUP_BUTTON_TAG,
+          tint = color,
+        )
+        Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
         Text(
           text = buttonText,
-          // Material3 OutlinedButton doesn't use textAllCaps by default, matching the style
+          color = color,
         )
       }
     }
