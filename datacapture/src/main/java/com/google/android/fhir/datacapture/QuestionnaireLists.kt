@@ -37,6 +37,7 @@ import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.RepeatedGroupAddItem
+import com.google.android.fhir.datacapture.views.compose.RepeatedGroupHeaderItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewHolderFactory
@@ -55,7 +56,6 @@ import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDial
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewHolderFactory
-import com.google.android.fhir.datacapture.views.factories.RepeatedGroupHeaderItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.SliderViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.TimePickerViewHolderFactory
@@ -115,6 +115,9 @@ internal fun QuestionnaireEditList(
         is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
           RepeatedGroupAddItem(adapterItem.item)
         }
+        is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+          RepeatedGroupHeaderItem(adapterItem)
+        }
         else -> {
           AndroidView(
             factory = { context ->
@@ -134,8 +137,6 @@ internal fun QuestionnaireEditList(
                     existingViewHolder !is QuestionnaireItemViewHolder -> true
                   adapterItem is QuestionnaireAdapterItem.Navigation &&
                     existingViewHolder !is NavigationViewHolder -> true
-                  adapterItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
-                    existingViewHolder !is RepeatedGroupHeaderItemViewHolder -> true
                   else -> false
                 }
 
@@ -160,15 +161,6 @@ internal fun QuestionnaireEditList(
                     view.addView(viewHolder.itemView)
                     viewHolder.bind(adapterItem.questionnaireNavigationUIState)
                   }
-                  adapterItem is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-                    val viewHolder =
-                      RepeatedGroupHeaderItemViewHolder(
-                        view.inflate(R.layout.repeated_group_instance_header_view),
-                      )
-                    view.setTag(R.id.question_view_holder, viewHolder)
-                    view.addView(viewHolder.itemView)
-                    viewHolder.bind(adapterItem)
-                  }
                 }
               } else {
                 // Update existing view holder
@@ -180,9 +172,6 @@ internal fun QuestionnaireEditList(
                     (existingViewHolder as NavigationViewHolder).bind(
                       adapterItem.questionnaireNavigationUIState,
                     )
-                  }
-                  adapterItem is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-                    (existingViewHolder as RepeatedGroupHeaderItemViewHolder).bind(adapterItem)
                   }
                 }
               }

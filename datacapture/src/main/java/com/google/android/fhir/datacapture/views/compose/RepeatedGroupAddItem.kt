@@ -39,13 +39,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /** Composable for the "Add" button for repeated group items. */
 @Composable
 fun RepeatedGroupAddItem(questionnaireViewItem: QuestionnaireViewItem) {
-  val coroutineScope = rememberCoroutineScope()
+  val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
   val questionText =
     remember(questionnaireViewItem) { questionnaireViewItem.questionText?.toString() ?: "" }
   val isQuestionnaireViewItemRepeatedGroup =
