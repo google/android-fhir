@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.extensions
 
 import androidx.compose.ui.text.AnnotatedString
-import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.fhir.model.r4b.Attachment
 import com.google.fhir.model.r4b.Boolean
@@ -29,9 +28,6 @@ import com.google.fhir.model.r4b.Questionnaire
 import com.google.fhir.model.r4b.QuestionnaireResponse
 import com.google.fhir.model.r4b.Reference
 import com.google.fhir.model.r4b.Resource
-import com.google.fhir.model.r4b.String
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 // Please note these URLs do not point to any FHIR Resource and are broken links. They are being
 // used until we can engage the FHIR community to add these extensions officially.
@@ -572,39 +568,36 @@ internal val Questionnaire.Item.itemMedia: Attachment?
   get() =
     (getExtensionByUrl(EXTENSION_ITEM_MEDIA)?.value as? Attachment)?.takeIf { it.hasContentType() }
 
-/** Returns the main MIME type of a MIME type string (e.g. image/png returns image). */
-internal val Attachment.mimeType: String?
-  get() = contentType?.substringBefore("/")
-
-/* TODO: unify the code path from itemAnswerMedia to use fetchBitmapFromUrl (github.com/google/android-fhir/issues/1876) */
-/** Fetches the Bitmap representation of [Attachment.url]. */
-internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
-  if (!hasUrl() || !UrlUtil.isValid(url) || !hasContentType()) return null
-
-  if (mimeType != MimeType.IMAGE.value) return null
-
-  val urlResolver = DataCapture.getConfiguration(context).urlResolver ?: return null
-
-  return withContext(Dispatchers.IO) { urlResolver.resolveBitmapUrl(url) }
-}
-
-/** Decodes the Bitmap representation of [Attachment.data]. */
-internal fun Attachment.decodeToBitmap(): Bitmap? {
-  if (!hasContentType() || !hasData()) return null
-
-  if (mimeType != MimeType.IMAGE.value) return null
-
-  return data.decodeToBitmap()
-}
-
-/** Returns Bitmap if Byte Array is a valid Bitmap representation, otherwise null. */
-private fun ByteArray.decodeToBitmap(): Bitmap? {
-  val bitmap = BitmapFactory.decodeByteArray(this, 0, this.size)
-
-  if (bitmap == null) Timber.w("Image could not be decoded")
-
-  return bitmap
-}
+// /* TODO: unify the code path from itemAnswerMedia to use fetchBitmapFromUrl
+// (github.com/google/android-fhir/issues/1876) */
+// /** Fetches the Bitmap representation of [Attachment.url]. */
+// internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
+//  if (!hasUrl() || !UrlUtil.isValid(url) || !hasContentType()) return null
+//
+//  if (mimeType != MimeType.IMAGE.value) return null
+//
+//  val urlResolver = DataCapture.getConfiguration(context).urlResolver ?: return null
+//
+//  return withContext(Dispatchers.IO) { urlResolver.resolveBitmapUrl(url) }
+// }
+//
+// /** Decodes the Bitmap representation of [Attachment.data]. */
+// internal fun Attachment.decodeToBitmap(): Bitmap? {
+//  if (!hasContentType() || !hasData()) return null
+//
+//  if (mimeType != MimeType.IMAGE.value) return null
+//
+//  return data.decodeToBitmap()
+// }
+//
+// /** Returns Bitmap if Byte Array is a valid Bitmap representation, otherwise null. */
+// private fun ByteArray.decodeToBitmap(): Bitmap? {
+//  val bitmap = BitmapFactory.decodeByteArray(this, 0, this.size)
+//
+//  if (bitmap == null) Timber.w("Image could not be decoded")
+//
+//  return bitmap
+// }
 
 /**
  * The unit for the numerical question.

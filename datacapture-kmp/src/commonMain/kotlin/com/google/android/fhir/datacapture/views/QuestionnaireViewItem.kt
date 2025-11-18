@@ -102,7 +102,8 @@ data class QuestionnaireViewItem(
     vararg questionnaireResponseItemAnswerComponent: QuestionnaireResponse.Item.Answer,
   ) {
     check(
-      questionnaireItem.repeats?.value == true || questionnaireResponseItemAnswerComponent.size <= 1
+      questionnaireItem.repeats?.value == true ||
+        questionnaireResponseItemAnswerComponent.size <= 1,
     ) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers."
     }

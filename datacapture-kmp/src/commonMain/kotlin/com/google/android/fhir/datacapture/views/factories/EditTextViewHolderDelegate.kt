@@ -139,7 +139,7 @@ class EditTextViewHolderDelegate(
 fun getRequiredOrOptionalText(
   questionnaireViewItem: QuestionnaireViewItem,
   requiredText: String,
-  optionalHelperText: String
+  optionalHelperText: String,
 ) =
   when {
     (questionnaireViewItem.questionnaireItem.required?.value == true &&

@@ -26,57 +26,36 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.google.android.fhir.datacapture.extensions.MimeType
-import com.google.android.fhir.datacapture.extensions.decodeToBitmap
-import com.google.android.fhir.datacapture.extensions.fetchBitmapFromUrl
-import com.google.android.fhir.datacapture.extensions.mimeType
+import com.google.android.fhir.datacapture.extensions.imageData
 import com.google.fhir.model.r4b.Attachment
+import org.jetbrains.compose.resources.decodeToImageBitmap
 
 @Composable
 fun MediaItem(attachment: Attachment) {
-  if (attachment.mimeType != MimeType.IMAGE.value) {
-    // TODO support other media files. Log with Nappier or Kermit
-    /*Timber.w(
-      "${attachment.mimeType?.capitalize(Locale.ROOT)} attachment is not supported in Item Media extension yet",
-    )*/
-    return
+  var attachmentBitmap: ImageBitmap? by remember(attachment) { mutableStateOf(null) }
+  LaunchedEffect(attachmentBitmap) {
+    attachmentBitmap = attachment.imageData()?.decodeToImageBitmap()
   }
-
-  ImageMediaItem(attachment)
+  attachmentBitmap?.let { ImageMediaItem(it, attachment.title?.value) }
 }
 
 @Composable
-fun ImageMediaItem(imageAttachment: Attachment) {
-  var bitmap by remember { mutableStateOf<Bitmap?>(null) }
-  val context = LocalContext.current
-
-  LaunchedEffect(imageAttachment) {
-    bitmap =
-      if (imageAttachment.data != null) {
-        imageAttachment.decodeToBitmap()
-      } else if (imageAttachment.url != null) {
-        imageAttachment.fetchBitmapFromUrl(context)
-      } else {
-        null
-      }
-  }
-
-  bitmap?.let {
-    Image(
-      modifier =
-        Modifier.testTag("media-image")
-          .padding(
-            horizontal = 16.dp,
-            vertical = 8.dp,
-          )
-          .sizeIn(
-            maxHeight = 200.dp,
-            maxWidth = 200.dp,
-          ),
-      bitmap = it.asImageBitmap(),
-      contentDescription = imageAttachment.title?.value,
-    )
-  }
+fun ImageMediaItem(imageBitmap: ImageBitmap, imageName: String?) {
+  Image(
+    modifier =
+      Modifier.testTag("media-image")
+        .padding(
+          horizontal = 16.dp,
+          vertical = 8.dp,
+        )
+        .sizeIn(
+          maxHeight = 200.dp,
+          maxWidth = 200.dp,
+        ),
+    bitmap = imageBitmap,
+    contentDescription = imageName,
+  )
 }
