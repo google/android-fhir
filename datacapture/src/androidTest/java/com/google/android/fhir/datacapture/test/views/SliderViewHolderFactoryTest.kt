@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,44 +14,66 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.factories
+package com.google.android.fhir.datacapture.test.views
 
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertRangeInfoEquals
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
-import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
-import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_SLIDER_STEP_VALUE_URL
+import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.material.slider.Slider
+import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
+import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_TAG
+import com.google.android.fhir.datacapture.views.compose.SLIDER_TAG
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
+import com.google.android.fhir.datacapture.views.factories.SliderViewHolderFactory
 import com.google.common.truth.Truth.assertThat
-import kotlin.test.assertFailsWith
-import org.hl7.fhir.r4.model.CodeableConcept
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Assert.assertThrows
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class SliderViewHolderFactoryTest {
-  private val parent =
-    FrameLayout(
-      Robolectric.buildActivity(AppCompatActivity::class.java).create().get().apply {
-        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      },
-    )
-  private val viewHolder = SliderViewHolderFactory.create(parent)
+
+  @get:Rule
+  val activityScenarioRule: ActivityScenarioRule<TestActivity> =
+    ActivityScenarioRule(TestActivity::class.java)
+
+  @get:Rule val composeTestRule = createEmptyComposeRule()
+
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
+
+  @Before
+  fun setUp() {
+    activityScenarioRule.scenario.onActivity { activity ->
+      viewHolder = SliderViewHolderFactory.create(FrameLayout(activity))
+      activity.setContentView(viewHolder.itemView)
+    }
+
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+  }
 
   @Test
   fun shouldSetQuestionHeader() {
@@ -63,6 +85,9 @@ class SliderViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
+
+    // Synchronize
+    composeTestRule.waitForIdle()
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
@@ -84,12 +109,13 @@ class SliderViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(10)
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(current = 10f, range = 0f..100f, steps = 99))
   }
 
   @Test
-  fun `step size should come from the sliderStepValue extension`() {
+  fun stepSizeShouldComeFromTheSliderStepValueExtension() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -102,11 +128,17 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).stepSize).isEqualTo(10)
+    val sliderStepsFromStepSize10: Int = 100.div(10) - 1
+
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(
+        ProgressBarRangeInfo(current = 0f, range = 0f..100f, steps = sliderStepsFromStepSize10),
+      )
   }
 
   @Test
-  fun `step size should be 1 if the sliderStepValue extension is not present`() {
+  fun stepSizeShouldBe1IfTheSliderStepValueExtensionIsNotPresent() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { linkId = "slider-step-value" },
@@ -116,11 +148,17 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).stepSize).isEqualTo(1)
+    val sliderStepsWithStepSize1: Int = 100 - 1
+
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(
+        ProgressBarRangeInfo(current = 0f, range = 0f..100f, steps = sliderStepsWithStepSize1),
+      )
   }
 
   @Test
-  fun `slider valueTo should come from the maxValue extension`() {
+  fun sliderValueToShouldComeFromTheMaxValueExtension() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -135,11 +173,13 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).valueTo).isEqualTo(200)
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(current = 0f, range = 0f..200f, steps = 199))
   }
 
   @Test
-  fun `slider valueTo should be set to default value if maxValue extension is not present`() {
+  fun sliderValueToShouldBeSetToDefaultValueIfMaxValueExtensionIsNotPresent() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -149,11 +189,13 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).valueTo).isEqualTo(100.0F)
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(current = 0f, range = 0f..100f, steps = 99))
   }
 
   @Test
-  fun `slider valueFrom should come from the maxValue extension`() {
+  fun sliderValueFromShouldComeFromTheMinValueExtension() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -168,11 +210,13 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).valueFrom).isEqualTo(50)
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(current = 50f, range = 50f..100f, steps = 49))
   }
 
   @Test
-  fun `slider valueFrom should be set to default value if minValue extension is not present`() {
+  fun sliderValueFromShouldBeSetToDefaultValueIfMinValueExtensionIsNotPresent() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -182,30 +226,38 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).valueFrom).isEqualTo(0.0F)
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(current = 0f, range = 0f..100f, steps = 99))
   }
 
   @Test
-  fun `throws exception if minValue is greater than maxvalue`() {
-    assertFailsWith<IllegalStateException> {
-      viewHolder.bind(
-        QuestionnaireViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            addExtension().apply {
-              url = "http://hl7.org/fhir/StructureDefinition/minValue"
-              setValue(IntegerType("100"))
-            }
-            addExtension().apply {
-              url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-              setValue(IntegerType("50"))
-            }
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _, _ -> },
-        ),
-      )
-    }
+  fun throwsExceptionIfMinValueIsGreaterThanMaxvalue() {
+    assertThrows(
+      IllegalStateException::class.java,
+      {
+        viewHolder.bind(
+          QuestionnaireViewItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              addExtension().apply {
+                url = "http://hl7.org/fhir/StructureDefinition/minValue"
+                setValue(IntegerType("100"))
+              }
+              addExtension().apply {
+                url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+                setValue(IntegerType("50"))
+              }
+            },
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _, _ -> },
+          ),
+        )
+
+        // Wait for synchronization
+        composeTestRule.waitForIdle()
+      },
+    )
   }
 
   @Test
@@ -220,13 +272,18 @@ class SliderViewHolderFactoryTest {
       )
 
     viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<Slider>(R.id.slider).value = 10.0F
 
-    assertThat(answerHolder!!.single().valueIntegerType.value).isEqualTo(10)
+    composeTestRule.onNodeWithTag(SLIDER_TAG).performSemanticsAction(SemanticsActions.SetProgress) {
+      it.invoke(20f)
+    }
+    // Synchronize
+    composeTestRule.waitForIdle()
+
+    assertThat(answerHolder!!.single().valueIntegerType.value).isEqualTo(20)
   }
 
   @Test
-  fun shouldSetSliderValueToDefault() {
+  fun shouldSetSliderValueToDefaultWhenQuestionnaireResponseHasMultipleAnswers() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -246,8 +303,9 @@ class SliderViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(0.0F)
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(0.0f, 0.0f..100f, steps = 99))
   }
 
   @Test
@@ -276,7 +334,7 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.toString()).isEqualTo("")
+    composeTestRule.onNodeWithTag(ERROR_TEXT_TAG).assertIsNotDisplayed().assertDoesNotExist()
   }
 
   @Test
@@ -305,12 +363,11 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.toString())
-      .isEqualTo("Minimum value allowed is:50")
+    composeTestRule.onNodeWithTag(ERROR_TEXT_TAG).assertTextEquals("Minimum value allowed is:50")
   }
 
   @Test
-  fun `hides error textview in the header`() {
+  fun hidesErrorTextviewInTheHeader() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -319,9 +376,10 @@ class SliderViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
-      .isEqualTo(View.GONE)
+    composeTestRule
+      .onNodeWithTag(ERROR_TEXT_AT_HEADER_TEST_TAG)
+      .assertIsNotDisplayed()
+      .assertDoesNotExist()
   }
 
   @Test
@@ -334,12 +392,11 @@ class SliderViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).isEnabled).isFalse()
+    composeTestRule.onNodeWithTag(SLIDER_TAG).assertIsNotEnabled()
   }
 
   @Test
-  fun `bind multiple times with different QuestionnaireItemViewItem should show proper slider value`() {
+  fun bindMultipleTimesWithDifferentQuestionnaireItemViewItemShouldShowProperSliderValue() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -355,7 +412,9 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(10)
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(10f, 0f..100f, steps = 99))
 
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -372,7 +431,9 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(12)
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(12f, 0f..100f, steps = 99))
 
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -388,11 +449,13 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(50)
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(50f, 50f..100f, steps = 49))
   }
 
   @Test
-  fun `hide asterisk`() {
+  fun hidesAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -406,12 +469,15 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
+    // Synchronize
+    composeTestRule.waitForIdle()
+
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question")
   }
 
   @Test
-  fun `show required text`() {
+  fun showsRequiredText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -422,14 +488,11 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
-      )
-      .isEqualTo("Required")
+    composeTestRule.onNodeWithText("Required").assertIsDisplayed()
   }
 
   @Test
-  fun `hide required text`() {
+  fun hidesRequiredtext() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -440,16 +503,11 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
-      )
-      .isEmpty()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
-      .isEqualTo(View.GONE)
+    composeTestRule.onNodeWithText("Required").assertIsNotDisplayed().assertDoesNotExist()
   }
 
   @Test
-  fun `show optional text`() {
+  fun showsOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
@@ -460,14 +518,11 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
-      )
-      .isEqualTo("Optional")
+    composeTestRule.onNodeWithText("Optional").assertIsDisplayed()
   }
 
   @Test
-  fun `hide optional text`() {
+  fun hidesOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
@@ -478,27 +533,6 @@ class SliderViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
-      )
-      .isEmpty()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
-      .isEqualTo(View.GONE)
+    composeTestRule.onNodeWithText("Optional").assertIsNotDisplayed().assertDoesNotExist()
   }
-
-  private val displayCategoryExtensionWithInstructionsCode =
-    Extension().apply {
-      url = EXTENSION_DISPLAY_CATEGORY_URL
-      setValue(
-        CodeableConcept().apply {
-          coding =
-            listOf(
-              Coding().apply {
-                code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
-                system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-              },
-            )
-        },
-      )
-    }
 }
