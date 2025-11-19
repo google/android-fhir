@@ -23,7 +23,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,6 +43,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
@@ -141,7 +141,7 @@ internal fun UnitText(unitString: String) {
   ) {
     Text(
       unitString,
-      style = MaterialTheme.typography.bodyMedium,
+      style = QuestionnaireTheme.typography.bodyMedium,
       modifier = Modifier.testTag(UNIT_TEXT_TEST_TAG),
     )
   }

@@ -28,7 +28,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
+import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewHolderFactory
@@ -192,9 +192,9 @@ private fun QuestionnaireReviewItem(
 
           Text(
             text = questionText,
-            style = MaterialTheme.typography.titleMedium,
+            style = QuestionnaireTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = QuestionnaireTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 4.dp),
           )
         }
@@ -206,8 +206,8 @@ private fun QuestionnaireReviewItem(
               if (hintText.isNotEmpty()) {
                 Text(
                   text = hintText,
-                  style = MaterialTheme.typography.bodyMedium,
-                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  style = QuestionnaireTheme.typography.bodyMedium,
+                  color = QuestionnaireTheme.colorScheme.onSurfaceVariant,
                   modifier = Modifier.padding(bottom = 8.dp),
                 )
               }
@@ -225,8 +225,8 @@ private fun QuestionnaireReviewItem(
             if (flyoverText.isNotEmpty()) {
               Text(
                 text = flyoverText,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = QuestionnaireTheme.typography.bodyMedium,
+                color = QuestionnaireTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 8.dp),
               )
             }
@@ -266,8 +266,8 @@ private fun QuestionnaireReviewItem(
         if (answerText.isNotEmpty()) {
           Text(
             text = answerText,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = QuestionnaireTheme.typography.bodyLarge,
+            color = QuestionnaireTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp),
           )
         }
@@ -285,12 +285,12 @@ private fun QuestionnaireReviewItem(
             Icon(
               imageVector = Icons.Default.Warning,
               contentDescription = "Error",
-              tint = MaterialTheme.colorScheme.error,
+              tint = QuestionnaireTheme.colorScheme.error,
             )
             Text(
               text = questionnaireViewItem.validationResult.getSingleStringValidationMessage(),
-              style = MaterialTheme.typography.bodyMedium,
-              color = MaterialTheme.colorScheme.error,
+              style = QuestionnaireTheme.typography.bodyMedium,
+              color = QuestionnaireTheme.colorScheme.error,
             )
           }
         }
@@ -300,7 +300,7 @@ private fun QuestionnaireReviewItem(
     // Divider
     HorizontalDivider(
       modifier = Modifier.padding(top = 16.dp),
-      color = MaterialTheme.colorScheme.outlineVariant,
+      color = QuestionnaireTheme.colorScheme.outlineVariant,
       thickness = 0.5.dp,
     )
   }

@@ -41,7 +41,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -58,6 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.fhir.model.r4.QuestionnaireResponse
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -268,7 +268,7 @@ fun QuestionnaireTitleBar(
   ) {
     Text(
       text = stringResource(Res.string.questionnaire_review_mode_title),
-      style = MaterialTheme.typography.titleLarge,
+      style = QuestionnaireTheme.typography.titleLarge,
       modifier = Modifier.weight(1f),
     )
 
@@ -294,7 +294,7 @@ fun QuestionnaireBottomNavigation(
 
     Surface(
       modifier = Modifier.fillMaxWidth(),
-      color = MaterialTheme.colorScheme.surface,
+      color = QuestionnaireTheme.colorScheme.surface,
     ) {
       Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
@@ -409,7 +409,7 @@ internal fun RepeatedGroupHeaderItem(
           "${repeatedGroupHeader.index + 1}",
           repeatedGroupHeader.title,
         ),
-      style = MaterialTheme.typography.titleMedium,
+      style = QuestionnaireTheme.typography.titleMedium,
       fontWeight = FontWeight.SemiBold,
       modifier = Modifier.weight(1f),
     )

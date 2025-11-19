@@ -34,7 +34,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,6 +53,7 @@ import com.google.android.fhir.datacapture.extensions.hasHelpButton
 import com.google.android.fhir.datacapture.extensions.localizedHelpAnnotatedString
 import com.google.android.fhir.datacapture.extensions.localizedPrefixAnnotatedString
 import com.google.android.fhir.datacapture.extensions.readCustomStyleExtension
+import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -160,7 +160,7 @@ internal fun Header(
 
     // Required/Optional Text
     if (showRequiredOrOptionalText && !requiredOptionalText.isNullOrBlank()) {
-      Text(text = requiredOptionalText, style = MaterialTheme.typography.bodyMedium)
+      Text(text = requiredOptionalText, style = QuestionnaireTheme.typography.bodyMedium)
     }
 
     // Validation Error
@@ -168,8 +168,8 @@ internal fun Header(
       Text(
         modifier = Modifier.testTag(ERROR_TEXT_AT_HEADER_TEST_TAG),
         text = validationResult.getSingleStringValidationMessage(),
-        color = MaterialTheme.colorScheme.error,
-        style = MaterialTheme.typography.bodySmall,
+        color = QuestionnaireTheme.colorScheme.error,
+        style = QuestionnaireTheme.typography.bodySmall,
       )
     }
   }
@@ -183,7 +183,7 @@ internal fun PrefixQuestionTitle(
 ) {
   Row(modifier = Modifier.fillMaxWidth()) {
     if (!prefixLocalizedText.isNullOrBlank()) {
-      Text(prefixLocalizedText)
+      Text(prefixLocalizedText, style = QuestionnaireTheme.textStyles.questionText)
 
       //      AndroidView(
       //        factory = {
@@ -206,7 +206,7 @@ internal fun PrefixQuestionTitle(
       Spacer(modifier = Modifier.width(5.dp))
     }
 
-    Text(questionLocalizedText)
+    Text(questionLocalizedText, style = QuestionnaireTheme.textStyles.questionText)
     //    AndroidView(
     //      factory = {
     //        TextView(it).apply {
@@ -246,7 +246,7 @@ internal fun Help(
     verticalAlignment = Alignment.CenterVertically,
   ) {
     hintLocalizedText?.let {
-      Text(it)
+      Text(it, style = QuestionnaireTheme.textStyles.subtitleText)
       //      AndroidView(
       //        modifier = Modifier.weight(0.7f),
       //        factory = {
@@ -298,7 +298,8 @@ internal fun Help(
     Card(
       modifier = Modifier.padding(top = 16.dp).testTag(HELP_CARD_TAG),
       colors =
-        CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        CardDefaults.cardColors()
+          .copy(containerColor = QuestionnaireTheme.colorScheme.surfaceVariant),
     ) {
       Column {
         Text(
@@ -309,11 +310,17 @@ internal fun Help(
                 top = 16.dp,
                 bottom = 4.dp,
               ),
-          style = MaterialTheme.typography.titleSmall,
+          style = QuestionnaireTheme.typography.titleSmall,
         )
 
         helpCardLocalizedText?.let {
-          Text(it, modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp))
+          Text(
+            it,
+            modifier =
+              Modifier.padding(horizontal = QuestionnaireTheme.dimensions.helpTextMarginHorizontal)
+                .padding(bottom = QuestionnaireTheme.dimensions.helpTextMarginBottom),
+            style = QuestionnaireTheme.textStyles.helpText,
+          )
         }
         //        AndroidView(
         //          factory = {

@@ -109,7 +109,7 @@ class EditTextViewHolderDelegate(
   @Composable
   private fun getValidationErrorMessage(questionnaireViewItem: QuestionnaireViewItem): String? {
     if (questionnaireViewItem.draftAnswer != null) {
-      return stringResource(validationMessageStringRes, validationMessageStringResArgs)
+      return stringResource(validationMessageStringRes, *validationMessageStringResArgs)
     }
     return when (questionnaireViewItem.validationResult) {
       is NotValidated,
