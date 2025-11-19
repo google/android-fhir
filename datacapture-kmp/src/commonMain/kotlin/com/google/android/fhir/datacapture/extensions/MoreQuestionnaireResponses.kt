@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.extensions
 
 import com.google.fhir.model.r4.DateTime
-import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 
@@ -25,8 +24,8 @@ internal const val EXTENSION_LAST_LAUNCHED_TIMESTAMP: String =
   "http://github.com/google-android/questionnaire-lastLaunched-timestamp"
 
 /** Pre-order list of all questionnaire response items in the questionnaire. */
-val QuestionnaireResponse.allItems: List<QuestionnaireResponse.Item>
-  get() = item.flatMap { it.descendant }
+val QuestionnaireResponse.Builder.allItems: List<QuestionnaireResponse.Item>
+  get() = item.flatMap { it.build().descendant }
 
 /**
  * Packs repeated groups under the same questionnaire response item.
@@ -52,45 +51,50 @@ val QuestionnaireResponse.allItems: List<QuestionnaireResponse.Item>
  * @throws IllegalArgumentException if more than one sibling questionnaire items (nested under the
  *   questionnaire root or the same parent item) share the same id
  */
-internal fun QuestionnaireResponse.packRepeatedGroups(questionnaire: Questionnaire) {
-  toBuilder().apply { item = item.packRepeatedGroups(questionnaire.item).toMutableList() }
+internal fun QuestionnaireResponse.Builder.packRepeatedGroups(questionnaire: Questionnaire) {
+  item = item.packRepeatedGroups(questionnaire.item).toMutableList()
 }
 
-private fun List<QuestionnaireResponse.Item>.packRepeatedGroups(
+private fun List<QuestionnaireResponse.Item.Builder>.packRepeatedGroups(
   questionnaireItems: List<Questionnaire.Item>,
-): List<QuestionnaireResponse.Item> {
-  return groupByAndZipByLinkId(questionnaireItems, this) {
+): List<QuestionnaireResponse.Item.Builder> {
+  return groupByAndZipByLinkId(questionnaireItems, map { it.build() }) {
       questionnaireItems,
       questionnaireResponseItems,
       ->
       if (questionnaireItems.isEmpty()) {
-        // If there's no questionnaire item, simply keep the response items. In other words, do not
-        // delete hanging questionnaire responses automatically. This is useful for validation
-        // workflow to identify invalid responses.
-        return@groupByAndZipByLinkId questionnaireResponseItems
+        return@groupByAndZipByLinkId questionnaireResponseItems.map { it.toBuilder() }
       }
 
       val questionnaireItem = questionnaireItems.single()
 
-      questionnaireResponseItems.forEach {
-        it.item = it.item.packRepeatedGroups(questionnaireItem.item)
-      }
+      val updatedResponseItems =
+        questionnaireResponseItems.map { responseItem ->
+          responseItem
+            .toBuilder()
+            .apply { item = item.packRepeatedGroups(questionnaireItem.item).toMutableList() }
+            .build()
+        }
 
       if (
         questionnaireItem.type.value == Questionnaire.QuestionnaireItemType.Group &&
           questionnaireItem.repeats?.value == true
       ) {
         listOf(
-          QuestionnaireResponse.Item().apply {
-            this.linkId = questionnaireItem.linkId
+          QuestionnaireResponse.Item.Builder(questionnaireItem.linkId.toBuilder()).apply {
+            linkId = questionnaireItem.linkId.toBuilder()
             answer =
-              questionnaireResponseItems.map {
-                QuestionnaireResponse.Item.Answer().apply { item = it.item }
-              }
+              updatedResponseItems
+                .map { responseItem ->
+                  QuestionnaireResponse.Item.Answer.Builder().apply {
+                    item = responseItem.toBuilder().item.toMutableList()
+                  }
+                }
+                .toMutableList()
           },
         )
       } else {
-        questionnaireResponseItems
+        updatedResponseItems.map { it.toBuilder() }
       }
     }
     .flatten()
@@ -113,34 +117,39 @@ private fun List<QuestionnaireResponse.Item>.packRepeatedGroups(
  *
  * See also [packRepeatedGroups].
  */
-internal fun QuestionnaireResponse.unpackRepeatedGroups(questionnaire: Questionnaire) {
-  item = unpackRepeatedGroups(questionnaire.item, item)
+internal fun QuestionnaireResponse.Builder.unpackRepeatedGroups(questionnaire: Questionnaire) {
+  item = unpackRepeatedGroups(questionnaire.item, item).toMutableList()
 }
 
 private fun unpackRepeatedGroups(
   questionnaireItems: List<Questionnaire.Item>,
-  questionnaireResponseItems: List<QuestionnaireResponse.Item>,
-): List<QuestionnaireResponse.Item> {
+  questionnaireResponseItems: List<QuestionnaireResponse.Item.Builder>,
+): List<QuestionnaireResponse.Item.Builder> {
   return questionnaireItems
-    .zipByLinkId(questionnaireResponseItems) { questionnaireItem, questionnaireResponseItem ->
-      unpackRepeatedGroups(questionnaireItem, questionnaireResponseItem)
+    .zipByLinkId(questionnaireResponseItems.map { it.build() }) {
+      questionnaireItem,
+      questionnaireResponseItem,
+      ->
+      unpackRepeatedGroups(questionnaireItem, questionnaireResponseItem.toBuilder())
     }
     .flatten()
 }
 
 private fun unpackRepeatedGroups(
   questionnaireItem: Questionnaire.Item,
-  questionnaireResponseItem: QuestionnaireResponse.Item,
-): List<QuestionnaireResponse.Item> {
+  questionnaireResponseItem: QuestionnaireResponse.Item.Builder,
+): List<QuestionnaireResponse.Item.Builder> {
   questionnaireResponseItem.item =
-    unpackRepeatedGroups(questionnaireItem.item, questionnaireResponseItem.item)
+    unpackRepeatedGroups(questionnaireItem.item, questionnaireResponseItem.item).toMutableList()
   questionnaireResponseItem.answer.forEach {
-    it.item = unpackRepeatedGroups(questionnaireItem.item, it.item)
+    it.item = unpackRepeatedGroups(questionnaireItem.item, it.item).toMutableList()
   }
   return if (questionnaireItem.isRepeatedGroup) {
     questionnaireResponseItem.answer.map {
       QuestionnaireResponse.Item.Builder(
-          com.google.fhir.model.r4.String.Builder().apply { value = questionnaireItem.linkId.value }
+          com.google.fhir.model.r4.String.Builder().apply {
+            value = questionnaireItem.linkId.value
+          },
         )
         .apply {
           linkId =
@@ -151,15 +160,8 @@ private fun unpackRepeatedGroups(
             com.google.fhir.model.r4.String.Builder().apply {
               value = questionnaireItem.localizedTextAnnotatedString?.toString()
             }
-          item -
-            QuestionnaireResponse.Item.Builder(
-                com.google.fhir.model.r4.String.Builder().apply {
-                  value = questionnaireItem.linkId.value
-                }
-              )
-              .apply { item = it.item.toMutableList() }
+          item = it.item
         }
-        .build()
     }
   } else {
     listOf(questionnaireResponseItem)
@@ -170,15 +172,8 @@ private fun unpackRepeatedGroups(
  * Adds a launch timestamp extension to the Questionnaire Response. If the extension @see
  * EXTENSION_LAUNCH_TIMESTAMP already exists, it updates its value; otherwise, it adds a new one.
  */
-internal var QuestionnaireResponse.launchTimestamp: DateTime?
+internal val QuestionnaireResponse.launchTimestamp: DateTime?
   get() {
     val extension = this.extension.firstOrNull { it.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP }
     return extension?.value?.asDateTime()?.value
-  }
-  set(value) {
-    extension.find { it.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP }?.setValue(value)
-      ?: run {
-        // Add a new extension if none exists
-        extension.add(Extension(url = EXTENSION_LAST_LAUNCHED_TIMESTAMP, value = value))
-      }
   }

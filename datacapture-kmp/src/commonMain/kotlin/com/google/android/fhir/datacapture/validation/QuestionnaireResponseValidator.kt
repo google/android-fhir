@@ -233,7 +233,7 @@ object QuestionnaireResponseValidator {
     }
     checkQuestionnaireResponseItems(
       questionnaire.item,
-      questionnaireResponse.copy().apply { packRepeatedGroups(questionnaire) }.item,
+      questionnaireResponse.toBuilder().apply { packRepeatedGroups(questionnaire) }.build().item,
     )
   }
 
@@ -273,7 +273,7 @@ object QuestionnaireResponseValidator {
         checkQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
       else -> {
         require(
-          questionnaireItem.repeats?.value == true || questionnaireResponseItem.answer.size <= 1
+          questionnaireItem.repeats?.value == true || questionnaireResponseItem.answer.size <= 1,
         ) {
           "Multiple answers for non-repeat questionnaire item ${questionnaireItem.linkId}"
         }

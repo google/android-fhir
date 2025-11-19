@@ -48,7 +48,6 @@ import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineVie
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemComposeViewHolderFactory
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
-import com.google.fhir.model.r4.String
 import kotlin.uuid.ExperimentalUuidApi
 
 // Choice questions are rendered as dialogs if they have at least this many options

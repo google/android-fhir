@@ -22,6 +22,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import com.google.android.fhir.datacapture.extensions.EXTENSION_LAST_LAUNCHED_TIMESTAMP
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.allItems
 import com.google.android.fhir.datacapture.extensions.copyNestedItemsToChildlessAnswers
@@ -33,7 +34,6 @@ import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.isRepeatedGroup
-import com.google.android.fhir.datacapture.extensions.launchTimestamp
 import com.google.android.fhir.datacapture.extensions.maxValue
 import com.google.android.fhir.datacapture.extensions.minValue
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
@@ -48,15 +48,15 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.fhir.model.r4.Canonical
 import com.google.fhir.model.r4.DateTime
 import com.google.fhir.model.r4.Enumeration
+import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.FhirDateTime
 import com.google.fhir.model.r4.FhirR4Json
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 import com.google.fhir.model.r4.Resource
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -68,15 +68,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.UtcOffset
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readString
 import org.jetbrains.compose.resources.getString
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
-
   private val jsonR4 = FhirR4Json()
   private val xFhirQueryResolver: XFhirQueryResolver? by lazy {
     DataCapture.getConfiguration().xFhirQueryResolver
@@ -133,10 +137,13 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
 
         questionnaireResponse.value =
           jsonR4.decodeFromString(
-            readFileContent(state[EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI]!! as String)
+            readFileContent(state[EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI]!! as String),
           ) as QuestionnaireResponse
 
-        addMissingResponseItems(questionnaire.item, questionnaireResponse.value.item)
+        addMissingResponseItems(
+          questionnaire.item,
+          questionnaireResponse.value.item.toMutableList(),
+        )
         checkQuestionnaireResponse(questionnaire, questionnaireResponse.value)
       }
       state.contains(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING) -> {
@@ -144,33 +151,58 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
           state[EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] as String
         questionnaireResponse.value =
           jsonR4.decodeFromString(questionnaireResponseJson) as QuestionnaireResponse
-        addMissingResponseItems(questionnaire.item, questionnaireResponse.value.item)
+        addMissingResponseItems(
+          questionnaire.item,
+          questionnaireResponse.value.item.toMutableList(),
+        )
         checkQuestionnaireResponse(questionnaire, questionnaireResponse.value)
       }
       else -> {
         questionnaireResponse.value =
           QuestionnaireResponse.Builder(
               status =
-                Enumeration(value = QuestionnaireResponse.QuestionnaireResponseStatus.In_Progress)
+                Enumeration(value = QuestionnaireResponse.QuestionnaireResponseStatus.In_Progress),
             )
-            .apply { questionnaire = this@QuestionnaireViewModel.questionnaire.url }
+            .apply {
+              questionnaire =
+                Canonical.Builder().apply {
+                  value = this@QuestionnaireViewModel.questionnaire.url?.value
+                }
+
+              val dateTime =
+                DateTime(
+                  value =
+                    FhirDateTime.DateTime(
+                      dateTime =
+                        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+                      utcOffset = UtcOffset.ZERO,
+                    ),
+                )
+              // Add extension for questionnaire launch time stamp
+              val timeStampExtension =
+                extension.firstOrNull { it.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP }
+              timeStampExtension?.apply { value?.let { Extension.Value.DateTime(dateTime) } }
+                ?: extension.add(
+                  Extension.Builder(EXTENSION_LAST_LAUNCHED_TIMESTAMP).apply {
+                    value = Extension.Value.DateTime(dateTime)
+                  },
+                )
+            }
+            .also { builder ->
+              // Retain the hierarchy and order of items within the questionnaire as specified in
+              // the
+              // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
+              builder.item.addAll(
+                questionnaire.item
+                  .filterNot { it.isRepeatedGroup }
+                  .map { it.createQuestionnaireResponseItem() },
+              )
+
+              builder.packRepeatedGroups(questionnaire)
+            }
             .build()
-        // Retain the hierarchy and order of items within the questionnaire as specified in the
-        // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
-        questionnaire.item
-          .filterNot { it.isRepeatedGroup }
-          .forEach { questionnaireResponse.addItem(it.createQuestionnaireResponseItem()) }
       }
     }
-    // Add extension for questionnaire launch time stamp
-    questionnaireResponse.value.launchTimestamp =
-      DateTime(
-        value =
-          FhirDateTime.fromString(
-            Clock.System.now().toString(),
-          ),
-      )
-    questionnaireResponse.value.packRepeatedGroups(questionnaire)
   }
 
   /**
@@ -179,25 +211,21 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
    * user, etc. is "in context" at the time the questionnaire response is being completed:
    * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
    */
-  private val questionnaireLaunchContextMap: Map<String, Resource>?
+  private val questionnaireLaunchContextMap: Map<String, Resource>? =
+    if (state.contains(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP)) {
 
-  init {
-    questionnaireLaunchContextMap =
-      if (state.contains(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP)) {
+      val launchContextMapString: Map<String, String> =
+        state[EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP] as Map<String, String>
 
-        val launchContextMapString: Map<String, String> =
-          state[EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP] as Map<String, String>
-
-        val launchContextMapResource =
-          launchContextMapString.mapValues { jsonR4.decodeFromString(it.value) }
-        questionnaire.questionnaireLaunchContexts?.let { launchContextExtensions ->
-          validateLaunchContextExtensions(launchContextExtensions)
-          filterByCodeInNameExtension(launchContextMapResource, launchContextExtensions)
-        }
-      } else {
-        null
+      val launchContextMapResource =
+        launchContextMapString.mapValues { jsonR4.decodeFromString(it.value) }
+      questionnaire.questionnaireLaunchContexts?.let { launchContextExtensions ->
+        validateLaunchContextExtensions(launchContextExtensions)
+        filterByCodeInNameExtension(launchContextMapResource, launchContextExtensions)
       }
-  }
+    } else {
+      null
+    }
 
   /** The map from each item in the [Questionnaire] to its parent. */
   private var questionnaireItemParentMap: Map<Questionnaire.Item, Questionnaire.Item>
@@ -326,9 +354,8 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
 
   /**
    * Callback function to update the view model after the answer(s) to a question have been changed.
-   * This is passed to the [com.google.android.fhir.datacapture.views.QuestionnaireViewItem] in its
-   * constructor so that it can invoke this callback function after the UI widget has updated the
-   * answer(s).
+   * This is passed to the [QuestionnaireViewItem] in its constructor so that it can invoke this
+   * callback function after the UI widget has updated the answer(s).
    *
    * This function updates the [QuestionnaireResponse] held in memory using the answer(s) provided
    * by the UI. Subsequently it should also trigger the recalculation of any relevant expressions,
@@ -361,7 +388,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
         }
       }
       if (questionnaireItem.shouldHaveNestedItemsUnderAnswers) {
-        questionnaireResponseItem.copyNestedItemsToChildlessAnswers(questionnaireItem)
+        questionnaireResponseItem.toBuilder().copyNestedItemsToChildlessAnswers(questionnaireItem)
 
         // If nested items are added to the answer, the enablement evaluator needs to be
         // reinitialized in order for it to rebuild the pre-order map and parent map of
@@ -413,7 +440,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
 
   private val questionnaireResponseItemValidator: QuestionnaireResponseItemValidator =
     QuestionnaireResponseItemValidator(expressionEvaluator)
-  */
+   */
 
   /**
    * Adds empty [QuestionnaireResponse.Item]s to `responseItems` so that each [Questionnaire.Item]
@@ -438,7 +465,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
 
     questionnaireItems.forEach {
       if (responseItemMap[it.linkId].isNullOrEmpty()) {
-        responseItems.add(it.createQuestionnaireResponseItem())
+        responseItems.add(it.createQuestionnaireResponseItem().build())
       } else {
         if (
           it.type.value == Questionnaire.QuestionnaireItemType.Group && it.repeats?.value != true
@@ -478,14 +505,19 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
           item =
             getEnabledResponseItems(
                 this@QuestionnaireViewModel.questionnaire.item,
-                questionnaireResponse.item,
+                questionnaireResponse.value.item,
               )
-              .map { it.copy() }
+              .toMutableList()
+
           unpackRepeatedGroups(this@QuestionnaireViewModel.questionnaire)
           // Use authored as a submission time stamp
           authored =
             DateTime.Builder().apply {
-              value = FhirDateTime.DateTime(Clock.System.now().toString())
+              value =
+                FhirDateTime.DateTime(
+                  dateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+                  utcOffset = UtcOffset.ZERO,
+                )
             }
         }
         .build()
@@ -497,9 +529,8 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     questionnaireResponse.value =
       questionnaireResponse.value
         .toBuilder()
-        .apply { this.allItems.forEach { it.answer = emptyList() } }
+        .apply { this.allItems.map { it.toBuilder().answer.apply { this.clear() } } }
         .build()
-
     draftAnswerMap.clear()
     modifiedQuestionnaireResponseItemSet.clear()
     responseItemToAnswersMapForDisabledQuestionnaireItem.clear()
@@ -879,8 +910,8 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
   }
 
   /**
-   * Returns the list of [com.google.android.fhir.datacapture.views.QuestionnaireViewItem]s
-   * generated for the questionnaire items and questionnaire response items.
+   * Returns the list of [QuestionnaireViewItem]s generated for the questionnaire items and
+   * questionnaire response items.
    */
   private suspend fun getQuestionnaireAdapterItems(
     questionnaireItemList: List<Questionnaire.Item>,
@@ -895,8 +926,8 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
   }
 
   /**
-   * Returns the list of [com.google.android.fhir.datacapture.views.QuestionnaireViewItem]s
-   * generated for the questionnaire item and questionnaire response item.
+   * Returns the list of [QuestionnaireViewItem]s generated for the questionnaire item and
+   * questionnaire response item.
    */
   private suspend fun getQuestionnaireAdapterItems(
     questionnaireItem: Questionnaire.Item,
@@ -1121,9 +1152,9 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
   private suspend fun getEnabledResponseItems(
     questionnaireItemList: List<Questionnaire.Item>,
     questionnaireResponseItemList: List<QuestionnaireResponse.Item>,
-  ): List<QuestionnaireResponse.Item> {
+  ): List<QuestionnaireResponse.Item.Builder> {
     //    val responseItemKeys = questionnaireResponseItemList.map { it.linkId }
-    val result = mutableListOf<QuestionnaireResponse.Item>()
+    val result = mutableListOf<QuestionnaireResponse.Item.Builder>()
 
     for ((_, questionnaireResponseItem) in
       questionnaireItemList.zip(questionnaireResponseItemList)) {
@@ -1142,7 +1173,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
       //          answer.forEach { it.item = getEnabledResponseItems(questionnaireItem.item,
       // it.item) }
       //        }
-      result.add(questionnaireResponseItem)
+      result.add(questionnaireResponseItem.toBuilder())
       //      }
     }
     return result
@@ -1173,9 +1204,8 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     }
 
   /**
-   * Validates the current page items if any are
-   * [com.google.android.fhir.datacapture.validation.NotValidated], and then, invokes [block] if
-   * they are all [com.google.android.fhir.datacapture.validation.Valid].
+   * Validates the current page items if any are [NotValidated], and then, invokes [block] if they
+   * are all [Valid].
    */
   private fun validateCurrentPageItems(block: () -> Unit) {
     if (

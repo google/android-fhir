@@ -32,8 +32,11 @@ val Questionnaire.targetStructureMap: String?
   get() {
     val extensionValue =
       this.extension.singleOrNull { it.url == TARGET_STRUCTURE_MAP }?.value ?: return null
-    return if (extensionValue is Extension.Value.Canonical) extensionValue.asString()?.value?.value
-    else null
+    return if (extensionValue is Extension.Value.Canonical) {
+      extensionValue.asString()?.value?.value
+    } else {
+      null
+    }
   }
 
 internal val Questionnaire.variableExpressions: List<Expression>

@@ -27,10 +27,11 @@ import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 import com.google.fhir.model.r4.Resource
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import com.google.fhir.model.r4.String as FhirString
 
 internal const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
 
@@ -301,7 +302,7 @@ private fun isValidDateEntryFormat(entryFormat: String?): Boolean {
     try {
       parseDate(
         Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString(),
-        entryFormat
+        entryFormat,
       )
       true
     } catch (e: Exception) {
@@ -701,9 +702,9 @@ internal fun Questionnaire.Item.findVariableExpression(
 //      it.castToExpression(it.value)
 //    }
 
-/** Returns list of extensions whose value is of type [Expression] */
-internal val Questionnaire.Item.expressionBasedExtensions
-  get() = this.extension.filter { it.value is Expression }
+// /** Returns list of extensions whose value is of type [Expression] */
+// internal val Questionnaire.Item.expressionBasedExtensions
+//  get() = this.extension.filter { it.value is Expression }
 //
 // /**
 // * Whether [item] has any expression directly referencing the current questionnaire item by link
@@ -942,27 +943,30 @@ internal fun Questionnaire.Item.createNestedQuestionnaireResponseItems() =
  * The hierarchy and order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-internal fun Questionnaire.Item.createQuestionnaireResponseItem(): QuestionnaireResponse.Item {
-  return QuestionnaireResponse.Item().apply {
-    linkId = this@createQuestionnaireResponseItem.linkId
-    answer = createQuestionnaireResponseItemAnswers()
-    if (
-      type.value != Questionnaire.QuestionnaireItemType.Group &&
-        this@createQuestionnaireResponseItem.item.isNotEmpty() &&
-        answer.isNotEmpty()
-    ) {
-      this.copyNestedItemsToChildlessAnswers(this@createQuestionnaireResponseItem)
-    } else if (
-      this@createQuestionnaireResponseItem.type.value ==
-        Questionnaire.QuestionnaireItemType.Group && repeats?.value != true
-    ) {
-      this@createQuestionnaireResponseItem.item.forEach {
-        if (!it.isRepeatedGroup) {
-          this.addItem(it.createQuestionnaireResponseItem())
+internal fun Questionnaire.Item.createQuestionnaireResponseItem():
+  QuestionnaireResponse.Item.Builder {
+  val qrLinkId = this@createQuestionnaireResponseItem.linkId
+  return QuestionnaireResponse.Item.Builder(FhirString.Builder().apply { value = qrLinkId.value })
+    .apply {
+      linkId = FhirString.Builder().apply { value = qrLinkId.value }
+      answer = createQuestionnaireResponseItemAnswers()
+      if (
+        type.value != Questionnaire.QuestionnaireItemType.Group &&
+          this@createQuestionnaireResponseItem.item.isNotEmpty() &&
+          answer.isNotEmpty()
+      ) {
+        this.copyNestedItemsToChildlessAnswers(this@createQuestionnaireResponseItem)
+      } else if (
+        this@createQuestionnaireResponseItem.type.value ==
+          Questionnaire.QuestionnaireItemType.Group && repeats?.value != true
+      ) {
+        this@createQuestionnaireResponseItem.item.forEach {
+          if (!it.isRepeatedGroup) {
+            this.item.add(it.createQuestionnaireResponseItem())
+          }
         }
       }
     }
-  }
 }
 
 /**
@@ -970,7 +974,7 @@ internal fun Questionnaire.Item.createQuestionnaireResponseItem(): Questionnaire
  * value.
  */
 private fun Questionnaire.Item.createQuestionnaireResponseItemAnswers():
-  List<QuestionnaireResponse.Item.Answer>? {
+  MutableList<QuestionnaireResponse.Item.Answer.Builder> {
   // TODO https://github.com/google/android-fhir/issues/2161
   // The rule can be by-passed if initial value was set by an initial-expression.
   // The [ResourceMapper] at L260 wrongfully sets the initial property of questionnaire after
@@ -988,7 +992,7 @@ private fun Questionnaire.Item.createQuestionnaireResponseItemAnswers():
       (initial.isEmpty() ||
         (initialFirstRep?.value != null && initialFirstRep.value.asQuantity()?.value == null))
   ) {
-    return null
+    return mutableListOf()
   }
 
   if (
@@ -1000,20 +1004,16 @@ private fun Questionnaire.Item.createQuestionnaireResponseItemAnswers():
     )
   }
 
-  if ((answerOption.initialSelected.size > 1 || initial.size > 1) && !repeats) {
+  if ((answerOption.initialSelected.size > 1 || initial.size > 1) && repeats?.value == false) {
     throw IllegalArgumentException(
       "Questionnaire item $linkId can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.",
     )
   }
 
-  return initial
-    .map { it.value }
-    .plus(answerOption.initialSelected)
-    .map {
-      QuestionnaireResponse.Item.Answer.Builder()
-        .apply { value = QuestionnaireResponse.Item.Answer.Value(value = it) }
-        .build()
-    }
+  val thiso: List<Questionnaire.Item.Initial.Value> = initial.map { it.value }
+  val this1: List<Questionnaire.Item.AnswerOption.Value> = answerOption.initialSelected
+
+  return mutableListOf()
 }
 
 /**

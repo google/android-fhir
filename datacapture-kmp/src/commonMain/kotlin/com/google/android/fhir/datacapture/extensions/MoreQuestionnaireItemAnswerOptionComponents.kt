@@ -37,7 +37,7 @@ internal val Questionnaire.Item.AnswerOption.optionExclusive: Boolean
   }
 
 /** Get the answer options values with `initialSelected` set to true */
-internal val List<Questionnaire.Item.AnswerOption>.initialSelected: List<Any>
+internal val List<Questionnaire.Item.AnswerOption>.initialSelected
   get() = this.filter { it.initialSelected?.value == true }.map { it.value }
 
 //

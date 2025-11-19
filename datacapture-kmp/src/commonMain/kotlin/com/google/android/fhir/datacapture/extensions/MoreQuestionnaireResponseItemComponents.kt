@@ -47,10 +47,12 @@ private fun QuestionnaireResponse.Item.appendDescendantTo(
  *
  * See https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-internal fun QuestionnaireResponse.Item.copyNestedItemsToChildlessAnswers(
+internal fun QuestionnaireResponse.Item.Builder.copyNestedItemsToChildlessAnswers(
   questionnaireItem: Questionnaire.Item,
 ) {
   answer
     .filter { it.item.isEmpty() }
-    .forEach { it.item = questionnaireItem.createNestedQuestionnaireResponseItems() }
+    .forEach {
+      it.item = questionnaireItem.createNestedQuestionnaireResponseItems().toMutableList()
+    }
 }
