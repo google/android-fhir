@@ -32,14 +32,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemComposeViewHolderFactory
-import com.google.fhir.model.r4b.Questionnaire
+import com.google.fhir.model.r4.Questionnaire
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -65,7 +61,7 @@ class QuestionnaireFragment : Fragment() {
     QuestionnaireItemViewHolderFactoryMatchersProvider by lazy {
     requireArguments().getString(EXTRA_MATCHERS_FACTORY)?.let { factoryKey ->
       val provider =
-        DataCapture.getConfiguration(requireContext())
+        DataCapture.getConfiguration()
           .questionnaireItemViewHolderFactoryMatchersProviderFactory
           ?.get(factoryKey)
 
@@ -348,100 +344,6 @@ class QuestionnaireFragment : Fragment() {
    * [EXTRA_QUESTIONNAIRE_JSON_STRING] is required.
    */
   companion object {
-    /**
-     * A JSON encoded string extra for a questionnaire. This should only be used for questionnaires
-     * with size at most 512KB. For large questionnaires, use [EXTRA_QUESTIONNAIRE_JSON_URI].
-     *
-     * This is required unless [EXTRA_QUESTIONNAIRE_JSON_URI] is provided.
-     *
-     * If this and [EXTRA_QUESTIONNAIRE_JSON_URI] are provided, [EXTRA_QUESTIONNAIRE_JSON_URI] takes
-     * precedence.
-     */
-    internal const val EXTRA_QUESTIONNAIRE_JSON_STRING = "questionnaire"
-
-    /**
-     * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire.
-     *
-     * This is required unless [EXTRA_QUESTIONNAIRE_JSON_STRING] is provided.
-     *
-     * If this and [EXTRA_QUESTIONNAIRE_JSON_STRING] are provided, this extra takes precedence.
-     */
-    internal const val EXTRA_QUESTIONNAIRE_JSON_URI = "questionnaire-uri"
-
-    /**
-     * A JSON encoded string extra for a prefilled questionnaire response. This should only be used
-     * for questionnaire response with size at most 512KB. For large questionnaire response, use
-     * [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI].
-     *
-     * If this and [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI] are provided,
-     * [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI] takes precedence.
-     */
-    internal const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
-
-    /**
-     * A map of launchContext name and JSON encoded strings extra for each questionnaire context.
-     */
-    internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP = "questionnaire-launch-contexts"
-
-    /**
-     * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
-     *
-     * If this and [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] are provided, this extra takes
-     * precedence.
-     */
-    internal const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
-
-    /**
-     * A [Boolean] extra to control if a review page is shown. By default it will be shown at the
-     * end of the questionnaire.
-     */
-    internal const val EXTRA_ENABLE_REVIEW_PAGE = "enable-review-page"
-
-    /**
-     * A [Boolean] extra to control if the review page is to be opened first. This has no effect if
-     * review page is not enabled.
-     */
-    internal const val EXTRA_SHOW_REVIEW_PAGE_FIRST = "show-review-page-first"
-
-    /**
-     * An [Boolean] extra to control if the questionnaire is read-only. If review page and read-only
-     * are both enabled, read-only will take precedence.
-     */
-    internal const val EXTRA_READ_ONLY = "read-only"
-
-    internal const val EXTRA_MATCHERS_FACTORY = "matcher_factory_class"
-
-    const val SUBMIT_REQUEST_KEY = "submit-request-key"
-
-    const val CANCEL_REQUEST_KEY = "cancel-request-key"
-
-    /**
-     * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
-     */
-    internal const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
-
-    /**
-     * A [Boolean] extra to show or hide the Cancel button in the questionnaire. Default is false.
-     */
-    internal const val EXTRA_SHOW_CANCEL_BUTTON = "show-cancel-button"
-
-    internal const val EXTRA_SHOW_OPTIONAL_TEXT = "show-optional-text"
-
-    internal const val EXTRA_SHOW_ASTERISK_TEXT = "show-asterisk-text"
-
-    internal const val EXTRA_SHOW_REQUIRED_TEXT = "show-required-text"
-
-    internal const val EXTRA_SUBMIT_BUTTON_TEXT = "submit-button-text"
-
-    internal const val EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL =
-      "show-navigation-in-default-long-scroll"
-
-    /**
-     * A [Boolean] extra to show or hide the Submit anyway button in the questionnaire. Default is
-     * true.
-     */
-    internal const val EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON = "show-submit-anyway-button"
-
     fun builder() = Builder()
   }
 

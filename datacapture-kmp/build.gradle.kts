@@ -75,9 +75,11 @@ kotlin {
         implementation(libs.navigation.compose)
         implementation(libs.androidx.lifecycle.viewmodel.compose)
         implementation(libs.androidx.lifecycle.runtime.compose)
-        implementation(libs.kotlin.fhir)
-        implementation(libs.kotlinx.serialization.json)
+        implementation(libs.kermit)
         implementation(libs.kotlinx.coroutines.core)
+        implementation(libs.kotlin.fhir)
+        implementation(libs.kotlinx.io.core)
+        implementation(libs.kotlinx.serialization.json)
       }
     }
 

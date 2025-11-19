@@ -22,8 +22,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import com.google.fhir.model.r4b.QuestionnaireResponse
-import com.google.fhir.model.r4b.String as FhirString
+import com.google.fhir.model.r4.QuestionnaireResponse
+import com.google.fhir.model.r4.String as FhirString
 
 /**
  * Implementation of [EditTextViewHolderDelegate] used in [EditTextSingleLineViewHolderFactory] and

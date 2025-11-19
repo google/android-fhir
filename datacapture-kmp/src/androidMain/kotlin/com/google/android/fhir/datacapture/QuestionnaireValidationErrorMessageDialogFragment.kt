@@ -24,21 +24,21 @@ import android.view.View
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.compose.ui.text.AnnotatedString
 import androidx.core.os.bundleOf
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.fhir.datacapture.extensions.flattened
-import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.extensions.localizedPrefixAnnotatedString
-import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
-import com.google.android.fhir.datacapture.extensions.toSpanned
+import com.google.android.fhir.datacapture.extensions.localizedTextAnnotatedString
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.fhir.model.r4b.Questionnaire
+import com.google.fhir.model.r4.Questionnaire
 
 /**
  * [android.app.Dialog] to highlight the required fields that need to be filled by the user before
@@ -103,6 +103,11 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
       }
   }
 
+  /** Converts Text with HTML Tag to formatted text. */
+  internal fun String.toSpanned(): Spanned {
+    return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
+  }
+
   companion object {
     const val TAG = "QuestionnaireValidationErrorMessageDialogFragment"
     const val RESULT_CALLBACK = "QuestionnaireValidationResultCallback"
@@ -131,7 +136,7 @@ internal class QuestionnaireValidationErrorViewModel : ViewModel() {
   }
 
   /** @return Texts associated with the failing [Questionnaire.Item]s. */
-  fun getItemsTextWithValidationErrors(): List<Spanned> {
+  fun getItemsTextWithValidationErrors(): List<AnnotatedString> {
     val invalidFields =
       validation?.filterValues { it.filterIsInstance<Invalid>().isNotEmpty() } ?: emptyMap()
     return questionnaire
@@ -141,12 +146,9 @@ internal class QuestionnaireValidationErrorViewModel : ViewModel() {
       ?.mapNotNull {
         // Use the question text if available, otherwise fall back to the fly-over and then the
         // prefix.
-        it.localizedTextSpanned?.takeIfNotBlank()
-          ?: it.localizedFlyoverSpanned?.takeIfNotBlank()
-            ?: it.localizedPrefixAnnotatedString?.takeIfNotBlank()
+        it.localizedTextAnnotatedString
+          ?: it.localizedTextAnnotatedString ?: it.localizedPrefixAnnotatedString
       }
       ?: emptyList()
   }
-
-  private fun Spanned.takeIfNotBlank(): Spanned? = takeIf { it.isNotBlank() }
 }

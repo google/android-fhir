@@ -65,9 +65,12 @@ fun Header(
   displayValidationResult: Boolean = false,
   showRequiredOrOptionalText: Boolean = false,
 ) {
-  val validationResult = remember(questionnaireViewItem.validationResult) { questionnaireViewItem.validationResult }
-  val questionnaireItem = remember(questionnaireViewItem.questionnaireItem) {  questionnaireViewItem.questionnaireItem }
-  val questionnaireResponseItem = remember(questionnaireViewItem) {  questionnaireViewItem.getQuestionnaireResponseItem() }
+  val validationResult =
+    remember(questionnaireViewItem.validationResult) { questionnaireViewItem.validationResult }
+  val questionnaireItem =
+    remember(questionnaireViewItem.questionnaireItem) { questionnaireViewItem.questionnaireItem }
+  val questionnaireResponseItem =
+    remember(questionnaireViewItem) { questionnaireViewItem.getQuestionnaireResponseItem() }
   val requiredOptionalText =
     when {
       (questionnaireItem.required?.value == true &&
@@ -80,19 +83,20 @@ fun Header(
     }
 
   val prefixLocalizedText = questionnaireViewItem.questionnaireItem.localizedPrefixAnnotatedString
-    val spaceAsterisk = stringResource(Res.string.space_asterisk)
-  val questionLocalizedText = remember(questionnaireViewItem) {
+  val spaceAsterisk = stringResource(Res.string.space_asterisk)
+  val questionLocalizedText =
+    remember(questionnaireViewItem) {
       buildAnnotatedString {
-          questionnaireViewItem.questionText?.let { append(it) }
-          if (
-              questionnaireViewItem.questionViewTextConfiguration.showAsterisk &&
-              questionnaireViewItem.questionnaireItem.required?.value == true &&
-              !questionnaireViewItem.questionnaireItem.text?.getLocalizedText().isNullOrEmpty()
-          ) {
-              append(spaceAsterisk)
-          }
+        questionnaireViewItem.questionText?.let { append(it) }
+        if (
+          questionnaireViewItem.questionViewTextConfiguration.showAsterisk &&
+            questionnaireViewItem.questionnaireItem.required?.value == true &&
+            !questionnaireViewItem.questionnaireItem.text?.getLocalizedText().isNullOrEmpty()
+        ) {
+          append(spaceAsterisk)
+        }
       }
-  }
+    }
   val hintLocalizedText =
     questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsAnnotatedString()
   val itemLocalizedHelpText = questionnaireItem.localizedHelpAnnotatedString
@@ -179,50 +183,50 @@ internal fun PrefixQuestionTitle(
 ) {
   Row(modifier = Modifier.fillMaxWidth()) {
     if (!prefixLocalizedText.isNullOrBlank()) {
-        Text(prefixLocalizedText)
+      Text(prefixLocalizedText)
 
-//      AndroidView(
-//        factory = {
-//          TextView(it).apply {
-//            id = R.id.prefix
-//            applyCustomOrDefaultStyle(
-//              context = it,
-//              view = this,
-//              customStyleName =
-//                readCustomStyleName(
-//                  StyleUrl.PREFIX_TEXT_VIEW,
-//                ),
-//              defaultStyleResId =
-//                getStyleResIdFromAttribute(it, R.attr.questionnaireQuestionTextStyle),
-//            )
-//          }
-//        },
-//        update = { it.text = prefixLocalizedText },
-//      )
+      //      AndroidView(
+      //        factory = {
+      //          TextView(it).apply {
+      //            id = R.id.prefix
+      //            applyCustomOrDefaultStyle(
+      //              context = it,
+      //              view = this,
+      //              customStyleName =
+      //                readCustomStyleName(
+      //                  StyleUrl.PREFIX_TEXT_VIEW,
+      //                ),
+      //              defaultStyleResId =
+      //                getStyleResIdFromAttribute(it, R.attr.questionnaireQuestionTextStyle),
+      //            )
+      //          }
+      //        },
+      //        update = { it.text = prefixLocalizedText },
+      //      )
       Spacer(modifier = Modifier.width(5.dp))
     }
 
-      Text(questionLocalizedText)
-//    AndroidView(
-//      factory = {
-//        TextView(it).apply {
-//          id = R.id.question
-//          movementMethod = LinkMovementMethod.getInstance()
-//          applyCustomOrDefaultStyle(
-//            context = it,
-//            view = this,
-//            customStyleName =
-//              readCustomStyleName(
-//                StyleUrl.QUESTION_TEXT_VIEW,
-//              ),
-//            defaultStyleResId =
-//              getStyleResIdFromAttribute(it, R.attr.questionnaireQuestionTextStyle),
-//          )
-//        }
-//      },
-//      modifier = Modifier.weight(1f),
-//      update = { it.text = questionLocalizedText },
-//    )
+    Text(questionLocalizedText)
+    //    AndroidView(
+    //      factory = {
+    //        TextView(it).apply {
+    //          id = R.id.question
+    //          movementMethod = LinkMovementMethod.getInstance()
+    //          applyCustomOrDefaultStyle(
+    //            context = it,
+    //            view = this,
+    //            customStyleName =
+    //              readCustomStyleName(
+    //                StyleUrl.QUESTION_TEXT_VIEW,
+    //              ),
+    //            defaultStyleResId =
+    //              getStyleResIdFromAttribute(it, R.attr.questionnaireQuestionTextStyle),
+    //          )
+    //        }
+    //      },
+    //      modifier = Modifier.weight(1f),
+    //      update = { it.text = questionLocalizedText },
+    //    )
   }
 }
 
@@ -242,27 +246,27 @@ internal fun Help(
     verticalAlignment = Alignment.CenterVertically,
   ) {
     hintLocalizedText?.let {
-        Text(it)
-//      AndroidView(
-//        modifier = Modifier.weight(0.7f),
-//        factory = {
-//          TextView(it).apply {
-//            id = R.id.hint
-//            movementMethod = LinkMovementMethod.getInstance()
-//            applyCustomOrDefaultStyle(
-//              context = it,
-//              view = this,
-//              customStyleName =
-//                readCustomStyleName(
-//                  StyleUrl.SUBTITLE_TEXT_VIEW,
-//                ),
-//              defaultStyleResId =
-//                getStyleResIdFromAttribute(it, R.attr.questionnaireSubtitleTextStyle),
-//            )
-//          }
-//        },
-//        update = { it.text = hintLocalizedText },
-//      )
+      Text(it)
+      //      AndroidView(
+      //        modifier = Modifier.weight(0.7f),
+      //        factory = {
+      //          TextView(it).apply {
+      //            id = R.id.hint
+      //            movementMethod = LinkMovementMethod.getInstance()
+      //            applyCustomOrDefaultStyle(
+      //              context = it,
+      //              view = this,
+      //              customStyleName =
+      //                readCustomStyleName(
+      //                  StyleUrl.SUBTITLE_TEXT_VIEW,
+      //                ),
+      //              defaultStyleResId =
+      //                getStyleResIdFromAttribute(it, R.attr.questionnaireSubtitleTextStyle),
+      //            )
+      //          }
+      //        },
+      //        update = { it.text = hintLocalizedText },
+      //      )
     }
 
     if (isHelpButtonVisible) {
@@ -308,28 +312,29 @@ internal fun Help(
           style = MaterialTheme.typography.titleSmall,
         )
 
-          helpCardLocalizedText?.let {
-              Text(it, modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp))
-          }
-//        AndroidView(
-//          factory = {
-//            TextView(it).apply {
-//              id = R.id.helpText
-//              movementMethod = LinkMovementMethod.getInstance()
-//
-//              QuestionItemDefaultStyle()
-//                .applyStyle(
-//                  context,
-//                  this,
-//                  getStyleResIdFromAttribute(it, R.attr.questionnaireHelpTextStyle),
-//                )
-//            }
-//          },
-//          modifier =
-//            Modifier.padding(horizontal = dimensionResource(R.dimen.help_text_margin_horizontal))
-//              .padding(bottom = dimensionResource(R.dimen.help_text_margin_bottom)),
-//          update = { it.text = helpCardLocalizedText },
-//        )
+        helpCardLocalizedText?.let {
+          Text(it, modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp))
+        }
+        //        AndroidView(
+        //          factory = {
+        //            TextView(it).apply {
+        //              id = R.id.helpText
+        //              movementMethod = LinkMovementMethod.getInstance()
+        //
+        //              QuestionItemDefaultStyle()
+        //                .applyStyle(
+        //                  context,
+        //                  this,
+        //                  getStyleResIdFromAttribute(it, R.attr.questionnaireHelpTextStyle),
+        //                )
+        //            }
+        //          },
+        //          modifier =
+        //            Modifier.padding(horizontal =
+        // dimensionResource(R.dimen.help_text_margin_horizontal))
+        //              .padding(bottom = dimensionResource(R.dimen.help_text_margin_bottom)),
+        //          update = { it.text = helpCardLocalizedText },
+        //        )
       }
     }
   }

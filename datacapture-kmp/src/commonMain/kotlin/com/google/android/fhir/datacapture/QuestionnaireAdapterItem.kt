@@ -17,7 +17,7 @@
 package com.google.android.fhir.datacapture
 
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.fhir.model.r4b.QuestionnaireResponse
+import com.google.fhir.model.r4.QuestionnaireResponse
 
 /** Various types of rows that can be used in a Questionnaire RecyclerView. */
 internal sealed interface QuestionnaireAdapterItem {

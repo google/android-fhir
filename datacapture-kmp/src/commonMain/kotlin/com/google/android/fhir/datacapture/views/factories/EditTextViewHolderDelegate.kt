@@ -133,7 +133,7 @@ class EditTextViewHolderDelegate(
 
 /**
  * Returns string identified by R.string.required if [QuestionnaireViewItem.showRequiredText] and
- * [com.google.fhir.model.r4b.Questionnaire.Item.required] is true, or R.string.optional_text if
+ * [com.google.fhir.model.r4.Questionnaire.Item.required] is true, or R.string.optional_text if
  * [QuestionnaireViewItem.showOptionalText] is true.
  */
 fun getRequiredOrOptionalText(

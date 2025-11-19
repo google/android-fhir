@@ -24,15 +24,7 @@ data object DataCapture {
    * If client has set a configuration by implementing [DataCaptureConfig.Provider], then it returns
    * that. Otherwise, it returns a default [DataCaptureConfig].
    */
-  fun getConfiguration(context: Context): DataCaptureConfig {
-    if (!::configuration.isInitialized) {
-      configuration =
-        if (context.applicationContext is DataCaptureConfig.Provider) {
-          (context.applicationContext as DataCaptureConfig.Provider).getDataCaptureConfig()
-        } else {
-          DataCaptureConfig()
-        }
-    }
+  fun getConfiguration(): DataCaptureConfig {
     return configuration
   }
 }

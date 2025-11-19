@@ -18,16 +18,23 @@ package com.google.android.fhir.datacapture.extensions
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
+import co.touchlab.kermit.Logger
 import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
-import com.google.fhir.model.r4b.Attachment
-import com.google.fhir.model.r4b.CodeableConcept
-import com.google.fhir.model.r4b.Coding
-import com.google.fhir.model.r4b.Expression
-import com.google.fhir.model.r4b.Extension
-import com.google.fhir.model.r4b.Questionnaire
-import com.google.fhir.model.r4b.QuestionnaireResponse
-import com.google.fhir.model.r4b.Reference
-import com.google.fhir.model.r4b.Resource
+import com.google.fhir.model.r4.Attachment
+import com.google.fhir.model.r4.Coding
+import com.google.fhir.model.r4.Expression
+import com.google.fhir.model.r4.Extension
+import com.google.fhir.model.r4.Questionnaire
+import com.google.fhir.model.r4.QuestionnaireResponse
+import com.google.fhir.model.r4.Resource
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+
+internal const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
+
+internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/maxValue"
 
 // Please note these URLs do not point to any FHIR Resource and are broken links. They are being
 // used until we can engage the FHIR community to add these extensions officially.
@@ -188,7 +195,7 @@ val Questionnaire.Item.initialExpression: Expression?
   get() {
     return this.extension
       .firstOrNull { it.url == ITEM_INITIAL_EXPRESSION_URL }
-      ?.let { it.value as Expression }
+      ?.let { it.value?.asExpression()?.value }
   }
 
 val Questionnaire.Item.itemControlCode: String?
@@ -198,14 +205,17 @@ val Questionnaire.Item.itemControlCode: String?
         .firstOrNull {
           it.url == EXTENSION_ITEM_CONTROL_URL || it.url == EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR
         }
-        ?.value as CodeableConcept?
+        ?.value
+        ?.asCodeableConcept()
+        ?.value
     return codeableConcept
       ?.coding
       ?.firstOrNull {
-        it.system == EXTENSION_ITEM_CONTROL_SYSTEM ||
-          it.system == EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR
+        EXTENSION_ITEM_CONTROL_SYSTEM == it.system?.value ||
+          EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR == it.system?.value
       }
       ?.code
+      ?.value
   }
 
 /**
@@ -243,7 +253,7 @@ val Questionnaire.Item.choiceOrientation: ChoiceOrientationTypes?
       (this.extension.firstOrNull { it.url == EXTENSION_CHOICE_ORIENTATION_URL }?.value
           as Extension.Value.Code?)
         ?.value
-    return ChoiceOrientationTypes.entries.firstOrNull { it.extensionCode == code }
+    return ChoiceOrientationTypes.entries.firstOrNull { it.extensionCode == code?.value }
   }
 
 /**
@@ -253,8 +263,8 @@ internal val Questionnaire.Item.isHidden: Boolean
   get() {
     val extension = this.extension.singleOrNull { it.url == EXTENSION_HIDDEN_URL } ?: return false
     val value = extension.value
-    if (value is BooleanType) {
-      return value.booleanValue()
+    if (value is Extension.Value.Boolean) {
+      return value.asBoolean()?.value?.value == true
     }
     return false
   }
@@ -266,8 +276,8 @@ val Questionnaire.Item.entryFormat: String?
   get() {
     val extension = extension.singleOrNull { it.url == EXTENSION_ENTRY_FORMAT_URL } ?: return null
     val value = extension.value
-    if (value is StringType) {
-      return value.toString()
+    if (value is Extension.Value.String) {
+      return value.asString()?.value?.value
     }
     return null
   }
@@ -285,14 +295,17 @@ val Questionnaire.Item.dateEntryFormatOrSystemDefault: String
     }
   }
 
+@OptIn(ExperimentalTime::class)
 private fun isValidDateEntryFormat(entryFormat: String?): Boolean {
   return entryFormat?.let {
     try {
-      val text = LocalDate.now().format(DateTimeFormatter.ofPattern(entryFormat))
-      LocalDate.parse(text, DateTimeFormatter.ofPattern(entryFormat))
+      parseDate(
+        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString(),
+        entryFormat
+      )
       true
     } catch (e: Exception) {
-      Timber.w(e.message)
+      Logger.w(messageString = e.message ?: "Error parsing date", throwable = e)
       false
     }
   }
@@ -305,23 +318,24 @@ val Questionnaire.Item.sliderStepValue: Int?
     val extension =
       this.extension.singleOrNull { it.url == EXTENSION_SLIDER_STEP_VALUE_URL } ?: return null
     val value = extension.value
-    if (value is IntegerType) {
-      return value.value
+    if (value is Extension.Value.Integer) {
+      return value.asInteger()?.value?.value
     }
     return null
   }
 
 internal val Questionnaire.Item.minValue
-  get() = getExtensionByUrl(MIN_VALUE_EXTENSION_URL)?.value
+  get() = this.extension.find { it.url == MIN_VALUE_EXTENSION_URL }?.value
 
-internal val Questionnaire.Item.minValueCqfCalculatedValueExpression
-  get() = getExtensionByUrl(MIN_VALUE_EXTENSION_URL)?.value?.cqfCalculatedValueExpression
+// internal val Questionnaire.Item.minValueCqfCalculatedValueExpression
+//  get() = this.extension.find { it.url == MIN_VALUE_EXTENSION_URL }
+// ?.value?.cqfCalculatedValueExpression
 
 internal val Questionnaire.Item.maxValue
-  get() = getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value
+  get() = this.extension.find { it.url == MAX_VALUE_EXTENSION_URL }?.value
 
-internal val Questionnaire.Item.maxValueCqfCalculatedValueExpression
-  get() = getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value?.cqfCalculatedValueExpression
+// internal val Questionnaire.Item.maxValueCqfCalculatedValueExpression
+//  get() = getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value?.cqfCalculatedValueExpression
 
 // ********************************************************************************************** //
 //                                                                                                //
@@ -341,10 +355,17 @@ internal enum class DisplayItemControlType(val extensionCode: String) {
 internal val Questionnaire.Item.displayItemControl: DisplayItemControlType?
   get() {
     val codeableConcept =
-      this.extension.firstOrNull { it.url == EXTENSION_ITEM_CONTROL_URL }?.value as CodeableConcept?
+      this.extension
+        .firstOrNull { it.url == EXTENSION_ITEM_CONTROL_URL }
+        ?.value
+        ?.asCodeableConcept()
+        ?.value
     val code =
-      codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_ITEM_CONTROL_SYSTEM }?.code
-    return DisplayItemControlType.values().firstOrNull { it.extensionCode == code }
+      codeableConcept
+        ?.coding
+        ?.firstOrNull { EXTENSION_ITEM_CONTROL_SYSTEM == it.system?.value }
+        ?.code
+    return DisplayItemControlType.entries.firstOrNull { it.extensionCode == code?.value }
   }
 
 /** Whether any one of the nested display item has [DisplayItemControlType.HELP] control. */
@@ -353,33 +374,19 @@ val Questionnaire.Item.hasHelpButton: Boolean
     return item.any { it.isHelpCode }
   }
 
-/** Converts Text with HTML Tag to formatted text. */
-internal fun String.toSpanned(): Spanned {
-  return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
-}
-
 /**
- * Localized and spanned value of [Questionnaire.Questionnaire.Item.text] if translation is present.
- * Default value otherwise.
+ * Localized and spanned value of [Questionnaire.Item.text] if translation is present. Default value
+ * otherwise.
  */
-
 val Questionnaire.Item.localizedTextAnnotatedString: AnnotatedString?
   get() = text?.getLocalizedText()?.toAnnotatedString()
 
 /**
- * Localized and spanned value of [Questionnaire.Questionnaire.Item.prefix] if translation is
- * present. Default value otherwise.
+ * Localized and spanned value of [Questionnaire.Item.prefix] if translation is present. Default
+ * value otherwise.
  */
 val Questionnaire.Item.localizedPrefixAnnotatedString: AnnotatedString?
-  get() = prefix?.getLocalizedText()?.toSpanned()
-
-/**
- * A nested questionnaire item of type display with displayCategory extension with
- * [EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS] code is used as the instructions of the parent
- * question.
- */
-val Questionnaire.Item.localizedInstructionsSpanned: Spanned
-  get() = item.getLocalizedInstructionsAnnotatedString()
+  get() = prefix?.getLocalizedText()?.toAnnotatedString()
 
 /**
  * Returns a Spanned object that contains the localized instructions for all of the items in this
@@ -388,15 +395,13 @@ val Questionnaire.Item.localizedInstructionsSpanned: Spanned
  */
 fun List<Questionnaire.Item>.getLocalizedInstructionsAnnotatedString(
   separator: String = "\n",
-) =
-  buildAnnotatedString {
-      this@getLocalizedInstructionsAnnotatedString.filter { questionnaireItem ->
-          questionnaireItem.type.value == Questionnaire.QuestionnaireItemType.Display &&
-                  questionnaireItem.isInstructionsCode
-      }
-          .map { it.localizedTextAnnotatedString }
-          .joinTo(this, separator)
-  }
+) = buildAnnotatedString {
+  this@getLocalizedInstructionsAnnotatedString.filter { questionnaireItem ->
+      questionnaireItem.type.value == Questionnaire.QuestionnaireItemType.Display &&
+        questionnaireItem.isInstructionsCode
+    }
+    .joinTo(this, separator) { it.localizedTextAnnotatedString.toString() }
+}
 
 /**
  * A nested questionnaire item of type display with code [DisplayItemControlType.FLYOVER] (if
@@ -405,14 +410,14 @@ fun List<Questionnaire.Item>.getLocalizedInstructionsAnnotatedString(
 internal val Questionnaire.Item.localizedFlyoverSpanned: AnnotatedString?
   get() = item.localizedFlyoverSpanned
 
-/** [localizedFlyoverSpanned] over list of [Questionnaire.Questionnaire.Item] */
+/** [localizedFlyoverSpanned] over list of [Questionnaire.Item] */
 val List<Questionnaire.Item>.localizedFlyoverSpanned: AnnotatedString?
   get() =
     this.firstOrNull { questionnaireItem ->
         questionnaireItem.type.value == Questionnaire.QuestionnaireItemType.Display &&
           questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
       }
-      ?.localizedTextSpanned
+      ?.localizedTextAnnotatedString
 
 val List<Questionnaire.Item>.localizedFlyoverAnnotatedString: AnnotatedString?
   get() =
@@ -443,14 +448,17 @@ internal val Questionnaire.Item.isInstructionsCode: Boolean
     return when (type.value) {
       Questionnaire.QuestionnaireItemType.Display -> {
         val codeableConcept =
-          this.extension.firstOrNull { it.url == EXTENSION_DISPLAY_CATEGORY_URL }?.value
-            as CodeableConcept?
+          this.extension
+            .firstOrNull { it.url == EXTENSION_DISPLAY_CATEGORY_URL }
+            ?.value
+            ?.asCodeableConcept()
+            ?.value
         val code =
           codeableConcept
             ?.coding
-            ?.firstOrNull { it.system.value == EXTENSION_DISPLAY_CATEGORY_SYSTEM }
+            ?.firstOrNull { EXTENSION_DISPLAY_CATEGORY_SYSTEM == it.system?.value }
             ?.code
-        code == EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
+        code?.value == EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
       }
       else -> {
         false
@@ -464,8 +472,8 @@ internal val Questionnaire.Item.isInstructionsCode: Boolean
  */
 internal val Questionnaire.Item.isFlyoverCode: Boolean
   get() {
-    return when (type) {
-      Questionnaire.QuestionnaireItemType.DISPLAY -> {
+    return when (type.value) {
+      Questionnaire.QuestionnaireItemType.Display -> {
         displayItemControl == DisplayItemControlType.FLYOVER
       }
       else -> {
@@ -506,8 +514,8 @@ val Questionnaire.Item.mimeTypes: List<String>
   get() {
     return extension
       .filter { it.url == EXTENSION_MIME_TYPE }
-      .map { (it.value as CodeType).valueAsString }
-      .filter { !it.isNullOrEmpty() }
+      .map { (it.value?.asCode()?.value)?.value.toString() }
+      .filter { it.isNotEmpty() }
   }
 
 /** Currently supported mime types. */
@@ -528,38 +536,40 @@ fun Questionnaire.Item.hasMimeTypeOnly(type: String): Boolean {
   return mimeTypes.all { it.substringBefore("/") == type }
 }
 
-/** The maximum size of an attachment in Bytes. */
-internal val Questionnaire.Item.maxSizeInBytes: BigDecimal?
-  get() =
-    (extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.valueAsPrimitive as DecimalType?)
-      ?.value
+// /** The maximum size of an attachment in Bytes. */
+// internal val Questionnaire.Item.maxSizeInBytes: BigDecimal?
+//  get() =
+//    (extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.valueAsPrimitive as DecimalType?)
+//      ?.value
+//
+// private val BYTES_PER_KIB = BigDecimal(1024)
+//
+// /** The maximum size of an attachment in Kibibytes. */
+// internal val Questionnaire.Item.maxSizeInKiBs: BigDecimal?
+//  get() = maxSizeInBytes?.div(BYTES_PER_KIB)
+//
+// private val BYTES_PER_MIB = BigDecimal(1048576)
+//
+// /** The maximum size of an attachment in Mebibytes. */
+// internal val Questionnaire.Item.maxSizeInMiBs: BigDecimal?
+//  get() = maxSizeInBytes?.div(BYTES_PER_MIB)
+//
+// /** The default maximum size of an attachment is 1 Mebibytes. */
+// private val DEFAULT_SIZE = BigDecimal(1048576)
+//
+// /** Returns true if given size is above maximum size allowed. */
+// internal fun Questionnaire.Item.isGivenSizeOverLimit(
+//  size: BigDecimal,
+// ): Boolean {
+//  return size > (maxSizeInBytes ?: DEFAULT_SIZE)
+// }
 
-private val BYTES_PER_KIB = BigDecimal(1024)
-
-/** The maximum size of an attachment in Kibibytes. */
-internal val Questionnaire.Item.maxSizeInKiBs: BigDecimal?
-  get() = maxSizeInBytes?.div(BYTES_PER_KIB)
-
-private val BYTES_PER_MIB = BigDecimal(1048576)
-
-/** The maximum size of an attachment in Mebibytes. */
-internal val Questionnaire.Item.maxSizeInMiBs: BigDecimal?
-  get() = maxSizeInBytes?.div(BYTES_PER_MIB)
-
-/** The default maximum size of an attachment is 1 Mebibytes. */
-private val DEFAULT_SIZE = BigDecimal(1048576)
-
-/** Returns true if given size is above maximum size allowed. */
-internal fun Questionnaire.Item.isGivenSizeOverLimit(
-  size: BigDecimal,
-): Boolean {
-  return size > (maxSizeInBytes ?: DEFAULT_SIZE)
-}
-
-/** A media that is attached to a [Questionnaire.Questionnaire.Item]. */
+/** A media that is attached to a [Questionnaire.Item]. */
 internal val Questionnaire.Item.itemMedia: Attachment?
   get() =
-    (getExtensionByUrl(EXTENSION_ITEM_MEDIA)?.value as? Attachment)?.takeIf { it.hasContentType() }
+    (this.extension.find { it.url == EXTENSION_ITEM_MEDIA }?.value?.asAttachment()?.value)?.takeIf {
+      it.contentType != null
+    }
 
 // /* TODO: unify the code path from itemAnswerMedia to use fetchBitmapFromUrl
 // (github.com/google/android-fhir/issues/1876) */
@@ -602,29 +612,29 @@ internal val Questionnaire.Item.unit: Coding?
     val extension =
       this.extension.singleOrNull { it.url == EXTENSION_QUESTIONNAIRE_UNIT_URL } ?: return null
     val value = extension.value
-    if (value is Coding) {
-      return value
+    if (value is Extension.Value.Coding) {
+      return value.asCoding()?.value
     }
     return null
   }
-
-/**
- * The unit options for the quantity question.
- *
- * See http://hl7.org/fhir/R4/extension-questionnaire-unitoption.html.
- */
-internal val Questionnaire.Item.unitOption: List<Coding>
-  get() {
-    return this.extension
-      .filter { it.url == EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL }
-      .map { it.value as Coding }
-      .plus(
-        // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
-        // quantity given as initial without value is for default unit reference purpose
-        this.initial.map { it.valueQuantity.toCoding() },
-      )
-      .distinctBy { it.code }
-  }
+//
+// /**
+// * The unit options for the quantity question.
+// *
+// * See http://hl7.org/fhir/R4/extension-questionnaire-unitoption.html.
+// */
+// internal val Questionnaire.Item.unitOption: List<Coding>
+//  get() {
+//    return this.extension
+//      .filter { it.url == EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL }
+//      .map { it.value as Coding }
+//      .plus(
+//        // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
+//        // quantity given as initial without value is for default unit reference purpose
+//        this.initial.map { it.value.asQuantity().toCoding() },
+//      )
+//      .distinctBy { it.code }
+//  }
 
 // ********************************************************************************************** //
 //                                                                                                //
@@ -635,42 +645,45 @@ internal val Questionnaire.Item.unitOption: List<Coding>
 //                                                                                                //
 // ********************************************************************************************** //
 
-internal val Questionnaire.Item.answerOptionsToggleExpressions
-  get() =
-    this.extension
-      .filter { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL }
-      .map { rootExtension ->
-        val options =
-          rootExtension.extension
-            .filter { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION }
-            .map { it.value }
-        if (options.isEmpty()) {
-          throw IllegalArgumentException(
-            "Questionnaire item $linkId with extension '$EXTENSION_ANSWER_EXPRESSION_URL' requires at least one option. See http://hl7.org/fhir/uv/sdc/STU3/StructureDefinition-sdc-questionnaire-answerOptionsToggleExpression.html.",
-          )
-        }
-        val expression =
-          rootExtension.extension
-            .single { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION }
-            .let { it.castToExpression(it.value) }
-        expression to options
-      }
+// internal val Questionnaire.Item.answerOptionsToggleExpressions
+//  get() =
+//    this.extension
+//      .filter { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL }
+//      .map { rootExtension ->
+//        val options =
+//          rootExtension.extension
+//            .filter { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION }
+//            .map { it.value }
+//        if (options.isEmpty()) {
+//          throw IllegalArgumentException(
+//            "Questionnaire item $linkId with extension '$EXTENSION_ANSWER_EXPRESSION_URL' requires
+// at least one option. See
+// http://hl7.org/fhir/uv/sdc/STU3/StructureDefinition-sdc-questionnaire-answerOptionsToggleExpression.html.",
+//          )
+//        }
+//        val expression =
+//          rootExtension.extension
+//            .single { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION }
+//            .let { it.castToExpression(it.value) }
+//        expression to options
+//      }
 
 // Return expression if Questionnaire.Item has ENABLE WHEN EXPRESSION URL
-val Questionnaire.Item.enableWhenExpression: Expression?
-  get() {
-    return this.extension
-      .firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }
-      ?.let { it.value as Expression }
-  }
+// val Questionnaire.Item.enableWhenExpression: Expression?
+//  get() {
+//    return this.extension
+//      .firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }
+//      ?.let { it.value as Expression }
+//  }
 
 internal val Questionnaire.Item.variableExpressions: List<Expression>
   get() =
-    this.extension.filter { it.url == EXTENSION_VARIABLE_URL }.map { it.castToExpression(it.value) }
+    this.extension
+      .filter { it.url == EXTENSION_VARIABLE_URL }
+      .mapNotNull { it.value?.asExpression()?.value }
 
 /**
- * Finds the specific variable name [String] at the questionnaire item
- * [Questionnaire.Questionnaire.Item]
+ * Finds the specific variable name [String] at the questionnaire item [Questionnaire.Item]
  *
  * @param variableName the [String] to match the variable
  * @return an [Expression]
@@ -678,74 +691,75 @@ internal val Questionnaire.Item.variableExpressions: List<Expression>
 internal fun Questionnaire.Item.findVariableExpression(
   variableName: String,
 ): Expression? {
-  return variableExpressions.find { it.name == variableName }
+  return variableExpressions.find { variableName == it.name?.value }
 }
-
-/** Returns Calculated expression, or null */
-internal val Questionnaire.Item.calculatedExpression: Expression?
-  get() =
-    this.getExtensionByUrl(EXTENSION_CALCULATED_EXPRESSION_URL)?.let {
-      it.castToExpression(it.value)
-    }
+//
+// /** Returns Calculated expression, or null */
+// internal val Questionnaire.Item.calculatedExpression: Expression?
+//  get() =
+//    this.getExtensionByUrl(EXTENSION_CALCULATED_EXPRESSION_URL)?.let {
+//      it.castToExpression(it.value)
+//    }
 
 /** Returns list of extensions whose value is of type [Expression] */
 internal val Questionnaire.Item.expressionBasedExtensions
   get() = this.extension.filter { it.value is Expression }
-
-/**
- * Whether [item] has any expression directly referencing the current questionnaire item by link ID
- * (e.g. if [item] has an expression `%resource.item.where(linkId='this-question')` where
- * `this-question` is the link ID of the current questionnaire item).
- */
-internal fun Questionnaire.Item.isReferencedBy(
-  item: Questionnaire.Item,
-) =
-  item.expressionBasedExtensions.any {
-    it
-      .castToExpression(it.value)
-      .expression
-      .replace(" ", "")
-      .contains(Regex(".*linkId='${this.linkId}'.*"))
-  }
-
-internal val Questionnaire.Item.answerExpression: Expression?
-  get() =
-    ToolingExtensions.getExtension(this, EXTENSION_ANSWER_EXPRESSION_URL)?.value?.let {
-      it.castToExpression(it)
-    }
-
-internal val Questionnaire.Item.candidateExpression: Expression?
-  get() =
-    ToolingExtensions.getExtension(this, EXTENSION_CANDIDATE_EXPRESSION_URL)?.value?.let {
-      it.castToExpression(it)
-    }
+//
+// /**
+// * Whether [item] has any expression directly referencing the current questionnaire item by link
+// ID
+// * (e.g. if [item] has an expression `%resource.item.where(linkId='this-question')` where
+// * `this-question` is the link ID of the current questionnaire item).
+// */
+// internal fun Questionnaire.Item.isReferencedBy(
+//  item: Questionnaire.Item,
+// ) =
+//  item.expressionBasedExtensions.any {
+//    it
+//      .castToExpression(it.value)
+//      .expression
+//      .replace(" ", "")
+//      .contains(Regex(".*linkId='${this.linkId}'.*"))
+//  }
+//
+// internal val Questionnaire.Item.answerExpression: Expression?
+//  get() =
+//    ToolingExtensions.getExtension(this, EXTENSION_ANSWER_EXPRESSION_URL)?.value?.let {
+//      it.castToExpression(it)
+//    }
+//
+// internal val Questionnaire.Item.candidateExpression: Expression?
+//  get() =
+//    ToolingExtensions.getExtension(this, EXTENSION_CANDIDATE_EXPRESSION_URL)?.value?.let {
+//      it.castToExpression(it)
+//    }
 
 // TODO implement full functionality of choice column
 // https://github.com/google/android-fhir/issues/1495
-/**
- * Choice column extension https://build.fhir.org/ig/HL7/sdc/examples.html#choiceColumn
- *
- * The extension choice-column defines its internal elements as nested extension with table
- * properties
- * - path -> the field in answerOption
- * - width -> the width of given column if widget generates a table; TBD in #1495
- * - label -> the label of given column of table or answerOption
- * - forDisplay -> if the column should be shown on UI
- */
-internal val Questionnaire.Item.choiceColumn: List<ChoiceColumn>?
-  get() =
-    ToolingExtensions.getExtensions(this, EXTENSION_CHOICE_COLUMN_URL)?.map { extension ->
-      extension.extension.let { nestedExtensions ->
-        ChoiceColumn(
-          path = nestedExtensions.find { it.url == "path" }!!.value.asStringValue(),
-          label = nestedExtensions.find { it.url == "label" }?.value?.asStringValue(),
-          forDisplay =
-            nestedExtensions.any {
-              it.url == "forDisplay" && it.castToBoolean(it.value).booleanValue()
-            },
-        )
-      }
-    }
+// /**
+// * Choice column extension https://build.fhir.org/ig/HL7/sdc/examples.html#choiceColumn
+// *
+// * The extension choice-column defines its internal elements as nested extension with table
+// * properties
+// * - path -> the field in answerOption
+// * - width -> the width of given column if widget generates a table; TBD in #1495
+// * - label -> the label of given column of table or answerOption
+// * - forDisplay -> if the column should be shown on UI
+// */
+// internal val Questionnaire.Item.choiceColumn: List<ChoiceColumn>?
+//  get() =
+//    ToolingExtensions.getExtensions(this, EXTENSION_CHOICE_COLUMN_URL)?.map { extension ->
+//      extension.extension.let { nestedExtensions ->
+//        ChoiceColumn(
+//          path = nestedExtensions.find { it.url == "path" }!!.value.asStringValue(),
+//          label = nestedExtensions.find { it.url == "label" }?.value?.asStringValue(),
+//          forDisplay =
+//            nestedExtensions.any {
+//              it.url == "forDisplay" && it.castToBoolean(it.value).booleanValue()
+//            },
+//        )
+//      }
+//    }
 
 /**
  * A choice column extracted from choice column extension contains following properties
@@ -769,36 +783,38 @@ internal data class ChoiceColumn(val path: String, val label: String?, val forDi
  *   resources [Resource], identifiers [Identifier] or codes [Coding]
  * @return list of answer options [Questionnaire.QuestionnaireItemAnswerOptionComponent]
  */
-internal fun Questionnaire.Item.extractAnswerOptions(
-  dataList: List<Base>,
-): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-  return when (this.type) {
-    Questionnaire.QuestionnaireItemType.REFERENCE -> {
-      require(dataList.all { it.isResource }) {
-        "'${this.type.toCode()}' cannot be used to populate $EXTENSION_CHOICE_COLUMN_URL. Only Resources can be used to populate the choice columns."
-      }
-
-      dataList.map { data ->
-        data as Resource
-        Reference().apply {
-          reference = "${data.resourceType}/${data.logicalId}"
-          this@extractAnswerOptions.choiceColumn
-            ?.filter { it.forDisplay }
-            ?.map { it.path }
-            ?.let { evaluateToDisplay(it, data) }
-            ?.also { display = it }
-        }
-      }
-    }
-    else -> {
-      require(dataList.all { !it.isResource }) {
-        "$EXTENSION_CHOICE_COLUMN_URL not applicable for '${this.type.toCode()}'. Only type reference is allowed with resource."
-      }
-
-      dataList.map { it.castToType(it) }
-    }
-  }.map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
-}
+// internal fun Questionnaire.Item.extractAnswerOptions(
+//  dataList: List<Base>,
+// ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+//  return when (this.type) {
+//    Questionnaire.QuestionnaireItemType.REFERENCE -> {
+//      require(dataList.all { it.isResource }) {
+//        "'${this.type.toCode()}' cannot be used to populate $EXTENSION_CHOICE_COLUMN_URL. Only
+// Resources can be used to populate the choice columns."
+//      }
+//
+//      dataList.map { data ->
+//        data as Resource
+//        Reference().apply {
+//          reference = "${data.resourceType}/${data.logicalId}"
+//          this@extractAnswerOptions.choiceColumn
+//            ?.filter { it.forDisplay }
+//            ?.map { it.path }
+//            ?.let { evaluateToDisplay(it, data) }
+//            ?.also { display = it }
+//        }
+//      }
+//    }
+//    else -> {
+//      require(dataList.all { !it.isResource }) {
+//        "$EXTENSION_CHOICE_COLUMN_URL not applicable for '${this.type.toCode()}'. Only type
+// reference is allowed with resource."
+//      }
+//
+//      dataList.map { it.castToType(it) }
+//    }
+//  }.map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
+// }
 
 /** See http://hl7.org/fhir/constraint-severity */
 enum class ConstraintSeverityTypes(
@@ -853,11 +869,11 @@ internal inline fun <T> List<Questionnaire.Item>.zipByLinkId(
  */
 internal inline fun <T> groupByAndZipByLinkId(
   questionnaireItemList: List<Questionnaire.Item>,
-  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+  questionnaireResponseItemList: List<QuestionnaireResponse.Item>,
   transform:
     (
       List<Questionnaire.Item>,
-      List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+      List<QuestionnaireResponse.Item>,
     ) -> T,
 ): List<T> {
   val linkIdToQuestionnaireItemListMap = questionnaireItemList.groupBy { it.linkId }
@@ -872,9 +888,8 @@ internal inline fun <T> groupByAndZipByLinkId(
 }
 
 /**
- * Whether the corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] should have
- * [QuestionnaireResponse.QuestionnaireResponseItemComponent]s nested under
- * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]s.
+ * Whether the corresponding [QuestionnaireResponse.Item] should have [QuestionnaireResponse.Item]s
+ * nested under [QuestionnaireResponse.Item.Answer]s.
  *
  * This is true for the following two cases:
  * 1. Questions with nested items
@@ -887,11 +902,13 @@ internal inline fun <T> groupByAndZipByLinkId(
  * For background, see https://build.fhir.org/questionnaireresponse.html#link.
  */
 internal val Questionnaire.Item.shouldHaveNestedItemsUnderAnswers: Boolean
-  get() = item.isNotEmpty() && (type != Questionnaire.QuestionnaireItemType.GROUP || repeats)
+  get() =
+    item.isNotEmpty() &&
+      (type.value != Questionnaire.QuestionnaireItemType.Group || repeats?.value == true)
 
 /**
- * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s corresponding to
- * the nested items under the questionnaire item.
+ * Creates a list of [QuestionnaireResponse.Item]s corresponding to the nested items under the
+ * questionnaire item.
  *
  * The list can be added as nested items under answers in a corresponding questionnaire response
  * item. This may be because
@@ -908,8 +925,8 @@ internal fun Questionnaire.Item.createNestedQuestionnaireResponseItems() =
   item.map { it.createQuestionnaireResponseItem() }
 
 /**
- * Creates a corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] for the
- * questionnaire item with the following properties:
+ * Creates a corresponding [QuestionnaireResponse.Item] for the questionnaire item with the
+ * following properties:
  * - same `linkId` as the questionnaire item,
  * - any initial answer(s) specified either in the `initial` element or as `initialSelected`
  *   `answerOption`(s),
@@ -925,20 +942,19 @@ internal fun Questionnaire.Item.createNestedQuestionnaireResponseItems() =
  * The hierarchy and order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-internal fun Questionnaire.Item.createQuestionnaireResponseItem():
-  QuestionnaireResponse.QuestionnaireResponseItemComponent {
-  return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+internal fun Questionnaire.Item.createQuestionnaireResponseItem(): QuestionnaireResponse.Item {
+  return QuestionnaireResponse.Item().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
     answer = createQuestionnaireResponseItemAnswers()
     if (
-      type != Questionnaire.QuestionnaireItemType.GROUP &&
+      type.value != Questionnaire.QuestionnaireItemType.Group &&
         this@createQuestionnaireResponseItem.item.isNotEmpty() &&
         answer.isNotEmpty()
     ) {
       this.copyNestedItemsToChildlessAnswers(this@createQuestionnaireResponseItem)
     } else if (
-      this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
-        !repeats
+      this@createQuestionnaireResponseItem.type.value ==
+        Questionnaire.QuestionnaireItemType.Group && repeats?.value != true
     ) {
       this@createQuestionnaireResponseItem.item.forEach {
         if (!it.isRepeatedGroup) {
@@ -954,7 +970,7 @@ internal fun Questionnaire.Item.createQuestionnaireResponseItem():
  * value.
  */
 private fun Questionnaire.Item.createQuestionnaireResponseItemAnswers():
-  MutableList<QuestionnaireResponse.Item>? {
+  List<QuestionnaireResponse.Item.Answer>? {
   // TODO https://github.com/google/android-fhir/issues/2161
   // The rule can be by-passed if initial value was set by an initial-expression.
   // The [ResourceMapper] at L260 wrongfully sets the initial property of questionnaire after
@@ -966,17 +982,18 @@ private fun Questionnaire.Item.createQuestionnaireResponseItemAnswers():
   // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
   // quantity given as initial without value is for unit reference purpose only. Answer conversion
   // not needed
+  val initialFirstRep = initial.singleOrNull()
   if (
     answerOption.initialSelected.isEmpty() &&
       (initial.isEmpty() ||
-        (initialFirstRep.hasValueQuantity() && initialFirstRep.valueQuantity.value == null))
+        (initialFirstRep?.value != null && initialFirstRep.value.asQuantity()?.value == null))
   ) {
     return null
   }
 
   if (
-    type == Questionnaire.QuestionnaireItemType.GROUP ||
-      type == Questionnaire.QuestionnaireItemType.DISPLAY
+    type.value == Questionnaire.QuestionnaireItemType.Group ||
+      type.value == Questionnaire.QuestionnaireItemType.Display
   ) {
     throw IllegalArgumentException(
       "Questionnaire item $linkId has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.",
@@ -992,13 +1009,16 @@ private fun Questionnaire.Item.createQuestionnaireResponseItemAnswers():
   return initial
     .map { it.value }
     .plus(answerOption.initialSelected)
-    .map { QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply { value = it } }
-    .toMutableList()
+    .map {
+      QuestionnaireResponse.Item.Answer.Builder()
+        .apply { value = QuestionnaireResponse.Item.Answer.Value(value = it) }
+        .build()
+    }
 }
 
 /**
- * Flatten a nested list of [Questionnaire.Questionnaire.Item] recursively and returns a flat list
- * of all items into list embedded at any level
+ * Flatten a nested list of [Questionnaire.Item] recursively and returns a flat list of all items
+ * into list embedded at any level
  */
 fun List<Questionnaire.Item>.flattened(): List<Questionnaire.Item> =
   mutableListOf<Questionnaire.Item>().also { flattenInto(it) }
@@ -1013,22 +1033,23 @@ private fun List<Questionnaire.Item>.flattenInto(
 }
 
 internal val Questionnaire.Item.isRepeatedGroup: Boolean
-  get() = type == Questionnaire.QuestionnaireItemType.GROUP && repeats
+  get() = type.value == Questionnaire.QuestionnaireItemType.Group && repeats?.value == true
 
 // TODO: Move this elsewhere.
 val Resource.logicalId: String
   get() {
-    return this.idElement?.idPart.orEmpty()
+    return this.id?.substringAfter("/")?.substringBefore("/")
+      ?: throw IllegalStateException("Id field cannot be null")
   }
 
 internal fun Questionnaire.Item.readCustomStyleExtension(styleUrl: StyleUrl): String? {
   // Find the base extension
-  val baseExtension = extension.find { it.url == StyleUrl.BASE.url.value }
+  val baseExtension = extension.find { it.url == StyleUrl.BASE.url }
   baseExtension?.let { ext ->
     // Extract nested extension based on the given StyleUrl
     ext.extension.forEach { nestedExt ->
-      if (nestedExt.url == styleUrl.url.value) {
-        return nestedExt.value?.asString()?.value
+      if (nestedExt.url == styleUrl.url) {
+        return nestedExt.value?.asString()?.value?.value
       }
     }
   }

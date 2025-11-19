@@ -16,8 +16,8 @@
 
 package com.google.android.fhir.datacapture
 
-import com.google.fhir.model.r4b.Coding
-import com.google.fhir.model.r4b.Resource
+import com.google.fhir.model.r4.Coding
+import com.google.fhir.model.r4.Resource
 
 /**
  * The App developers may provide the [DataCaptureConfig] for the DataCapture library by

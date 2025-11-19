@@ -18,8 +18,8 @@ package com.google.android.fhir.datacapture.extensions
 
 import androidx.compose.ui.text.capitalize
 import com.google.android.fhir.datacapture.UrlResolver
-import com.google.fhir.model.r4b.Attachment
-import com.google.fhir.model.r4b.Base64Binary
+import com.google.fhir.model.r4.Attachment
+import com.google.fhir.model.r4.Base64Binary
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.text.capitalize

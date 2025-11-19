@@ -30,7 +30,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.google.android.fhir.datacapture.extensions.imageData
-import com.google.fhir.model.r4b.Attachment
+import com.google.fhir.model.r4.Attachment
 import org.jetbrains.compose.resources.decodeToImageBitmap
 
 @Composable

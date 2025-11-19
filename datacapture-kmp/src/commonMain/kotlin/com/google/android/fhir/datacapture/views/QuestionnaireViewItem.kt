@@ -17,19 +17,16 @@
 package com.google.android.fhir.datacapture.views
 
 import androidx.compose.ui.text.AnnotatedString
-import com.google.android.fhir.datacapture.extensions.getLocalizedText
 import com.google.android.fhir.datacapture.extensions.isHelpCode
-import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.localizedTextAnnotatedString
 import com.google.android.fhir.datacapture.extensions.maxValue
 import com.google.android.fhir.datacapture.extensions.minValue
 import com.google.android.fhir.datacapture.extensions.toAnnotatedString
-import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.fhir.model.r4b.DataType
-import com.google.fhir.model.r4b.Questionnaire
-import com.google.fhir.model.r4b.QuestionnaireResponse
+import com.google.fhir.model.r4.Questionnaire
+import com.google.fhir.model.r4.QuestionnaireResponse
 
 /**
  * Data item for [QuestionnaireItemViewHolder] in [androidx.compose.foundation.lazy.LazyColumn].
@@ -78,12 +75,12 @@ data class QuestionnaireViewItem(
     ) -> Unit,
   val enabledAnswerOptions: List<Questionnaire.Item.AnswerOption> =
     questionnaireItem.answerOption.ifEmpty { emptyList() },
-  val minAnswerValue: DataType? = questionnaireItem.minValue,
-  val maxAnswerValue: DataType? = questionnaireItem.maxValue,
+  val minAnswerValue: Any? = questionnaireItem.minValue,
+  val maxAnswerValue: Any? = questionnaireItem.maxValue,
   val draftAnswer: Any? = null,
   val enabledDisplayItems: List<Questionnaire.Item> = emptyList(),
   val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),
-  val isHelpCardOpen: Boolean = questionnaireItem.isHelpCode.value ?: false,
+  val isHelpCardOpen: Boolean = questionnaireItem.isHelpCode,
   val helpCardStateChangedCallback: (Boolean, QuestionnaireResponse.Item) -> Unit = { _, _ -> },
 ) {
 
@@ -180,10 +177,11 @@ data class QuestionnaireViewItem(
   /**
    * Fetches the question title that should be displayed to user. The title is first fetched from
    * [QuestionnaireResponse.Item] (derived from cqf-expression), otherwise it is derived from
-   * [localizedTextSpanned] of [QuestionnaireResponse.QuestionnaireItemComponent]
+   * [localizedTextAnnotatedString] of [QuestionnaireResponse.Item]
    */
   val questionText: AnnotatedString? by lazy {
-    questionnaireResponseItem.text?.value?.toAnnotatedString() ?: questionnaireItem.text?.getLocalizedText()?.toAnnotatedString()
+    questionnaireResponseItem.text?.value?.toAnnotatedString()
+      ?: questionnaireItem.localizedTextAnnotatedString
   }
 
   /**
@@ -210,8 +208,7 @@ data class QuestionnaireViewItem(
 
   /**
    * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem] have the
-   * same [Questionnaire.QuestionnaireItemComponent] and
-   * [QuestionnaireResponse.QuestionnaireResponseItemComponent].
+   * same [Questionnaire.Item] and [QuestionnaireResponse.Item].
    *
    * This is useful for determining if two [QuestionnaireViewItem]s are representing the same
    * question and answer in the [Questionnaire] and [QuestionnaireResponse]. This can be used to
@@ -243,7 +240,7 @@ data class QuestionnaireViewItem(
    * same [ValidationResult].
    *
    * This is useful for determining if the [QuestionnaireViewItem] has outdated [ValidationResult]
-   * and therefore needs to be updated in the [RecyclerView] UI.
+   * and therefore needs to be updated in the list UI.
    */
   internal fun hasTheSameValidationResult(other: QuestionnaireViewItem): Boolean {
     if (validationResult is NotValidated || validationResult is Valid) {

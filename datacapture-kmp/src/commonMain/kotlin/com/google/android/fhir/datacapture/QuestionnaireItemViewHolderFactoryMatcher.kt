@@ -17,7 +17,7 @@
 package com.google.android.fhir.datacapture
 
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemComposeViewHolderFactory
-import com.google.fhir.model.r4b.Questionnaire
+import com.google.fhir.model.r4.Questionnaire
 
 /**
  * Data class that holds a matcher function ([matches]) which evaluates whether a given [factory]

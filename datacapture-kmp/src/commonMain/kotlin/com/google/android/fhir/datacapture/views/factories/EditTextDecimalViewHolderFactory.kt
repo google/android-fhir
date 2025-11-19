@@ -21,8 +21,8 @@ import android_fhir.datacapture_kmp.generated.resources.decimal_format_validatio
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import com.google.fhir.model.r4b.Decimal
-import com.google.fhir.model.r4b.QuestionnaireResponse
+import com.google.fhir.model.r4.Decimal
+import com.google.fhir.model.r4.QuestionnaireResponse
 
 internal object EditTextDecimalViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
 

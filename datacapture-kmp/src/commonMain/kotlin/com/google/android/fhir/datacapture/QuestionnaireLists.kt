@@ -46,9 +46,9 @@ import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewHo
 import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemComposeViewHolderFactory
-import com.google.fhir.model.r4b.Questionnaire
-import com.google.fhir.model.r4b.QuestionnaireResponse
-import com.google.fhir.model.r4b.String
+import com.google.fhir.model.r4.Questionnaire
+import com.google.fhir.model.r4.QuestionnaireResponse
+import com.google.fhir.model.r4.String
 import kotlin.uuid.ExperimentalUuidApi
 
 // Choice questions are rendered as dialogs if they have at least this many options
@@ -103,7 +103,11 @@ internal fun QuestionnaireEditList(
     ) { adapterItem: QuestionnaireAdapterItem ->
       when (adapterItem) {
         is QuestionnaireAdapterItem.Question -> {
-          getQuestionnaireItemViewHolderFactory(getItemViewTypeForQuestion(adapterItem.item))
+          val questionnaireViewHolderType = getItemViewTypeForQuestion(adapterItem.item)
+          val questionnaireItemViewHolderDelegate =
+            getQuestionnaireItemViewHolderFactory(questionnaireViewHolderType)
+              ?.getQuestionnaireItemViewHolderDelegate()
+          questionnaireItemViewHolderDelegate?.Content(adapterItem.item)
         }
         is QuestionnaireAdapterItem.Navigation -> {
           QuestionnaireBottomNavigation(adapterItem.questionnaireNavigationUIState)
@@ -373,7 +377,7 @@ private fun getChoiceViewHolderType(
 
   // Use the view type that the client wants if they specified an itemControl or dialog extension
   return when {
-    questionnaireItem.shouldUseDialog.value == true -> QuestionnaireViewHolderType.DIALOG_SELECT
+    questionnaireItem.shouldUseDialog -> QuestionnaireViewHolderType.DIALOG_SELECT
     else -> questionnaireItem.itemControl?.viewHolderType
   }
   // Otherwise, choose a sensible UI element automatically
