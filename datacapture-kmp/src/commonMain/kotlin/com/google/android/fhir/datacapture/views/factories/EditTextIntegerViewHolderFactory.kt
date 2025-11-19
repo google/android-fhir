@@ -47,7 +47,7 @@ internal object EditTextIntegerViewHolderFactory : QuestionnaireItemComposeViewH
             QuestionnaireResponse.Item.Answer(
               value =
                 QuestionnaireResponse.Item.Answer.Value.Integer(
-                  FhirInteger(value = inputText.toInt())
+                  FhirInteger(value = inputText.toInt()),
                 ),
             ),
           )

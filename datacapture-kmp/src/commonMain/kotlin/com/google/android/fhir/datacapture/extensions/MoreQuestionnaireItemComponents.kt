@@ -17,10 +17,9 @@
 package com.google.android.fhir.datacapture.extensions
 
 import androidx.compose.ui.text.AnnotatedString
-import com.google.android.fhir.datacapture.DataCapture
+import androidx.compose.ui.text.buildAnnotatedString
 import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.fhir.model.r4b.Attachment
-import com.google.fhir.model.r4b.Boolean
 import com.google.fhir.model.r4b.CodeableConcept
 import com.google.fhir.model.r4b.Coding
 import com.google.fhir.model.r4b.Expression
@@ -29,9 +28,6 @@ import com.google.fhir.model.r4b.Questionnaire
 import com.google.fhir.model.r4b.QuestionnaireResponse
 import com.google.fhir.model.r4b.Reference
 import com.google.fhir.model.r4b.Resource
-import com.google.fhir.model.r4b.String
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 // Please note these URLs do not point to any FHIR Resource and are broken links. They are being
 // used until we can engage the FHIR community to add these extensions officially.
@@ -362,26 +358,20 @@ internal fun String.toSpanned(): Spanned {
   return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
 }
 
-internal fun String.toAnnotatedString(): AnnotatedString {
-  return AnnotatedString.fromHtml(this)
-}
-
 /**
  * Localized and spanned value of [Questionnaire.Questionnaire.Item.text] if translation is present.
  * Default value otherwise.
  */
-val Questionnaire.Item.localizedTextSpanned: Spanned?
-  get() = textElement?.getLocalizedText()?.toSpanned()
 
 val Questionnaire.Item.localizedTextAnnotatedString: AnnotatedString?
-  get() = textElement?.getLocalizedText()?.toAnnotatedString()
+  get() = text?.getLocalizedText()?.toAnnotatedString()
 
 /**
  * Localized and spanned value of [Questionnaire.Questionnaire.Item.prefix] if translation is
  * present. Default value otherwise.
  */
-val Questionnaire.Item.localizedPrefixSpanned: Spanned?
-  get() = prefixElement?.getLocalizedText()?.toSpanned()
+val Questionnaire.Item.localizedPrefixAnnotatedString: AnnotatedString?
+  get() = prefix?.getLocalizedText()?.toSpanned()
 
 /**
  * A nested questionnaire item of type display with displayCategory extension with
@@ -389,23 +379,23 @@ val Questionnaire.Item.localizedPrefixSpanned: Spanned?
  * question.
  */
 val Questionnaire.Item.localizedInstructionsSpanned: Spanned
-  get() = item.getLocalizedInstructionsSpanned()
+  get() = item.getLocalizedInstructionsAnnotatedString()
 
 /**
  * Returns a Spanned object that contains the localized instructions for all of the items in this
  * list that are of type `Questionnaire.QuestionnaireItemType.DISPLAY` and have the
  * `isInstructionsCode` flag set. The instructions are separated by newlines.
  */
-fun List<Questionnaire.Item>.getLocalizedInstructionsSpanned(
+fun List<Questionnaire.Item>.getLocalizedInstructionsAnnotatedString(
   separator: String = "\n",
 ) =
-  SpannableStringBuilder().apply {
-    this@getLocalizedInstructionsSpanned.filter { questionnaireItem ->
-        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-          questionnaireItem.isInstructionsCode
+  buildAnnotatedString {
+      this@getLocalizedInstructionsAnnotatedString.filter { questionnaireItem ->
+          questionnaireItem.type.value == Questionnaire.QuestionnaireItemType.Display &&
+                  questionnaireItem.isInstructionsCode
       }
-      .map { it.localizedTextSpanned }
-      .joinTo(this, separator)
+          .map { it.localizedTextAnnotatedString }
+          .joinTo(this, separator)
   }
 
 /**
@@ -430,22 +420,21 @@ val List<Questionnaire.Item>.localizedFlyoverAnnotatedString: AnnotatedString?
         questionnaireItem.type.value == Questionnaire.QuestionnaireItemType.Display &&
           questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
       }
-      ?.text
-      ?.localizedTextAnnotatedString()
+      ?.localizedTextAnnotatedString
 
 /**
  * A nested questionnaire item of type display with displayCategory extension with
  * [EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS] code is used as the instructions of the parent
  * question.
  */
-val Questionnaire.Item.localizedHelpSpanned: AnnotatedString?
-  get() = item.localizedHelpSpanned
+val Questionnaire.Item.localizedHelpAnnotatedString: AnnotatedString?
+  get() = item.localizedHelpAnnotatedString
 
-/** [localizedHelpSpanned] over list of [Questionnaire.Questionnaire.Item] */
-val List<Questionnaire.Item>.localizedHelpSpanned: AnnotatedString?
+/** [localizedHelpAnnotatedString] over list of [Questionnaire.Questionnaire.Item] */
+val List<Questionnaire.Item>.localizedHelpAnnotatedString: AnnotatedString?
   get() {
     return this.firstOrNull { questionnaireItem -> questionnaireItem.isHelpCode }
-      ?.localizedTextSpanned
+      ?.localizedTextAnnotatedString
   }
 
 /** Returns `true` if extension is display category extension and contains 'instructions' code. */
@@ -572,39 +561,36 @@ internal val Questionnaire.Item.itemMedia: Attachment?
   get() =
     (getExtensionByUrl(EXTENSION_ITEM_MEDIA)?.value as? Attachment)?.takeIf { it.hasContentType() }
 
-/** Returns the main MIME type of a MIME type string (e.g. image/png returns image). */
-internal val Attachment.mimeType: String?
-  get() = contentType?.substringBefore("/")
-
-/* TODO: unify the code path from itemAnswerMedia to use fetchBitmapFromUrl (github.com/google/android-fhir/issues/1876) */
-/** Fetches the Bitmap representation of [Attachment.url]. */
-internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
-  if (!hasUrl() || !UrlUtil.isValid(url) || !hasContentType()) return null
-
-  if (mimeType != MimeType.IMAGE.value) return null
-
-  val urlResolver = DataCapture.getConfiguration(context).urlResolver ?: return null
-
-  return withContext(Dispatchers.IO) { urlResolver.resolveBitmapUrl(url) }
-}
-
-/** Decodes the Bitmap representation of [Attachment.data]. */
-internal fun Attachment.decodeToBitmap(): Bitmap? {
-  if (!hasContentType() || !hasData()) return null
-
-  if (mimeType != MimeType.IMAGE.value) return null
-
-  return data.decodeToBitmap()
-}
-
-/** Returns Bitmap if Byte Array is a valid Bitmap representation, otherwise null. */
-private fun ByteArray.decodeToBitmap(): Bitmap? {
-  val bitmap = BitmapFactory.decodeByteArray(this, 0, this.size)
-
-  if (bitmap == null) Timber.w("Image could not be decoded")
-
-  return bitmap
-}
+// /* TODO: unify the code path from itemAnswerMedia to use fetchBitmapFromUrl
+// (github.com/google/android-fhir/issues/1876) */
+// /** Fetches the Bitmap representation of [Attachment.url]. */
+// internal suspend fun Attachment.fetchBitmapFromUrl(context: Context): Bitmap? {
+//  if (!hasUrl() || !UrlUtil.isValid(url) || !hasContentType()) return null
+//
+//  if (mimeType != MimeType.IMAGE.value) return null
+//
+//  val urlResolver = DataCapture.getConfiguration(context).urlResolver ?: return null
+//
+//  return withContext(Dispatchers.IO) { urlResolver.resolveBitmapUrl(url) }
+// }
+//
+// /** Decodes the Bitmap representation of [Attachment.data]. */
+// internal fun Attachment.decodeToBitmap(): Bitmap? {
+//  if (!hasContentType() || !hasData()) return null
+//
+//  if (mimeType != MimeType.IMAGE.value) return null
+//
+//  return data.decodeToBitmap()
+// }
+//
+// /** Returns Bitmap if Byte Array is a valid Bitmap representation, otherwise null. */
+// private fun ByteArray.decodeToBitmap(): Bitmap? {
+//  val bitmap = BitmapFactory.decodeByteArray(this, 0, this.size)
+//
+//  if (bitmap == null) Timber.w("Image could not be decoded")
+//
+//  return bitmap
+// }
 
 /**
  * The unit for the numerical question.

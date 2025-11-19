@@ -17,10 +17,12 @@
 package com.google.android.fhir.datacapture.views
 
 import androidx.compose.ui.text.AnnotatedString
+import com.google.android.fhir.datacapture.extensions.getLocalizedText
 import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.maxValue
 import com.google.android.fhir.datacapture.extensions.minValue
+import com.google.android.fhir.datacapture.extensions.toAnnotatedString
 import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -102,7 +104,8 @@ data class QuestionnaireViewItem(
     vararg questionnaireResponseItemAnswerComponent: QuestionnaireResponse.Item.Answer,
   ) {
     check(
-      questionnaireItem.repeats?.value == true || questionnaireResponseItemAnswerComponent.size <= 1
+      questionnaireItem.repeats?.value == true ||
+        questionnaireResponseItemAnswerComponent.size <= 1,
     ) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers."
     }
@@ -180,7 +183,7 @@ data class QuestionnaireViewItem(
    * [localizedTextSpanned] of [QuestionnaireResponse.QuestionnaireItemComponent]
    */
   val questionText: AnnotatedString? by lazy {
-    questionnaireResponseItem.text?.toSpanned() ?: questionnaireItem.localizedTextSpanned
+    questionnaireResponseItem.text?.value?.toAnnotatedString() ?: questionnaireItem.text?.getLocalizedText()?.toAnnotatedString()
   }
 
   /**

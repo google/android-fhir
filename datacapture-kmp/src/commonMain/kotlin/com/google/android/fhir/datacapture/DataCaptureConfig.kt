@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture
 
-import androidx.compose.ui.graphics.ImageBitmap
 import com.google.fhir.model.r4b.Coding
 import com.google.fhir.model.r4b.Resource
 
@@ -94,7 +93,7 @@ fun interface XFhirQueryResolver {
  * its UI.
  */
 interface UrlResolver {
-  suspend fun resolveBitmapUrl(url: String): ImageBitmap?
+  suspend fun resolveBitmapUrl(url: String): ByteArray?
 }
 
 /**

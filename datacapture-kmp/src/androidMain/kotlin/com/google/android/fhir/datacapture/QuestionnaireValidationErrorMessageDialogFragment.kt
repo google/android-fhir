@@ -32,7 +32,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
-import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.extensions.localizedPrefixAnnotatedString
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -143,7 +143,7 @@ internal class QuestionnaireValidationErrorViewModel : ViewModel() {
         // prefix.
         it.localizedTextSpanned?.takeIfNotBlank()
           ?: it.localizedFlyoverSpanned?.takeIfNotBlank()
-            ?: it.localizedPrefixSpanned?.takeIfNotBlank()
+            ?: it.localizedPrefixAnnotatedString?.takeIfNotBlank()
       }
       ?: emptyList()
   }
