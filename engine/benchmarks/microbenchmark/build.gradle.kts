@@ -52,7 +52,7 @@ afterEvaluate { configureFirebaseTestLabForMicroBenchmark() }
 
 dependencies {
   androidTestImplementation(libs.retrofit)
-  androidTestImplementation(libs.mock.web.server)
+  androidTestImplementation(libs.okhttp3.mock.web.server)
   androidTestImplementation(libs.androidx.benchmark.junit4)
   androidTestImplementation(libs.androidx.test.ext.junit)
   androidTestImplementation(libs.androidx.test.runner)

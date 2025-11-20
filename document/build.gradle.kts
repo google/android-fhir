@@ -41,7 +41,7 @@ dependencies {
   implementation(libs.android.fhir.engine)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.core)
-  implementation(libs.http.interceptor)
+  implementation(libs.okhttp3.interceptor)
   implementation(libs.material)
   implementation(libs.nimbus)
   implementation(libs.retrofit)
@@ -51,7 +51,7 @@ dependencies {
 
   testImplementation(libs.junit)
   testImplementation(libs.kotlinx.coroutines.test)
-  testImplementation(libs.mock.web.server)
+  testImplementation(libs.okhttp3.mock.web.server)
   testImplementation(libs.mockito.inline)
   testImplementation(libs.mockito.kotlin)
   testImplementation(libs.robolectric)
