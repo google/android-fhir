@@ -16,8 +16,15 @@
 
 package com.google.android.fhir.datacapture.views.compose
 
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.OutputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.insert
+import androidx.compose.foundation.text.input.maxLength
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.text.input.then
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,10 +42,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -51,6 +57,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.toLocalDate
 import java.time.LocalDate
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,47 +74,67 @@ internal fun DatePickerItem(
   parseStringToLocalDate: (String, DateFormatPattern) -> LocalDate?,
   onDateInputEntry: (DateInput) -> Unit,
 ) {
-  val focusManager = LocalFocusManager.current
   val keyboardController = LocalSoftwareKeyboardController.current
   var dateInputState by remember(dateInput) { mutableStateOf(dateInput) }
-  val dateInputDisplay by remember(dateInputState) { derivedStateOf { dateInputState.display } }
+  val textFieldState = rememberTextFieldState(dateInputState.display)
+  var isFocused by remember { mutableStateOf(false) }
+
+  val firstDelimiterIndex =
+    remember(dateInputFormat) {
+      dateInputFormat.patternWithDelimiters.indexOf(dateInputFormat.delimiter).takeIf { it >= 0 }
+    }
+  val secondDelimiterIndex =
+    remember(dateInputFormat) {
+      dateInputFormat.patternWithDelimiters.lastIndexOf(dateInputFormat.delimiter).takeIf {
+        it >= 0
+      }
+    }
+  val dateFormatLength =
+    remember(dateInputFormat) { dateInputFormat.patternWithoutDelimiters.length }
 
   var showDatePickerModal by remember { mutableStateOf(false) }
 
-  LaunchedEffect(dateInputState) {
-    if (dateInputState != dateInput) {
-      onDateInputEntry(dateInputState)
+  // Sync external dateInput changes to textFieldState
+  LaunchedEffect(dateInput) {
+    if (!isFocused && dateInput.display != textFieldState.text.toString()) {
+      textFieldState.setTextAndPlaceCursorAtEnd(dateInput.display)
     }
   }
 
-  OutlinedTextField(
-    value = dateInputDisplay,
-    onValueChange = {
-      if (
-        it.length <= dateInputFormat.patternWithoutDelimiters.length &&
-          it.all { char -> char.isDigit() }
-      ) {
+  // Monitor textFieldState changes and update dateInputState
+  LaunchedEffect(textFieldState) {
+    snapshotFlow { textFieldState.text.toString() }
+      .collectLatest {
         val trimmedText = it.trim()
         val localDate =
-          if (
-            trimmedText.isNotBlank() &&
-              trimmedText.length == dateInputFormat.patternWithoutDelimiters.length
-          ) {
+          if (trimmedText.isNotBlank() && trimmedText.length == dateFormatLength) {
             parseStringToLocalDate(trimmedText, dateInputFormat.patternWithoutDelimiters)
           } else {
             null
           }
-        dateInputState = DateInput(it, localDate)
+        val newDateInput = DateInput(trimmedText, localDate)
+        if (dateInputState != newDateInput) {
+          dateInputState = newDateInput
+          onDateInputEntry(newDateInput)
+        }
       }
-    },
-    singleLine = true,
+  }
+
+  OutlinedTextField(
+    state = textFieldState,
+    lineLimits = TextFieldLineLimits.SingleLine,
     label = { Text(labelText) },
     modifier =
       modifier
         .testTag(DATE_TEXT_INPUT_FIELD)
         .onFocusChanged {
+          isFocused = it.isFocused
           if (!it.isFocused) {
             keyboardController?.hide()
+            //              Sync external dateInput changes to textFieldState
+            if (dateInput.display != textFieldState.text.toString()) {
+              textFieldState.setTextAndPlaceCursorAtEnd(dateInput.display)
+            }
           }
         }
         .semantics { if (isError) error(helperText ?: "") },
@@ -122,17 +149,29 @@ internal fun DatePickerItem(
       }
     },
     enabled = enabled,
+    inputTransformation =
+      InputTransformation.maxLength(dateFormatLength).then {
+        if (asCharSequence().any { !Character.isDigit(it) }) revertAllChanges()
+      },
     keyboardOptions =
       KeyboardOptions(
         autoCorrectEnabled = false,
         keyboardType = KeyboardType.Number,
         imeAction = ImeAction.Done,
       ),
-    keyboardActions =
-      KeyboardActions(
-        onNext = { focusManager.moveFocus(FocusDirection.Down) },
-      ),
-    visualTransformation = DateVisualTransformation(dateInputFormat),
+    outputTransformation =
+      OutputTransformation {
+        firstDelimiterIndex?.let {
+          if (length >= firstDelimiterIndex) {
+            insert(firstDelimiterIndex, dateInputFormat.delimiter.toString())
+          }
+        }
+        secondDelimiterIndex?.let {
+          if (length >= secondDelimiterIndex) {
+            insert(secondDelimiterIndex, dateInputFormat.delimiter.toString())
+          }
+        }
+      },
   )
 
   if (selectableDates != null && showDatePickerModal) {
@@ -141,11 +180,8 @@ internal fun DatePickerItem(
       selectableDates,
       onDateSelected = { dateMillis ->
         dateMillis?.toLocalDate()?.let {
-          dateInputState =
-            DateInput(
-              display = it.format(dateInputFormat.patternWithoutDelimiters),
-              value = it,
-            )
+          val formattedDate = it.format(dateInputFormat.patternWithoutDelimiters)
+          textFieldState.setTextAndPlaceCursorAtEnd(formattedDate)
         }
       },
     ) {
@@ -196,5 +232,9 @@ internal fun DatePickerModal(
 typealias DateFormatPattern = String
 
 data class DateInput(val display: String, val value: LocalDate?)
+
+data class DateInputFormat(val patternWithDelimiters: String, val delimiter: Char) {
+  val patternWithoutDelimiters: String = patternWithDelimiters.replace(delimiter.toString(), "")
+}
 
 const val DATE_TEXT_INPUT_FIELD = "date_picker_text_field"
