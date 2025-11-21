@@ -57,6 +57,8 @@ import com.google.fhir.model.r4.FhirR4Json
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 import com.google.fhir.model.r4.Resource
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -76,8 +78,6 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readString
 import org.jetbrains.compose.resources.getString
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
@@ -190,8 +190,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
             }
             .also { builder ->
               // Retain the hierarchy and order of items within the questionnaire as specified in
-              // the
-              // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
+              // the standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
               builder.item.addAll(
                 questionnaire.item
                   .filterNot { it.isRepeatedGroup }

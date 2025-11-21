@@ -103,6 +103,7 @@ class QuestionnaireFragment : Fragment() {
   /** @suppress */
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    DataCapture.initialize(requireContext())
     setupViewModelCallbacks()
     setupFragmentResultListeners()
   }

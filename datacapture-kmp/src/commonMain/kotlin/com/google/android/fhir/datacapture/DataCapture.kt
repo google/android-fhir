@@ -17,14 +17,11 @@
 package com.google.android.fhir.datacapture
 
 /** Stores config and global state of the Structured Data Capture Library. */
-data object DataCapture {
-  lateinit var config: DataCaptureConfig
+expect object DataCapture {
 
   /**
    * If client has set a configuration by implementing [DataCaptureConfig.Provider], then it returns
    * that. Otherwise, it returns a default [DataCaptureConfig].
    */
-  fun getConfiguration(): DataCaptureConfig {
-    return config
-  }
+  fun getConfiguration(): DataCaptureConfig
 }

@@ -27,11 +27,11 @@ import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 import com.google.fhir.model.r4.Resource
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import com.google.fhir.model.r4.String as FhirString
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-import com.google.fhir.model.r4.String as FhirString
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 internal const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
 

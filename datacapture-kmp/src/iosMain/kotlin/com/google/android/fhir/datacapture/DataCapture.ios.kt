@@ -16,4 +16,9 @@
 
 package com.google.android.fhir.datacapture
 
-actual fun platform() = "iOS"
+actual object DataCapture {
+  actual fun getConfiguration(): DataCaptureConfig {
+    // TODO Replace default configuration with actual data capture configuration
+    return DataCaptureConfig()
+  }
+}
