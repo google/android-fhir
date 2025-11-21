@@ -16,16 +16,16 @@
 
 package com.google.android.fhir.datacapture.views.compose
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +48,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.toLocalizedString
 import java.time.LocalTime
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TimePickerItem(
   modifier: Modifier = Modifier,
@@ -64,76 +65,75 @@ internal fun TimePickerItem(
   val keyboardController = LocalSoftwareKeyboardController.current
   var selectedTimeTextDisplay by
     remember(timeSelectedDisplay) { mutableStateOf(timeSelectedDisplay ?: "") }
-  var showTimePickerModal by remember { mutableStateOf(false) }
   var timePickerDialogType by remember { mutableStateOf<TimeInputMode>(TimeInputMode.CLOCK) }
+  var expanded by remember { mutableStateOf(false) }
 
-  OutlinedTextField(
-    value = selectedTimeTextDisplay,
-    onValueChange = {},
-    singleLine = true,
-    label = { Text(hint) },
-    modifier =
-      modifier
-        .testTag(TIME_PICKER_INPUT_FIELD)
-        .onFocusChanged {
-          if (!it.isFocused) {
-            keyboardController?.hide()
-          }
-        }
-        .semantics { if (isError) error(supportingHelperText ?: "") },
-    supportingText = { supportingHelperText?.let { Text(it) } },
-    isError = isError,
-    trailingIcon = {
-      IconButton(
-        onClick = {
-          timePickerDialogType = TimeInputMode.CLOCK
-          showTimePickerModal = true
-        },
-        enabled = enabled,
-      ) {
-        Icon(
-          painterResource(R.drawable.gm_schedule_24),
-          contentDescription = stringResource(R.string.select_time),
-        )
+  ExposedDropdownMenuBox(
+    expanded = expanded,
+    onExpandedChange = {
+      if (it) {
+        timePickerDialogType = TimeInputMode.KEYBOARD
       }
+      expanded = it
     },
-    readOnly = true,
-    enabled = enabled,
-    keyboardOptions =
-      KeyboardOptions(
-        autoCorrectEnabled = false,
-        keyboardType = KeyboardType.Number,
-        imeAction = ImeAction.Done,
-      ),
-    keyboardActions =
-      KeyboardActions(
-        onNext = { focusManager.moveFocus(FocusDirection.Down) },
-      ),
-    interactionSource =
-      remember { MutableInteractionSource() }
-        .also { interactionSource ->
-          LaunchedEffect(interactionSource) {
-            interactionSource.interactions.collect {
-              if (it is PressInteraction.Release) {
-                timePickerDialogType = TimeInputMode.KEYBOARD
-                showTimePickerModal = true
-              }
+  ) {
+    OutlinedTextField(
+      value = selectedTimeTextDisplay,
+      onValueChange = {},
+      singleLine = true,
+      label = { Text(hint) },
+      modifier =
+        modifier
+          .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled)
+          .testTag(TIME_PICKER_INPUT_FIELD)
+          .onFocusChanged {
+            if (!it.isFocused) {
+              keyboardController?.hide()
             }
           }
-        },
-  )
+          .semantics { if (isError) error(supportingHelperText ?: "") },
+      supportingText = { supportingHelperText?.let { Text(it) } },
+      isError = isError,
+      trailingIcon = {
+        IconButton(
+          onClick = {
+            timePickerDialogType = TimeInputMode.CLOCK
+            expanded = true
+          },
+          enabled = enabled,
+        ) {
+          Icon(
+            painterResource(R.drawable.gm_schedule_24),
+            contentDescription = stringResource(R.string.select_time),
+          )
+        }
+      },
+      readOnly = true,
+      enabled = enabled,
+      keyboardOptions =
+        KeyboardOptions(
+          autoCorrectEnabled = false,
+          keyboardType = KeyboardType.Number,
+          imeAction = ImeAction.Done,
+        ),
+      keyboardActions =
+        KeyboardActions(
+          onNext = { focusManager.moveFocus(FocusDirection.Down) },
+        ),
+    )
 
-  if (showTimePickerModal) {
-    TimePickerDialog(
-      type = timePickerDialogType,
-      initialSelectedHour = initialStartTime.hour,
-      initialSelectedMinute = initialStartTime.minute,
-      onDismiss = { showTimePickerModal = false },
-    ) { hour, min,
-      ->
-      val localTime = LocalTime.of(hour, min)
-      selectedTimeTextDisplay = localTime.toLocalizedString(context)
-      onTimeChanged(localTime)
+    if (expanded) {
+      TimePickerDialog(
+        type = timePickerDialogType,
+        initialSelectedHour = initialStartTime.hour,
+        initialSelectedMinute = initialStartTime.minute,
+        onDismiss = { expanded = false },
+      ) { hour, min,
+        ->
+        val localTime = LocalTime.of(hour, min)
+        selectedTimeTextDisplay = localTime.toLocalizedString(context)
+        onTimeChanged(localTime)
+      }
     }
   }
 }
