@@ -34,6 +34,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -46,17 +47,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.toLocalDate
 import java.time.LocalDate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,45 +76,78 @@ internal fun DatePickerItem(
 ) {
   val focusManager = LocalFocusManager.current
   val keyboardController = LocalSoftwareKeyboardController.current
-  var dateInputState by remember(dateInput) { mutableStateOf(dateInput) }
-  val dateInputDisplay by
-    remember(dateInputState) {
-      derivedStateOf {
+  val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
+
+  var dateInputDisplay by
+    remember(dateInput) {
+      mutableStateOf(
         TextFieldValue(
-          text = dateInputState.display,
-          selection = TextRange(dateInputFormat.patternWithDelimiters.length),
-        )
-      }
+          text = dateInput.display,
+          selection = TextRange(dateInputFormat.pattern.length),
+        ),
+      )
     }
 
   var showDatePickerModal by remember { mutableStateOf(false) }
-
-  LaunchedEffect(dateInputState) {
-    if (dateInputState != dateInput) {
-      onDateInputEntry(dateInputState)
+  var typingJob by remember { mutableStateOf<Job?>(null) }
+  val postDelayedNewDateInput: (DateInput, Long) -> Unit = remember {
+    { newDateInput, delayInMillis ->
+      typingJob?.cancel() // Cancel previous debounce
+      typingJob =
+        coroutineScope.launch {
+          delay(delayInMillis) // Debounce delay
+          if (newDateInput != dateInput) {
+            onDateInputEntry(newDateInput)
+          }
+        }
     }
   }
 
   OutlinedTextField(
     value = dateInputDisplay,
-    onValueChange = {
-      val text = it.text
-      if (
-        text.length <= dateInputFormat.patternWithoutDelimiters.length &&
-          text.all { char -> char.isDigit() }
-      ) {
-        val trimmedText = text.trim()
-        val localDate =
-          if (
-            trimmedText.isNotBlank() &&
-              trimmedText.length == dateInputFormat.patternWithoutDelimiters.length
-          ) {
-            parseStringToLocalDate(trimmedText, dateInputFormat.patternWithoutDelimiters)
-          } else {
-            null
-          }
-        dateInputState = DateInput(text, localDate)
-      }
+    onValueChange = { textFieldValue ->
+      textFieldValue.text
+        .takeIf {
+          it.length <= dateInputFormat.pattern.length &&
+            it.all { char -> char.isDigit() || char == dateInputFormat.delimiter }
+        }
+        ?.let {
+          val isDeletion = it.length < dateInputDisplay.text.length
+          val formattedText =
+            if (!dateInputFormat.delimiterExistsInPattern || isDeletion) {
+              it
+            } else {
+              StringBuilder(it)
+                .apply {
+                  if (
+                    this.length > dateInputFormat.delimiterFirstIndex &&
+                      get(dateInputFormat.delimiterFirstIndex) != dateInputFormat.delimiter
+                  ) {
+                    insert(dateInputFormat.delimiterFirstIndex, dateInputFormat.delimiter)
+                  }
+                  if (
+                    this.length > dateInputFormat.delimiterLastIndex &&
+                      dateInputFormat.delimiterLastIndex > dateInputFormat.delimiterFirstIndex &&
+                      get(dateInputFormat.delimiterLastIndex) != dateInputFormat.delimiter
+                  ) {
+                    insert(dateInputFormat.delimiterLastIndex, dateInputFormat.delimiter)
+                  }
+                }
+                .toString()
+            }
+          val localDate =
+            if (formattedText.length == dateInputFormat.pattern.length) {
+              parseStringToLocalDate(formattedText, dateInputFormat.pattern)
+            } else {
+              null
+            }
+          dateInputDisplay =
+            dateInputDisplay.copy(
+              text = formattedText,
+              selection = TextRange(dateInputFormat.pattern.length),
+            )
+          postDelayedNewDateInput(DateInput(formattedText, localDate), HANDLE_INPUT_DEBOUNCE_TIME)
+        }
     },
     singleLine = true,
     label = { Text(labelText) },
@@ -147,25 +181,6 @@ internal fun DatePickerItem(
       KeyboardActions(
         onNext = { focusManager.moveFocus(FocusDirection.Down) },
       ),
-    visualTransformation =
-      if (!dateInputFormat.delimiterExistsInPattern) {
-        VisualTransformation.None
-      } else {
-        VisualTransformation { originalText ->
-          val text = buildAnnotatedString {
-            originalText.forEachIndexed { index, ch ->
-              append(ch)
-              if (
-                index + 1 == dateInputFormat.delimiterFirstIndex ||
-                  index + 2 == dateInputFormat.delimiterLastIndex
-              ) {
-                append(dateInputFormat.delimiter)
-              }
-            }
-          }
-          TransformedText(text, dateInputFormat.offsetMapping)
-        }
-      },
   )
 
   if (selectableDates != null && showDatePickerModal) {
@@ -174,11 +189,18 @@ internal fun DatePickerItem(
       selectableDates,
       onDateSelected = { dateMillis ->
         dateMillis?.toLocalDate()?.let {
-          dateInputState =
+          val dateDisplay = it.format(dateInputFormat.pattern)
+          dateInputDisplay =
+            dateInputDisplay.copy(
+              text = dateDisplay,
+              selection = TextRange(dateInputFormat.pattern.length),
+            )
+          val newDateInput =
             DateInput(
-              display = it.format(dateInputFormat.patternWithoutDelimiters),
+              display = dateDisplay,
               value = it,
             )
+          postDelayedNewDateInput(newDateInput, 0L)
         }
       },
     ) {
@@ -230,35 +252,11 @@ typealias DateFormatPattern = String
 
 data class DateInput(val display: String, val value: LocalDate?)
 
-data class DateInputFormat(val patternWithDelimiters: String, val delimiter: Char) {
-  val patternWithoutDelimiters: String = patternWithDelimiters.replace(delimiter.toString(), "")
+data class DateInputFormat(val pattern: String, val delimiter: Char) {
 
-  val delimiterFirstIndex: Int = patternWithDelimiters.indexOf(delimiter)
-  val delimiterLastIndex: Int = patternWithDelimiters.lastIndexOf(delimiter)
+  val delimiterFirstIndex: Int = pattern.indexOf(delimiter)
+  val delimiterLastIndex: Int = pattern.lastIndexOf(delimiter)
   val delimiterExistsInPattern = delimiterFirstIndex != -1 && delimiterLastIndex != -1
-
-  val offsetMapping =
-    object : OffsetMapping {
-      override fun originalToTransformed(offset: Int): Int {
-        return when {
-          delimiterExistsInPattern &&
-            offset >= delimiterLastIndex &&
-            delimiterLastIndex > delimiterFirstIndex -> offset + 2
-          delimiterExistsInPattern && offset >= delimiterFirstIndex -> offset + 1
-          else -> offset
-        }
-      }
-
-      override fun transformedToOriginal(offset: Int): Int {
-        return when {
-          delimiterExistsInPattern &&
-            offset >= delimiterLastIndex &&
-            offset > delimiterFirstIndex -> offset - 2
-          delimiterExistsInPattern && offset >= delimiterFirstIndex -> offset - 1
-          else -> offset
-        }
-      }
-    }
 }
 
 const val DATE_TEXT_INPUT_FIELD = "date_picker_text_field"

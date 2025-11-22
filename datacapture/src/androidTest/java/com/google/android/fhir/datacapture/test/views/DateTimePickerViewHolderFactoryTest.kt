@@ -171,9 +171,7 @@ class DateTimePickerViewHolderFactoryTest {
       )
     viewHolder.bind(itemViewItem)
 
-    composeTestRule
-      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
-      .performTextReplacement("11192020") // transforms to 11/19/2020 in the date widget
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("11/19/2020")
     composeTestRule.waitUntil { answer != null }
 
     val dateTime = answer!!.value as DateTimeType
@@ -199,9 +197,7 @@ class DateTimePickerViewHolderFactoryTest {
       )
     viewHolder.bind(itemViewItem)
 
-    composeTestRule
-      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
-      .performTextReplacement("20201119") // transforms to 2020/11/19 in the date widget
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("2020/11/19")
     composeTestRule.waitUntil { answer != null }
 
     val dateTime = answer!!.value as DateTimeType
@@ -255,13 +251,11 @@ class DateTimePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
     viewHolder.bind(itemViewItem)
-    composeTestRule
-      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
-      .performTextReplacement("202011") // transforms to 2020/11 for Locale.JAPAN
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("2020/11")
 
     composeTestRule
       .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
-      .assertTextEquals("2020/11/")
+      .assertTextEquals("2020/11")
   }
 
   @Test
@@ -335,13 +329,13 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        draftAnswer = "0207", // transforms to 02/07 for default locale
+        draftAnswer = "02/07",
       )
 
     viewHolder.bind(questionnaireItem)
     composeTestRule
       .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
-      .assertTextEquals("02/07/")
+      .assertTextEquals("02/07")
   }
 
   @Test
@@ -352,13 +346,13 @@ class DateTimePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        draftAnswer = "0207", // transforms to 02/07 for default locale
+        draftAnswer = "02/07",
       )
 
     viewHolder.bind(questionnaireItem)
     composeTestRule
       .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
-      .assertTextEquals("02/07/")
+      .assertTextEquals("02/07")
 
     questionnaireItem =
       QuestionnaireViewItem(

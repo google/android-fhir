@@ -72,6 +72,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
@@ -231,99 +232,113 @@ class QuestionnaireUiEspressoTest {
   fun dateTimePicker_shouldShowErrorForWrongDate() {
     buildFragmentFromQuestionnaire("/component_date_time_picker.json")
 
-    // Add month and day. No need to add slashes as they are added automatically
-    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("0105")
+    runBlocking {
+      // Add month and day. No need to add slashes as they are added automatically
+      composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("0105")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
 
-    composeTestRule
-      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
-      .assert(
-        SemanticsMatcher.expectValue(
-          SemanticsProperties.Error,
-          "Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)",
-        ),
-      )
-    composeTestRule.onNodeWithTag(TIME_PICKER_INPUT_FIELD).assertIsNotEnabled()
+      composeTestRule
+        .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+        .assert(
+          SemanticsMatcher.expectValue(
+            SemanticsProperties.Error,
+            "Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)",
+          ),
+        )
+      composeTestRule.onNodeWithTag(TIME_PICKER_INPUT_FIELD).assertIsNotEnabled()
+    }
   }
 
   @Test
   fun dateTimePicker_shouldEnableTimePickerWithCorrectDate_butNotSaveInQuestionnaireResponse() {
     buildFragmentFromQuestionnaire("/component_date_time_picker.json")
 
-    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("01052005")
+    runBlocking {
+      composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("01052005")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
 
-    composeTestRule
-      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
-      .assert(
-        SemanticsMatcher.keyNotDefined(
-          SemanticsProperties.Error,
-        ),
-      )
-    composeTestRule.onNodeWithTag(TIME_PICKER_INPUT_FIELD).assertIsEnabled()
+      composeTestRule
+        .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+        .assert(
+          SemanticsMatcher.keyNotDefined(
+            SemanticsProperties.Error,
+          ),
+        )
+      composeTestRule.onNodeWithTag(TIME_PICKER_INPUT_FIELD).assertIsEnabled()
 
-    val questionnaireResponse = runBlocking { getQuestionnaireResponse() }
-    assertThat(questionnaireResponse.item.size).isEqualTo(1)
-    assertThat(questionnaireResponse.item.first().answer.size).isEqualTo(1)
-    val answer = questionnaireResponse.item.first().answer.first().valueDateTimeType
-    assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 0, 0))
+      val questionnaireResponse = getQuestionnaireResponse()
+      assertThat(questionnaireResponse.item.size).isEqualTo(1)
+      assertThat(questionnaireResponse.item.first().answer.size).isEqualTo(1)
+      val answer = questionnaireResponse.item.first().answer.first().valueDateTimeType
+      assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 0, 0))
+    }
   }
 
   @Test
   fun dateTimePicker_shouldSetAnswerWhenDateAndTimeAreFilled() {
     buildFragmentFromQuestionnaire("/component_date_time_picker.json")
 
-    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("01052005")
+    runBlocking {
+      composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("01052005")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
+      composeTestRule
+        .onNodeWithTag(TIME_PICKER_INPUT_FIELD)
+        .onChildren()
+        .filterToOne(
+          SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button),
+        )
+        .performClick()
 
-    composeTestRule
-      .onNodeWithTag(TIME_PICKER_INPUT_FIELD)
-      .onChildren()
-      .filterToOne(
-        SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button),
-      )
-      .performClick()
+      composeTestRule.onNodeWithText("AM").performClick()
+      composeTestRule.onNodeWithContentDescription("Select hour", substring = true).performClick()
+      composeTestRule.onNodeWithContentDescription("6 o'clock", substring = true).performClick()
 
-    composeTestRule.onNodeWithText("AM").performClick()
-    composeTestRule.onNodeWithContentDescription("Select hour", substring = true).performClick()
-    composeTestRule.onNodeWithContentDescription("6 o'clock", substring = true).performClick()
+      composeTestRule
+        .onNodeWithContentDescription("Select minutes", substring = true)
+        .performClick()
+      composeTestRule.onNodeWithContentDescription("10 minutes", substring = true).performClick()
 
-    composeTestRule.onNodeWithContentDescription("Select minutes", substring = true).performClick()
-    composeTestRule.onNodeWithContentDescription("10 minutes", substring = true).performClick()
+      composeTestRule.onNodeWithText("OK").performClick()
+      // Synchronize
+      composeTestRule.waitForIdle()
 
-    composeTestRule.onNodeWithText("OK").performClick()
-    // Synchronize
-    composeTestRule.waitForIdle()
-
-    val questionnaireResponse = runBlocking { getQuestionnaireResponse() }
-    val answer = questionnaireResponse.item.first().answer.first().valueDateTimeType
-    // check Locale
-    assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
+      val questionnaireResponse = getQuestionnaireResponse()
+      val answer = questionnaireResponse.item.first().answer.first().valueDateTimeType
+      // check Locale
+      assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
+    }
   }
 
   @Test
   fun datePicker_shouldShowErrorForWrongDate() {
     buildFragmentFromQuestionnaire("/component_date_picker.json")
 
-    // Add month and day. No need to add slashes as they are added automatically
-    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput("0105")
-    composeTestRule
-      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
-      .assert(
-        SemanticsMatcher.expectValue(
-          SemanticsProperties.Error,
-          "Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)",
-        ),
-      )
+    runBlocking {
+      // Add month and day. No need to add slashes as they are added automatically
+      composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput("0105")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
+      composeTestRule
+        .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+        .assert(
+          SemanticsMatcher.expectValue(
+            SemanticsProperties.Error,
+            "Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)",
+          ),
+        )
+    }
   }
 
   @Test
   fun datePicker_shouldSaveInQuestionnaireResponseWhenCorrectDateEntered() {
     buildFragmentFromQuestionnaire("/component_date_picker.json")
 
-    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput("01052005")
-    composeTestRule
-      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
-      .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Error))
-
     runBlocking {
+      composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput("01052005")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
+      composeTestRule
+        .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+        .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Error))
+
       val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType
       assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
     }
@@ -579,19 +594,25 @@ class QuestionnaireUiEspressoTest {
   @Test
   fun clearAllAnswers_shouldClearDraftAnswer() {
     val questionnaireFragment = buildFragmentFromQuestionnaire("/component_date_picker.json")
-    // Add month and day. No need to add slashes as they are added automatically
-    composeTestRule
-      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
-      .performTextInput("0105")
-    composeTestRule
-      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
-      .assertTextEquals("01/05/")
 
-    questionnaireFragment.clearAllAnswers()
+    runBlocking {
+      // Add month and day. No need to add slashes as they are added automatically
+      composeTestRule
+        .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+        .performTextInput("0105")
+      composeTestRule
+        .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+        .assertTextEquals("01/05")
+      delay(1.seconds) // Add delay to give time for new questionnaire state
+      composeTestRule.awaitIdle()
 
-    composeTestRule
-      .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
-      .assertTextEquals("")
+      questionnaireFragment.clearAllAnswers()
+      composeTestRule.awaitIdle()
+
+      composeTestRule
+        .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+        .assertTextEquals("")
+    }
   }
 
   @Test

@@ -223,8 +223,7 @@ class DatePickerViewHolderFactoryTest {
       )
 
     viewHolder.bind(item)
-    val dateTextInput = "11192020" // is transformed to 11/19/2020 in the date widget
-    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput(dateTextInput)
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput("11/19/2020")
     composeTestRule.waitUntil { answers != null }
 
     val answer = answers!!.single().value as DateType
@@ -246,7 +245,7 @@ class DatePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, result, _ -> answers = result },
       )
     viewHolder.bind(item)
-    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput("20201119")
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput("2020/11/19")
     composeTestRule.waitUntil { answers != null }
     val answer = answers!!.single().value as DateType
 
@@ -303,15 +302,14 @@ class DatePickerViewHolderFactoryTest {
     composeTestRule
       .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
       .assertTextEquals("11/19/2020")
-    val dateTextInput = "1119" // transforms to 11/19 in the datePicker widget
     composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performSemanticsAction(
       SemanticsActions.SetText,
     ) {
-      it(dateTextInput.toAnnotatedString())
+      it("11/19".toAnnotatedString())
     }
     composeTestRule
       .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
-      .assertTextEquals("11/19/")
+      .assertTextEquals("11/19")
   }
 
   @Test
@@ -388,13 +386,13 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        draftAnswer = "0207",
+        draftAnswer = "02/07",
       )
 
     viewHolder.bind(questionnaireItem)
     composeTestRule
       .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
-      .assertTextEquals("02/07/")
+      .assertTextEquals("02/07")
   }
 
   @Test
@@ -406,13 +404,13 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        draftAnswer = "0207",
+        draftAnswer = "02/07",
       )
 
     viewHolder.bind(questionnaireItem)
     composeTestRule
       .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
-      .assertTextEquals("02/07/")
+      .assertTextEquals("02/07")
 
     questionnaireItem =
       QuestionnaireViewItem(

@@ -129,7 +129,7 @@ internal object DateTimePickerViewHolderFactory : QuestionnaireItemComposeViewHo
           remember(questionnaireViewItem) { questionnaireViewItem.draftAnswer as? String }
         val dateInput =
           remember(dateInputFormat, questionnaireItemViewItemDate, draftAnswer) {
-            questionnaireItemViewItemDate?.format(dateInputFormat.patternWithoutDelimiters)?.let {
+            questionnaireItemViewItemDate?.format(dateInputFormat.pattern)?.let {
               DateInput(it, questionnaireItemViewItemDate)
             }
               ?: DateInput(display = draftAnswer ?: "", null)
@@ -191,6 +191,7 @@ internal object DateTimePickerViewHolderFactory : QuestionnaireItemComposeViewHo
               parseStringToLocalDate = { str, pattern -> parseLocalDateOrNull(str, pattern) },
               onDateInputEntry = {
                 val (display, date) = it
+                println("Yellow: $display == $date")
                 coroutineScope.launch {
                   if (date != null) {
                     val dateTime =

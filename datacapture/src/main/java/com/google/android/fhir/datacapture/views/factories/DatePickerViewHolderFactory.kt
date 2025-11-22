@@ -98,12 +98,14 @@ internal object DatePickerViewHolderFactory : QuestionnaireItemComposeViewHolder
             questionnaireItemAnswerDateInMillis ?: MaterialDatePicker.todayInUtcMilliseconds()
           }
         val draftAnswer =
-          remember(questionnaireViewItem) { questionnaireViewItem.draftAnswer as? String }
+          remember(questionnaireViewItem.draftAnswer) {
+            questionnaireViewItem.draftAnswer as? String
+          }
         val dateInput =
           remember(dateInputFormat, questionnaireItemAnswerLocalDate, draftAnswer) {
-            questionnaireItemAnswerLocalDate
-              ?.format(dateInputFormat.patternWithoutDelimiters)
-              ?.let { DateInput(it, questionnaireItemAnswerLocalDate) }
+            questionnaireItemAnswerLocalDate?.format(dateInputFormat.pattern)?.let {
+              DateInput(it, questionnaireItemAnswerLocalDate)
+            }
               ?: DateInput(display = draftAnswer ?: "", null)
           }
 
@@ -168,7 +170,7 @@ internal object DatePickerViewHolderFactory : QuestionnaireItemComposeViewHolder
                   parseDateOnTextChanged(
                     questionnaireViewItem,
                     display,
-                    dateInputFormat.patternWithoutDelimiters,
+                    dateInputFormat.pattern,
                   )
                 }
               }
