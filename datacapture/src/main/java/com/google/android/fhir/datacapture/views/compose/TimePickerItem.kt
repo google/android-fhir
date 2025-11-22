@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views.compose
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -69,6 +70,7 @@ internal fun TimePickerItem(
   var expanded by remember { mutableStateOf(false) }
 
   ExposedDropdownMenuBox(
+    modifier = modifier,
     expanded = expanded,
     onExpandedChange = {
       if (it) {
@@ -83,7 +85,7 @@ internal fun TimePickerItem(
       singleLine = true,
       label = { Text(hint) },
       modifier =
-        modifier
+        Modifier.fillMaxWidth()
           .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled)
           .testTag(TIME_PICKER_INPUT_FIELD)
           .onFocusChanged {
