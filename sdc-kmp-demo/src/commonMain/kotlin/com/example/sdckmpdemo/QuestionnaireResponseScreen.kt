@@ -1,5 +1,6 @@
 package com.example.sdckmpdemo
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,9 +68,12 @@ fun QuestionnaireResponseScreen(
           Text(
             text = responseJson,
             style = MaterialTheme.typography.bodyMedium.copy(
-              fontFamily = FontFamily.Monospace
+              fontFamily = FontFamily.Monospace,
+              fontSize = 12.sp
             ),
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+              .padding(16.dp)
+              .horizontalScroll(rememberScrollState())
           )
         }
       }
