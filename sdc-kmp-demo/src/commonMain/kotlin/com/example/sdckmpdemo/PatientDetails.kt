@@ -1,11 +1,14 @@
 package com.example.sdckmpdemo
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +40,7 @@ fun PatientDetails(
     viewModel: PatientViewModel,
     id: String,
     onBackClick: () -> Unit,
+    navigateToQuestionnaire: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
   val patients by viewModel.patients.collectAsState()
@@ -76,6 +80,15 @@ fun PatientDetails(
           )
           LabeledInfoMultiLine(stringResource(Res.string.label_address), patient.address.addresses)
         }
+      }
+
+      Spacer(modifier = Modifier.height(16.dp))
+
+      Button(
+        onClick = navigateToQuestionnaire,
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Text("Fill Questionnaire")
       }
     }
   }

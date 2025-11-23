@@ -1,7 +1,7 @@
 package com.example.sdckmpdemo
 
-import com.google.fhir.model.r5.FhirR5Json
-import com.google.fhir.model.r5.Patient
+import com.google.fhir.model.r4.FhirR4Json
+import com.google.fhir.model.r4.Patient
 import android_fhir.sdc_kmp_demo.generated.resources.Res
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +26,7 @@ class PatientViewModel {
       val jsonString = Res.readBytes("files/list.json").decodeToString()
       val jsonArray = json.parseToJsonElement(jsonString) as JsonArray
       val patients = jsonArray.map { patientJson ->
-        FhirR5Json().decodeFromString(json.encodeToString(patientJson)) as Patient
+        FhirR4Json().decodeFromString(json.encodeToString(patientJson)) as Patient
       }
       _patients.update { patients }
     }

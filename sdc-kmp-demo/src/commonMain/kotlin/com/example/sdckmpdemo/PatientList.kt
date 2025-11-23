@@ -31,7 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.google.fhir.model.r5.Patient
+import com.google.fhir.model.r4.Patient
 
 @Composable
 fun PatientList(

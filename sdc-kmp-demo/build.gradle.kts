@@ -100,6 +100,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.navigation.compose)
+            implementation(project(":datacapture-kmp"))
         }
     }
 }

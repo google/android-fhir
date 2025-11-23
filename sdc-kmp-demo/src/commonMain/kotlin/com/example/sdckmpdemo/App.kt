@@ -9,14 +9,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.sdckmpdemo.ui.theme.AppTheme
-import com.google.fhir.model.r5.Address
-import com.google.fhir.model.r5.HumanName
+import com.google.fhir.model.r4.Address
+import com.google.fhir.model.r4.HumanName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Serializable object PatientListDestination
 
 @Serializable data class PatientDetailDestination(val id: String)
+
+@Serializable object QuestionnaireDestination
 
 @Composable
 @Preview
@@ -38,6 +40,12 @@ fun App() {
             PatientDetails(
                 viewModel = viewModel,
                 id = backStackEntry.toRoute<PatientDetailDestination>().id,
+                onBackClick = { navController.popBackStack() },
+                navigateToQuestionnaire = { navController.navigate(QuestionnaireDestination) },
+            )
+        }
+        composable<QuestionnaireDestination> {
+            QuestionnaireScreen(
                 onBackClick = { navController.popBackStack() },
             )
         }
