@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun QuestionnaireScreen(
   onBackClick: () -> Unit,
+  navigateToResponse: (String) -> Unit,
   modifier: Modifier = Modifier,
 ) {
   var questionnaireJson by remember { mutableStateOf<String?>(null) }
@@ -59,9 +60,8 @@ fun QuestionnaireScreen(
           showCancelButton = true,
           onSubmit = { response ->
             val responseJson = fhirJson.encodeToString(response)
-            println("Questionnaire submitted: $responseJson")
             scope.launch {
-              onBackClick()
+              navigateToResponse(responseJson)
             }
           },
           onCancel = {

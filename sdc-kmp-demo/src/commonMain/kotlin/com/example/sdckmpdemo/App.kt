@@ -20,6 +20,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Serializable object QuestionnaireDestination
 
+@Serializable data class QuestionnaireResponseDestination(val responseJson: String)
+
 @Composable
 @Preview
 fun App() {
@@ -46,6 +48,15 @@ fun App() {
         }
         composable<QuestionnaireDestination> {
             QuestionnaireScreen(
+                onBackClick = { navController.popBackStack() },
+                navigateToResponse = { responseJson ->
+                    navController.navigate(QuestionnaireResponseDestination(responseJson))
+                },
+            )
+        }
+        composable<QuestionnaireResponseDestination> { backStackEntry ->
+            QuestionnaireResponseScreen(
+                responseJson = backStackEntry.toRoute<QuestionnaireResponseDestination>().responseJson,
                 onBackClick = { navController.popBackStack() },
             )
         }
