@@ -25,6 +25,8 @@ dependencies {
   implementation(plugin(libs.plugins.compose.hotreload))
   implementation(plugin(libs.plugins.compose.multiplatform))
   implementation(plugin(libs.plugins.kotlin.multiplatform))
+  implementation(plugin(libs.plugins.android.application.build.src))
+  implementation(plugin(libs.plugins.kotlin.serialization.build.src))
 }
 
 fun DependencyHandler.plugin(plugin: Provider<PluginDependency>) =

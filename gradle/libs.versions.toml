@@ -216,6 +216,7 @@ androidx-tracing = ["androidx-tracing-tracing", "androidx-tracing-tracing-androi
 
 [plugins]
 android-application = { id = "com.android.application" }
+android-application-build-src = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-library = { id = "com.android.library" }
 android-test = { id = "com.android.test" }
 androidx-benchmark = { id = "androidx.benchmark" }
@@ -228,6 +229,7 @@ fladle = { id = "com.osacky.fladle" }
 kotlin-android = { id = "org.jetbrains.kotlin.android" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization" }
+kotlin-serialization-build-src = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 ruler = { id = "com.spotify.ruler" }
