@@ -21,6 +21,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.google.android.fhir.datacapture.QuestionnaireUI
+import com.google.fhir.model.r4.FhirR4Json
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +32,7 @@ fun QuestionnaireScreen(
 ) {
   var questionnaireJson by remember { mutableStateOf<String?>(null) }
   val scope = rememberCoroutineScope()
+  val fhirJson = remember { FhirR4Json() }
 
   // Load questionnaire JSON from resources
   LaunchedEffect(Unit) {
@@ -56,8 +58,8 @@ fun QuestionnaireScreen(
           showSubmitButton = true,
           showCancelButton = true,
           onSubmit = { response ->
-            // Log the response and navigate back
-            println("Questionnaire submitted: $response")
+            val responseJson = fhirJson.encodeToString(response)
+            println("Questionnaire submitted: $responseJson")
             scope.launch {
               onBackClick()
             }
