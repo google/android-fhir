@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.google.fhir.model.r4.Decimal
 import com.google.fhir.model.r4.QuestionnaireResponse
+import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 
 internal object EditTextDecimalViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
 
@@ -45,7 +46,7 @@ internal object EditTextDecimalViewHolderFactory : QuestionnaireItemComposeViewH
         inputText.toDoubleOrNull()?.let {
           questionnaireViewItem.setAnswer(
             QuestionnaireResponse.Item.Answer(
-              value = QuestionnaireResponse.Item.Answer.Value.Decimal(Decimal(it.toString())),
+              value = QuestionnaireResponse.Item.Answer.Value.Decimal(Decimal(value = it.toBigDecimal())),
             ),
           )
         }

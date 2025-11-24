@@ -45,7 +45,7 @@ internal fun createEditTextStringViewHolderDelegate(multiLine: Boolean = false) 
       } else {
         questionnaireViewItem.setAnswer(
           QuestionnaireResponse.Item.Answer(
-            value = QuestionnaireResponse.Item.Answer.Value.String(FhirString(inputText)),
+            value = QuestionnaireResponse.Item.Answer.Value.String(FhirString(value = inputText)),
           ),
         )
       }
