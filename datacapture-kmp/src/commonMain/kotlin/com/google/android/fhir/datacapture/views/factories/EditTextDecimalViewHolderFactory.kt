@@ -36,9 +36,9 @@ internal object EditTextDecimalViewHolderFactory : QuestionnaireItemComposeViewH
         val draftAnswer = it.draftAnswer?.toString()
 
         when {
-          questionnaireItemViewItemDecimalAnswer != null && draftAnswer.isNullOrEmpty() -> ""
+          questionnaireItemViewItemDecimalAnswer == null && draftAnswer.isNullOrEmpty() -> ""
           questionnaireItemViewItemDecimalAnswer != null ->
-            questionnaireItemViewItemDecimalAnswer.value.toString()
+            questionnaireItemViewItemDecimalAnswer.value.value.toString()
           else -> draftAnswer
         }
       },
