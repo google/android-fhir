@@ -1,0 +1,38 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "sample-questionnaire",
+  "status": "active",
+  "title": "Sample Information Form",
+  "item": [
+    {
+      "linkId": "name",
+      "type": "string",
+      "text": "Name",
+      "required": true
+    },
+    {
+      "linkId": "age",
+      "type": "integer",
+      "text": "Age",
+      "required": false
+    },
+    {
+      "linkId": "height",
+      "type": "decimal",
+      "text": "Height (meters)",
+      "required": false
+    },
+    {
+      "linkId": "weight",
+      "type": "decimal",
+      "text": "Weight (kg)",
+      "required": false
+    },
+    {
+      "linkId": "notes",
+      "type": "text",
+      "text": "Additional Notes",
+      "required": false
+    }
+  ]
+}

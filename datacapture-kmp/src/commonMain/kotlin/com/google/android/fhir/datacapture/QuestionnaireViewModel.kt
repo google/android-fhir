@@ -386,6 +386,12 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
           }
         }
       }
+
+      (questionnaireResponseItem.answer as? MutableList)?.let { answerList ->
+        answerList.clear()
+        answerList.addAll(answers)
+      }
+
       if (questionnaireItem.shouldHaveNestedItemsUnderAnswers) {
         questionnaireResponseItem.toBuilder().copyNestedItemsToChildlessAnswers(questionnaireItem)
 
