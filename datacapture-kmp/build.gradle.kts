@@ -1,4 +1,7 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
   id("org.jetbrains.kotlin.multiplatform")
@@ -49,6 +52,13 @@ kotlin {
   iosArm64 { binaries.framework { baseName = xcfName } }
 
   iosSimulatorArm64 { binaries.framework { baseName = xcfName } }
+
+  wasmJs {
+    browser()
+    binaries.executable()
+  }
+
+  jvm("desktop") { compilations.all { kotlinOptions.jvmTarget = "21" } }
 
   // Source set declarations.
   // Declaring a target automatically creates a source set with the same name. By default, the

@@ -16,24 +16,17 @@
 
 package com.example.sdckmpdemo
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPlacement
+import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.window.application
 
-class MainActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    enableEdgeToEdge()
-    super.onCreate(savedInstanceState)
-
-    setContent { App() }
+fun main() = application {
+  Window(
+    onCloseRequest = ::exitApplication,
+    title = "SDC Demo",
+    state = WindowState(placement = WindowPlacement.Maximized),
+  ) {
+    App()
   }
-}
-
-@Preview
-@Composable
-fun AppAndroidPreview() {
-  App()
 }

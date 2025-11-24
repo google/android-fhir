@@ -1,3 +1,19 @@
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.example.sdckmpdemo
 
 import android_fhir.sdc_kmp_demo.generated.resources.Res
@@ -20,7 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.google.android.fhir.datacapture.QuestionnaireUI
+import com.google.android.fhir.datacapture.Questionnaire
 import com.google.fhir.model.r4.FhirR4Json
 import kotlinx.coroutines.launch
 
@@ -29,7 +45,6 @@ import kotlinx.coroutines.launch
 fun QuestionnaireScreen(
   onBackClick: () -> Unit,
   navigateToResponse: (String) -> Unit,
-  modifier: Modifier = Modifier,
 ) {
   var questionnaireJson by remember { mutableStateOf<String?>(null) }
   val scope = rememberCoroutineScope()
@@ -48,30 +63,27 @@ fun QuestionnaireScreen(
           IconButton(onClick = onBackClick) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
           }
-        }
+        },
       )
-    }
+    },
   ) { paddingValues ->
     Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
       questionnaireJson?.let { json ->
-        QuestionnaireUI(
+        Questionnaire(
           questionnaireJson = json,
           showSubmitButton = true,
           showCancelButton = true,
           onSubmit = { response ->
             val responseJson = fhirJson.encodeToString(response)
-            scope.launch {
-              navigateToResponse(responseJson)
-            }
+            scope.launch { navigateToResponse(responseJson) }
           },
           onCancel = {
             // Navigate back on cancel
             onBackClick()
-          }
+          },
         )
-      } ?: run {
-        Text("Loading questionnaire...")
       }
+        ?: run { Text("Loading questionnaire...") }
     }
   }
 }

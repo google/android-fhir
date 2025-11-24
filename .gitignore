@@ -45,6 +45,7 @@ captures/
 .classpath
 .project
 .settings
+.vscode
 
 # Keystore files
 # Uncomment the following lines if you do not want to check your keystore files in.
@@ -101,4 +102,6 @@ docs/use/api/*/**
 # Synthea
 synthea
 
-.vscode
+ ### Kotlin/JS
+ kotlin-js-store/
+ node_modules/

@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
  *
  * Example usage:
  * ```
- * QuestionnaireUI(
+ * Questionnaire(
  *   questionnaireJson = myQuestionnaireJson,
  *   showSubmitButton = true,
  *   showCancelButton = true,
@@ -61,7 +61,7 @@ import kotlinx.coroutines.launch
  * ```
  */
 @Composable
-fun QuestionnaireUI(
+fun Questionnaire(
   questionnaireJson: String,
   questionnaireResponseJson: String? = null,
   showSubmitButton: Boolean = true,
@@ -76,35 +76,34 @@ fun QuestionnaireUI(
   onSubmit: suspend (QuestionnaireResponse) -> Unit,
   onCancel: () -> Unit,
 ) {
-  val stateMap = remember(
-    questionnaireJson,
-    questionnaireResponseJson,
-    showSubmitButton,
-    showCancelButton,
-    showReviewPage,
-    isReadOnly,
-    showAsterisk,
-    showRequiredText,
-    showOptionalText,
-    submitButtonText,
-  ) {
-    buildMap<String, Any> {
-      put(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireJson)
-      questionnaireResponseJson?.let { put(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, it) }
-      put(EXTRA_SHOW_SUBMIT_BUTTON, showSubmitButton)
-      put(EXTRA_SHOW_CANCEL_BUTTON, showCancelButton)
-      put(EXTRA_ENABLE_REVIEW_PAGE, showReviewPage)
-      put(EXTRA_READ_ONLY, isReadOnly)
-      put(EXTRA_SHOW_ASTERISK_TEXT, showAsterisk)
-      put(EXTRA_SHOW_REQUIRED_TEXT, showRequiredText)
-      put(EXTRA_SHOW_OPTIONAL_TEXT, showOptionalText)
-      submitButtonText?.let { put(EXTRA_SUBMIT_BUTTON_TEXT, it) }
+  val stateMap =
+    remember(
+      questionnaireJson,
+      questionnaireResponseJson,
+      showSubmitButton,
+      showCancelButton,
+      showReviewPage,
+      isReadOnly,
+      showAsterisk,
+      showRequiredText,
+      showOptionalText,
+      submitButtonText,
+    ) {
+      buildMap<String, Any> {
+        put(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireJson)
+        questionnaireResponseJson?.let { put(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, it) }
+        put(EXTRA_SHOW_SUBMIT_BUTTON, showSubmitButton)
+        put(EXTRA_SHOW_CANCEL_BUTTON, showCancelButton)
+        put(EXTRA_ENABLE_REVIEW_PAGE, showReviewPage)
+        put(EXTRA_READ_ONLY, isReadOnly)
+        put(EXTRA_SHOW_ASTERISK_TEXT, showAsterisk)
+        put(EXTRA_SHOW_REQUIRED_TEXT, showRequiredText)
+        put(EXTRA_SHOW_OPTIONAL_TEXT, showOptionalText)
+        submitButtonText?.let { put(EXTRA_SUBMIT_BUTTON_TEXT, it) }
+      }
     }
-  }
 
-  val viewModel: QuestionnaireViewModel = viewModel {
-    QuestionnaireViewModel(stateMap)
-  }
+  val viewModel: QuestionnaireViewModel = viewModel { QuestionnaireViewModel(stateMap) }
 
   val scope = rememberCoroutineScope()
 
@@ -116,12 +115,11 @@ fun QuestionnaireUI(
       }
     }
 
-    viewModel.setOnCancelButtonClickListener {
-      onCancel()
-    }
+    viewModel.setOnCancelButtonClickListener { onCancel() }
   }
 
-  val effectiveMatchersProvider = matchersProvider ?: EmptyQuestionnaireItemViewHolderFactoryMatchersProvider
+  val effectiveMatchersProvider =
+    matchersProvider ?: EmptyQuestionnaireItemViewHolderFactoryMatchersProvider
 
   QuestionnaireScreen(
     viewModel = viewModel,
@@ -130,8 +128,8 @@ fun QuestionnaireUI(
 }
 
 /**
- * Default empty implementation of QuestionnaireItemViewHolderFactoryMatchersProvider
- * that provides no custom matchers.
+ * Default empty implementation of QuestionnaireItemViewHolderFactoryMatchersProvider that provides
+ * no custom matchers.
  */
 private object EmptyQuestionnaireItemViewHolderFactoryMatchersProvider :
   QuestionnaireItemViewHolderFactoryMatchersProvider() {
