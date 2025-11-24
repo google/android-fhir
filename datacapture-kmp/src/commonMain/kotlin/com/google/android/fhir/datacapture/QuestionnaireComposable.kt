@@ -76,7 +76,6 @@ fun QuestionnaireUI(
   onSubmit: suspend (QuestionnaireResponse) -> Unit,
   onCancel: () -> Unit,
 ) {
-  // Build the state map for QuestionnaireViewModel
   val stateMap = remember(
     questionnaireJson,
     questionnaireResponseJson,
@@ -103,15 +102,12 @@ fun QuestionnaireUI(
     }
   }
 
-  // Create the ViewModel with the state map
   val viewModel: QuestionnaireViewModel = viewModel {
     QuestionnaireViewModel(stateMap)
   }
 
-  // Create a coroutine scope for callbacks
   val scope = rememberCoroutineScope()
 
-  // Set up callbacks
   LaunchedEffect(viewModel, onSubmit, onCancel) {
     viewModel.setOnSubmitButtonClickListener {
       scope.launch {
@@ -125,10 +121,8 @@ fun QuestionnaireUI(
     }
   }
 
-  // Use the provided matchers provider or default empty one
   val effectiveMatchersProvider = matchersProvider ?: EmptyQuestionnaireItemViewHolderFactoryMatchersProvider
 
-  // Render the internal QuestionnaireScreen
   QuestionnaireScreen(
     viewModel = viewModel,
     matchersProvider = effectiveMatchersProvider,
