@@ -31,7 +31,7 @@ internal object EditTextIntegerViewHolderFactory : QuestionnaireItemComposeViewH
     EditTextViewHolderDelegate(
       KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
       uiInputText = {
-        val answer = it.answers.singleOrNull()?.value?.asInteger()?.value?.toString()
+        val answer = it.answers.singleOrNull()?.value?.asInteger()?.value?.value?.toString()
         val draftAnswer = it.draftAnswer?.toString()
         when {
           answer.isNullOrEmpty() && draftAnswer.isNullOrEmpty() -> ""
