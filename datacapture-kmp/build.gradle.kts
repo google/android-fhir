@@ -13,6 +13,8 @@ plugins {
 }
 
 kotlin {
+  jvmToolchain(21)
+
   androidLibrary {
     namespace = "com.google.android.fhir.datacapture"
     compileSdk = 36
@@ -55,10 +57,15 @@ kotlin {
 
   wasmJs {
     browser()
-    binaries.executable()
+    binaries.library()
   }
 
-  jvm("desktop") { compilations.all { kotlinOptions.jvmTarget = "21" } }
+  jvm("desktop")
+
+  js {
+    browser()
+    binaries.library()
+  }
 
   // Source set declarations.
   // Declaring a target automatically creates a source set with the same name. By default, the

@@ -35,6 +35,8 @@ android {
 kotlin {
   androidTarget { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
 
+  jvm("desktop") { compilations.all { kotlinOptions.jvmTarget = "11" } }
+
   val xcfName = "sdc-kmp-demoKit"
 
   listOf(
