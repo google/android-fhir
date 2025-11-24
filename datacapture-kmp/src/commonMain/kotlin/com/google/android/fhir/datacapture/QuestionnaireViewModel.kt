@@ -69,7 +69,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.UtcOffset
 import kotlinx.datetime.toLocalDateTime
@@ -270,7 +269,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
 
   private var submitButtonText =
     state[EXTRA_SUBMIT_BUTTON_TEXT] as String?
-      ?: runBlocking { getString(Res.string.submit_questionnaire) }
+      ?: "submit"
 
   private var onSubmitButtonClickListener: () -> Unit = {}
 
