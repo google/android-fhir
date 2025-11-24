@@ -5,35 +5,34 @@
   "title": "Sample Information Form",
   "item": [
     {
-      "linkId": "section-1",
-      "type": "group",
-      "text": "Personal Information",
-      "item": [
-        {
-          "linkId": "first-name",
-          "type": "string",
-          "text": "First Name",
-          "required": true
-        },
-        {
-          "linkId": "last-name",
-          "type": "string",
-          "text": "Last Name",
-          "required": true
-        },
-        {
-          "linkId": "email",
-          "type": "string",
-          "text": "Email Address",
-          "required": false
-        },
-        {
-          "linkId": "notes",
-          "type": "text",
-          "text": "Additional Notes",
-          "required": false
-        }
-      ]
+      "linkId": "name",
+      "type": "string",
+      "text": "Name",
+      "required": true
+    },
+    {
+      "linkId": "age",
+      "type": "integer",
+      "text": "Age",
+      "required": false
+    },
+    {
+      "linkId": "height",
+      "type": "decimal",
+      "text": "Height (meters)",
+      "required": false
+    },
+    {
+      "linkId": "weight",
+      "type": "decimal",
+      "text": "Weight (kg)",
+      "required": false
+    },
+    {
+      "linkId": "notes",
+      "type": "text",
+      "text": "Additional Notes",
+      "required": false
     }
   ]
 }
