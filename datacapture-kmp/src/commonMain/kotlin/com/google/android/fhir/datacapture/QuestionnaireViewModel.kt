@@ -267,9 +267,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
   private var shouldSetNavigationInLongScroll =
     state[EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL] as Boolean? ?: false
 
-  private var submitButtonText =
-    state[EXTRA_SUBMIT_BUTTON_TEXT] as String?
-      ?: "submit"
+  private var submitButtonText = state[EXTRA_SUBMIT_BUTTON_TEXT] as String? ?: ""
 
   private var onSubmitButtonClickListener: () -> Unit = {}
 
@@ -796,7 +794,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
           navSubmit =
             if (showSubmitButton) {
               QuestionnaireNavigationViewUIState.Enabled(
-                submitButtonText,
+                submitButtonText.ifEmpty { getString(Res.string.submit_questionnaire) },
                 onSubmitButtonClickListener,
               )
             } else {
@@ -880,7 +878,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
         navSubmit =
           if (showSubmitButton) {
             QuestionnaireNavigationViewUIState.Enabled(
-              submitButtonText,
+              submitButtonText.ifEmpty { getString(Res.string.submit_questionnaire) },
               onSubmitButtonClickListener,
             )
           } else {
