@@ -10,7 +10,7 @@
     <string name="review_answers_text">Review answers</string>
     <string name="button_review">Review</string>
     <string name="submit_questionnaire">Submit</string>
-    <string name="cancel_questionnaire">@android:string/cancel</string>
+    <string name="cancel_questionnaire">Cancel</string>
     <string
         name="questionnaire_review_mode_title"
     >Review answers before submitting</string>
