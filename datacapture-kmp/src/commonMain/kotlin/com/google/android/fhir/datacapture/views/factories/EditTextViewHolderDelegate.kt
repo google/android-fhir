@@ -42,7 +42,6 @@ import com.google.android.fhir.datacapture.views.compose.EditTextFieldState
 import com.google.android.fhir.datacapture.views.compose.Header
 import com.google.android.fhir.datacapture.views.compose.MediaItem
 import com.google.android.fhir.datacapture.views.compose.UnitText
-import kotlinx.coroutines.Dispatchers
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -58,7 +57,7 @@ class EditTextViewHolderDelegate(
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
     val text = uiInputText(questionnaireViewItem) ?: ""
-    val coroutineScope = rememberCoroutineScope({ Dispatchers.Main })
+    val coroutineScope = rememberCoroutineScope()
     val optionalHelperText = stringResource(Res.string.required_text_and_new_line)
     val required = stringResource(Res.string.required)
     val validationMessage = getValidationErrorMessage(questionnaireViewItem)

@@ -17,10 +17,10 @@
 package com.example.sdckmpdemo
 
 import android_fhir.sdc_kmp_demo.generated.resources.Res
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.fhir.model.r4.FhirR4Json
 import com.google.fhir.model.r4.Patient
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,12 +31,12 @@ import kotlinx.serialization.json.JsonArray
 
 private val json = Json { prettyPrint = true }
 
-class PatientViewModel {
+class PatientViewModel : ViewModel() {
   private val _patients = MutableStateFlow<List<Patient>>(emptyList())
   val patients: StateFlow<List<Patient>> = _patients.asStateFlow()
 
   init {
-    CoroutineScope(Dispatchers.Main).launch {
+    viewModelScope.launch {
       val jsonString = Res.readBytes("files/list.json").decodeToString()
       val jsonArray = json.parseToJsonElement(jsonString) as JsonArray
       val patients =

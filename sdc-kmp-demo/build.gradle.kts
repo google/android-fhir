@@ -95,6 +95,8 @@ kotlin {
       implementation(libs.navigation.compose)
       implementation(project(":datacapture-kmp"))
     }
+
+    val desktopMain by getting { dependencies { implementation(compose.desktop.currentOs) } }
   }
 }
 

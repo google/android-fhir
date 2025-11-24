@@ -13,7 +13,7 @@ plugins {
 }
 
 kotlin {
-  jvmToolchain(21)
+  jvmToolchain(11)
 
   androidLibrary {
     namespace = "com.google.android.fhir.datacapture"
@@ -171,6 +171,14 @@ kotlin {
         /* implementation(project(":knowledge")) {
           exclude(group = "com.google.android.fhir", module = "engine")
         }*/
+      }
+    }
+
+    val desktopMain by getting {
+      dependencies {
+        implementation(compose.desktop.currentOs)
+        // Provide Main Dispatcher for JVM target
+        implementation(libs.kotlinx.coroutines.swing)
       }
     }
 
