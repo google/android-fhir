@@ -46,7 +46,8 @@ internal object EditTextDecimalViewHolderFactory : QuestionnaireItemComposeViewH
         inputText.toDoubleOrNull()?.let {
           questionnaireViewItem.setAnswer(
             QuestionnaireResponse.Item.Answer(
-              value = QuestionnaireResponse.Item.Answer.Value.Decimal(Decimal(value = it.toBigDecimal())),
+              value =
+                QuestionnaireResponse.Item.Answer.Value.Decimal(Decimal(value = it.toBigDecimal())),
             ),
           )
         }

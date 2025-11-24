@@ -33,22 +33,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.google.android.fhir.datacapture.Questionnaire
-import com.google.fhir.model.r4.FhirR4Json
-import kotlinx.coroutines.launch
+import com.google.fhir.model.r4.QuestionnaireResponse
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuestionnaireScreen(
   onBackClick: () -> Unit,
-  navigateToResponse: (String) -> Unit,
+  navigateToResponse: (suspend () -> QuestionnaireResponse) -> Unit,
 ) {
   var questionnaireJson by remember { mutableStateOf<String?>(null) }
-  val scope = rememberCoroutineScope()
-  val fhirJson = remember { FhirR4Json() }
 
   // Load questionnaire JSON from resources
   LaunchedEffect(Unit) {
@@ -73,10 +69,7 @@ fun QuestionnaireScreen(
           questionnaireJson = json,
           showSubmitButton = true,
           showCancelButton = true,
-          onSubmit = { response ->
-            val responseJson = fhirJson.encodeToString(response)
-            scope.launch { navigateToResponse(responseJson) }
-          },
+          onSubmit = { response -> navigateToResponse(response) },
           onCancel = {
             // Navigate back on cancel
             onBackClick()

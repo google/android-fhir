@@ -18,6 +18,8 @@ package com.example.sdckmpdemo
 
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -26,7 +28,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.sdckmpdemo.ui.theme.AppTheme
 import com.google.fhir.model.r4.Address
+import com.google.fhir.model.r4.FhirR4Json
 import com.google.fhir.model.r4.HumanName
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -45,6 +49,8 @@ fun App() {
     Surface {
       val navController: NavHostController = rememberNavController()
       val viewModel: PatientViewModel = viewModel { PatientViewModel() }
+      val coroutineScope = rememberCoroutineScope()
+      val fhirJson = remember { FhirR4Json() }
       NavHost(navController = navController, startDestination = PatientListDestination) {
         composable<PatientListDestination> {
           PatientList(
@@ -65,8 +71,11 @@ fun App() {
         composable<QuestionnaireDestination> {
           QuestionnaireScreen(
             onBackClick = { navController.popBackStack() },
-            navigateToResponse = { responseJson ->
-              navController.navigate(QuestionnaireResponseDestination(responseJson))
+            navigateToResponse = { response ->
+              coroutineScope.launch {
+                val responseJson = fhirJson.encodeToString(response())
+                navController.navigate(QuestionnaireResponseDestination(responseJson))
+              }
             },
           )
         }

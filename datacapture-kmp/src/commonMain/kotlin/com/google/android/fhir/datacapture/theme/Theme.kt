@@ -221,18 +221,18 @@ val LocalQuestionnaireAlphas = staticCompositionLocalOf { QuestionnaireAlphas() 
 @Composable
 fun QuestionnaireTheme(
   darkTheme: Boolean = isSystemInDarkTheme(),
-  colorScheme: ColorScheme = if (darkTheme) {
+  colorScheme: ColorScheme =
+    if (darkTheme) {
       darkColorScheme()
-  } else {
+    } else {
       lightColorScheme()
-  },
+    },
   typography: Typography = Typography(),
   dimensions: QuestionnaireDimensions = QuestionnaireDimensions(),
   shapes: QuestionnaireShapes = QuestionnaireShapes(),
   alphas: QuestionnaireAlphas = QuestionnaireAlphas(),
   content: @Composable () -> Unit,
 ) {
-
   val questionnaireTextStyles =
     QuestionnaireTextStyles(
       groupTypeQuestionText = typography.titleMedium,

@@ -19,10 +19,8 @@ package com.google.android.fhir.datacapture
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.fhir.model.r4.QuestionnaireResponse
-import kotlinx.coroutines.launch
 
 /**
  * Public composable function for displaying a FHIR Questionnaire in KMP applications.
@@ -73,7 +71,7 @@ fun Questionnaire(
   showOptionalText: Boolean = false,
   submitButtonText: String? = null,
   matchersProvider: QuestionnaireItemViewHolderFactoryMatchersProvider? = null,
-  onSubmit: suspend (QuestionnaireResponse) -> Unit,
+  onSubmit: (suspend () -> QuestionnaireResponse) -> Unit,
   onCancel: () -> Unit,
 ) {
   val stateMap =
@@ -105,15 +103,8 @@ fun Questionnaire(
 
   val viewModel: QuestionnaireViewModel = viewModel { QuestionnaireViewModel(stateMap) }
 
-  val scope = rememberCoroutineScope()
-
   LaunchedEffect(viewModel, onSubmit, onCancel) {
-    viewModel.setOnSubmitButtonClickListener {
-      scope.launch {
-        val response = viewModel.getQuestionnaireResponse()
-        onSubmit(response)
-      }
-    }
+    viewModel.setOnSubmitButtonClickListener { onSubmit { viewModel.getQuestionnaireResponse() } }
 
     viewModel.setOnCancelButtonClickListener { onCancel() }
   }
