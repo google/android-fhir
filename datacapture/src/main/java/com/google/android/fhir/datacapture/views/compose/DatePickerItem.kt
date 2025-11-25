@@ -90,18 +90,19 @@ internal fun DatePickerItem(
 
   var showDatePickerModal by remember { mutableStateOf(false) }
   var typingJob by remember { mutableStateOf<Job?>(null) }
-  val postDelayedNewDateInput: (DateInput, Long) -> Unit = remember {
-    { newDateInput, delayInMillis ->
-      typingJob?.cancel() // Cancel previous debounce
-      typingJob =
-        coroutineScope.launch {
-          delay(delayInMillis) // Debounce delay
-          if (newDateInput != dateInput) {
-            onDateInputEntry(newDateInput)
+  val postDelayedNewDateInput: (DateInput, Long) -> Unit =
+    remember(dateInput) {
+      { newDateInput, delayInMillis ->
+        typingJob?.cancel() // Cancel previous debounce
+        typingJob =
+          coroutineScope.launch {
+            delay(delayInMillis) // Debounce delay
+            if (newDateInput != dateInput) {
+              onDateInputEntry(newDateInput)
+            }
           }
-        }
+      }
     }
-  }
 
   OutlinedTextField(
     value = dateInputDisplay,
@@ -109,7 +110,16 @@ internal fun DatePickerItem(
       textFieldValue.text
         .takeIf {
           it.length <= dateInputFormat.pattern.length &&
-            it.all { char -> char.isDigit() || char == dateInputFormat.delimiter }
+            it
+              .mapIndexed { index, char ->
+                char.isDigit() ||
+                  (index in
+                    arrayOf(
+                      dateInputFormat.delimiterFirstIndex,
+                      dateInputFormat.delimiterLastIndex,
+                    ) && char == dateInputFormat.delimiter)
+              }
+              .all { isAllowed -> isAllowed }
         }
         ?.let {
           val isDeletion = it.length < dateInputDisplay.text.length
