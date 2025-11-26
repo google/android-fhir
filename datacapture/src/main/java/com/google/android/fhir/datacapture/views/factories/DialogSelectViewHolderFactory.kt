@@ -37,7 +37,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModel
@@ -147,6 +150,8 @@ internal object DialogSelectViewHolderFactory : QuestionnaireItemComposeViewHold
               readOnly = true,
               modifier =
                 Modifier.fillMaxWidth()
+                  .testTag(MULTI_SELECT_TEXT_FIELD_TAG)
+                  .semantics { if (hasValidationError) error(supportingHelperText ?: "") }
                   .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, !readOnly),
               label = { hintLabelText?.let { Text(it) } },
               trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -370,3 +375,5 @@ private fun Questionnaire.QuestionnaireItemComponent.buildConfig() =
     // Client had to specify that they want an open-choice control to use "Other" options
     otherOptionsAllowed = itemControl == ItemControlTypes.OPEN_CHOICE,
   )
+
+internal const val MULTI_SELECT_TEXT_FIELD_TAG = "multi_select_summary_holder"

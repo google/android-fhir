@@ -44,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -157,7 +158,8 @@ fun DialogSelect(
                         option = optionSelectRow.option.copy(selected = selected),
                       )
                     }
-                    multiSelect &&
+                    selected &&
+                      multiSelect &&
                       (optionSelectRow.option.item.optionExclusive ||
                         option.option.item.optionExclusive) -> {
                       // if the selected answer option has optionExclusive extension, then deselect
@@ -178,7 +180,7 @@ fun DialogSelect(
                   }
                 }
 
-              if (selected && !multiSelect) {
+              if (selected && (!multiSelect || optionSelectRow.option.item.optionExclusive)) {
                 otherOptionRowSelected = false
                 otherOptionEditTexts.clear()
               }
@@ -226,7 +228,10 @@ fun DialogSelect(
               contentType = { _, _ -> OptionSelectRow.OtherEditText },
             ) { index, option ->
               Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                modifier =
+                  Modifier.testTag(OTHER_OPTION_TEXT_FIELD_TAG)
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
               ) {
                 OutlinedTextField(
@@ -316,6 +321,7 @@ internal fun OptionChoice(
   image: Drawable? = null,
   onSelectionChange: (Boolean) -> Unit,
 ) {
+  val testTagModifier = modifier.testTag(OPTION_CHOICE_TAG)
   if (isMultiSelect) {
     ChoiceCheckbox(
       label = label,
@@ -323,7 +329,7 @@ internal fun OptionChoice(
       enabled = true,
       image = image,
       onCheckedChange = { checked -> onSelectionChange(checked) },
-      modifier = modifier,
+      modifier = testTagModifier,
     )
   } else {
     ChoiceRadioButton(
@@ -332,7 +338,7 @@ internal fun OptionChoice(
       enabled = true,
       image = image,
       onClick = { onSelectionChange(!selected) },
-      modifier = modifier,
+      modifier = testTagModifier,
     )
   }
 }
@@ -431,3 +437,6 @@ internal fun List<OptionSelectRow>.toSelectedOptions(): SelectedOptions {
         .map { it.currentText },
   )
 }
+
+internal const val OPTION_CHOICE_TAG = "dialog_select_option_choice"
+internal const val OTHER_OPTION_TEXT_FIELD_TAG = "other_option_edit_text_field"

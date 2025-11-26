@@ -16,21 +16,24 @@
 
 package com.google.android.fhir.datacapture.test.views
 
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.text.AnnotatedString
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
@@ -40,20 +43,17 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_OPTION_EXCLUSIVE
 import com.google.android.fhir.datacapture.extensions.ItemControlTypes
 import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.test.utilities.assertQuestionnaireResponseAtIndex
-import com.google.android.fhir.datacapture.test.utilities.clickOnText
-import com.google.android.fhir.datacapture.test.utilities.clickOnTextInDialog
-import com.google.android.fhir.datacapture.test.utilities.delayMainThread
-import com.google.android.fhir.datacapture.test.utilities.endIconClickInTextInputLayout
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
+import com.google.android.fhir.datacapture.views.compose.OPTION_CHOICE_TAG
+import com.google.android.fhir.datacapture.views.compose.OTHER_OPTION_TEXT_FIELD_TAG
 import com.google.android.fhir.datacapture.views.factories.DialogSelectViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.MULTI_SELECT_TEXT_FIELD_TAG
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
-import com.google.android.material.textfield.TextInputLayout
-import com.google.common.truth.StringSubject
 import com.google.common.truth.Truth.assertThat
-import org.hamcrest.Matchers.not
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -61,26 +61,28 @@ import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class DialogMultiSelectViewHolderFactoryTest {
-  @Rule
-  @JvmField
+  @get:Rule
   var activityScenarioRule: ActivityScenarioRule<TestActivity> =
     ActivityScenarioRule(TestActivity::class.java)
 
-  private lateinit var parent: FrameLayout
+  @get:Rule val composeTestRule = createEmptyComposeRule()
+
   private lateinit var viewHolder: QuestionnaireItemViewHolder
 
   @Before
   fun setup() {
-    activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
-    viewHolder = DialogSelectViewHolderFactory.create(parent)
-    setTestLayout(viewHolder.itemView)
+    activityScenarioRule.scenario.onActivity { activity ->
+      viewHolder = DialogSelectViewHolderFactory.create(FrameLayout(activity))
+      activity.setContentView(viewHolder.itemView)
+    }
+
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
   }
 
   @Test
@@ -94,15 +96,23 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("Coding 1")
-    clickOnText("Coding 3")
-    clickOnText("Coding 5")
-    clickOnText("Save")
+    // Click to open the dialog
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
-    assertDisplayedText().isEqualTo("Coding 1, Coding 3, Coding 5")
+    // Select options in the dialog
+    composeTestRule.onNodeWithText("Coding 1").performClick()
+    composeTestRule.onNodeWithText("Coding 3").performClick()
+    composeTestRule.onNodeWithText("Coding 5").performClick()
+    composeTestRule
+      .onNodeWithText(viewHolder.itemView.context.getString(R.string.save))
+      .performClick()
+
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assertTextEquals("Coding 1, Coding 3, Coding 5")
+      .assertIsDisplayed()
     assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 1", "Coding 3", "Coding 5")
   }
 
@@ -123,15 +133,21 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("Coding 1")
-    clickOnText("Coding 3")
-    clickOnText("Coding Exclusive")
-    clickOnText("Save")
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
-    assertDisplayedText().isEqualTo("Coding Exclusive")
+    composeTestRule.onNodeWithText("Coding 1").performClick()
+    composeTestRule.onNodeWithText("Coding 3").performClick()
+    composeTestRule.onNodeWithText("Coding Exclusive").performClick()
+    composeTestRule
+      .onNodeWithText(viewHolder.itemView.context.getString(R.string.save))
+      .performClick()
+
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assertTextEquals("Coding Exclusive")
+      .assertIsDisplayed()
     assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding Exclusive")
   }
 
@@ -152,15 +168,21 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("Coding Exclusive")
-    clickOnText("Coding 1")
-    clickOnText("Coding 3")
-    clickOnText("Save")
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
-    assertDisplayedText().isEqualTo("Coding 1, Coding 3")
+    composeTestRule.onNodeWithText("Coding Exclusive").performClick()
+    composeTestRule.onNodeWithText("Coding 1").performClick()
+    composeTestRule.onNodeWithText("Coding 3").performClick()
+    composeTestRule
+      .onNodeWithText(viewHolder.itemView.context.getString(R.string.save))
+      .performClick()
+
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assertTextEquals("Coding 1, Coding 3")
+      .assertIsDisplayed()
     assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 1", "Coding 3")
   }
 
@@ -187,16 +209,22 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("Coding 1")
-    clickOnText("Coding 3")
-    clickOnText("Coding Exclusive 1")
-    clickOnText("Coding Exclusive 2")
-    clickOnText("Save")
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
-    assertDisplayedText().isEqualTo("Coding Exclusive 2")
+    composeTestRule.onNodeWithText("Coding 1").performClick()
+    composeTestRule.onNodeWithText("Coding 3").performClick()
+    composeTestRule.onNodeWithText("Coding Exclusive 1").performClick()
+    composeTestRule.onNodeWithText("Coding Exclusive 2").performClick()
+    composeTestRule
+      .onNodeWithText(viewHolder.itemView.context.getString(R.string.save))
+      .performClick()
+
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assertTextEquals("Coding Exclusive 2")
+      .assertIsDisplayed()
     assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding Exclusive 2")
   }
 
@@ -223,16 +251,22 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("Coding Exclusive 1")
-    clickOnTextInDialog("Coding Exclusive 2")
-    clickOnText("Coding 1")
-    clickOnText("Coding 3")
-    clickOnText("Save")
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
-    assertDisplayedText().isEqualTo("Coding 1, Coding 3")
+    composeTestRule.onNodeWithText("Coding Exclusive 1").performClick()
+    composeTestRule.onNodeWithText("Coding Exclusive 2").performClick()
+    composeTestRule.onNodeWithText("Coding 1").performClick()
+    composeTestRule.onNodeWithText("Coding 3").performClick()
+    composeTestRule
+      .onNodeWithText(viewHolder.itemView.context.getString(R.string.save))
+      .performClick()
+
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assertTextEquals("Coding 1, Coding 3")
+      .assertIsDisplayed()
     assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 1", "Coding 3")
   }
 
@@ -246,12 +280,19 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("Save")
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
-    assertDisplayedText().isEmpty()
+    composeTestRule
+      .onNodeWithText(viewHolder.itemView.context.getString(R.string.save))
+      .performClick()
+
+    // When nothing is selected, the field should be empty
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assertTextEquals("")
+      .assertIsDisplayed()
     assertThat(questionnaireViewItem.answers).isEmpty()
   }
 
@@ -265,14 +306,19 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("Coding 3")
-    clickOnText("Coding 1")
-    clickOnText("Cancel")
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
-    assertDisplayedText().isEmpty()
+    composeTestRule.onNodeWithText("Coding 3").performClick()
+    composeTestRule.onNodeWithText("Coding 1").performClick()
+    composeTestRule.onNodeWithText("Cancel").performClick()
+
+    // When cancelled, nothing should be saved
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assertTextEquals("")
+      .assertIsDisplayed()
     assertThat(questionnaireViewItem.answers).isEmpty()
   }
 
@@ -287,14 +333,20 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("Coding 2")
-    clickOnText("Coding 1")
-    clickOnText("Save")
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
-    assertDisplayedText().isEqualTo("Coding 1")
+    composeTestRule.onNodeWithText("Coding 2").performClick()
+    composeTestRule.onNodeWithText("Coding 1").performClick()
+    composeTestRule
+      .onNodeWithText(viewHolder.itemView.context.getString(R.string.save))
+      .performClick()
+
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assertTextEquals("Coding 1")
+      .assertIsDisplayed()
     assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 1")
   }
 
@@ -309,13 +361,16 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("Coding 2")
-    clickOnText("Save")
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
-    assertDisplayedText().isEqualTo("Coding 2")
+    composeTestRule.onNodeWithText("Coding 2").performClick()
+    composeTestRule
+      .onNodeWithText(viewHolder.itemView.context.getString(R.string.save))
+      .performClick()
+
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).assertTextEquals("Coding 2")
     assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 2")
   }
 
@@ -329,12 +384,18 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("Save")
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
+    composeTestRule
+      .onNodeWithText(viewHolder.itemView.context.getString(R.string.save))
+      .performClick()
 
-    assertDisplayedText().isEmpty()
+    // When nothing is selected, the field should be empty
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assertTextEquals("")
+      .assertIsDisplayed()
     assertThat(questionnaireViewItem.answers).isEmpty()
   }
 
@@ -367,15 +428,9 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
         enabledDisplayItems = listOf(hintItem),
       )
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    assertThat(
-        viewHolder.itemView
-          .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
-          .hint
-          .toString(),
-      )
-      .isEqualTo("Select code")
+    composeTestRule.onNodeWithText("Select code").assertIsDisplayed()
   }
 
   @Test
@@ -388,17 +443,19 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("Coding 2")
-    clickOnText("Cancel")
+    viewHolder.bind(questionnaireViewItem)
 
-    assertDisplayedText().isEmpty()
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
+
+    composeTestRule.onNodeWithText("Coding 2").performClick()
+    composeTestRule.onNodeWithText("Cancel").performClick()
+    composeTestRule.waitForIdle()
+
+    // When cancelled, nothing should be saved
     assertThat(questionnaireViewItem.answers).isEmpty()
   }
 
   @Test
-  @Ignore // TODO https://github.com/google/android-fhir/issues/1482 FIXME
   fun selectOther_shouldScrollDownToShowAddAnotherAnswer() {
     val questionnaireItem =
       answerOptions(
@@ -421,14 +478,18 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    onView(withId(R.id.recycler_view))
-      .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(8))
-    clickOnTextInDialog("Other")
-    onView(withId(R.id.add_another)).perform(delayMainThread())
-    onView(withId(R.id.add_another)).check(matches(isDisplayed()))
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
+
+    val context = viewHolder.itemView.context
+    // Select "Other" option
+    composeTestRule.onNodeWithText(context.getString(R.string.open_choice_other)).performClick()
+
+    // "Add Another" button should be displayed in multi-select mode
+    composeTestRule
+      .onNodeWithText(context.getString(R.string.open_choice_other_add_another))
+      .assertIsDisplayed()
   }
 
   @Test
@@ -454,18 +515,22 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    onView(withId(R.id.recycler_view))
-      .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(8))
-    clickOnTextInDialog("Other")
-    clickOnTextInDialog("Other")
-    onView(ViewMatchers.withId(R.id.add_another)).check(doesNotExist())
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
+
+    val context = viewHolder.itemView.context
+    // Select and then unselect "Other" option
+    composeTestRule.onNodeWithText(context.getString(R.string.open_choice_other)).performClick()
+    composeTestRule.onNodeWithText(context.getString(R.string.open_choice_other)).performClick()
+
+    // "Add Another" button should not be displayed when "Other" is unselected
+    composeTestRule
+      .onNodeWithText(context.getString(R.string.open_choice_other_add_another))
+      .assertDoesNotExist()
   }
 
   @Test
-  @SdkSuppress(minSdkVersion = 33) // TODO https://github.com/google/android-fhir/issues/1482 FIXME
   fun clickAddAnotherAnswer_shouldScrollDownToShowAddAnotherAnswer() {
     val questionnaireItem =
       answerOptions(
@@ -488,19 +553,26 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    onView(withId(R.id.recycler_view))
-      .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(8))
-    clickOnTextInDialog("Other")
-    onView(withId(R.id.add_another)).perform(click())
-    onView(withId(R.id.add_another)).perform(delayMainThread())
-    onView(withId(R.id.add_another)).check(matches(isDisplayed()))
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
+
+    val context = viewHolder.itemView.context
+    // Select "Other" option
+    composeTestRule.onNodeWithText(context.getString(R.string.open_choice_other)).performClick()
+
+    // Click "Add Another" button
+    composeTestRule
+      .onNodeWithText(context.getString(R.string.open_choice_other_add_another))
+      .performClick()
+
+    // "Add Another" button should still be displayed after clicking
+    composeTestRule
+      .onNodeWithText(context.getString(R.string.open_choice_other_add_another))
+      .assertIsDisplayed()
   }
 
   @Test
-  @SdkSuppress(minSdkVersion = 33)
   fun selectOther_selectExclusive_shouldHideAddAnotherAnswer() {
     val questionnaireItem =
       answerOptions(
@@ -530,14 +602,21 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    onView(withId(R.id.recycler_view))
-      .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(9))
-    clickOnTextInDialog("Other")
-    clickOnTextInDialog("Coding Exclusive")
-    onView(withId(R.id.add_another)).check(doesNotExist())
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
+
+    val context = viewHolder.itemView.context
+    // Select "Other" option
+    composeTestRule.onNodeWithText(context.getString(R.string.open_choice_other)).performClick()
+
+    // Select exclusive option
+    composeTestRule.onNodeWithText("Coding Exclusive").performClick()
+
+    // "Add Another" button should not be displayed when exclusive option is selected
+    composeTestRule
+      .onNodeWithText(context.getString(R.string.open_choice_other_add_another))
+      .assertDoesNotExist()
   }
 
   @Test
@@ -570,17 +649,27 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    onView(withId(R.id.recycler_view))
-      .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(9))
-    clickOnTextInDialog("Other")
-    onView(withId(R.id.add_another)).perform(delayMainThread())
-    onView(withId(R.id.add_another)).perform(click())
-    clickOnTextInDialog("Coding Exclusive")
-    onView(withId(R.id.add_another)).check(doesNotExist())
-    onView(withId(R.id.edit_text)).check(doesNotExist())
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
+
+    val context = viewHolder.itemView.context
+    // Select "Other" option
+    composeTestRule.onNodeWithText(context.getString(R.string.open_choice_other)).performClick()
+
+    // Click "Add Another" button
+    composeTestRule
+      .onNodeWithText(context.getString(R.string.open_choice_other_add_another))
+      .performClick()
+
+    // Select exclusive option
+    composeTestRule.onNodeWithText("Coding Exclusive").performClick()
+
+    // "Add Another" button and edit text should not be displayed when exclusive option is selected
+    composeTestRule.onAllNodes(hasTestTag(OTHER_OPTION_TEXT_FIELD_TAG)).assertCountEquals(0)
+    composeTestRule
+      .onNodeWithText(context.getString(R.string.open_choice_other_add_another))
+      .assertDoesNotExist()
   }
 
   @Test
@@ -595,149 +684,122 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
-
-    onView(withId(R.id.error_text_at_header)).check(matches(not(isDisplayed())))
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(ERROR_TEXT_AT_HEADER_TEST_TAG).assertDoesNotExist()
   }
 
   @Test
   fun show_asterisk() {
-    runOnUI {
-      viewHolder.bind(
-        QuestionnaireViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "1"
-            text = "Question?"
-            required = true
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _, _ -> },
-          questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true),
-        ),
-      )
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "1"
+          text = "Question?"
+          required = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true),
+      ),
+    )
+    composeTestRule.waitForIdle()
 
-      assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
-        .isEqualTo("Question? *")
-    }
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+      .isEqualTo("Question? *")
   }
 
   @Test
   fun hide_asterisk() {
-    runOnUI {
-      viewHolder.bind(
-        QuestionnaireViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "1"
-            text = "Question?"
-            required = true
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _, _ -> },
-          questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false),
-        ),
-      )
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "1"
+          text = "Question?"
+          required = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false),
+      ),
+    )
+    composeTestRule.waitForIdle()
 
-      assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
-        .isEqualTo("Question?")
-    }
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+      .isEqualTo("Question?")
   }
 
   @Test
   fun show_requiredText() {
-    runOnUI {
-      viewHolder.bind(
-        QuestionnaireViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "1"
-            required = true
-            text = "Question?"
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _, _ -> },
-          questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true),
-        ),
-      )
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "1"
+          required = true
+          text = "Question?"
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true),
+      ),
+    )
 
-      assertThat(
-          viewHolder.itemView
-            .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
-            .helperText
-            .toString(),
-        )
-        .isEqualTo("Required")
-    }
+    // The "Required" text should be displayed in the supporting text of the OutlinedTextField
+    composeTestRule.onNodeWithText("Required").assertIsDisplayed()
   }
 
   @Test
   fun hide_requiredText() {
-    runOnUI {
-      viewHolder.bind(
-        QuestionnaireViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "1"
-            required = true
-            text = "Question?"
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _, _ -> },
-          questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false),
-        ),
-      )
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "1"
+          required = true
+          text = "Question?"
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false),
+      ),
+    )
 
-      assertThat(
-          viewHolder.itemView
-            .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
-            .helperText,
-        )
-        .isNull()
-    }
+    // When showRequiredText is false, "Required" text should not be displayed
+    composeTestRule.onNodeWithText("Required").assertDoesNotExist()
   }
 
   @Test
   fun shows_optionalText() {
-    runOnUI {
-      viewHolder.bind(
-        QuestionnaireViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _, _ -> },
-          questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true),
-        ),
-      )
-      assertThat(
-          viewHolder.itemView
-            .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
-            .helperText
-            .toString(),
-        )
-        .isEqualTo("Optional")
-    }
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true),
+      ),
+    )
+
+    // The "Optional" text should be displayed in the supporting text of the OutlinedTextField
+    composeTestRule.onNodeWithText("Optional").assertIsDisplayed()
   }
 
   @Test
   fun hide_optionalText() {
-    runOnUI {
-      viewHolder.bind(
-        QuestionnaireViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _, _ -> },
-          questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false),
-        ),
-      )
-      assertThat(
-          viewHolder.itemView
-            .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
-            .helperText,
-        )
-        .isNull()
-    }
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false),
+      ),
+    )
+
+    // When showOptionalText is false, "Optional" text should not be displayed
+    composeTestRule.onNodeWithText("Optional").assertDoesNotExist()
   }
 
   @Test
@@ -752,12 +814,14 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, answers, _ -> },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
-
-    assertThat(
-        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error,
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.keyNotDefined(
+          SemanticsProperties.Error,
+        ),
       )
-      .isNull()
   }
 
   @Test
@@ -770,21 +834,49 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, answers, _ -> },
       )
 
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("Coding 2")
-    clickOnText("Save")
-    assertDisplayedText().isEqualTo("Coding 2")
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
-    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("Coding 2")
-    clickOnText("Save")
+    composeTestRule.onNode(hasTestTag(OPTION_CHOICE_TAG) and hasText("Coding 2")).performClick()
+    composeTestRule
+      .onNodeWithText(viewHolder.itemView.context.getString(R.string.save))
+      .performClick()
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error,
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.EditableText,
+          AnnotatedString("Coding 2"),
+        ),
       )
-      .isEqualTo("Missing answer for required field.")
+      .assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
+
+    composeTestRule.onNode(hasTestTag(OPTION_CHOICE_TAG) and hasText("Coding 2")).performClick()
+    composeTestRule
+      .onNodeWithText(viewHolder.itemView.context.getString(R.string.save))
+      .performClick()
+
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.EditableText,
+          AnnotatedString(""),
+        ),
+      )
+      .assertIsDisplayed()
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.Error,
+          "Missing answer for required field.",
+        ),
+      )
   }
 
   @Test
@@ -797,10 +889,10 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString(),
-      )
-      .isEqualTo("")
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assertTextEquals("")
+      .assertIsDisplayed()
   }
 
   @Test
@@ -816,10 +908,10 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString(),
-      )
-      .isEqualTo("Coding 1, Coding 3")
+
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assertTextEquals("Coding 1, Coding 3")
   }
 
   @Test
@@ -836,10 +928,14 @@ class DialogMultiSelectViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error,
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.Error,
+          "Missing answer for required field.",
+        ),
       )
-      .isEqualTo("Missing answer for required field.")
   }
 
   @Test
@@ -867,10 +963,13 @@ class DialogMultiSelectViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error,
+    composeTestRule
+      .onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.keyNotDefined(
+          SemanticsProperties.Error,
+        ),
       )
-      .isNull()
   }
 
   @Test
@@ -886,30 +985,8 @@ class DialogMultiSelectViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    assertThat(
-        viewHolder.itemView
-          .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
-          .isEnabled,
-      )
-      .isFalse()
+    composeTestRule.onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).assertIsNotEnabled()
   }
-
-  /** Method to run code snippet on UI/main thread */
-  private fun runOnUI(action: () -> Unit) {
-    activityScenarioRule.scenario.onActivity { activity -> action() }
-  }
-
-  /** Method to set content view for test activity */
-  private fun setTestLayout(view: View) {
-    activityScenarioRule.scenario.onActivity { activity -> activity.setContentView(view) }
-    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-  }
-
-  private fun assertDisplayedText(): StringSubject =
-    assertThat(
-      viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString(),
-    )
 
   private val openChoiceType =
     Extension().apply {
@@ -925,29 +1002,27 @@ class DialogMultiSelectViewHolderFactoryTest {
       )
     }
 
-  internal companion object {
-    private fun answerOptions(multiSelect: Boolean, vararg options: String) =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        this.repeats = multiSelect
-        linkId = "1"
-        options.forEach { option ->
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = option }
-            },
-          )
-        }
+  private fun answerOptions(multiSelect: Boolean, vararg options: String) =
+    Questionnaire.QuestionnaireItemComponent().apply {
+      this.repeats = multiSelect
+      linkId = "1"
+      options.forEach { option ->
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = option }
+          },
+        )
       }
+    }
 
-    private fun responseOptions(vararg responses: String) =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        responses.forEach { response ->
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Coding().apply { display = response }
-            },
-          )
-        }
+  private fun responseOptions(vararg responses: String) =
+    QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+      responses.forEach { response ->
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = Coding().apply { display = response }
+          },
+        )
       }
-  }
+    }
 }
