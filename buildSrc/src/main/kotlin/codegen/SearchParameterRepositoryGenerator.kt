@@ -81,7 +81,7 @@ internal object SearchParameterRepositoryGenerator {
             SearchParamDefinition(
               className = searchParamDefinitionClass,
               name = searchParameter.name,
-              paramTypeCode = searchParameter.type.toCode().toUpperCase(Locale.US),
+              paramTypeCode = searchParameter.type.toCode().uppercase(Locale.US),
               path = path.value,
             ),
           )
@@ -90,7 +90,7 @@ internal object SearchParameterRepositoryGenerator {
             SearchParamDefinition(
               className = searchParamDefinitionClass,
               name = searchParameter.name,
-              paramTypeCode = searchParameter.type.toCode().toUpperCase(Locale.US),
+              paramTypeCode = searchParameter.type.toCode().uppercase(Locale.US),
               path = path.value,
             ),
           )
