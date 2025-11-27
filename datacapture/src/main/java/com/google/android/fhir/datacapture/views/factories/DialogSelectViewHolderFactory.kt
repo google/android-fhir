@@ -17,9 +17,6 @@
 package com.google.android.fhir.datacapture.views.factories
 
 import android.content.Context
-import android.view.View
-import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -42,35 +39,22 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
-import androidx.core.os.bundleOf
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.ItemControlTypes
 import com.google.android.fhir.datacapture.extensions.asStringValue
-import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverAnnotatedString
-import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
-import com.google.android.fhir.datacapture.extensions.toSpanned
-import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
-import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.views.HeaderView
-import com.google.android.fhir.datacapture.views.OptionSelectDialogFragment
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.DialogSelect
 import com.google.android.fhir.datacapture.views.compose.Header
 import com.google.android.fhir.datacapture.views.compose.MediaItem
-import com.google.android.material.textfield.TextInputLayout
+import com.google.android.fhir.datacapture.views.compose.OptionDialogSelect
+import com.google.android.fhir.datacapture.views.compose.OptionSelectOption
+import com.google.android.fhir.datacapture.views.compose.SelectedOptions
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
@@ -78,11 +62,6 @@ internal object DialogSelectViewHolderFactory : QuestionnaireItemComposeViewHold
   @OptIn(ExperimentalMaterial3Api::class)
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemComposeViewHolderDelegate {
-      lateinit var questionnaireViewItem: QuestionnaireViewItem
-      private lateinit var header: HeaderView
-      private lateinit var summary: TextView
-      private lateinit var summaryHolder: TextInputLayout
-      private var selectedOptionsJob: Job? = null
 
       @Composable
       override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
@@ -165,7 +144,7 @@ internal object DialogSelectViewHolderFactory : QuestionnaireItemComposeViewHold
             )
 
             if (expanded) {
-              DialogSelect(
+              OptionDialogSelect(
                 context = context,
                 title = dialogTitle,
                 multiSelect = isMultiSelect,
@@ -196,157 +175,11 @@ internal object DialogSelectViewHolderFactory : QuestionnaireItemComposeViewHold
                   }
                 },
               )
-
-              //                OptionSelectDialog (
-              //                    title = dialogTitle,
-              //                    multiSelect = isMultiSelect,
-              //                    otherOptionsAllowed = allowOtherOptions,
-              //                    initialSelectedOptions = selectedOptions,
-              //                    onDismiss = { expanded = false },
-              //                    onConfirm = { newOptions ->
-              //                        coroutineScope.launch {
-              //                            selectedOptions = newOptions
-              //                            updateAnswers(questionnaireViewItem, newOptions)
-              //                        }
-              //                    },
-              //                )
             }
           }
         }
-      }
-
-      fun init(itemView: View) {
-        header = itemView.findViewById(R.id.header)
-        summary = itemView.findViewById(R.id.multi_select_summary)
-        summaryHolder = itemView.findViewById(R.id.multi_select_summary_holder)
-      }
-
-      fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        cleanupOldState()
-        with(summaryHolder) {
-          hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
-          helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
-        }
-        val activity =
-          requireNotNull(header.context.tryUnwrapContext()) {
-            "Can only use dialog select in an AppCompatActivity context"
-          }
-        val viewModel: QuestionnaireItemDialogSelectViewModel by activity.viewModels()
-
-        // Bind static data
-        header.bind(questionnaireViewItem)
-
-        val questionnaireItem = questionnaireViewItem.questionnaireItem
-        val selectedOptions = questionnaireViewItem.extractInitialOptions(header.context)
-        summary.text = selectedOptions.selectedSummary.toSpanned()
-        selectedOptionsJob =
-          activity.lifecycleScope.launch {
-            // Listen for changes to selected options to update summary + FHIR data model
-            viewModel.getSelectedOptionsFlow(questionnaireItem.linkId).collect { selectedOptions ->
-              summary.text = selectedOptions.selectedSummary.toSpanned()
-              updateAnswers(questionnaireViewItem, selectedOptions)
-            }
-          }
-
-        // When dropdown is clicked, show dialog
-        val onClick =
-          View.OnClickListener {
-            val fragment =
-              OptionSelectDialogFragment(
-                // We use the question text for the dialog title. If there is no question text, we
-                // use flyover text as it is sometimes used in text fields instead of question text.
-                title = questionnaireViewItem.questionText
-                    ?: questionnaireItem.localizedFlyoverSpanned ?: "",
-                config = questionnaireItem.buildConfig(),
-                selectedOptions = selectedOptions,
-              )
-            fragment.arguments =
-              bundleOf(
-                OptionSelectDialogFragment.KEY_QUESTION_LINK_ID to questionnaireItem.linkId,
-              )
-            fragment.show(activity.supportFragmentManager, null)
-          }
-
-        // We need to set the click-listener on both the summary TextView, and the endIcon (the
-        // small downward-facing arrow on the right side of the container), so that clicks on both
-        // views will open the dialog.
-        summary.setOnClickListener(onClick)
-        summaryHolder.setEndIconOnClickListener(onClick)
-
-        displayValidationResult(questionnaireViewItem.validationResult)
-      }
-
-      private fun displayValidationResult(validationResult: ValidationResult) {
-        summaryHolder.error =
-          getValidationErrorMessage(
-            summaryHolder.context,
-            questionnaireViewItem,
-            validationResult,
-          )
-      }
-
-      fun setReadOnly(isReadOnly: Boolean) {
-        summaryHolder.isEnabled = !isReadOnly
-      }
-
-      private fun cleanupOldState() {
-        selectedOptionsJob?.cancel()
-      }
-
-      private suspend fun updateAnswers(
-        questionnaireViewItem: QuestionnaireViewItem,
-        selectedOptions: SelectedOptions,
-      ) {
-        questionnaireViewItem.clearAnswer()
-        var answers = arrayOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
-        selectedOptions.options
-          .filter { it.selected }
-          .map { option ->
-            answers +=
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = option.item.value
-              }
-          }
-        selectedOptions.otherOptions.map { otherOption ->
-          answers +=
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType(otherOption)
-            }
-        }
-        questionnaireViewItem.setAnswer(*answers)
       }
     }
-}
-
-internal class QuestionnaireItemDialogSelectViewModel : ViewModel() {
-  private val linkIdsToSelectedOptionsFlow =
-    mutableMapOf<String, MutableSharedFlow<SelectedOptions>>()
-
-  fun getSelectedOptionsFlow(linkId: String): Flow<SelectedOptions> = selectedOptionsFlow(linkId)
-
-  suspend fun updateSelectedOptions(linkId: String, selectedOptions: SelectedOptions) {
-    selectedOptionsFlow(linkId).emit(selectedOptions)
-  }
-
-  private fun selectedOptionsFlow(linkId: String) =
-    linkIdsToSelectedOptionsFlow.getOrPut(linkId) { MutableSharedFlow(replay = 0) }
-}
-
-data class SelectedOptions(
-  val options: List<OptionSelectOption>,
-  val otherOptions: List<String>,
-) {
-  val selectedSummary: String =
-    (options.filter { it.selected }.map { it.displayString } + otherOptions).joinToString()
-}
-
-/** Represents selectable options in the multi-select page. */
-data class OptionSelectOption(
-  val item: Questionnaire.QuestionnaireItemAnswerOptionComponent,
-  val selected: Boolean,
-  val context: Context,
-) {
-  val displayString: String = item.value.displayString(context)
 }
 
 private fun QuestionnaireViewItem.extractInitialOptions(context: Context): SelectedOptions {
@@ -368,12 +201,5 @@ private fun QuestionnaireViewItem.extractInitialOptions(context: Context): Selec
         .filter { value -> value !in options.map { it.item.value.asStringValue() } },
   )
 }
-
-private fun Questionnaire.QuestionnaireItemComponent.buildConfig() =
-  OptionSelectDialogFragment.Config(
-    multiSelect = repeats,
-    // Client had to specify that they want an open-choice control to use "Other" options
-    otherOptionsAllowed = itemControl == ItemControlTypes.OPEN_CHOICE,
-  )
 
 internal const val MULTI_SELECT_TEXT_FIELD_TAG = "multi_select_summary_holder"

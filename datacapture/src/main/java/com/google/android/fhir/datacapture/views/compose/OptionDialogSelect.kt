@@ -54,15 +54,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.optionExclusive
 import com.google.android.fhir.datacapture.extensions.toAnnotatedString
-import com.google.android.fhir.datacapture.views.factories.OptionSelectOption
-import com.google.android.fhir.datacapture.views.factories.SelectedOptions
 import java.util.concurrent.atomic.AtomicInteger
+import org.hl7.fhir.r4.model.Questionnaire
 
 @Composable
-fun DialogSelect(
+fun OptionDialogSelect(
   context: Context,
   title: AnnotatedString,
   multiSelect: Boolean,
@@ -88,10 +88,6 @@ fun DialogSelect(
   val showAddAnother =
     remember(otherOptionRowSelected, multiSelect) { otherOptionRowSelected && multiSelect }
   val listState = rememberLazyListState()
-  remember(multiSelect, otherOptionsAllowed, selectedOptions) {
-    val rows = selectedOptions.toOptionRows(multiSelect, otherOptionsAllowed).toTypedArray()
-    mutableStateListOf(*rows)
-  }
 
   LaunchedEffect(otherOptionRowSelected, otherOptionEditTexts.size) {
     if (otherOptionRowSelected) {
@@ -343,6 +339,23 @@ internal fun OptionChoice(
   }
 }
 
+data class SelectedOptions(
+  val options: List<OptionSelectOption>,
+  val otherOptions: List<String>,
+) {
+  val selectedSummary: String =
+    (options.filter { it.selected }.map { it.displayString } + otherOptions).joinToString()
+}
+
+/** Represents selectable options in the multi-select page. */
+data class OptionSelectOption(
+  val item: Questionnaire.QuestionnaireItemAnswerOptionComponent,
+  val selected: Boolean,
+  val context: Context,
+) {
+  val displayString: String = item.value.displayString(context)
+}
+
 /** Sealed class representing different types of rows in the option select dialog. */
 internal sealed class OptionSelectRow {
   /** A predefined option. */
@@ -376,66 +389,6 @@ internal sealed class OptionSelectRow {
       is OtherEditText -> "other_edit_$id"
       OtherAddAnother -> "add_another"
     }
-}
-
-/** Converts the initial SelectedOptions state into rows to display * */
-internal fun SelectedOptions.toOptionRows(
-  multiSelect: Boolean,
-  otherOptionsAllowed: Boolean,
-): List<OptionSelectRow> = buildList {
-  addAll(options.map { OptionSelectRow.Option(it) })
-  if (!otherOptionsAllowed) return@buildList
-
-  // Show "Other" option and select if other options list is not empty
-  add(OptionSelectRow.OtherRow(selected = otherOptions.isNotEmpty()))
-
-  if (otherOptions.isNotEmpty()) {
-    check(multiSelect || otherOptions.size == 1) {
-      "Multiple 'Other' options selected in single-select mode: $otherOptions"
-    }
-    addAll(otherOptions.map { OptionSelectRow.OtherEditText.fromText(it) })
-  }
-
-  sanitizeOtherOptionRows(multiSelectEnabled = multiSelect)
-}
-
-internal fun List<OptionSelectRow>.sanitizeOtherOptionRows(
-  multiSelectEnabled: Boolean,
-): List<OptionSelectRow> {
-  // Now that we've set the selected states properly, we need to make sure that the "Other" rows
-  // are showing in their correct state
-  val isOtherRowSelected = this.any { it is OptionSelectRow.OtherRow && it.selected }
-  return when {
-    isOtherRowSelected && multiSelectEnabled && this.last() !is OptionSelectRow.OtherAddAnother -> {
-      // In multi-select with Other enabled, we need the last row to be an AddAnother button
-      this + OptionSelectRow.OtherAddAnother
-    }
-    isOtherRowSelected &&
-      !multiSelectEnabled &&
-      this.last() !is OptionSelectRow.OtherAddAnother -> {
-      // In single-select with Other enabled, the last row should just be an OtherEditText
-      this + OptionSelectRow.OtherEditText.fromText("")
-    }
-    !isOtherRowSelected -> {
-      // We should not show the "Other" edit-texts or Add Another buttons, so return a sub-list with
-      // those items dropped
-      this.dropLastWhile {
-        it is OptionSelectRow.OtherEditText || it is OptionSelectRow.OtherAddAnother
-      }
-    }
-    else -> this
-  }
-}
-
-/** Converts rows back to SelectedOptions for saving. */
-internal fun List<OptionSelectRow>.toSelectedOptions(): SelectedOptions {
-  return SelectedOptions(
-    options = filterIsInstance<OptionSelectRow.Option>().map { it.option },
-    otherOptions =
-      filterIsInstance<OptionSelectRow.OtherEditText>()
-        .filter { it.currentText.isNotBlank() }
-        .map { it.currentText },
-  )
 }
 
 internal const val OPTION_CHOICE_TAG = "dialog_select_option_choice"
