@@ -21,8 +21,8 @@ androidx-datastore = "1.0.0"
 androidx-espresso = "3.5.1"
 androidx-fragment = "1.6.0"
 androidx-lifecycle = "2.8.7"
-androidx-navigation = "2.6.0"
 androidx-lifecycle-viewmodel = "2.9.3"
+androidx-navigation = "2.6.0"
 androidx-navigation-compose = "2.9.5"
 androidx-recyclerview = "1.4.0"
 androidx-room = "2.7.1"
@@ -34,43 +34,47 @@ androidx-test-runner = "1.5.0"
 androidx-tracing = "1.3.0"
 androidx-work = "2.8.1"
 apache-commons-compress = "1.21"
+compose-hotreload = "1.0.0-rc04"
+compose-multiplatform = "1.9.3"
 desugarJdkLibs = "2.0.3"
 dokka = "1.9.20"
 fhir-ucum = "1.0.3"
-compose-hotreload = "1.0.0-rc04"
-compose-multiplatform = "1.9.3"
 fladleVersion = "0.17.4"
 glide = "4.16.0"
+gradle = "8.13.0"
 guava = "32.1.3-android"
 hapi-fhir = "6.8.0"
 hapi-fhir-core = "6.0.22"
+hapiFhirStructuresR4 = "6.10.0"
 json-assert = "1.5.1"
 json-tools-patch = "1.13"
-gradle = "8.13.0"
 junit = "4.13.2"
 kermit = "2.0.8"
 kotlin = "2.2.20"
 kotlin-fhir = "1.0.0-beta01"
+kotlinpoet = "2.2.0"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization-json = "1.9.0"
 kotlinxCoroutinesSwing = "1.10.2"
 kotlinxIoCore = "0.8.0"
 licenseeGradlePlugin = "1.8.0"
 logback-android = "3.0.0"
+material = "1.13.0"
+materialIconsExtended = "1.7.3"
 mlkit-barcode-scanning = "16.1.1"
 mlkit-object-detection = "16.2.3"
 mlkit-object-detection-custom = "16.3.1"
 mockito-inline = "4.0.0"
 mockito-kotlin = "3.2.0"
+navigation-compose = "2.9.1"
 nimbus = "9.31"
 okhttp3 = "4.11.0"
-material = "1.13.0"
-materialIconsExtended = "1.7.3"
-navigation-compose = "2.9.1"
 opencds-cqf-fhir = "3.8.0"
 play-services-location = "21.0.1"
 retrofit = "2.9.0"
 robolectric = "4.10.3"
+rulerGradlePlugin = "1.4.0"
+spotlessPluginGradle = "6.22.0"
 sqlcipher = "4.5.4"
 timber = "5.0.1"
 truth = "1.1.5"
@@ -142,6 +146,7 @@ guava = { module = "com.google.guava:guava", version.ref = "guava" }
 hapi-fhir-caching-guava = { module = "ca.uhn.hapi.fhir:hapi-fhir-caching-guava", version.ref = "hapi-fhir" }
 hapi-fhir-core-convertors = { module = "ca.uhn.hapi.fhir:org.hl7.fhir.convertors", version.ref = "hapi-fhir-core" }
 hapi-fhir-structures-r4 = { module = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4", version.ref = "hapi-fhir" }
+hapi-fhir-structures-r4-v6100 = { module = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4", version.ref = "hapiFhirStructuresR4" }
 hapi-fhir-validation = { module = "ca.uhn.hapi.fhir:hapi-fhir-validation", version.ref = "hapi-fhir" }
 hapi-fhir-validation-r4 = { module = "ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4", version.ref = "hapi-fhir" }
 json-assert = { module = "org.skyscreamer:jsonassert", version.ref = "json-assert" }
@@ -152,6 +157,7 @@ kotlin-fhir = { module = "com.google.fhir:fhir-model", version.ref = "kotlin-fhi
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-playservices = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
@@ -180,6 +186,8 @@ play-services-location = { module = "com.google.android.gms:play-services-locati
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+ruler-gradle-plugin = { module = "com.spotify.ruler:ruler-gradle-plugin", version.ref = "rulerGradlePlugin" }
+spotless-plugin-gradle = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotlessPluginGradle" }
 sqlcipher = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlcipher" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
@@ -193,19 +201,19 @@ androidx-tracing = ["androidx-tracing-tracing", "androidx-tracing-tracing-androi
 
 [plugins]
 android-application = { id = "com.android.application" }
+android-application-build-src = { id = "com.android.application", version.ref = "android-gradle-plugin" }
+android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "android-gradle-plugin" }
 android-library = { id = "com.android.library" }
 android-test = { id = "com.android.test" }
 androidx-benchmark = { id = "androidx.benchmark" }
 androidx-navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin" }
-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-kotlin-android = { id = "org.jetbrains.kotlin.android" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization" }
-ksp = { id = "com.google.devtools.ksp" }
-android-application-build-src = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose-hotreload = { id = "org.jetbrains.compose.hot-reload", version.ref = "compose-hotreload" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
-kotlin-serialization-build-src = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+kotlin-android = { id = "org.jetbrains.kotlin.android" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "android-gradle-plugin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization" }
+kotlin-serialization-build-src = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp" }
