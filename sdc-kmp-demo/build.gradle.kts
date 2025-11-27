@@ -37,7 +37,7 @@ kotlin {
 
   jvm("desktop")
 
-  val xcfName = "sdc-kmp-demoKit"
+  val xcfName = "sdcKmpDemoKit"
 
   listOf(
       iosX64(),
