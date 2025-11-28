@@ -16,10 +16,13 @@
 
 package com.google.android.fhir.datacapture.test.views
 
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -27,8 +30,9 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.views.GroupHeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_TAG
+import com.google.android.fhir.datacapture.views.compose.HEADER_TAG
 import com.google.android.fhir.datacapture.views.factories.GroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat
@@ -71,6 +75,8 @@ class GroupViewHolderFactoryTest {
       ),
     )
 
+    composeTestRule.waitForIdle()
+
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Group header")
   }
@@ -85,9 +91,9 @@ class GroupViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
-      .isEqualTo("Missing answer for required field.")
+    composeTestRule
+      .onNodeWithTag(ERROR_TEXT_TAG)
+      .assertTextEquals("Missing answer for required field.")
   }
 
   @Test
@@ -112,8 +118,7 @@ class GroupViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isEqualTo("")
+    composeTestRule.onNodeWithTag(ERROR_TEXT_TAG).assertDoesNotExist()
   }
 
   @Test
@@ -137,21 +142,12 @@ class GroupViewHolderFactoryTest {
       ),
     )
 
+    composeTestRule.waitForIdle()
+
     assertThat(
-        viewHolder.itemView
-          .findViewById<GroupHeaderView>(R.id.header)
-          .findViewById<TextView>(R.id.hint)
-          .text
-          .isNullOrEmpty(),
+        viewHolder.itemView.findViewById<TextView?>(R.id.hint),
       )
-      .isTrue()
-    assertThat(
-        viewHolder.itemView
-          .findViewById<GroupHeaderView>(R.id.header)
-          .findViewById<TextView>(R.id.hint)
-          .visibility,
-      )
-      .isEqualTo(View.GONE)
+      .isNull()
   }
 
   @Test
@@ -164,8 +160,7 @@ class GroupViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.itemView.findViewById<GroupHeaderView>(R.id.header).visibility)
-      .isEqualTo(View.VISIBLE)
+    composeTestRule.onNodeWithTag(HEADER_TAG).assertIsDisplayed()
   }
 
   @Test
@@ -179,7 +174,6 @@ class GroupViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<GroupHeaderView>(R.id.header).visibility)
-      .isEqualTo(View.GONE)
+    composeTestRule.onNodeWithTag(HEADER_TAG).assertIsNotDisplayed()
   }
 }

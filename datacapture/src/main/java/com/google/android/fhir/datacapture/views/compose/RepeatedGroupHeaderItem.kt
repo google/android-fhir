@@ -58,7 +58,7 @@ internal fun RepeatedGroupHeaderItem(
   ) {
     Text(
       text = stringResource(R.string.repeated_group_title, indexNumber, title),
-      modifier = Modifier.weight(1f),
+      modifier = Modifier.testTag(REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG).weight(1f),
       style = MaterialTheme.typography.titleMedium,
     )
 
@@ -83,4 +83,5 @@ internal fun RepeatedGroupHeaderItem(
   }
 }
 
-const val DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG = "deleteRepeatedGroupItemButtonTag"
+const val DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG = "delete_repeated_group_item_button"
+const val REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG = "repeated_group_instance_header_title"
