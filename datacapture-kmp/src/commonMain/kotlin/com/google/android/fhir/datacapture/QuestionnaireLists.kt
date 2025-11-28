@@ -247,20 +247,25 @@ private fun QuestionnaireReviewItem(
             .map { itemAnswer -> itemAnswer.value }
             .joinToString(", ") { answer ->
               when (answer) {
-                is QuestionnaireResponse.Item.Answer.Value.String -> answer.asString()
-                is QuestionnaireResponse.Item.Answer.Value.Integer -> answer.asInteger().toString()
-                is QuestionnaireResponse.Item.Answer.Value.Decimal -> answer.asDecimal().toString()
-                is QuestionnaireResponse.Item.Answer.Value.Date -> answer.asDate().toString()
-                is QuestionnaireResponse.Item.Answer.Value.Time -> answer.asTime().toString()
+                is QuestionnaireResponse.Item.Answer.Value.String -> answer.asString()?.value?.value
+                is QuestionnaireResponse.Item.Answer.Value.Integer ->
+                  answer.asInteger()?.value?.value.toString()
+                is QuestionnaireResponse.Item.Answer.Value.Decimal ->
+                  answer.asDecimal()?.value?.value?.toStringExpanded()
+                is QuestionnaireResponse.Item.Answer.Value.Date ->
+                  answer.asDate()?.value?.value?.toString()
+                is QuestionnaireResponse.Item.Answer.Value.Time ->
+                  answer.asTime()?.value?.value?.toString()
                 is QuestionnaireResponse.Item.Answer.Value.DateTime ->
-                  answer.asDateTime().toString()
+                  answer.asDateTime()?.value?.value?.toString()
                 is QuestionnaireResponse.Item.Answer.Value.Quantity ->
-                  answer.asQuantity()?.value.toString()
+                  answer.asQuantity()?.value?.value?.value?.toStringExpanded()
                 is QuestionnaireResponse.Item.Answer.Value.Coding ->
                   answer.asCoding()?.value?.code?.value.toString()
                 else -> ""
               }
-                as CharSequence
+                as CharSequence?
+                ?: ""
             }
 
         if (answerText.isNotEmpty()) {

@@ -69,6 +69,7 @@ fun QuestionnaireScreen(
           questionnaireJson = json,
           showSubmitButton = true,
           showCancelButton = true,
+          showReviewPage = true,
           onSubmit = { response -> navigateToResponse(response) },
           onCancel = {
             // Navigate back on cancel
