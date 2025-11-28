@@ -20,11 +20,16 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.fragment.app.commitNow
 import androidx.test.espresso.Espresso.onView
@@ -49,6 +54,7 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValid
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
 import com.google.android.fhir.datacapture.views.compose.HANDLE_INPUT_DEBOUNCE_TIME
+import com.google.android.fhir.datacapture.views.compose.PAGE_NAVIGATION_BUTTON_TAG
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localDateTime
 import com.google.android.material.progressindicator.LinearProgressIndicator
@@ -91,51 +97,49 @@ class QuestionnaireUiEspressoTest {
   @Test
   fun shouldDisplayReviewButtonWhenNoMorePagesToDisplay() {
     buildFragmentFromQuestionnaire("/paginated_questionnaire_with_dependent_answer.json", true)
-
-    onView(withId(com.google.android.fhir.datacapture.R.id.review_mode_button))
-      .check(
-        ViewAssertions.matches(
-          ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
-        ),
-      )
+    val reviewButtonText =
+      context.getString(com.google.android.fhir.datacapture.R.string.button_review)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
+      .assertIsDisplayed()
 
     clickOnText("Yes")
-    onView(withId(com.google.android.fhir.datacapture.R.id.review_mode_button))
-      .check(
-        ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
-      )
+
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
+      .assertIsNotDisplayed()
 
     clickOnText("No")
-    onView(withId(com.google.android.fhir.datacapture.R.id.review_mode_button))
-      .check(
-        ViewAssertions.matches(
-          ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
-        ),
-      )
+
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
+      .assertIsDisplayed()
   }
 
   @Test
   fun shouldHideNextButtonIfDisabled() {
     buildFragmentFromQuestionnaire("/layout_paginated.json", true)
 
-    clickOnText("Next")
+    val nextButtonText =
+      context.getString(com.google.android.fhir.datacapture.R.string.button_pagination_next)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
+      .performClick()
 
-    onView(withId(com.google.android.fhir.datacapture.R.id.pagination_next_button))
-      .check(
-        ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
-      )
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
+      .assertIsNotDisplayed()
   }
 
   @Test
   fun shouldDisplayNextButtonIfEnabled() {
     buildFragmentFromQuestionnaire("/layout_paginated.json", true)
 
-    onView(withId(com.google.android.fhir.datacapture.R.id.pagination_next_button))
-      .check(
-        ViewAssertions.matches(
-          ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
-        ),
-      )
+    val nextButtonText =
+      context.getString(com.google.android.fhir.datacapture.R.string.button_pagination_next)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
+      .assertIsDisplayed()
   }
 
   @Test
@@ -595,8 +599,11 @@ class QuestionnaireUiEspressoTest {
   fun progressBar_shouldProgress_onPaginationNext() {
     buildFragmentFromQuestionnaire("/layout_paginated.json")
 
-    onView(withId(com.google.android.fhir.datacapture.R.id.pagination_next_button))
-      .perform(ViewActions.click())
+    val nextButtonText =
+      context.getString(com.google.android.fhir.datacapture.R.string.button_pagination_next)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
+      .performClick()
 
     onView(withId(com.google.android.fhir.datacapture.R.id.questionnaire_progress_indicator))
       .check { view, _ ->
@@ -609,8 +616,13 @@ class QuestionnaireUiEspressoTest {
   fun progressBar_shouldBeGone_whenNavigatedToReviewScreen() {
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json", isReviewMode = true)
 
-    onView(withId(com.google.android.fhir.datacapture.R.id.review_mode_button))
-      .perform(ViewActions.click())
+    val reviewButtonText =
+      context.getString(com.google.android.fhir.datacapture.R.string.button_review)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
+      .performClick()
+
+    composeTestRule.waitForIdle()
 
     onView(withId(com.google.android.fhir.datacapture.R.id.questionnaire_progress_indicator))
       .check { view, _ ->
@@ -623,8 +635,12 @@ class QuestionnaireUiEspressoTest {
   fun progressBar_shouldBeVisible_whenNavigatedToEditScreenFromReview() {
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json", isReviewMode = true)
 
-    onView(withId(com.google.android.fhir.datacapture.R.id.review_mode_button))
-      .perform(ViewActions.click())
+    val reviewButtonText =
+      context.getString(com.google.android.fhir.datacapture.R.string.button_review)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
+      .performClick()
+    composeTestRule.waitForIdle()
 
     onView(withId(com.google.android.fhir.datacapture.R.id.review_mode_edit_button))
       .perform(ViewActions.click())
@@ -699,6 +715,251 @@ class QuestionnaireUiEspressoTest {
       .check(doesNotExist())
   }
 
+  @Test
+  fun shouldHideNextButtonOnLastPage() {
+    val questionnaireJson =
+      """{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "1.1",
+          "type": "display",
+          "text": "Item 1"
+        }
+      ]
+    },
+    {
+      "linkId": "2",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "2.1",
+          "type": "display",
+          "text": "Item 2"
+        }
+      ]
+    }
+  ]
+}
+"""
+    val questionnaire = parser.parseResource(questionnaireJson) as Questionnaire
+    buildFragmentFromQuestionnaire(questionnaire)
+    val nextButtonText =
+      context.getString(com.google.android.fhir.datacapture.R.string.button_pagination_next)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
+      .performClick()
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
+      .assertDoesNotExist()
+  }
+
+  @Test
+  fun reviewPageShouldShowBothEditAndSubmitButton() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+    buildFragmentFromQuestionnaire(questionnaire, isReviewMode = true, showReviewPageFirst = true)
+    onView(withId(com.google.android.fhir.datacapture.R.id.review_mode_edit_button))
+      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+    composeTestRule
+      .onNode(
+        hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and
+          hasText(
+            context.getString(com.google.android.fhir.datacapture.R.string.submit_questionnaire),
+          ),
+      )
+      .assertIsDisplayed()
+  }
+
+  @Test
+  fun questionnaireSubmitButtonTextShouldBeEditable() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+    val customButtonText = "Apply"
+    buildFragmentFromQuestionnaire(questionnaire, submitText = customButtonText)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(customButtonText))
+      .assertIsDisplayed()
+  }
+
+  @Test
+  fun shouldHidePreviousButtonOnFirstPage() {
+    val questionnaireJson =
+      """{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "1.1",
+          "type": "display",
+          "text": "Item 1"
+        }
+      ]
+    },
+    {
+      "linkId": "2",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "2.1",
+          "type": "display",
+          "text": "Item 2"
+        }
+      ]
+    }
+  ]
+}
+"""
+    val questionnaire = parser.parseResource(questionnaireJson) as Questionnaire
+    buildFragmentFromQuestionnaire(questionnaire)
+    composeTestRule
+      .onNode(
+        hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and
+          hasText(
+            context.getString(
+              com.google.android.fhir.datacapture.R.string.button_pagination_previous,
+            ),
+          ),
+      )
+      .assertDoesNotExist()
+  }
+
+  fun showBottomNavigationContainerWhenSetShowNavigationInDefaultLongScrollIsSetToFalse() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+    buildFragmentFromQuestionnaire(questionnaire, showNavigationLongScroll = false)
+    onView(withId(com.google.android.fhir.datacapture.R.id.bottom_nav_container_frame))
+      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+    composeTestRule
+      .onNode(
+        hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and
+          hasText(
+            context.getString(com.google.android.fhir.datacapture.R.string.submit_questionnaire),
+          ),
+      )
+      .assertIsDisplayed()
+      .assertIsEnabled()
+  }
+
+  @Test
+  fun hideTheBottomNavigationContainerWhenSetShowNavigationInDefaultLongScrollIsSetToTrue() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+    buildFragmentFromQuestionnaire(questionnaire, showNavigationLongScroll = true)
+    onView(withId(com.google.android.fhir.datacapture.R.id.bottom_nav_container_frame))
+      .check(
+        ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
+      )
+    composeTestRule
+      .onNode(
+        hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and
+          hasText(
+            context.getString(com.google.android.fhir.datacapture.R.string.submit_questionnaire),
+          ),
+      )
+      .assertIsDisplayed()
+      .assertIsEnabled()
+  }
+
   private fun buildFragmentFromQuestionnaire(
     fileName: String,
     isReviewMode: Boolean = false,
@@ -726,11 +987,17 @@ class QuestionnaireUiEspressoTest {
   private fun buildFragmentFromQuestionnaire(
     questionnaire: Questionnaire,
     isReviewMode: Boolean = false,
+    showReviewPageFirst: Boolean = false,
+    showNavigationLongScroll: Boolean = false,
+    submitText: String? = null,
   ) {
     val questionnaireFragment =
       QuestionnaireFragment.builder()
         .setQuestionnaire(parser.encodeResourceToString(questionnaire))
         .showReviewPageBeforeSubmit(isReviewMode)
+        .setShowNavigationInDefaultLongScroll(showNavigationLongScroll)
+        .showReviewPageFirst(showReviewPageFirst)
+        .apply { submitText?.let { setSubmitButtonText(it) } }
         .build()
     composeTestRule.activityRule.scenario.onActivity { activity ->
       activity.supportFragmentManager.commitNow {

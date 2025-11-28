@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
@@ -48,11 +49,6 @@ fun PageBottomNavigationView(
   Mdc3Theme { PageNavigationView(navigationUIState = navigationUIState, modifier = modifier) }
 }
 
-/**
- * Composable function that renders the navigation bar for questionnaires.
- *
- * This replaces the XML-based pagination_navigation_view.xml layout with a Compose implementation.
- */
 @Composable
 fun PageNavigationView(
   navigationUIState: QuestionnaireNavigationUIState,
@@ -128,7 +124,7 @@ private fun PageNavigationButton(
     val buttonText = navigationViewState.labelText?.takeIf { it.isNotBlank() } ?: defaultText
     Button(
       onClick = navigationViewState.onClickAction,
-      modifier = modifier,
+      modifier = modifier.testTag(PAGE_NAVIGATION_BUTTON_TAG),
     ) {
       Text(
         text = buttonText,
@@ -136,3 +132,5 @@ private fun PageNavigationButton(
     }
   }
 }
+
+internal const val PAGE_NAVIGATION_BUTTON_TAG = "page_navigation_button"
