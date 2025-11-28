@@ -346,7 +346,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
    * When the draft answer becomes valid, its entry in the map is removed, e.g, "02/02/2023" is
    * valid answer and should not be in this map.
    */
-  private val draftAnswerMap = mutableMapOf<com.google.fhir.model.r4.String, Any>()
+  private val draftAnswerMap = mutableMapOf<QuestionnaireResponse.Item, Any>()
 
   /**
    * Callback function to update the view model after the answer(s) to a question have been changed.
@@ -373,13 +373,13 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     { questionnaireItem, questionnaireResponseItem, answers, draftAnswer ->
       when {
         (questionnaireResponseItem.answer.isNotEmpty()) -> {
-          draftAnswerMap.remove(questionnaireResponseItem.linkId)
+          draftAnswerMap.remove(questionnaireResponseItem)
         }
         else -> {
           if (draftAnswer == null) {
-            draftAnswerMap.remove(questionnaireResponseItem.linkId)
+            draftAnswerMap.remove(questionnaireResponseItem)
           } else {
-            draftAnswerMap[questionnaireResponseItem.linkId] = draftAnswer
+            draftAnswerMap[questionnaireResponseItem] = draftAnswer
           }
         }
       }
@@ -1018,7 +1018,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
               //                    it,
               //                  )
               //                }
-              draftAnswer = draftAnswerMap[questionnaireResponseItem.linkId],
+              draftAnswer = draftAnswerMap[questionnaireResponseItem],
               enabledDisplayItems =
                 questionnaireItem.item.filter {
                   it.isDisplayItem

@@ -38,7 +38,7 @@ internal object EditTextDecimalViewHolderFactory : QuestionnaireItemComposeViewH
         when {
           questionnaireItemViewItemDecimalAnswer == null && draftAnswer.isNullOrEmpty() -> ""
           questionnaireItemViewItemDecimalAnswer != null ->
-            questionnaireItemViewItemDecimalAnswer.value.value.toString()
+            questionnaireItemViewItemDecimalAnswer.value.value?.toStringExpanded()
           else -> draftAnswer
         }
       },
