@@ -31,6 +31,7 @@ import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.text.AnnotatedString
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -48,6 +49,7 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
+import com.google.android.fhir.datacapture.views.compose.OPTION_CHOICE_LIST_TAG
 import com.google.android.fhir.datacapture.views.compose.OPTION_CHOICE_TAG
 import com.google.android.fhir.datacapture.views.compose.OTHER_OPTION_TEXT_FIELD_TAG
 import com.google.android.fhir.datacapture.views.factories.DialogSelectViewHolderFactory
@@ -484,7 +486,9 @@ class DialogMultiSelectViewHolderFactoryTest {
 
     val context = viewHolder.itemView.context
     // Select "Other" option
-    composeTestRule.onNodeWithText(context.getString(R.string.open_choice_other)).performClick()
+    val otherText = context.getString(R.string.open_choice_other)
+    composeTestRule.onNodeWithTag(OPTION_CHOICE_LIST_TAG).performScrollToNode(hasText(otherText))
+    composeTestRule.onNodeWithText(otherText).performClick()
 
     // "Add Another" button should be displayed in multi-select mode
     composeTestRule
@@ -521,8 +525,10 @@ class DialogMultiSelectViewHolderFactoryTest {
 
     val context = viewHolder.itemView.context
     // Select and then unselect "Other" option
-    composeTestRule.onNodeWithText(context.getString(R.string.open_choice_other)).performClick()
-    composeTestRule.onNodeWithText(context.getString(R.string.open_choice_other)).performClick()
+    val otherText = context.getString(R.string.open_choice_other)
+    composeTestRule.onNodeWithTag(OPTION_CHOICE_LIST_TAG).performScrollToNode(hasText(otherText))
+    composeTestRule.onNodeWithText(otherText).performClick()
+    composeTestRule.onNodeWithText(otherText).performClick()
 
     // "Add Another" button should not be displayed when "Other" is unselected
     composeTestRule
@@ -559,17 +565,19 @@ class DialogMultiSelectViewHolderFactoryTest {
 
     val context = viewHolder.itemView.context
     // Select "Other" option
-    composeTestRule.onNodeWithText(context.getString(R.string.open_choice_other)).performClick()
+    val otherText = context.getString(R.string.open_choice_other)
+    composeTestRule.onNodeWithTag(OPTION_CHOICE_LIST_TAG).performScrollToNode(hasText(otherText))
+    composeTestRule.onNodeWithText(otherText).performClick()
 
     // Click "Add Another" button
+    val addAnotherText = context.getString(R.string.open_choice_other_add_another)
     composeTestRule
-      .onNodeWithText(context.getString(R.string.open_choice_other_add_another))
-      .performClick()
+      .onNodeWithTag(OPTION_CHOICE_LIST_TAG)
+      .performScrollToNode(hasText(addAnotherText))
+    composeTestRule.onNodeWithText(addAnotherText).performClick()
 
     // "Add Another" button should still be displayed after clicking
-    composeTestRule
-      .onNodeWithText(context.getString(R.string.open_choice_other_add_another))
-      .assertIsDisplayed()
+    composeTestRule.onNodeWithText(addAnotherText).assertIsDisplayed()
   }
 
   @Test
@@ -608,7 +616,9 @@ class DialogMultiSelectViewHolderFactoryTest {
 
     val context = viewHolder.itemView.context
     // Select "Other" option
-    composeTestRule.onNodeWithText(context.getString(R.string.open_choice_other)).performClick()
+    val otherText = context.getString(R.string.open_choice_other)
+    composeTestRule.onNodeWithTag(OPTION_CHOICE_LIST_TAG).performScrollToNode(hasText(otherText))
+    composeTestRule.onNodeWithText(otherText).performClick()
 
     // Select exclusive option
     composeTestRule.onNodeWithText("Coding Exclusive").performClick()
@@ -655,7 +665,9 @@ class DialogMultiSelectViewHolderFactoryTest {
 
     val context = viewHolder.itemView.context
     // Select "Other" option
-    composeTestRule.onNodeWithText(context.getString(R.string.open_choice_other)).performClick()
+    val otherText = context.getString(R.string.open_choice_other)
+    composeTestRule.onNodeWithTag(OPTION_CHOICE_LIST_TAG).performScrollToNode(hasText(otherText))
+    composeTestRule.onNodeWithText(otherText).performClick()
 
     // Click "Add Another" button
     composeTestRule

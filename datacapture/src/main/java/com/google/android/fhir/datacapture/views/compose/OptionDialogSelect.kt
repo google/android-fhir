@@ -124,6 +124,7 @@ fun OptionDialogSelect(
           state = listState,
           modifier =
             Modifier.fillMaxWidth()
+              .testTag(OPTION_CHOICE_LIST_TAG)
               .weight(1f, fill = false)
               .padding(top = dimensionResource(R.dimen.dialog_option_scroll_margin_top)),
           verticalArrangement =
@@ -391,5 +392,6 @@ internal sealed class OptionSelectRow {
     }
 }
 
+internal const val OPTION_CHOICE_LIST_TAG = "dialog_select_option_choice_list"
 internal const val OPTION_CHOICE_TAG = "dialog_select_option_choice"
 internal const val OTHER_OPTION_TEXT_FIELD_TAG = "other_option_edit_text_field"
