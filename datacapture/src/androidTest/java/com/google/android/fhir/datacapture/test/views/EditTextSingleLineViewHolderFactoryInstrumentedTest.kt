@@ -378,4 +378,41 @@ class EditTextSingleLineViewHolderFactoryInstrumentedTest {
 
     composeTestRule.onNodeWithText("Optional").assertDoesNotExist()
   }
+
+  @Test
+  fun displaysCorrectTextOnQuestionnaireViewItemAnswerUpdate() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "First Name" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          answer =
+            listOf(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = StringType("Jane")
+              },
+            )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("Jane")
+
+    val questionnaireViewItemUpdatedAnswer =
+      questionnaireViewItem.copy(
+        questionnaireResponseItem =
+          questionnaireViewItem.getQuestionnaireResponseItem().apply {
+            answer =
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = StringType("Janette")
+                },
+              )
+          },
+      )
+    viewHolder.bind(questionnaireViewItemUpdatedAnswer)
+
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("Janette")
+  }
 }
