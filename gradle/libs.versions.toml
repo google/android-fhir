@@ -50,6 +50,7 @@ json-assert = "1.5.1"
 json-tools-patch = "1.13"
 junit = "4.13.2"
 kermit = "2.0.8"
+kotest = "6.0.7"
 kotlin = "2.2.20"
 kotlin-fhir = "1.0.0-beta02"
 kotlinpoet = "2.2.0"
@@ -153,6 +154,7 @@ json-assert = { module = "org.skyscreamer:jsonassert", version.ref = "json-asser
 json-tools-patch = { module = "com.github.java-json-tools:json-patch", version.ref = "json-tools-patch" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+kotest-assertions-core = {module = "io.kotest:kotest-assertions-core", version.ref="kotest"}
 kotlin-fhir = { module = "com.google.fhir:fhir-model", version.ref = "kotlin-fhir" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

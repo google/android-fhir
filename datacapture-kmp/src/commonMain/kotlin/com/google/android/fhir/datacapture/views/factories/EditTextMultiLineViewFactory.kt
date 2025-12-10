@@ -16,16 +16,4 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import androidx.compose.runtime.Composable
-import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-
-interface QuestionnaireItemComposeViewHolderFactory {
-  fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemComposeViewHolderDelegate
-}
-
-interface QuestionnaireItemComposeViewHolderDelegate : QuestionnaireItemViewHolderDelegate {
-
-  @Composable fun Content(questionnaireViewItem: QuestionnaireViewItem)
-}
-
-sealed interface QuestionnaireItemViewHolderDelegate
+internal val EditTextMultiLineViewFactory = createEditTextStringViewHolderDelegate(multiLine = true)

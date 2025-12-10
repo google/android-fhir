@@ -41,11 +41,11 @@ import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewHolderFactory
-import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewHolderFactory
-import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewHolderFactory
-import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewHolderFactory
-import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemComposeViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewFactory
+import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewFactory
+import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewFactory
+import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewFactory
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 import kotlin.uuid.ExperimentalUuidApi
@@ -104,8 +104,7 @@ internal fun QuestionnaireEditList(
         is QuestionnaireAdapterItem.Question -> {
           val questionnaireViewHolderType = getItemViewTypeForQuestion(adapterItem.item)
           val questionnaireItemViewHolderDelegate =
-            getQuestionnaireItemViewHolderFactory(questionnaireViewHolderType)
-              ?.getQuestionnaireItemViewHolderDelegate()
+            getQuestionnaireItemViewFactory(questionnaireViewHolderType)
           questionnaireItemViewHolderDelegate?.Content(adapterItem.item)
         }
         is QuestionnaireAdapterItem.Navigation -> {
@@ -327,14 +326,14 @@ private fun QuestionnaireReviewItem(
   return questionnaireViewHolderFactory.create(parent)
 }*/
 
-fun getQuestionnaireItemViewHolderFactory(
+fun getQuestionnaireItemViewFactory(
   questionnaireViewHolderType: QuestionnaireViewHolderType,
-): QuestionnaireItemComposeViewHolderFactory? {
+): QuestionnaireItemViewFactory? {
   return when (questionnaireViewHolderType) {
-    QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE -> EditTextSingleLineViewHolderFactory
-    QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE -> EditTextMultiLineViewHolderFactory
-    QuestionnaireViewHolderType.EDIT_TEXT_INTEGER -> EditTextIntegerViewHolderFactory
-    QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewHolderFactory
+    QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE -> EditTextSingleLineViewFactory
+    QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE -> EditTextMultiLineViewFactory
+    QuestionnaireViewHolderType.EDIT_TEXT_INTEGER -> EditTextIntegerViewFactory
+    QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewFactory
     else -> null
   }
 }

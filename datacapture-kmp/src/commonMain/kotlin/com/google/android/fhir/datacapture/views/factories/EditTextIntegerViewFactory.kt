@@ -17,39 +17,46 @@
 package com.google.android.fhir.datacapture.views.factories
 
 import android_fhir.datacapture_kmp.generated.resources.Res
-import android_fhir.datacapture_kmp.generated.resources.required_text_and_new_line
+import android_fhir.datacapture_kmp.generated.resources.integer_format_validation_error_msg
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import com.google.android.fhir.datacapture.NumberFormatter
+import com.google.fhir.model.r4.Integer as FhirInteger
 import com.google.fhir.model.r4.QuestionnaireResponse
-import com.google.fhir.model.r4.String as FhirString
 
-/**
- * Implementation of [EditTextViewFactoryDelegate] used in [EditTextSingleLineViewFactory] and
- * [EditTextMultiLineViewFactory].
- *
- * Any `ViewHolder` containing a `EditText` view that collects text data should use this class.
- */
-internal fun createEditTextStringViewHolderDelegate(multiLine: Boolean = false) =
+internal val EditTextIntegerViewFactory =
   EditTextViewFactoryDelegate(
-    KeyboardOptions(
-      keyboardType = KeyboardType.Text,
-      capitalization = KeyboardCapitalization.Sentences,
-      imeAction = ImeAction.Done,
-    ),
-    uiInputText = { it.answers.singleOrNull()?.value?.asString()?.value?.value ?: "" },
+    KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+    uiInputText = {
+      val answer = it.answers.singleOrNull()?.value?.asInteger()?.value?.value?.toString()
+      val draftAnswer = it.draftAnswer?.toString()
+      when {
+        answer.isNullOrEmpty() && draftAnswer.isNullOrEmpty() -> ""
+        answer?.toIntOrNull() != null -> answer
+        else -> draftAnswer
+      }
+    },
     handleInput = { inputText, questionnaireViewItem ->
       if (inputText.isEmpty()) {
         questionnaireViewItem.clearAnswer()
-      } else {
+      } else if (inputText.toIntOrNull() != null) {
         questionnaireViewItem.setAnswer(
           QuestionnaireResponse.Item.Answer(
-            value = QuestionnaireResponse.Item.Answer.Value.String(FhirString(value = inputText)),
+            value =
+              QuestionnaireResponse.Item.Answer.Value.Integer(
+                FhirInteger(value = inputText.toInt()),
+              ),
           ),
         )
+      } else {
+        questionnaireViewItem.setDraftAnswer(inputText)
       }
     },
-    isMultiLine = multiLine,
-    validationMessageStringRes = Res.string.required_text_and_new_line,
+    validationMessageStringRes = Res.string.integer_format_validation_error_msg,
+    validationMessageStringResArgs =
+      arrayOf(
+        NumberFormatter.formatInteger(Int.MIN_VALUE),
+        NumberFormatter.formatInteger(Int.MAX_VALUE),
+      ),
   )

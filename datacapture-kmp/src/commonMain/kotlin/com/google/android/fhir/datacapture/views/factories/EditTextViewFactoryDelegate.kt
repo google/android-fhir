@@ -45,14 +45,14 @@ import com.google.android.fhir.datacapture.views.compose.UnitText
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
-class EditTextViewHolderDelegate(
+class EditTextViewFactoryDelegate(
   private val keyboardOptions: KeyboardOptions,
   private val uiInputText: (QuestionnaireViewItem) -> String?,
   private val handleInput: suspend (String, QuestionnaireViewItem) -> Unit,
   private val isMultiLine: Boolean = false,
   private val validationMessageStringRes: StringResource,
   private val validationMessageStringResArgs: Array<Any> = emptyArray(),
-) : QuestionnaireItemComposeViewHolderDelegate {
+) : QuestionnaireItemViewFactory {
 
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {

@@ -16,6 +16,9 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-internal object EditTextSingleLineViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
-  override fun getQuestionnaireItemViewHolderDelegate() = createEditTextStringViewHolderDelegate()
+import androidx.compose.runtime.Composable
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+
+interface QuestionnaireItemViewFactory {
+  @Composable fun Content(questionnaireViewItem: QuestionnaireViewItem)
 }
