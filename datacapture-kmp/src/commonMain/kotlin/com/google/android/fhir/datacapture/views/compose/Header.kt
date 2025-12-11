@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.views.compose
 
 import android_fhir.datacapture_kmp.generated.resources.Res
 import android_fhir.datacapture_kmp.generated.resources.help
-import android_fhir.datacapture_kmp.generated.resources.optional_helper_text
 import android_fhir.datacapture_kmp.generated.resources.required
 import android_fhir.datacapture_kmp.generated.resources.space_asterisk
 import androidx.compose.foundation.layout.Column
@@ -71,16 +70,7 @@ fun Header(
     remember(questionnaireViewItem.questionnaireItem) { questionnaireViewItem.questionnaireItem }
   val questionnaireResponseItem =
     remember(questionnaireViewItem) { questionnaireViewItem.getQuestionnaireResponseItem() }
-  val requiredOptionalText =
-    when {
-      (questionnaireItem.required?.value == true &&
-        questionnaireViewItem.questionViewTextConfiguration.showRequiredText) ->
-        stringResource(Res.string.required)
-      (questionnaireItem.required?.value != true &&
-        questionnaireViewItem.questionViewTextConfiguration.showOptionalText) ->
-        stringResource(Res.string.optional_helper_text)
-      else -> null
-    }
+  val requiredOptionalText = getRequiredOrOptionalText(questionnaireViewItem)
 
   val prefixLocalizedText = questionnaireViewItem.questionnaireItem.localizedPrefixAnnotatedString
   val spaceAsterisk = stringResource(Res.string.space_asterisk)

@@ -29,6 +29,29 @@
       "required": false
     },
     {
+      "linkId": "1",
+      "text": "Enter length",
+      "type": "quantity",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+          "valueCoding": {
+            "system": "http://unitsofmeasure.org",
+            "code": "cm",
+            "display": "centimeter"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+          "valueCoding": {
+            "system": "http://unitsofmeasure.org",
+            "code": "[in_i]",
+            "display": "inch"
+          }
+        }
+      ]
+    },
+    {
       "linkId": "notes",
       "type": "text",
       "text": "Additional Notes",

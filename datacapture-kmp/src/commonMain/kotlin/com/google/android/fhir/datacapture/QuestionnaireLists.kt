@@ -45,6 +45,7 @@ import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewFa
 import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewFactory
+import com.google.android.fhir.datacapture.views.factories.QuantityViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewFactory
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
@@ -105,7 +106,7 @@ internal fun QuestionnaireEditList(
           val questionnaireViewHolderType = getItemViewTypeForQuestion(adapterItem.item)
           val questionnaireItemViewHolderDelegate =
             getQuestionnaireItemViewFactory(questionnaireViewHolderType)
-          questionnaireItemViewHolderDelegate?.Content(adapterItem.item)
+          questionnaireItemViewHolderDelegate.Content(adapterItem.item)
         }
         is QuestionnaireAdapterItem.Navigation -> {
           QuestionnaireBottomNavigation(adapterItem.questionnaireNavigationUIState)
@@ -328,13 +329,14 @@ private fun QuestionnaireReviewItem(
 
 fun getQuestionnaireItemViewFactory(
   questionnaireViewHolderType: QuestionnaireViewHolderType,
-): QuestionnaireItemViewFactory? {
+): QuestionnaireItemViewFactory {
   return when (questionnaireViewHolderType) {
     QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE -> EditTextSingleLineViewFactory
     QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE -> EditTextMultiLineViewFactory
     QuestionnaireViewHolderType.EDIT_TEXT_INTEGER -> EditTextIntegerViewFactory
     QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewFactory
-    else -> null
+    QuestionnaireViewHolderType.QUANTITY -> QuantityViewFactory
+    else -> TODO()
   }
 }
 
