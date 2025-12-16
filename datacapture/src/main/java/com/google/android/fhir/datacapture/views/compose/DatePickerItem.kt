@@ -107,21 +107,8 @@ internal fun DatePickerItem(
   OutlinedTextField(
     value = dateInputDisplay,
     onValueChange = { textFieldValue ->
-      textFieldValue.text
-        .takeIf {
-          it.length <= dateInputFormat.pattern.length &&
-            it
-              .mapIndexed { index, char ->
-                char.isDigit() ||
-                  (index in
-                    arrayOf(
-                      dateInputFormat.delimiterFirstIndex,
-                      dateInputFormat.delimiterLastIndex,
-                    ) && char == dateInputFormat.delimiter)
-              }
-              .all { isAllowed -> isAllowed }
-        }
-        ?.let {
+      if (dateInputFormat.isTextValid(textFieldValue.text)) {
+        textFieldValue.text.let {
           val isDeletion = it.length < dateInputDisplay.text.length
           val formattedText =
             if (!dateInputFormat.delimiterExistsInPattern || isDeletion) {
@@ -129,18 +116,10 @@ internal fun DatePickerItem(
             } else {
               StringBuilder(it)
                 .apply {
-                  if (
-                    this.length > dateInputFormat.delimiterFirstIndex &&
-                      get(dateInputFormat.delimiterFirstIndex) != dateInputFormat.delimiter
-                  ) {
-                    insert(dateInputFormat.delimiterFirstIndex, dateInputFormat.delimiter)
-                  }
-                  if (
-                    this.length > dateInputFormat.delimiterLastIndex &&
-                      dateInputFormat.delimiterLastIndex > dateInputFormat.delimiterFirstIndex &&
-                      get(dateInputFormat.delimiterLastIndex) != dateInputFormat.delimiter
-                  ) {
-                    insert(dateInputFormat.delimiterLastIndex, dateInputFormat.delimiter)
+                  dateInputFormat.delimiterIndex.forEach { index ->
+                    if (this.length > index && get(index) != dateInputFormat.delimiter) {
+                      insert(index, dateInputFormat.delimiter)
+                    }
                   }
                 }
                 .toString()
@@ -156,8 +135,12 @@ internal fun DatePickerItem(
               text = formattedText,
               selection = TextRange(dateInputFormat.pattern.length),
             )
-          postDelayedNewDateInput(DateInput(formattedText, localDate), HANDLE_INPUT_DEBOUNCE_TIME)
+          postDelayedNewDateInput(
+            DateInput(formattedText, localDate),
+            HANDLE_INPUT_DEBOUNCE_TIME,
+          )
         }
+      }
     },
     singleLine = true,
     label = { Text(labelText) },
@@ -263,10 +246,14 @@ typealias DateFormatPattern = String
 data class DateInput(val display: String, val value: LocalDate?)
 
 data class DateInputFormat(val pattern: String, val delimiter: Char) {
+  val delimiterIndex = pattern.indices.filter { pattern[it] == delimiter }
+  val delimiterExistsInPattern = delimiterIndex.isNotEmpty()
 
-  val delimiterFirstIndex: Int = pattern.indexOf(delimiter)
-  val delimiterLastIndex: Int = pattern.lastIndexOf(delimiter)
-  val delimiterExistsInPattern = delimiterFirstIndex != -1 && delimiterLastIndex != -1
+  fun isTextValid(text: String): Boolean =
+    text.length <= pattern.length &&
+      text
+        .filterIndexed { index, ch -> ch.isDigit() || (ch == delimiter && index in delimiterIndex) }
+        .isNotEmpty()
 }
 
 const val DATE_TEXT_INPUT_FIELD = "date_picker_text_field"
