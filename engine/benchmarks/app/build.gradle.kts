@@ -1,8 +1,8 @@
 plugins {
-  id(Plugins.BuildPlugins.application)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.kotlinCompose)
-  id(Plugins.BuildPlugins.kotlinSerialization)
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.kotlin.compose)
+  alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -16,7 +16,7 @@ android {
     versionCode = 1
     versionName = "1.0"
 
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
     val baseUrlKey = "FHIR_SERVER_BASE_URL"
     val fhirServerBaseUrl =
@@ -59,7 +59,7 @@ android {
 configureSyntheaTask()
 
 dependencies {
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
   implementation(project(":engine"))
 
   implementation(libs.androidx.core)

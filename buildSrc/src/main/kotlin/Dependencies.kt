@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,16 +41,7 @@ object Dependencies {
     const val fhirCoreUtilsModule = "ca.uhn.hapi.fhir:org.hl7.fhir.utilities"
     const val fhirCoreConvertorsModule = "ca.uhn.hapi.fhir:org.hl7.fhir.convertors"
 
-    const val guavaCachingModule = "ca.uhn.hapi.fhir:hapi-fhir-caching-guava"
-
-    const val structuresR4 = "$structuresR4Module:${Versions.hapiFhir}"
-
     const val validation = "$validationModule:${Versions.hapiFhir}"
-    const val validationR4 = "$validationR4Module:${Versions.hapiFhir}"
-
-    const val fhirCoreConvertors = "$fhirCoreConvertorsModule:${Versions.hapiFhirCore}"
-
-    const val guavaCaching = "$guavaCachingModule:${Versions.hapiFhir}"
   }
 
   object Jackson {
@@ -70,68 +61,13 @@ object Dependencies {
     const val jsr310Base = "$datatypeGroup:jackson-datatype-jsr310:${Versions.jackson}"
   }
 
-  object Retrofit {
-    const val coreRetrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
-    const val gsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
-  }
-
-  object Mlkit {
-    const val barcodeScanning =
-      "com.google.mlkit:barcode-scanning:${Versions.Mlkit.barcodeScanning}"
-    const val objectDetection =
-      "com.google.mlkit:object-detection:${Versions.Mlkit.objectDetection}"
-    const val objectDetectionCustom =
-      "com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
-  }
-
-  const val playServicesLocation =
-    "com.google.android.gms:play-services-location:${Versions.playServicesLocation}"
-
-  const val apacheCommonsCompress =
-    "org.apache.commons:commons-compress:${Versions.apacheCommonsCompress}"
-
-  const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
-  const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
-
   const val guavaModule = "com.google.guava:guava"
-  const val guava = "$guavaModule:${Versions.guava}"
-
-  const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.http}"
-  const val http = "com.squareup.okhttp3:okhttp:${Versions.http}"
-  const val mockWebServer = "com.squareup.okhttp3:mockwebserver:${Versions.http}"
-
-  const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
-  const val sqlcipher = "net.zetetic:android-database-sqlcipher:${Versions.sqlcipher}"
-  const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
-  const val woodstox = "com.fasterxml.woodstox:woodstox-core:${Versions.woodstox}"
-  const val xerces = "xerces:xercesImpl:${Versions.xerces}"
-
-  const val zxing = "com.google.zxing:core:${Versions.zxing}"
-  const val nimbus = "com.nimbusds:nimbus-jose-jwt:${Versions.nimbus}"
-
-  const val androidBenchmarkRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
-  const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-  // Makes Json assertions where the order of elements, tabs/whitespaces are not important.
-  const val jsonAssert = "org.skyscreamer:jsonassert:${Versions.jsonAssert}"
-  const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
-  const val mockitoInline = "org.mockito:mockito-inline:${Versions.mockitoInline}"
-  const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
-
-  // Makes XML assertions where the order of elements, tabs/whitespaces are not important.
-  const val xmlUnit = "org.xmlunit:xmlunit-core:${Versions.xmlUnit}"
 
   object Versions {
-    const val apacheCommonsCompress = "1.21"
-    const val desugarJdkLibs = "2.0.3"
-    const val caffeine = "2.9.1"
-    const val fhirUcum = "1.0.3"
     const val guava = "32.1.3-android"
 
     const val hapiFhir = "6.8.0"
     const val hapiFhirCore = "6.0.22"
-
-    const val http = "4.11.0"
 
     // Maximum Jackson libraries (excluding core) version that supports Android API Level 24:
     // https://github.com/FasterXML/jackson-databind/issues/3658
@@ -140,32 +76,8 @@ object Dependencies {
     // Maximum Jackson Core library version that supports Android API Level 24:
     const val jacksonCore = "2.15.2"
 
-    const val jsonToolsPatch = "1.13"
-    const val jsonAssert = "1.5.1"
-    const val retrofit = "2.9.0"
-    const val gsonConverter = "2.1.0"
-    const val sqlcipher = "4.5.4"
-    const val timber = "5.0.1"
-    const val woodstox = "6.5.1"
-    const val xerces = "2.12.2"
-    const val xmlUnit = "2.9.1"
-
-    const val zxing = "3.4.1"
-    const val nimbus = "9.31"
-
     // Test dependencies
     const val jacoco = "0.8.10"
-    const val mockitoKotlin = "3.2.0"
-    const val mockitoInline = "4.0.0"
-    const val robolectric = "4.10.3"
-
-    object Mlkit {
-      const val barcodeScanning = "16.1.1"
-      const val objectDetection = "16.2.3"
-      const val objectDetectionCustom = "16.3.1"
-    }
-
-    const val playServicesLocation = "21.0.1"
   }
 
   fun Configuration.removeIncompatibleDependencies() {
