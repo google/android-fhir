@@ -162,23 +162,25 @@ internal fun AutoCompleteDropDownItem(
   var selectedDropDownAnswerOption by
     remember(selectedOption, options) { mutableStateOf(selectedOption) }
 
-  // Track if change is from user typing
-  var isUserTyping by remember(options) { mutableStateOf(false) }
+  // A flag to track when the user is in the process of filtering the options.
+  var inFilterMode: Boolean by remember(options) { mutableStateOf(false) }
 
   var selectedOptionDisplay by
     remember(selectedDropDownAnswerOption) {
-      isUserTyping = false // Reset when option is selected
+      // When an option is selected, the filter is no longer active.
+      inFilterMode = false
       val stringValue = selectedDropDownAnswerOption?.answerOptionString ?: ""
       mutableStateOf(TextFieldValue(stringValue, selection = TextRange(stringValue.length)))
     }
 
-  // Only filter when user is actively typing
+  // The options are filtered only when the user is in filter mode.
   val filteredOptions =
-    remember(options, selectedOptionDisplay, isUserTyping) {
-      if (isUserTyping) {
+    remember(options, selectedOptionDisplay, inFilterMode) {
+      if (inFilterMode) {
         options.filter { it.answerOptionString.contains(selectedOptionDisplay.text, true) }
       } else {
-        options // Show all options when not typing
+        // When not in filter mode, all options are displayed.
+        options
       }
     }
 
@@ -197,7 +199,7 @@ internal fun AutoCompleteDropDownItem(
     OutlinedTextField(
       value = selectedOptionDisplay,
       onValueChange = {
-        isUserTyping = true // Mark as user typing
+        inFilterMode = true
         selectedOptionDisplay = it
         if (!expanded) expanded = true
       },
