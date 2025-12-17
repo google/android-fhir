@@ -119,7 +119,7 @@ dependencies {
     exclude(module = "httpclient")
   }
   implementation(libs.hapi.fhir.validation.r4)
-  implementation(libs.http.interceptor)
+  implementation(libs.okhttp3.interceptor)
   implementation(libs.json.tools.patch)
   implementation(libs.kotlin.stdlib)
   implementation(libs.retrofit)
@@ -138,7 +138,7 @@ dependencies {
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)
   testImplementation(libs.kotlinx.coroutines.test)
-  testImplementation(libs.mock.web.server)
+  testImplementation(libs.okhttp3.mock.web.server)
   testImplementation(libs.mockito.inline)
   testImplementation(libs.mockito.kotlin)
   testImplementation(libs.robolectric)
