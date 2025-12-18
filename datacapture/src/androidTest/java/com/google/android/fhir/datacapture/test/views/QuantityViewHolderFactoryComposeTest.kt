@@ -22,10 +22,15 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isPopup
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -41,8 +46,10 @@ import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TA
 import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
 import com.google.android.fhir.datacapture.views.factories.QuantityViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -52,7 +59,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class QuantityViewHolderFactoryTest {
+class QuantityViewHolderFactoryComposeTest {
 
   @get:Rule
   val activityScenarioRule: ActivityScenarioRule<TestActivity> =
@@ -86,7 +93,7 @@ class QuantityViewHolderFactoryTest {
     // Synchronize
     composeTestRule.waitForIdle()
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
 
@@ -294,6 +301,115 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
+  fun shouldSetDraftWithUnit() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var draftHolder: Any? = null
+
+    val questionnaireViewItem = createQuestionnaireViewItem { answers, draft ->
+      answerHolder = answers
+      draftHolder = draft
+    }
+
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
+    composeTestRule
+      .onNode(hasText("centimeter") and hasAnyAncestor(isPopup()))
+      .assertIsDisplayed()
+      .performClick()
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).assertTextEquals("centimeter")
+
+    composeTestRule.waitUntil { draftHolder != null }
+
+    with(draftHolder as Coding) {
+      assertThat(system).isEqualTo("http://unitofmeasure.com")
+      assertThat(code).isEqualTo("cm")
+      assertThat(display).isEqualTo("centimeter")
+    }
+    assertThat(answerHolder).isEmpty()
+  }
+
+  @Test
+  fun shouldSetDraftWithDecimalValue() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var draftHolder: Any? = null
+
+    val questionnaireViewItem = createQuestionnaireViewItem { answers, draft ->
+      answerHolder = answers
+      draftHolder = draft
+    }
+
+    viewHolder.bind(questionnaireViewItem)
+
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performClick().performTextInput("22")
+    composeTestRule.waitUntil { draftHolder != null }
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("22")
+
+    assertThat(draftHolder as BigDecimal).isEqualTo(BigDecimal(22))
+    assertThat(answerHolder).isEmpty()
+  }
+
+  @Test
+  fun draftWithUnit_shouldCompleteQuantity() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var draftHolder: Any? = null
+
+    val questionnaireViewItem =
+      createQuestionnaireViewItem(Coding("http://unitofmeasure.com", "cm", "centimeter")) {
+        answers,
+        draft,
+        ->
+        answerHolder = answers
+        draftHolder = draft
+      }
+
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performClick().performTextInput("22")
+
+    composeTestRule.waitUntil { !answerHolder.isNullOrEmpty() }
+
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("22")
+
+    with(answerHolder!!.single().valueQuantity) {
+      assertThat(system).isEqualTo("http://unitofmeasure.com")
+      assertThat(code).isEqualTo("cm")
+      assertThat(unit).isEqualTo("centimeter")
+      assertThat(value).isEqualTo(BigDecimal("22.0"))
+    }
+    assertThat(draftHolder).isNull()
+  }
+
+  @Test
+  fun draftWithDecimalValue_shouldCompleteQuantity() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    var draftHolder: Any? = null
+
+    val questionnaireViewItem =
+      createQuestionnaireViewItem(BigDecimal(22)) { answers, draft ->
+        answerHolder = answers
+        draftHolder = draft
+      }
+
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).performClick()
+    composeTestRule
+      .onNode(hasText("centimeter") and hasAnyAncestor(isPopup()))
+      .assertIsDisplayed()
+      .performClick()
+    composeTestRule.onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG).assertTextEquals("centimeter")
+
+    composeTestRule.waitUntil { !answerHolder.isNullOrEmpty() }
+
+    with(answerHolder!!.single().valueQuantity) {
+      assertThat(system).isEqualTo("http://unitofmeasure.com")
+      assertThat(code).isEqualTo("cm")
+      assertThat(unit).isEqualTo("centimeter")
+      assertThat(value).isEqualTo(BigDecimal("22.0"))
+    }
+    assertThat(draftHolder).isNull()
+  }
+
+  @Test
   fun shouldShowAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -310,7 +426,7 @@ class QuantityViewHolderFactoryTest {
     // Synchronize
     composeTestRule.waitForIdle()
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question? *")
   }
 
@@ -332,7 +448,7 @@ class QuantityViewHolderFactoryTest {
     // Synchronize
     composeTestRule.waitForIdle()
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
 
@@ -394,5 +510,45 @@ class QuantityViewHolderFactoryTest {
     )
 
     composeTestRule.onNodeWithText("Optional").assertDoesNotExist()
+  }
+
+  private fun createQuestionnaireViewItem(
+    draftAnswer: Any? = null,
+    answersChangedCallback:
+      (List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>, Any?) -> Unit,
+  ): QuestionnaireViewItem {
+    return QuestionnaireViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        required = true
+        addExtension(
+          Extension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption"
+            setValue(
+              Coding().apply {
+                code = "cm"
+                system = "http://unitofmeasure.com"
+                display = "centimeter"
+              },
+            )
+          },
+        )
+        addExtension(
+          Extension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption"
+            setValue(
+              Coding().apply {
+                code = "[in_i]"
+                system = "http://unitofmeasure.com"
+                display = "inch"
+              },
+            )
+          },
+        )
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+      validationResult = NotValidated,
+      answersChangedCallback = { _, _, answers, draft -> answersChangedCallback(answers, draft) },
+      draftAnswer = draftAnswer,
+    )
   }
 }
