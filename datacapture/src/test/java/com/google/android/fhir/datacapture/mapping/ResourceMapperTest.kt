@@ -25,7 +25,7 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.extensions.CODE_SYSTEM_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.ITEM_INITIAL_EXPRESSION_URL
-import com.google.android.fhir.datacapture.views.factories.localDate
+import com.google.android.fhir.datacapture.extensions.localDate
 import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
