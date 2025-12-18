@@ -26,7 +26,7 @@ import androidx.compose.ui.res.dimensionResource
 import com.google.android.fhir.datacapture.R
 
 @Composable
-fun ErrorText(validationMessage: String) {
+internal fun ErrorText(validationMessage: String) {
   Text(
     text = validationMessage,
     style = MaterialTheme.typography.bodySmall,
