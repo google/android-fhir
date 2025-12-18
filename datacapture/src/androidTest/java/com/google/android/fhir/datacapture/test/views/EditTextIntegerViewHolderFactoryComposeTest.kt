@@ -39,14 +39,10 @@ import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
 import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
-import com.google.android.fhir.datacapture.views.compose.UNIT_TEXT_TEST_TAG
-import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat
-import java.math.BigDecimal
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.After
@@ -56,7 +52,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class EditTextDecimalViewHolderFactoryInstrumentedTest {
+class EditTextIntegerViewHolderFactoryComposeTest {
 
   @get:Rule
   val activityScenarioRule: ActivityScenarioRule<TestActivity> =
@@ -78,7 +74,7 @@ class EditTextDecimalViewHolderFactoryInstrumentedTest {
   fun setup() {
     activityScenarioRule.scenario.onActivity { activity ->
       parent = FrameLayout(activity)
-      viewHolder = EditTextDecimalViewHolderFactory.create(parent)
+      viewHolder = EditTextIntegerViewHolderFactory.create(parent)
       activity.setContentView(viewHolder.itemView)
     }
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
@@ -116,7 +112,7 @@ class EditTextDecimalViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("1.1")
+              value = IntegerType(5)
             },
           )
         },
@@ -124,7 +120,7 @@ class EditTextDecimalViewHolderFactoryInstrumentedTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("1.1")
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("5")
   }
 
   @Test
@@ -135,7 +131,7 @@ class EditTextDecimalViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("1.1")
+              value = IntegerType(5)
             },
           )
         },
@@ -144,70 +140,6 @@ class EditTextDecimalViewHolderFactoryInstrumentedTest {
       ),
     )
 
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("")
-  }
-
-  @Test
-  fun shouldSetUnitText() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          type = Questionnaire.QuestionnaireItemType.DECIMAL
-          addExtension(
-            Extension().apply {
-              url = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
-              setValue(Coding().apply { code = "kg" })
-            },
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("1.1")
-            },
-          )
-        },
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    composeTestRule.onNodeWithTag(UNIT_TEXT_TEST_TAG).assertTextEquals("kg")
-  }
-
-  @Test
-  fun shouldClearUnitText() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          type = Questionnaire.QuestionnaireItemType.DECIMAL
-          addExtension(
-            Extension().apply {
-              url = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
-              setValue(Coding().apply { code = "kg" })
-            },
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("1.1")
-            },
-          )
-        },
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -235,12 +167,12 @@ class EditTextDecimalViewHolderFactoryInstrumentedTest {
       )
 
     viewHolder.bind(questionnaireViewItem)
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("1.1").also {
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("13").also {
       pendingTextChange += 1
     }
     composeTestRule.waitForIdle()
 
-    assertThat(answers!!.single().valueDecimalType.value).isEqualTo(BigDecimal.valueOf(1.1))
+    assertThat(answers!!.single().valueIntegerType.value).isEqualTo(13)
   }
 
   @Test
@@ -273,11 +205,12 @@ class EditTextDecimalViewHolderFactoryInstrumentedTest {
         },
       )
     viewHolder.bind(questionnaireViewItem)
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("1.1.1.1").also {
+    // The character in 1O2 is the letter O, not the number 0
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("1O2").also {
       pendingTextChange += 1
     }
     composeTestRule.waitForIdle()
-    assertThat(draftAnswer as String).isEqualTo("1.1.1.1")
+    assertThat(draftAnswer as String).isEqualTo("1O2")
   }
 
   @Test
@@ -287,17 +220,17 @@ class EditTextDecimalViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(DecimalType("2.2"))
+            setValue(IntegerType("2"))
           }
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(DecimalType("4.4"))
+            setValue(IntegerType("4"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("3.3")
+              value = IntegerType("3")
             },
           )
         },
@@ -316,27 +249,27 @@ class EditTextDecimalViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(DecimalType("2.1"))
+            setValue(IntegerType("2"))
           }
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(DecimalType("4.2"))
+            setValue(IntegerType("4"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("1.1")
+              value = IntegerType("1")
             },
           )
         },
-        validationResult = Invalid(listOf("Minimum value allowed is:2.1")),
+        validationResult = Invalid(listOf("Minimum value allowed is:2")),
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
 
     composeTestRule.onNodeWithContentDescription("Error").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Minimum value allowed is:2.1").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Minimum value allowed is:2").assertIsDisplayed()
   }
 
   @Test
@@ -478,13 +411,13 @@ class EditTextDecimalViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        draftAnswer = "1.1.1.1",
+        draftAnswer = "9999999999",
       ),
     )
 
     composeTestRule
       .onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG, useUnmergedTree = true)
-      .assertTextEquals("1.1.1.1")
+      .assertTextEquals("9999999999")
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -497,5 +430,42 @@ class EditTextDecimalViewHolderFactoryInstrumentedTest {
     composeTestRule
       .onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG, useUnmergedTree = true)
       .assertTextEquals("")
+  }
+
+  @Test
+  fun displaysCorrectTextOnQuestionnaireViewItemAnswerUpdate() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Age" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          answer =
+            listOf(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = IntegerType("12")
+              },
+            )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("12")
+
+    val questionnaireViewItemUpdatedAnswer =
+      questionnaireViewItem.copy(
+        questionnaireResponseItem =
+          questionnaireViewItem.getQuestionnaireResponseItem().apply {
+            answer =
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = IntegerType("120")
+                },
+              )
+          },
+      )
+    viewHolder.bind(questionnaireViewItemUpdatedAnswer)
+
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("120")
   }
 }

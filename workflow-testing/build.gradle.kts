@@ -1,8 +1,8 @@
 import Dependencies.removeIncompatibleDependencies
 
 plugins {
-  id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.kotlinAndroid)
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -15,16 +15,15 @@ android {
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
+  compileOnly(libs.json.assert)
+  compileOnly(libs.junit)
   compileOnly(libs.opencds.cqf.fhir.cr)
   compileOnly(libs.opencds.cqf.fhir.jackson)
   compileOnly(libs.opencds.cqf.fhir.utility)
-  compileOnly(project(":engine")) { exclude(module = "truth") }
-
-  compileOnly(Dependencies.jsonAssert)
-  compileOnly(Dependencies.woodstox)
-  compileOnly(Dependencies.xmlUnit)
-  compileOnly(libs.junit)
   compileOnly(libs.truth)
+  compileOnly(libs.woodstox)
+  compileOnly(libs.xml.unit)
+  compileOnly(project(":engine")) { exclude(module = "truth") }
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->

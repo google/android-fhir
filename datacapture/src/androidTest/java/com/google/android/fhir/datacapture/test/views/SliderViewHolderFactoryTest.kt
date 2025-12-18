@@ -18,41 +18,44 @@ package com.google.android.fhir.datacapture.test.views
 
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.compose.ui.test.IdlingResource
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertRangeInfoEquals
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.EXTENSION_SLIDER_STEP_VALUE_URL
 import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
 import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
-import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewHolderFactory
+import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_TAG
+import com.google.android.fhir.datacapture.views.compose.SLIDER_TAG
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
+import com.google.android.fhir.datacapture.views.factories.SliderViewHolderFactory
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.junit.After
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class EditTextIntegerViewHolderFactoryInstrumentedTest {
+class SliderViewHolderFactoryTest {
 
   @get:Rule
   val activityScenarioRule: ActivityScenarioRule<TestActivity> =
@@ -61,34 +64,19 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
   @get:Rule val composeTestRule = createEmptyComposeRule()
 
   private lateinit var viewHolder: QuestionnaireItemViewHolder
-  private lateinit var parent: FrameLayout
-
-  private var pendingTextChange = 0
-  private val handlingTextIdlingResource =
-    object : IdlingResource {
-      override val isIdleNow: Boolean
-        get() = pendingTextChange == 0
-    }
 
   @Before
-  fun setup() {
+  fun setUp() {
     activityScenarioRule.scenario.onActivity { activity ->
-      parent = FrameLayout(activity)
-      viewHolder = EditTextIntegerViewHolderFactory.create(parent)
+      viewHolder = SliderViewHolderFactory.create(FrameLayout(activity))
       activity.setContentView(viewHolder.itemView)
     }
+
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-
-    composeTestRule.registerIdlingResource(handlingTextIdlingResource)
-  }
-
-  @After
-  fun tearDown() {
-    composeTestRule.unregisterIdlingResource(handlingTextIdlingResource)
   }
 
   @Test
-  fun shouldSetQuestionnaireHeader() {
+  fun shouldSetQuestionHeader() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -97,6 +85,7 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
+
     // Synchronize
     composeTestRule.waitForIdle()
 
@@ -105,14 +94,14 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun shouldSetInputText() {
+  fun shouldSetSliderValue() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType(5)
+              value = IntegerType(10)
             },
           )
         },
@@ -120,117 +109,223 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("5")
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(current = 10f, range = 0f..100f, steps = 99))
   }
 
   @Test
-  fun shouldSetInputTextToEmpty() {
+  fun stepSizeShouldComeFromTheSliderStepValueExtension() {
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType(5)
-            },
-          )
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "slider-step-value"
+          addExtension(EXTENSION_SLIDER_STEP_VALUE_URL, IntegerType(10))
         },
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
 
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("")
+    val sliderStepsFromStepSize10: Int = 100.div(10) - 1
+
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(
+        ProgressBarRangeInfo(current = 0f, range = 0f..100f, steps = sliderStepsFromStepSize10),
+      )
   }
 
   @Test
-  fun shouldSetQuestionnaireResponseItemAnswerIfTextIsValid() {
-    var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
-    val questionnaireViewItem =
+  fun stepSizeShouldBe1IfTheSliderStepValueExtensionIsNotPresent() {
+    viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "slider-step-value" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, result, _ ->
-          answers = result
-          pendingTextChange -= if (pendingTextChange > 0) 1 else 0
-        },
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    val sliderStepsWithStepSize1: Int = 100 - 1
+
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(
+        ProgressBarRangeInfo(current = 0f, range = 0f..100f, steps = sliderStepsWithStepSize1),
       )
-
-    viewHolder.bind(questionnaireViewItem)
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("13").also {
-      pendingTextChange += 1
-    }
-    composeTestRule.waitForIdle()
-
-    assertThat(answers!!.single().valueIntegerType.value).isEqualTo(13)
   }
 
   @Test
-  fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
-    val questionnaireViewItem =
+  fun sliderValueToShouldComeFromTheMaxValueExtension() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue(IntegerType("200"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(current = 0f, range = 0f..200f, steps = 199))
+  }
+
+  @Test
+  fun sliderValueToShouldBeSetToDefaultValueIfMaxValueExtensionIsNotPresent() {
+    viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
-    viewHolder.bind(questionnaireViewItem)
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("")
-    composeTestRule.waitForIdle()
+      ),
+    )
 
-    assertThat(questionnaireViewItem.answers).isEmpty()
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(current = 0f, range = 0f..100f, steps = 99))
   }
 
   @Test
-  fun shouldSetDraftAnswerIfTextIsInvalid() {
-    var draftAnswer: Any? = null
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, result ->
-          draftAnswer = result
-          pendingTextChange -= if (pendingTextChange > 0) 1 else 0
-        },
-      )
-    viewHolder.bind(questionnaireViewItem)
-    // The character in 1O2 is the letter O, not the number 0
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("1O2").also {
-      pendingTextChange += 1
-    }
-    composeTestRule.waitForIdle()
-    assertThat(draftAnswer as String).isEqualTo("1O2")
-  }
-
-  @Test
-  fun displayValidationResultShouldShowNoErrorMesssage() {
+  fun sliderValueFromShouldComeFromTheMinValueExtension() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(IntegerType("2"))
+            setValue(IntegerType("50"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(current = 50f, range = 50f..100f, steps = 49))
+  }
+
+  @Test
+  fun sliderValueFromShouldBeSetToDefaultValueIfMinValueExtensionIsNotPresent() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(current = 0f, range = 0f..100f, steps = 99))
+  }
+
+  @Test
+  fun throwsExceptionIfMinValueIsGreaterThanMaxvalue() {
+    assertThrows(
+      IllegalStateException::class.java,
+      {
+        viewHolder.bind(
+          QuestionnaireViewItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              addExtension().apply {
+                url = "http://hl7.org/fhir/StructureDefinition/minValue"
+                setValue(IntegerType("100"))
+              }
+              addExtension().apply {
+                url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+                setValue(IntegerType("50"))
+              }
+            },
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _, _ -> },
+          ),
+        )
+
+        // Wait for synchronization
+        composeTestRule.waitForIdle()
+      },
+    )
+  }
+
+  @Test
+  fun shouldSetQuestionnaireResponseSliderAnswer() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
+      )
+
+    viewHolder.bind(questionnaireViewItem)
+
+    composeTestRule.onNodeWithTag(SLIDER_TAG).performSemanticsAction(SemanticsActions.SetProgress) {
+      it.invoke(20f)
+    }
+    // Synchronize
+    composeTestRule.waitForIdle()
+
+    assertThat(answerHolder!!.single().valueIntegerType.value).isEqualTo(20)
+  }
+
+  @Test
+  fun shouldSetSliderValueToDefaultWhenQuestionnaireResponseHasMultipleAnswers() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = IntegerType(10)
+            },
+          )
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = IntegerType(10)
+            },
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(0.0f, 0.0f..100f, steps = 99))
+  }
+
+  @Test
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue(IntegerType("50"))
           }
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(IntegerType("4"))
+            setValue(IntegerType("100"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType("3")
+              value = IntegerType("75")
             },
           )
         },
@@ -239,37 +334,36 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
       ),
     )
 
-    composeTestRule.onNodeWithContentDescription("Error").assertDoesNotExist()
+    composeTestRule.onNodeWithTag(ERROR_TEXT_TAG).assertIsNotDisplayed().assertDoesNotExist()
   }
 
   @Test
-  fun displayValidationResultShouldShowErrorMessage() {
+  fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(IntegerType("2"))
+            setValue(IntegerType("50"))
           }
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(IntegerType("4"))
+            setValue(IntegerType("100"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType("1")
+              value = IntegerType("25")
             },
           )
         },
-        validationResult = Invalid(listOf("Minimum value allowed is:2")),
+        validationResult = Invalid(listOf("Minimum value allowed is:50")),
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
 
-    composeTestRule.onNodeWithContentDescription("Error").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Minimum value allowed is:2").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(ERROR_TEXT_TAG).assertTextEquals("Minimum value allowed is:50")
   }
 
   @Test
@@ -282,12 +376,14 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    composeTestRule.onNodeWithTag(ERROR_TEXT_AT_HEADER_TEST_TAG).assertIsNotDisplayed()
+    composeTestRule
+      .onNodeWithTag(ERROR_TEXT_AT_HEADER_TEST_TAG)
+      .assertIsNotDisplayed()
+      .assertDoesNotExist()
   }
 
   @Test
-  fun bindReadOnlyShouldDisableView() {
+  fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
@@ -296,38 +392,74 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertIsDisplayed().assertIsNotEnabled()
+    composeTestRule.onNodeWithTag(SLIDER_TAG).assertIsNotEnabled()
   }
 
   @Test
-  fun showAsterisk() {
+  fun bindMultipleTimesWithDifferentQuestionnaireItemViewItemShouldShowProperSliderValue() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = IntegerType(10)
+            },
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(10f, 0f..100f, steps = 99))
+
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = IntegerType(12)
+            },
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(12f, 0f..100f, steps = 99))
+
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          text = "Question?"
-          required = true
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue(IntegerType("50"))
+          }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true),
       ),
     )
 
-    // Synchronize
-    composeTestRule.waitForIdle()
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
-      .isEqualTo("Question? *")
+    composeTestRule
+      .onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(50f, 50f..100f, steps = 49))
   }
 
   @Test
-  fun hideAsterisk() {
+  fun hidesAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          text = "Question?"
+          text = "Question"
           required = true
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
@@ -341,7 +473,7 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
     composeTestRule.waitForIdle()
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
-      .isEqualTo("Question?")
+      .isEqualTo("Question")
   }
 
   @Test
@@ -360,7 +492,7 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun hideRequiredText() {
+  fun hidesRequiredtext() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -370,14 +502,15 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
         questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false),
       ),
     )
-    composeTestRule.onNodeWithText("Required").assertDoesNotExist()
+
+    composeTestRule.onNodeWithText("Required").assertIsNotDisplayed().assertDoesNotExist()
   }
 
   @Test
-  fun showOptionalText() {
+  fun showsOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
@@ -389,10 +522,10 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun hideOptionalText() {
+  fun hidesOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
@@ -400,35 +533,6 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
       ),
     )
 
-    composeTestRule.onNodeWithText("Optional").assertDoesNotExist()
-  }
-
-  @Test
-  fun bindAgainShouldRemovePreviousText() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-        draftAnswer = "9999999999",
-      ),
-    )
-
-    composeTestRule
-      .onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG, useUnmergedTree = true)
-      .assertTextEquals("9999999999")
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    composeTestRule
-      .onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG, useUnmergedTree = true)
-      .assertTextEquals("")
+    composeTestRule.onNodeWithText("Optional").assertIsNotDisplayed().assertDoesNotExist()
   }
 }

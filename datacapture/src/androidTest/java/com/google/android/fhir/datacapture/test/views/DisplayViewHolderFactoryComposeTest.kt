@@ -40,7 +40,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class DisplayViewHolderFactoryTest {
+class DisplayViewHolderFactoryComposeTest {
   @get:Rule
   val activityScenarioRule: ActivityScenarioRule<TestActivity> =
     ActivityScenarioRule(TestActivity::class.java)
