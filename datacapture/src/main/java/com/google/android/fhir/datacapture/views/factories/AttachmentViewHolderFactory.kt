@@ -114,7 +114,7 @@ internal object AttachmentViewHolderFactory : QuestionnaireItemComposeViewHolder
           remember(questionnaireViewItem.answers) {
             mutableStateOf(questionnaireViewItem.answers.singleOrNull()?.valueAttachment)
           }
-        val displayTakePhoto =
+        val displayTakePhotoButton =
           remember(questionnaireItem) { questionnaireItem.hasMimeType(MimeType.IMAGE.value) }
         val uploadButtonTextResId =
           remember(questionnaireItem) {
@@ -157,24 +157,16 @@ internal object AttachmentViewHolderFactory : QuestionnaireItemComposeViewHolder
             horizontalArrangement =
               Arrangement.spacedBy(dimensionResource(R.dimen.attachment_action_button_margin_end)),
           ) {
-            if (displayTakePhoto) {
+            if (displayTakePhotoButton) {
               TakePhotoButton(
                 context,
                 enabled = !readOnly,
                 maxFileSizeLimitInBytes = questionnaireItem.maxSizeInBytes ?: DEFAULT_SIZE,
                 supportedMimeType = questionnaireItem::hasMimeType,
                 onFailure = { errorMessage = it },
-              ) { uri, fileName ->
+              ) { attachment ->
                 coroutineScope.launch {
-                  val attachmentMimeTypeWithSubType = context.getMimeTypeFromUri(uri)
-                  val attachmentByteArray = context.readBytesFromUri(uri)
-                  currentAttachment =
-                    Attachment().apply {
-                      contentType = attachmentMimeTypeWithSubType
-                      data = attachmentByteArray
-                      title = fileName
-                      creation = Date()
-                    }
+                  currentAttachment = attachment
 
                   val answer =
                     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -198,19 +190,11 @@ internal object AttachmentViewHolderFactory : QuestionnaireItemComposeViewHolder
               onFailure = { errorMessage = it },
             ) {
               coroutineScope.launch {
-                val attachmentMimeTypeWithSubType = context.getMimeTypeFromUri(it)
-                val attachmentByteArray = context.readBytesFromUri(it)
-                currentAttachment =
-                  Attachment().apply {
-                    contentType = attachmentMimeTypeWithSubType
-                    data = attachmentByteArray
-                    title = getFileName(context.contentResolver, it)
-                    creation = Date()
-                  }
+                currentAttachment = it
 
                 val answer =
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = currentAttachment
+                    value = it
                   }
                 questionnaireViewItem.setAnswer(answer)
 
@@ -250,18 +234,6 @@ internal object AttachmentViewHolderFactory : QuestionnaireItemComposeViewHolder
           }
         }
       }
-
-      private fun getFileName(contentResolver: ContentResolver, uri: Uri): String {
-        var fileName = ""
-        val columns = arrayOf(OpenableColumns.DISPLAY_NAME)
-        contentResolver.query(uri, columns, null, null, null)?.use { cursor ->
-          val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-          if (cursor.moveToFirst() && nameIndex >= 0) {
-            fileName = cursor.getString(nameIndex) ?: ""
-          }
-        }
-        return fileName
-      }
     }
 }
 
@@ -272,7 +244,7 @@ private fun TakePhotoButton(
   maxFileSizeLimitInBytes: BigDecimal,
   supportedMimeType: (String) -> Boolean,
   onFailure: (String) -> Unit,
-  onSuccess: (Uri, String) -> Unit,
+  onSuccess: (Attachment) -> Unit,
 ) {
   val file = remember { File.createTempFile("IMG_", ".jpeg", context.cacheDir) }
   var attachmentUri by remember(file) { mutableStateOf<Uri?>(null) }
@@ -299,20 +271,32 @@ private fun TakePhotoButton(
     rememberLauncherForActivityResult(
       contract = ActivityResultContracts.TakePicture(),
       onResult = { success ->
-        when {
-          !success -> {
-            onFailure(mediaNotSavedError)
-          }
-          file.length().toBigDecimal() > maxFileSizeLimitInBytes -> {
-            onFailure(maxSizeImageLimitErrorMessage)
-          }
-          !supportedMimeType(getMimeType(context.getMimeTypeFromUri(attachmentUri!!))) -> {
-            onFailure(wrongMediaFormatErrorMessage)
-          }
-          else -> {
-            onSuccess(attachmentUri!!, file.name)
-          }
+        if (!success) {
+          onFailure(mediaNotSavedError)
+          return@rememberLauncherForActivityResult
         }
+
+        val uri =
+          attachmentUri
+            ?: run {
+              onFailure(mediaNotSavedError)
+              return@rememberLauncherForActivityResult
+            }
+
+        val attachment =
+          createValidatedAttachmentOrReportFailure(
+            context = context,
+            uri = uri,
+            fileName = file.name,
+            maxFileSizeLimitInBytes = maxFileSizeLimitInBytes,
+            supportedMimeType = supportedMimeType,
+            maxSizeErrorMessage = maxSizeImageLimitErrorMessage,
+            wrongMediaFormatErrorMessage = wrongMediaFormatErrorMessage,
+            onFailure = onFailure,
+          )
+            ?: return@rememberLauncherForActivityResult
+
+        onSuccess(attachment)
       },
     )
 
@@ -375,7 +359,7 @@ private fun UploadFileButton(
   maxFileSizeLimitInBytes: BigDecimal,
   supportedMimeType: (String) -> Boolean,
   onFailure: (String) -> Unit,
-  onSuccess: (Uri) -> Unit,
+  onSuccess: (Attachment) -> Unit,
 ) {
   val bytesInMB = remember { BigDecimal(BYTES_IN_MB) }
   val maxSizeImageLimitErrorMessage =
@@ -394,20 +378,20 @@ private fun UploadFileButton(
           return@rememberLauncherForActivityResult
         }
 
-        val attachmentByteArray = context.readBytesFromUri(uri)
-        if (attachmentByteArray.size.toBigDecimal() > maxFileSizeLimitInBytes) {
-          onFailure(maxSizeImageLimitErrorMessage)
-          return@rememberLauncherForActivityResult
-        }
+        val attachment =
+          createValidatedAttachmentOrReportFailure(
+            context = context,
+            uri = uri,
+            fileName = getFileName(context.contentResolver, uri),
+            maxFileSizeLimitInBytes = maxFileSizeLimitInBytes,
+            supportedMimeType = supportedMimeType,
+            maxSizeErrorMessage = maxSizeImageLimitErrorMessage,
+            wrongMediaFormatErrorMessage = wrongMediaFormatErrorMessage,
+            onFailure = onFailure,
+          )
+            ?: return@rememberLauncherForActivityResult
 
-        val attachmentMimeTypeWithSubType = context.getMimeTypeFromUri(uri)
-        val attachmentMimeType = getMimeType(attachmentMimeTypeWithSubType)
-        if (!supportedMimeType(attachmentMimeType)) {
-          onFailure(wrongMediaFormatErrorMessage)
-          return@rememberLauncherForActivityResult
-        }
-
-        onSuccess(uri)
+        onSuccess(attachment)
       },
     )
 
@@ -530,6 +514,49 @@ private fun AttachmentPreview(
       Spacer(modifier = Modifier.width(BUTTON_ICON_SPACING.dp))
       Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
     }
+  }
+}
+
+private fun getFileName(contentResolver: ContentResolver, uri: Uri): String {
+  var fileName = ""
+  val columns = arrayOf(OpenableColumns.DISPLAY_NAME)
+  contentResolver.query(uri, columns, null, null, null)?.use { cursor ->
+    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+    if (cursor.moveToFirst() && nameIndex >= 0) {
+      fileName = cursor.getString(nameIndex) ?: ""
+    }
+  }
+  return fileName
+}
+
+private fun createValidatedAttachmentOrReportFailure(
+  context: Context,
+  uri: Uri,
+  fileName: String,
+  maxFileSizeLimitInBytes: BigDecimal,
+  supportedMimeType: (String) -> Boolean,
+  maxSizeErrorMessage: String,
+  wrongMediaFormatErrorMessage: String,
+  onFailure: (String) -> Unit,
+): Attachment? {
+  val attachmentByteArray = context.readBytesFromUri(uri)
+  if (attachmentByteArray.size.toBigDecimal() > maxFileSizeLimitInBytes) {
+    onFailure(maxSizeErrorMessage)
+    return null
+  }
+
+  val attachmentMimeTypeWithSubType = context.getMimeTypeFromUri(uri)
+  val attachmentMimeType = getMimeType(attachmentMimeTypeWithSubType)
+  if (!supportedMimeType(attachmentMimeType)) {
+    onFailure(wrongMediaFormatErrorMessage)
+    return null
+  }
+
+  return Attachment().apply {
+    contentType = attachmentMimeTypeWithSubType
+    data = attachmentByteArray
+    title = fileName
+    creation = Date()
   }
 }
 
