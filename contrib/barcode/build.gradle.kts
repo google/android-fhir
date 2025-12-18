@@ -1,10 +1,11 @@
 import Dependencies.removeIncompatibleDependencies
 
 plugins {
-  id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.mavenPublish)
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
+  `maven-publish`
   jacoco
+  alias(libs.plugins.dokka)
 }
 
 publishArtifact(Releases.Contrib.Barcode)
@@ -16,7 +17,7 @@ android {
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
   }
@@ -55,33 +56,33 @@ android {
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  androidTestImplementation(Dependencies.mockitoInline)
   androidTestImplementation(libs.androidx.fragment.testing)
   androidTestImplementation(libs.androidx.test.core)
   androidTestImplementation(libs.androidx.test.ext.junit)
   androidTestImplementation(libs.androidx.test.ext.junit.ktx)
   androidTestImplementation(libs.androidx.test.rules)
   androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.mockito.inline)
   androidTestImplementation(libs.truth)
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-  implementation(project(":datacapture"))
-  implementation(Dependencies.Mlkit.barcodeScanning)
-  implementation(Dependencies.Mlkit.objectDetection)
-  implementation(Dependencies.Mlkit.objectDetectionCustom)
-  implementation(Dependencies.timber)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.core)
   implementation(libs.androidx.fragment)
   implementation(libs.material)
+  implementation(libs.mlkit.barcode.scanning)
+  implementation(libs.mlkit.obj.detection)
+  implementation(libs.mlkit.obj.detection.custom)
+  implementation(libs.timber)
+  implementation(project(":datacapture"))
 
-  testImplementation(Dependencies.mockitoInline)
-  testImplementation(Dependencies.mockitoKotlin)
-  testImplementation(Dependencies.robolectric)
   testImplementation(libs.androidx.fragment.testing)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.mockito.inline)
+  testImplementation(libs.mockito.kotlin)
+  testImplementation(libs.robolectric)
   testImplementation(libs.truth)
 }
