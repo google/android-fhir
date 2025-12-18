@@ -431,4 +431,41 @@ class EditTextIntegerViewHolderFactoryComposeTest {
       .onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG, useUnmergedTree = true)
       .assertTextEquals("")
   }
+
+  @Test
+  fun displaysCorrectTextOnQuestionnaireViewItemAnswerUpdate() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Age" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          answer =
+            listOf(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = IntegerType("12")
+              },
+            )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("12")
+
+    val questionnaireViewItemUpdatedAnswer =
+      questionnaireViewItem.copy(
+        questionnaireResponseItem =
+          questionnaireViewItem.getQuestionnaireResponseItem().apply {
+            answer =
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = IntegerType("120")
+                },
+              )
+          },
+      )
+    viewHolder.bind(questionnaireViewItemUpdatedAnswer)
+
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("120")
+  }
 }
