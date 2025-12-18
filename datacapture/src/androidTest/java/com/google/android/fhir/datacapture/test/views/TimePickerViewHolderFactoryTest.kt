@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,38 +14,54 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture.test.views
 
+import android.text.format.DateFormat
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.TIME_PICKER_INPUT_FIELD
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.TimePickerViewHolderFactory
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.TimeType
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowSettings
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class TimePickerViewHolderFactoryTest {
-  private val context =
-    Robolectric.buildActivity(AppCompatActivity::class.java).create().get().apply {
-      setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-    }
-  private val parent = FrameLayout(context)
-  private val viewHolder = TimePickerViewHolderFactory.create(parent)
+  @get:Rule
+  val activityScenarioRule: ActivityScenarioRule<TestActivity> =
+    ActivityScenarioRule(TestActivity::class.java)
 
-  private val QuestionnaireItemViewHolder.timeInputView: TextView
-    get() {
-      return itemView.findViewById(R.id.text_input_edit_text)
+  @get:Rule val composeTestRule = createEmptyComposeRule()
+
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
+  private lateinit var parent: FrameLayout
+
+  @Before
+  fun setUp() {
+    activityScenarioRule.scenario.onActivity { activity ->
+      parent = FrameLayout(activity)
+      viewHolder = TimePickerViewHolderFactory.create(parent)
+      activity.setContentView(viewHolder.itemView)
     }
+
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+  }
 
   @Test
   fun shouldSetQuestionHeader() {
@@ -57,6 +73,8 @@ class TimePickerViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
+    // Synchronize
+    composeTestRule.waitForIdle()
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
@@ -73,60 +91,56 @@ class TimePickerViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.timeInputView.text.toString()).isEqualTo("")
+    composeTestRule
+      .onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals("")
   }
 
   @Test
-  fun `should show AM time when set time format is 12 hrs`() {
-    ShadowSettings.set24HourTimeFormat(false)
+  fun shouldDisplayAMTimeInCorrectFormat_dependingOnSystemSettings() {
+    val context = viewHolder.itemView.context
+    val is24Hour = DateFormat.is24HourFormat(context)
+
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(TimeType("10:10")),
+              .setValue(TimeType("10:10:00")),
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.timeInputView.text.toString()).isEqualTo("10:10 AM")
+
+    val expectedTime = if (is24Hour) "10:10" else "10:10 AM"
+    composeTestRule
+      .onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals(expectedTime)
   }
 
   @Test
-  fun `should show PM time when set time format is 12 hrs`() {
-    ShadowSettings.set24HourTimeFormat(false)
+  fun shouldDisplayPMTimeInCorrectFormat_dependingOnSystemSettings() {
+    val context = viewHolder.itemView.context
+    val is24Hour = DateFormat.is24HourFormat(context)
+
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(TimeType("22:10:10")),
+              .setValue(TimeType("22:10:00")),
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.timeInputView.text.toString()).isEqualTo("10:10 PM")
-  }
 
-  @Test
-  fun `should show time when set time format is 24 hrs`() {
-    ShadowSettings.set24HourTimeFormat(true)
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(TimeType("22:10")),
-          ),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-    assertThat(viewHolder.timeInputView.text.toString()).isEqualTo("22:10")
+    val expectedTime = if (is24Hour) "22:10" else "10:10 PM"
+    composeTestRule
+      .onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true)
+      .assertTextEquals(expectedTime)
   }
 }

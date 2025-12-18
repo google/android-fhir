@@ -267,4 +267,43 @@ data class QuestionnaireViewItem(
     }
     return validationResult == other.validationResult
   }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as QuestionnaireViewItem
+
+    // Structural equality
+    if (isHelpCardOpen != other.isHelpCardOpen) return false
+    if (questionnaireItem != other.questionnaireItem) return false
+    if (questionnaireResponseItem != other.questionnaireResponseItem) return false
+    if (validationResult != other.validationResult) return false
+    if (answersChangedCallback != other.answersChangedCallback) return false
+    if (enabledAnswerOptions != other.enabledAnswerOptions) return false
+    if (minAnswerValue != other.minAnswerValue) return false
+    if (maxAnswerValue != other.maxAnswerValue) return false
+    if (draftAnswer != other.draftAnswer) return false
+    if (enabledDisplayItems != other.enabledDisplayItems) return false
+    if (questionViewTextConfiguration != other.questionViewTextConfiguration) return false
+    if (helpCardStateChangedCallback != other.helpCardStateChangedCallback) return false
+
+    return hasTheSameResponse(other)
+  }
+
+  override fun hashCode(): Int {
+    var result = isHelpCardOpen.hashCode()
+    result = 31 * result + questionnaireItem.hashCode()
+    result = 31 * result + questionnaireResponseItem.hashCode()
+    result = 31 * result + validationResult.hashCode()
+    result = 31 * result + answersChangedCallback.hashCode()
+    result = 31 * result + enabledAnswerOptions.hashCode()
+    result = 31 * result + (minAnswerValue?.hashCode() ?: 0)
+    result = 31 * result + (maxAnswerValue?.hashCode() ?: 0)
+    result = 31 * result + (draftAnswer?.hashCode() ?: 0)
+    result = 31 * result + enabledDisplayItems.hashCode()
+    result = 31 * result + questionViewTextConfiguration.hashCode()
+    result = 31 * result + helpCardStateChangedCallback.hashCode()
+    return result
+  }
 }
