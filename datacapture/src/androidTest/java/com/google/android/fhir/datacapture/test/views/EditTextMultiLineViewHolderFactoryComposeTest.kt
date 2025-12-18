@@ -39,7 +39,7 @@ import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
 import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
-import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
@@ -53,7 +53,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class EditTextSingleLineViewHolderFactoryInstrumentedTest {
+class EditTextMultiLineViewHolderFactoryComposeTest {
 
   @get:Rule
   val activityScenarioRule: ActivityScenarioRule<TestActivity> =
@@ -75,7 +75,7 @@ class EditTextSingleLineViewHolderFactoryInstrumentedTest {
   fun setup() {
     activityScenarioRule.scenario.onActivity { activity ->
       parent = FrameLayout(activity)
-      viewHolder = EditTextSingleLineViewHolderFactory.create(parent)
+      viewHolder = EditTextMultiLineViewHolderFactory.create(parent)
       activity.setContentView(viewHolder.itemView)
     }
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
@@ -377,42 +377,5 @@ class EditTextSingleLineViewHolderFactoryInstrumentedTest {
     )
 
     composeTestRule.onNodeWithText("Optional").assertDoesNotExist()
-  }
-
-  @Test
-  fun displaysCorrectTextOnQuestionnaireViewItemAnswerUpdate() {
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "First Name" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          answer =
-            listOf(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = StringType("Jane")
-              },
-            )
-        },
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      )
-
-    viewHolder.bind(questionnaireViewItem)
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("Jane")
-
-    val questionnaireViewItemUpdatedAnswer =
-      questionnaireViewItem.copy(
-        questionnaireResponseItem =
-          questionnaireViewItem.getQuestionnaireResponseItem().apply {
-            answer =
-              listOf(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = StringType("Janette")
-                },
-              )
-          },
-      )
-    viewHolder.bind(questionnaireViewItemUpdatedAnswer)
-
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("Janette")
   }
 }
