@@ -16,239 +16,207 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.View
-import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SelectableDates
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.extensions.dateEntryFormatOrSystemDefault
+import com.google.android.fhir.datacapture.extensions.dateType
 import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
-import com.google.android.fhir.datacapture.extensions.parseDate
-import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
+import com.google.android.fhir.datacapture.extensions.itemMedia
+import com.google.android.fhir.datacapture.extensions.localDate
+import com.google.android.fhir.datacapture.extensions.parseLocalDateOrNull
+import com.google.android.fhir.datacapture.extensions.toLocalDate
 import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.material.datepicker.CalendarConstraints
-import com.google.android.material.datepicker.CalendarConstraints.DateValidator
-import com.google.android.material.datepicker.CompositeDateValidator
-import com.google.android.material.datepicker.DateValidatorPointBackward
-import com.google.android.material.datepicker.DateValidatorPointForward
+import com.google.android.fhir.datacapture.views.compose.DateInput
+import com.google.android.fhir.datacapture.views.compose.DateInputFormat
+import com.google.android.fhir.datacapture.views.compose.DatePickerItem
+import com.google.android.fhir.datacapture.views.compose.Header
+import com.google.android.fhir.datacapture.views.compose.MediaItem
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
-import java.text.ParseException
-import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.format.DateTimeParseException
-import java.util.Date
-import kotlin.math.abs
-import kotlin.math.log10
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object DatePickerViewHolderFactory :
-  QuestionnaireItemAndroidViewHolderFactory(R.layout.date_picker_view) {
+internal object DatePickerViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
+  @OptIn(ExperimentalMaterial3Api::class)
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemAndroidViewHolderDelegate {
-      private lateinit var context: AppCompatActivity
-      private lateinit var header: HeaderView
-      private lateinit var textInputLayout: TextInputLayout
-      private lateinit var textInputEditText: TextInputEditText
-      override lateinit var questionnaireViewItem: QuestionnaireViewItem
-      private lateinit var canonicalizedDatePattern: String
-      private var textWatcher: TextWatcher? = null
+    object : QuestionnaireItemComposeViewHolderDelegate {
 
-      override fun init(itemView: View) {
-        context = itemView.context.tryUnwrapContext()!!
-        header = itemView.findViewById(R.id.header)
-        textInputLayout = itemView.findViewById(R.id.text_input_layout)
-        textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
-        textInputEditText.setOnFocusChangeListener { view, hasFocus ->
-          if (!hasFocus) {
-            (view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
-              .hideSoftInputFromWindow(view.windowToken, 0)
+      @Composable
+      override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
+        val context = LocalContext.current
+        val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
+        val dateEntryFormat =
+          remember(questionnaireViewItem) {
+            questionnaireViewItem.questionnaireItem.dateEntryFormatOrSystemDefault
           }
-        }
-        textInputLayout.setEndIconOnClickListener {
-          // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
-          // and again in TextInputEditText during layout inflation. As a result, it is
-          // necessary to access the base context twice to retrieve the application object
-          // from the view's context.
-          val context = itemView.context.tryUnwrapContext()!!
-          val localDateInput =
+        val datePatternSeparator =
+          remember(dateEntryFormat) { getDateSeparator(dateEntryFormat) ?: '/' }
+        val canonicalizedDatePattern =
+          remember(dateEntryFormat) { canonicalizeDatePattern(dateEntryFormat) }
+        val uiDatePatternText =
+          remember(canonicalizedDatePattern) {
+            // Use 'mm' for month instead of 'MM' to avoid confusion.
+            // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
+            canonicalizedDatePattern.lowercase()
+          }
+        val dateInputFormat =
+          remember(canonicalizedDatePattern, datePatternSeparator) {
+            DateInputFormat(
+              canonicalizedDatePattern,
+              datePatternSeparator,
+            )
+          }
+        val questionnaireItemAnswerLocalDate =
+          remember(questionnaireViewItem.answers) {
             questionnaireViewItem.answers.singleOrNull()?.valueDateType?.localDate
-          buildMaterialDatePicker(localDateInput)
-            .apply {
-              addOnPositiveButtonClickListener { epochMilli ->
-                with(Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()) {
-                  textInputEditText.setText(this?.format(canonicalizedDatePattern))
-                  setQuestionnaireItemViewItemAnswer(this)
-                }
-                // Clear focus so that the user can refocus to open the dialog
-                textInputEditText.clearFocus()
-              }
+          }
+        val questionnaireItemAnswerDateInMillis =
+          remember(questionnaireItemAnswerLocalDate) {
+            questionnaireItemAnswerLocalDate?.atStartOfDay(ZONE_ID_UTC)?.toInstant()?.toEpochMilli()
+          }
+        val initialSelectedDateInMillis =
+          remember(questionnaireItemAnswerDateInMillis) {
+            questionnaireItemAnswerDateInMillis ?: MaterialDatePicker.todayInUtcMilliseconds()
+          }
+        val draftAnswer =
+          remember(questionnaireViewItem.draftAnswer) {
+            questionnaireViewItem.draftAnswer as? String
+          }
+        val dateInput =
+          remember(dateInputFormat, questionnaireItemAnswerLocalDate, draftAnswer) {
+            questionnaireItemAnswerLocalDate?.format(dateInputFormat.pattern)?.let {
+              DateInput(it, questionnaireItemAnswerLocalDate)
             }
-            .show(context.supportFragmentManager, TAG)
-        }
-      }
+              ?: DateInput(display = draftAnswer ?: "", null)
+          }
 
-      @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
-      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        clearPreviousState()
-        header.bind(questionnaireViewItem)
+        val selectableDatesResult =
+          remember(questionnaireViewItem) { getSelectableDates(questionnaireViewItem) }
 
-        val datePattern = questionnaireViewItem.questionnaireItem.dateEntryFormatOrSystemDefault
-        // Special character used in date pattern
-        val datePatternSeparator = getDateSeparator(datePattern)
-        canonicalizedDatePattern = canonicalizeDatePattern(datePattern)
+        val selectableDates = remember(selectableDatesResult) { selectableDatesResult.getOrNull() }
 
-        with(textInputLayout) {
-          // Use 'mm' for month instead of 'MM' to avoid confusion.
-          // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
-          hint = canonicalizedDatePattern.lowercase()
-          helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
-        }
-        textInputEditText.removeTextChangedListener(textWatcher)
+        val prohibitInput = remember(selectableDatesResult) { selectableDatesResult.isFailure }
 
-        val questionnaireItemViewItemDateAnswer =
-          questionnaireViewItem.answers.singleOrNull()?.valueDateType?.localDate
+        val validationMessage =
+          remember(draftAnswer, selectableDatesResult) {
+            if (selectableDatesResult.isFailure) {
+              selectableDatesResult.exceptionOrNull()?.localizedMessage
+            } else {
+              // If the draft answer is set, this means the user has yet to type a parseable answer,
+              // so we display an error.
+              getValidationErrorMessage(
+                context,
+                questionnaireViewItem,
+                if (!draftAnswer.isNullOrEmpty()) {
+                  Invalid(
+                    listOf(invalidDateErrorText(context, canonicalizedDatePattern)),
+                  )
+                } else {
+                  questionnaireViewItem.validationResult
+                },
+              )
+            }
+          }
 
-        val dateStringToDisplay =
-          questionnaireItemViewItemDateAnswer?.format(canonicalizedDatePattern)
-            ?: questionnaireViewItem.draftAnswer as? String
-
-        if (textInputEditText.text.toString() != dateStringToDisplay) {
-          textInputEditText.setText(dateStringToDisplay)
-        }
-
-        // If the draft answer is set, this means the user has yet to type a parseable answer,
-        // so we display an error.
-        val draftAnswer = questionnaireViewItem.draftAnswer as? String
-        if (!draftAnswer.isNullOrEmpty()) {
-          displayValidationResult(
-            Invalid(
-              listOf(invalidDateErrorText(textInputEditText.context, canonicalizedDatePattern)),
+        Column(
+          modifier =
+            Modifier.padding(
+              horizontal = dimensionResource(R.dimen.item_margin_horizontal),
+              vertical = dimensionResource(R.dimen.item_margin_vertical),
             ),
-          )
-        } else {
-          displayValidationResult(questionnaireViewItem.validationResult)
-        }
-        textWatcher = DatePatternTextWatcher(datePatternSeparator)
-        textInputEditText.addTextChangedListener(textWatcher)
-      }
+        ) {
+          Header(questionnaireViewItem)
+          questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
 
-      override fun setReadOnly(isReadOnly: Boolean) {
-        textInputEditText.isEnabled = !isReadOnly
-        textInputLayout.isEnabled = !isReadOnly
-      }
-
-      private fun buildMaterialDatePicker(localDate: LocalDate?): MaterialDatePicker<Long> {
-        val selectedDateMillis =
-          localDate?.atStartOfDay(ZONE_ID_UTC)?.toInstant()?.toEpochMilli()
-            ?: MaterialDatePicker.todayInUtcMilliseconds()
-
-        return MaterialDatePicker.Builder.datePicker()
-          .setTitleText(R.string.select_date)
-          .setSelection(selectedDateMillis)
-          .setCalendarConstraints(getCalenderConstraint())
-          .build()
-      }
-
-      private fun getCalenderConstraint(): CalendarConstraints {
-        val min = (questionnaireViewItem.minAnswerValue as? DateType)?.value?.time
-        val max = (questionnaireViewItem.maxAnswerValue as? DateType)?.value?.time
-
-        if (min != null && max != null && min > max) {
-          throw IllegalArgumentException("minValue cannot be greater than maxValue")
-        }
-
-        val listValidators = ArrayList<DateValidator>()
-        min?.let { listValidators.add(DateValidatorPointForward.from(it)) }
-        max?.let { listValidators.add(DateValidatorPointBackward.before(it)) }
-        val validators = CompositeDateValidator.allOf(listValidators)
-
-        return CalendarConstraints.Builder().setValidator(validators).build()
-      }
-
-      private fun clearPreviousState() {
-        textInputEditText.isEnabled = true
-        textInputLayout.isEnabled = true
-      }
-
-      /** Set the answer in the [QuestionnaireResponse]. */
-      private fun setQuestionnaireItemViewItemAnswer(localDate: LocalDate) =
-        context.lifecycleScope.launch {
-          questionnaireViewItem.setAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = localDate.dateType
+          DatePickerItem(
+            modifier = Modifier.fillMaxWidth(),
+            initialSelectedDateMillis = initialSelectedDateInMillis,
+            selectableDates = selectableDates,
+            dateInputFormat = dateInputFormat,
+            dateInput = dateInput,
+            labelText = uiDatePatternText,
+            helperText = validationMessage.takeIf { !it.isNullOrBlank() }
+                ?: getRequiredOrOptionalText(questionnaireViewItem, context),
+            isError = !validationMessage.isNullOrBlank(),
+            enabled = !(questionnaireViewItem.questionnaireItem.readOnly || prohibitInput),
+            parseStringToLocalDate = { str, pattern -> parseLocalDateOrNull(str, pattern) },
+            onDateInputEntry = {
+              val (display, date) = it
+              if (date != null) {
+                coroutineScope.launch {
+                  setQuestionnaireItemViewItemAnswer(questionnaireViewItem, date)
+                }
+              } else {
+                coroutineScope.launch {
+                  parseDateOnTextChanged(
+                    questionnaireViewItem,
+                    display,
+                    dateInputFormat.pattern,
+                  )
+                }
+              }
             },
           )
         }
+      }
+
+      private fun getSelectableDates(
+        questionnaireViewItem: QuestionnaireViewItem,
+      ): Result<SelectableDates> {
+        val min = (questionnaireViewItem.minAnswerValue as? DateType)?.value?.time
+        val max = (questionnaireViewItem.maxAnswerValue as? DateType)?.value?.time
+
+        return if (min != null && max != null && min > max) {
+          Result.failure(IllegalArgumentException("minValue cannot be greater than maxValue"))
+        } else {
+          Result.success(selectableDates(min, max))
+        }
+      }
+
+      /** Set the answer in the [QuestionnaireResponse]. */
+      private suspend fun setQuestionnaireItemViewItemAnswer(
+        questionnaireViewItem: QuestionnaireViewItem,
+        localDate: LocalDate,
+      ) =
+        questionnaireViewItem.setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = localDate.dateType
+          },
+        )
 
       /**
        * Each time the user types in a character, parse the string and if it can be parsed into a
        * date, set the answer in the [QuestionnaireResponse], otherwise, set the draft answer.
        */
-      private fun parseDateOnTextChanged(dateToDisplay: String) =
-        context.lifecycleScope.launch {
-          try {
-            val localDate = parseDate(dateToDisplay, canonicalizedDatePattern)
-            setQuestionnaireItemViewItemAnswer(localDate)
-          } catch (e: ParseException) {
-            questionnaireViewItem.setDraftAnswer(dateToDisplay)
-          } catch (e: DateTimeParseException) {
-            questionnaireViewItem.setDraftAnswer(dateToDisplay)
-          }
-        }
-
-      private fun displayValidationResult(validationResult: ValidationResult) {
-        textInputLayout.error =
-          getValidationErrorMessage(
-            textInputLayout.context,
-            questionnaireViewItem,
-            validationResult,
-          )
-      }
-
-      /** Automatically appends date separator (e.g. "/") during date input. */
-      inner class DatePatternTextWatcher(private val dateFormatSeparator: Char?) : TextWatcher {
-        private var isDeleting = false
-
-        override fun beforeTextChanged(
-          charSequence: CharSequence,
-          start: Int,
-          count: Int,
-          after: Int,
-        ) {
-          isDeleting = count > after
-        }
-
-        override fun onTextChanged(
-          charSequence: CharSequence,
-          start: Int,
-          before: Int,
-          count: Int,
-        ) {}
-
-        override fun afterTextChanged(editable: Editable) {
-          handleDateFormatAfterTextChange(
-            editable,
-            canonicalizedDatePattern,
-            dateFormatSeparator,
-            isDeleting,
-          )
-          parseDateOnTextChanged(editable.toString())
+      private suspend fun parseDateOnTextChanged(
+        questionnaireViewItem: QuestionnaireViewItem,
+        dateToDisplay: String,
+        pattern: String,
+      ) {
+        val localDate = parseLocalDateOrNull(dateToDisplay, pattern)
+        if (localDate != null) {
+          setQuestionnaireItemViewItemAnswer(questionnaireViewItem, localDate)
+        } else {
+          questionnaireViewItem.setDraftAnswer(dateToDisplay)
         }
       }
     }
@@ -257,71 +225,6 @@ internal object DatePickerViewHolderFactory :
 internal const val TAG = "date-picker"
 internal val ZONE_ID_UTC = ZoneId.of("UTC")
 
-/**
- * Format entered date to acceptable date format where 2 digits for day and month, 4 digits for
- * year.
- */
-internal fun handleDateFormatAfterTextChange(
-  editable: Editable,
-  canonicalizedDatePattern: String,
-  dateFormatSeparator: Char?,
-  isDeleting: Boolean,
-) {
-  val editableLength = editable.length
-  if (editable.isEmpty()) {
-    return
-  }
-  // restrict date entry upto acceptable date length
-  if (editableLength > canonicalizedDatePattern.length) {
-    editable.replace(canonicalizedDatePattern.length, editableLength, "")
-    return
-  }
-  // handle delete text and separator
-  if (editableLength < canonicalizedDatePattern.length) {
-    // Do not add the separator again if the user has just deleted it.
-    if (!isDeleting && canonicalizedDatePattern[editableLength] == dateFormatSeparator) {
-      // 02 is entered with dd/MM/yyyy so appending / to editable 02/
-      editable.append(dateFormatSeparator)
-    }
-    if (
-      canonicalizedDatePattern[editable.lastIndex] == dateFormatSeparator &&
-        editable[editable.lastIndex] != dateFormatSeparator
-    ) {
-      // Add separator to break different date components, e.g. converting "123" to "12/3"
-      editable.insert(editable.lastIndex, dateFormatSeparator.toString())
-    }
-  }
-}
-
-internal val DateType.localDate
-  get() =
-    if (!this.hasValue()) {
-      null
-    } else {
-      LocalDate.of(
-        year,
-        month + 1,
-        day,
-      )
-    }
-
-internal val LocalDate.dateType
-  get() = DateType(year, monthValue - 1, dayOfMonth)
-
-internal val Date.localDate
-  get() = LocalDate.of(year + 1900, month + 1, date)
-
-// Count the number of digits in an Integer
-internal fun Int.length() =
-  when (this) {
-    0 -> 1
-    else -> log10(abs(toDouble())).toInt() + 1
-  }
-
-/**
- * Replaces 'dd' with '31', 'MM' with '01' and 'yyyy' with '2023' and returns new string. For
- * example, given a `formatPattern` of dd/MM/yyyy, returns 31/01/2023
- */
 internal fun invalidDateErrorText(context: Context, formatPattern: String) =
   context.getString(
     R.string.date_format_validation_error_msg,
@@ -330,3 +233,18 @@ internal fun invalidDateErrorText(context: Context, formatPattern: String) =
     formatPattern.lowercase(),
     formatPattern.replace("dd", "31").replace("MM", "01").replace("yyyy", "2023"),
   )
+
+@OptIn(ExperimentalMaterial3Api::class)
+internal fun selectableDates(minDateMillis: Long?, maxDateMillis: Long?) =
+  object : SelectableDates {
+    override fun isSelectableDate(utcTimeMillis: Long) =
+      (minDateMillis == null || utcTimeMillis >= minDateMillis) &&
+        (maxDateMillis == null || utcTimeMillis <= maxDateMillis)
+
+    private fun getYear(timeInMillis: Long) = timeInMillis.toLocalDate().year
+
+    override fun isSelectableYear(year: Int): Boolean {
+      return (minDateMillis == null || year >= getYear(minDateMillis)) &&
+        (maxDateMillis == null || year <= getYear(maxDateMillis))
+    }
+  }
