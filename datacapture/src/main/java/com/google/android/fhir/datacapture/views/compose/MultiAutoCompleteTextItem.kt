@@ -79,21 +79,22 @@ internal fun MultiAutoCompleteTextItem(
   val density = LocalDensity.current
   val chipMargin = dimensionResource(R.dimen.auto_complete_chip_margin)
   val chipMarginBottom = dimensionResource(R.dimen.auto_complete_chip_margin_bottom)
+  val textFieldContentPadding = dimensionResource(R.dimen.auto_complete_text_field_content_padding)
 
   val interactionSource = remember { MutableInteractionSource() }
   val colors = OutlinedTextFieldDefaults.colors()
   val contentPadding =
     remember(chipContainerHeight, selectedOptions.size) {
       PaddingValues(
-        start = 16.dp,
+        start = textFieldContentPadding,
         top =
           if (selectedOptions.isNotEmpty()) {
-            with(density) { chipContainerHeight.toDp() } + 16.dp
+            with(density) { chipContainerHeight.toDp() } + textFieldContentPadding
           } else {
-            16.dp
+            textFieldContentPadding
           },
-        end = 16.dp,
-        bottom = 16.dp,
+        end = textFieldContentPadding,
+        bottom = textFieldContentPadding,
       )
     }
 

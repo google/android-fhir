@@ -96,8 +96,6 @@ internal object AutoCompleteViewHolderFactory : QuestionnaireItemComposeViewHold
           Header(questionnaireViewItem, showRequiredOrOptionalText = true)
           questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
 
-          // TODO: Set text gravity using Modifier
-          //                .align(Alignment.BottomCenter)
           MultiAutoCompleteTextItem(
             modifier = Modifier.fillMaxWidth(),
             enabled = !isReadOnly,
