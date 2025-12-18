@@ -45,6 +45,7 @@ import com.google.android.fhir.datacapture.views.compose.Header
 import com.google.android.fhir.datacapture.views.compose.MediaItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object RadioGroupViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
@@ -72,34 +73,22 @@ internal object RadioGroupViewHolderFactory : QuestionnaireItemComposeViewHolder
               },
             )
           }
-
-        @Suppress("LocalVariableName")
-        val AnswerOptionRadioButtons: @Composable (Modifier) -> Unit = { modifier ->
-          enabledAnswerOptions.forEach {
-            val labelText = remember(it) { AnnotatedString(it.value.displayString(context)) }
-            ChoiceRadioButton(
-              label = labelText,
-              selected = it == selectedAnswerOption,
-              enabled = !readOnly,
-              modifier = modifier.testTag(RADIO_OPTION_TAG),
-              image = it.itemAnswerOptionImage(context),
-            ) {
-              coroutineScope.launch {
-                if (selectedAnswerOption != it) {
-                  selectedAnswerOption = it
-                  questionnaireViewItem.setAnswer(
-                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                      value = it.value
-                    },
-                  )
-                } else {
-                  selectedAnswerOption = null
-                  questionnaireViewItem.clearAnswer()
-                }
-              }
+        val onAnswerOptionChoiceChange:
+          suspend (Questionnaire.QuestionnaireItemAnswerOptionComponent) -> Unit =
+          { answerOption ->
+            if (selectedAnswerOption != answerOption) {
+              selectedAnswerOption = answerOption
+              questionnaireViewItem.setAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = answerOption.value
+                },
+              )
+            } else {
+              // Deselect an answerOption
+              selectedAnswerOption = null
+              questionnaireViewItem.clearAnswer()
             }
           }
-        }
 
         Column(
           modifier =
@@ -125,7 +114,17 @@ internal object RadioGroupViewHolderFactory : QuestionnaireItemComposeViewHolder
                 verticalArrangement =
                   Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_vertical)),
               ) {
-                AnswerOptionRadioButtons(Modifier.weight(1f))
+                enabledAnswerOptions.forEach {
+                  ChoiceRadioButton(
+                    label = remember(it) { AnnotatedString(it.value.displayString(context)) },
+                    selected = it == selectedAnswerOption,
+                    enabled = !readOnly,
+                    modifier = Modifier.weight(1f).testTag(RADIO_OPTION_TAG),
+                    image = it.itemAnswerOptionImage(context),
+                  ) {
+                    coroutineScope.launch { onAnswerOptionChoiceChange(it) }
+                  }
+                }
               }
             }
             ChoiceOrientationTypes.VERTICAL -> {
@@ -134,7 +133,17 @@ internal object RadioGroupViewHolderFactory : QuestionnaireItemComposeViewHolder
                 verticalArrangement =
                   Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_vertical)),
               ) {
-                AnswerOptionRadioButtons(Modifier.fillMaxWidth())
+                enabledAnswerOptions.forEach {
+                  ChoiceRadioButton(
+                    label = remember(it) { AnnotatedString(it.value.displayString(context)) },
+                    selected = it == selectedAnswerOption,
+                    enabled = !readOnly,
+                    modifier = Modifier.fillMaxWidth().testTag(RADIO_OPTION_TAG),
+                    image = it.itemAnswerOptionImage(context),
+                  ) {
+                    coroutineScope.launch { onAnswerOptionChoiceChange(it) }
+                  }
+                }
               }
             }
           }

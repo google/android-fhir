@@ -45,6 +45,7 @@ import com.google.android.fhir.datacapture.views.compose.Header
 import com.google.android.fhir.datacapture.views.compose.MediaItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object CheckBoxGroupViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
@@ -64,7 +65,6 @@ internal object CheckBoxGroupViewHolderFactory : QuestionnaireItemComposeViewHol
           }
         val enabledAnswerOptions =
           remember(questionnaireViewItem) { questionnaireViewItem.enabledAnswerOptions }
-        // Track selected answer options as a set
         var selectedAnswerOptions by
           remember(questionnaireViewItem) {
             mutableStateOf(
@@ -74,61 +74,48 @@ internal object CheckBoxGroupViewHolderFactory : QuestionnaireItemComposeViewHol
             )
           }
 
-        @Suppress("LocalVariableName")
-        val AnswerOptionCheckboxes: @Composable (Modifier) -> Unit = { modifier ->
-          enabledAnswerOptions.forEach { answerOption ->
-            val labelText =
-              remember(answerOption) { AnnotatedString(answerOption.value.displayString(context)) }
+        val onAnswerOptionCheckedChange:
+          suspend (Questionnaire.QuestionnaireItemAnswerOptionComponent, Boolean) -> Unit =
+          { answerOption, checked ->
+            when {
+              checked && answerOption.optionExclusive -> {
+                // If this answer option has optionExclusive extension, deselect other options
+                selectedAnswerOptions = setOf(answerOption)
+                questionnaireViewItem.setAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = answerOption.value
+                  },
+                )
+              }
+              checked -> {
+                // Deselect any optionExclusive answer options
+                val exclusiveOptions = enabledAnswerOptions.filter { it.optionExclusive }.toSet()
+                selectedAnswerOptions = (selectedAnswerOptions - exclusiveOptions) + answerOption
 
-            ChoiceCheckbox(
-              label = labelText,
-              checked = answerOption in selectedAnswerOptions,
-              enabled = !readOnly,
-              modifier = modifier.testTag(CHECKBOX_OPTION_TAG),
-              image = answerOption.itemAnswerOptionImage(context),
-            ) { checked ->
-              coroutineScope.launch {
-                if (checked) {
-                  if (answerOption.optionExclusive) {
-                    // If this answer option has optionExclusive extension, deselect other options
-                    selectedAnswerOptions = setOf(answerOption)
-                    questionnaireViewItem.setAnswer(
-                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                        value = answerOption.value
-                      },
-                    )
-                    return@launch
-                  }
-
-                  // Deselect any optionExclusive answer options
-                  val exclusiveOptions = enabledAnswerOptions.filter { it.optionExclusive }.toSet()
-                  selectedAnswerOptions = (selectedAnswerOptions - exclusiveOptions) + answerOption
-
-                  // Add the answer
-                  val answers =
-                    questionnaireViewItem.answers +
-                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                        value = answerOption.value
-                      }
-                  // Remove exclusive options from answers
-                  val newAnswers =
-                    answers.filterNot { answer ->
-                      exclusiveOptions.any { it.value.equalsDeep(answer.value) }
-                    }
-                  questionnaireViewItem.setAnswer(*newAnswers.toTypedArray())
-                } else {
-                  // Remove the answer
-                  selectedAnswerOptions = selectedAnswerOptions - answerOption
-                  questionnaireViewItem.removeAnswer(
+                // Add the answer
+                val answers =
+                  questionnaireViewItem.answers +
                     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                       value = answerOption.value
-                    },
-                  )
-                }
+                    }
+                // Remove exclusive options from answers
+                val newAnswers =
+                  answers.filterNot { answer ->
+                    exclusiveOptions.any { it.value.equalsDeep(answer.value) }
+                  }
+                questionnaireViewItem.setAnswer(*newAnswers.toTypedArray())
+              }
+              else -> {
+                // Remove the answer
+                selectedAnswerOptions = selectedAnswerOptions - answerOption
+                questionnaireViewItem.removeAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = answerOption.value
+                  },
+                )
               }
             }
           }
-        }
 
         Column(
           modifier =
@@ -154,7 +141,20 @@ internal object CheckBoxGroupViewHolderFactory : QuestionnaireItemComposeViewHol
                 verticalArrangement =
                   Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_vertical)),
               ) {
-                AnswerOptionCheckboxes(Modifier.weight(1f))
+                enabledAnswerOptions.forEach { answerOption ->
+                  ChoiceCheckbox(
+                    label =
+                      remember(answerOption) {
+                        AnnotatedString(answerOption.value.displayString(context))
+                      },
+                    checked = answerOption in selectedAnswerOptions,
+                    enabled = !readOnly,
+                    modifier = Modifier.weight(1f).testTag(CHECKBOX_OPTION_TAG),
+                    image = answerOption.itemAnswerOptionImage(context),
+                  ) {
+                    coroutineScope.launch { onAnswerOptionCheckedChange(answerOption, it) }
+                  }
+                }
               }
             }
             ChoiceOrientationTypes.VERTICAL -> {
@@ -163,7 +163,20 @@ internal object CheckBoxGroupViewHolderFactory : QuestionnaireItemComposeViewHol
                 verticalArrangement =
                   Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_vertical)),
               ) {
-                AnswerOptionCheckboxes(Modifier.fillMaxWidth())
+                enabledAnswerOptions.forEach { answerOption ->
+                  ChoiceCheckbox(
+                    label =
+                      remember(answerOption) {
+                        AnnotatedString(answerOption.value.displayString(context))
+                      },
+                    checked = answerOption in selectedAnswerOptions,
+                    enabled = !readOnly,
+                    modifier = Modifier.fillMaxWidth().testTag(CHECKBOX_OPTION_TAG),
+                    image = answerOption.itemAnswerOptionImage(context),
+                  ) {
+                    coroutineScope.launch { onAnswerOptionCheckedChange(answerOption, it) }
+                  }
+                }
               }
             }
           }
@@ -171,3 +184,5 @@ internal object CheckBoxGroupViewHolderFactory : QuestionnaireItemComposeViewHol
       }
     }
 }
+
+internal const val CHECKBOX_OPTION_TAG = "checkbox_group_option"

@@ -66,53 +66,19 @@ internal object BooleanChoiceViewHolderFactory : QuestionnaireItemComposeViewHol
           }
         var selectedChoiceState by remember(currentAnswer) { mutableStateOf(currentAnswer) }
 
-        @Suppress("LocalVariableName")
-        val YesChoiceRadioButton: @Composable (Modifier) -> Unit = {
-          ChoiceRadioButton(
-            label = AnnotatedString(stringResource(R.string.yes)),
-            selected = selectedChoiceState == true,
-            enabled = !readOnly,
-            modifier = it.testTag(YES_CHOICE_RADIO_BUTTON_TAG),
-          ) {
-            coroutineScope.launch {
-              if (selectedChoiceState != true) {
-                selectedChoiceState = true
-                questionnaireViewItem.setAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = BooleanType(true)
-                  },
-                )
-              } else {
-                selectedChoiceState = null // unset
-                questionnaireViewItem.clearAnswer()
-              }
-            }
+        val onChoiceSelection: suspend (Boolean) -> Unit = { selected ->
+          if (selectedChoiceState != selected) {
+            selectedChoiceState = selected
+            questionnaireViewItem.setAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(selected)
+              },
+            )
+          } else {
+            // clear selection
+            selectedChoiceState = null
+            questionnaireViewItem.clearAnswer()
           }
-        }
-
-        @Suppress("LocalVariableName")
-        val NoChoiceRadioButton: @Composable (Modifier) -> Unit = {
-          ChoiceRadioButton(
-            label = AnnotatedString(stringResource(R.string.no)),
-            selected = selectedChoiceState == false,
-            enabled = !readOnly,
-            modifier = it.testTag(NO_CHOICE_RADIO_BUTTON_TAG),
-            onClick = {
-              coroutineScope.launch {
-                if (selectedChoiceState != false) {
-                  selectedChoiceState = false
-                  questionnaireViewItem.setAnswer(
-                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                      value = BooleanType(false)
-                    },
-                  )
-                } else {
-                  selectedChoiceState = null // unset
-                  questionnaireViewItem.clearAnswer()
-                }
-              }
-            },
-          )
         }
 
         Column(
@@ -139,8 +105,22 @@ internal object BooleanChoiceViewHolderFactory : QuestionnaireItemComposeViewHol
                 verticalArrangement =
                   Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_vertical)),
               ) {
-                YesChoiceRadioButton(Modifier.weight(1f))
-                NoChoiceRadioButton(Modifier.weight(1f))
+                ChoiceRadioButton(
+                  label = AnnotatedString(stringResource(R.string.yes)),
+                  selected = selectedChoiceState == true,
+                  enabled = !readOnly,
+                  modifier = Modifier.weight(1f).testTag(YES_CHOICE_RADIO_BUTTON_TAG),
+                ) {
+                  coroutineScope.launch { onChoiceSelection(true) }
+                }
+
+                ChoiceRadioButton(
+                  label = AnnotatedString(stringResource(R.string.no)),
+                  selected = selectedChoiceState == false,
+                  enabled = !readOnly,
+                  modifier = Modifier.weight(1f).testTag(NO_CHOICE_RADIO_BUTTON_TAG),
+                  onClick = { coroutineScope.launch { onChoiceSelection(false) } },
+                )
               }
             }
             ChoiceOrientationTypes.VERTICAL -> {
@@ -149,8 +129,22 @@ internal object BooleanChoiceViewHolderFactory : QuestionnaireItemComposeViewHol
                 verticalArrangement =
                   Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_vertical)),
               ) {
-                YesChoiceRadioButton(Modifier.fillMaxWidth())
-                NoChoiceRadioButton(Modifier.fillMaxWidth())
+                ChoiceRadioButton(
+                  label = AnnotatedString(stringResource(R.string.yes)),
+                  selected = selectedChoiceState == true,
+                  enabled = !readOnly,
+                  modifier = Modifier.fillMaxWidth().testTag(YES_CHOICE_RADIO_BUTTON_TAG),
+                ) {
+                  coroutineScope.launch { onChoiceSelection(true) }
+                }
+
+                ChoiceRadioButton(
+                  label = AnnotatedString(stringResource(R.string.no)),
+                  selected = selectedChoiceState == false,
+                  enabled = !readOnly,
+                  modifier = Modifier.fillMaxWidth().testTag(NO_CHOICE_RADIO_BUTTON_TAG),
+                  onClick = { coroutineScope.launch { onChoiceSelection(false) } },
+                )
               }
             }
           }
