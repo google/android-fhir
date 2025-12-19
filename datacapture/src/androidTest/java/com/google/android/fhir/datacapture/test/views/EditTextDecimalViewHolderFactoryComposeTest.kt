@@ -39,13 +39,16 @@ import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
 import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
-import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewHolderFactory
+import com.google.android.fhir.datacapture.views.compose.UNIT_TEXT_TEST_TAG
+import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.IntegerType
+import java.math.BigDecimal
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -53,7 +56,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class EditTextMultiLineViewHolderFactoryInstrumentedTest {
+class EditTextDecimalViewHolderFactoryComposeTest {
 
   @get:Rule
   val activityScenarioRule: ActivityScenarioRule<TestActivity> =
@@ -75,7 +78,7 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
   fun setup() {
     activityScenarioRule.scenario.onActivity { activity ->
       parent = FrameLayout(activity)
-      viewHolder = EditTextMultiLineViewHolderFactory.create(parent)
+      viewHolder = EditTextDecimalViewHolderFactory.create(parent)
       activity.setContentView(viewHolder.itemView)
     }
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
@@ -113,7 +116,7 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("Answer")
+              value = DecimalType("1.1")
             },
           )
         },
@@ -121,7 +124,7 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("Answer")
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("1.1")
   }
 
   @Test
@@ -132,7 +135,7 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("Answer")
+              value = DecimalType("1.1")
             },
           )
         },
@@ -154,7 +157,71 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun shouldSetQuestionnaireResponseItemAnswer() {
+  fun shouldSetUnitText() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          type = Questionnaire.QuestionnaireItemType.DECIMAL
+          addExtension(
+            Extension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
+              setValue(Coding().apply { code = "kg" })
+            },
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DecimalType("1.1")
+            },
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    composeTestRule.onNodeWithTag(UNIT_TEXT_TEST_TAG).assertTextEquals("kg")
+  }
+
+  @Test
+  fun shouldClearUnitText() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          type = Questionnaire.QuestionnaireItemType.DECIMAL
+          addExtension(
+            Extension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
+              setValue(Coding().apply { code = "kg" })
+            },
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DecimalType("1.1")
+            },
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("")
+  }
+
+  @Test
+  fun shouldSetQuestionnaireResponseItemAnswerIfTextIsValid() {
     var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -168,12 +235,12 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
       )
 
     viewHolder.bind(questionnaireViewItem)
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("Answer").also {
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("1.1").also {
       pendingTextChange += 1
     }
     composeTestRule.waitForIdle()
 
-    assertThat(answers!!.single().valueStringType.value).isEqualTo("Answer")
+    assertThat(answers!!.single().valueDecimalType.value).isEqualTo(BigDecimal.valueOf(1.1))
   }
 
   @Test
@@ -193,19 +260,44 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+  fun shouldSetDraftAnswerIfTextIsInvalid() {
+    var draftAnswer: Any? = null
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, result ->
+          draftAnswer = result
+          pendingTextChange -= if (pendingTextChange > 0) 1 else 0
+        },
+      )
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("1.1.1.1").also {
+      pendingTextChange += 1
+    }
+    composeTestRule.waitForIdle()
+    assertThat(draftAnswer as String).isEqualTo("1.1.1.1")
+  }
+
+  @Test
+  fun displayValidationResultShouldShowNoErrorMesssage() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/minLength"
-            setValue(IntegerType("10"))
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue(DecimalType("2.2"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue(DecimalType("4.4"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("hello there")
+              value = DecimalType("3.3")
             },
           )
         },
@@ -218,34 +310,33 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun displayValidationResult_error_shouldShowErrorMessage() {
+  fun displayValidationResultShouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/minLength"
-            setValue(IntegerType("10"))
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue(DecimalType("2.1"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue(DecimalType("4.2"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("hello")
+              value = DecimalType("1.1")
             },
           )
         },
-        validationResult =
-          Invalid(
-            listOf("The minimum number of characters that are permitted in the answer is: 10"),
-          ),
+        validationResult = Invalid(listOf("Minimum value allowed is:2.1")),
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
 
     composeTestRule.onNodeWithContentDescription("Error").assertIsDisplayed()
-    composeTestRule
-      .onNodeWithText("The minimum number of characters that are permitted in the answer is: 10")
-      .assertIsDisplayed()
+    composeTestRule.onNodeWithText("Minimum value allowed is:2.1").assertIsDisplayed()
   }
 
   @Test
@@ -377,5 +468,71 @@ class EditTextMultiLineViewHolderFactoryInstrumentedTest {
     )
 
     composeTestRule.onNodeWithText("Optional").assertDoesNotExist()
+  }
+
+  @Test
+  fun bindAgainShouldRemovePreviousText() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        draftAnswer = "1.1.1.1",
+      ),
+    )
+
+    composeTestRule
+      .onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG, useUnmergedTree = true)
+      .assertTextEquals("1.1.1.1")
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    composeTestRule
+      .onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG, useUnmergedTree = true)
+      .assertTextEquals("")
+  }
+
+  @Test
+  fun displaysCorrectTextOnQuestionnaireViewItemAnswerUpdate() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Weight" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          answer =
+            listOf(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = DecimalType("124.5")
+              },
+            )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("124.5")
+
+    val questionnaireViewItemUpdatedAnswer =
+      questionnaireViewItem.copy(
+        questionnaireResponseItem =
+          questionnaireViewItem.getQuestionnaireResponseItem().apply {
+            answer =
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = DecimalType("124.578")
+                },
+              )
+          },
+      )
+    viewHolder.bind(questionnaireViewItemUpdatedAnswer)
+
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("124.578")
   }
 }
