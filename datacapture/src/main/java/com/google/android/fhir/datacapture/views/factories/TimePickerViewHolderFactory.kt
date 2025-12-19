@@ -16,130 +16,106 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.text.InputType
-import android.text.format.DateFormat
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
+import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
+import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.extensions.toLocalizedString
-import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
-import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
-import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_KEYBOARD
-import com.google.android.material.timepicker.TimeFormat
+import com.google.android.fhir.datacapture.views.compose.Header
+import com.google.android.fhir.datacapture.views.compose.MediaItem
+import com.google.android.fhir.datacapture.views.compose.TimePickerItem
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.TimeType
 
-object TimePickerViewHolderFactory :
-  QuestionnaireItemAndroidViewHolderFactory(R.layout.time_picker_view) {
+object TimePickerViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
 
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemAndroidViewHolderDelegate {
-      private val TAG = "time-picker"
-      private lateinit var context: AppCompatActivity
-      private lateinit var header: HeaderView
-      private lateinit var timeInputLayout: TextInputLayout
-      private lateinit var timeInputEditText: TextInputEditText
-      override lateinit var questionnaireViewItem: QuestionnaireViewItem
+    object : QuestionnaireItemComposeViewHolderDelegate {
 
-      override fun init(itemView: View) {
-        context = itemView.context.tryUnwrapContext()!!
-        header = itemView.findViewById(R.id.header)
-        timeInputLayout = itemView.findViewById(R.id.text_input_layout)
-        timeInputEditText = itemView.findViewById(R.id.text_input_edit_text)
-        timeInputEditText.inputType = InputType.TYPE_NULL
-        timeInputEditText.hint = itemView.context.getString(R.string.time)
-
-        timeInputLayout.setEndIconOnClickListener {
-          // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
-          // and again in TextInputEditText during layout inflation. As a result, it is
-          // necessary to access the base context twice to retrieve the application object
-          // from the view's context.
-          val context = itemView.context.tryUnwrapContext()!!
-          buildMaterialTimePicker(context, INPUT_MODE_CLOCK)
-        }
-        timeInputEditText.setOnClickListener {
-          buildMaterialTimePicker(itemView.context, INPUT_MODE_KEYBOARD)
-        }
-      }
-
-      @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
-      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        clearPreviousState()
-        header.bind(questionnaireViewItem)
-        timeInputLayout.helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
-
-        val questionnaireItemViewItemDateTimeAnswer =
-          questionnaireViewItem.answers.singleOrNull()?.valueTimeType?.localTime
-
-        // If there is no set answer in the QuestionnaireItemViewItem, make the time field empty.
-        timeInputEditText.setText(
-          questionnaireItemViewItemDateTimeAnswer?.toLocalizedString(timeInputEditText.context)
-            ?: "",
-        )
-      }
-
-      override fun setReadOnly(isReadOnly: Boolean) {
-        // The system outside this delegate should only be able to mark it read only. Otherwise, it
-        // will change the state set by this delegate in bindView().
-        if (isReadOnly) {
-          timeInputEditText.isEnabled = false
-          timeInputLayout.isEnabled = false
-        }
-      }
-
-      private fun buildMaterialTimePicker(context: Context, inputMode: Int) {
-        val selectedTime =
-          questionnaireViewItem.answers.singleOrNull()?.valueTimeType?.localTime ?: LocalTime.now()
-        val timeFormat =
-          if (DateFormat.is24HourFormat(context)) {
-            TimeFormat.CLOCK_24H
-          } else {
-            TimeFormat.CLOCK_12H
+      @Composable
+      override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
+        val context = LocalContext.current
+        val validationMessage =
+          remember(questionnaireViewItem.validationResult) {
+            getValidationErrorMessage(
+              context,
+              questionnaireViewItem,
+              questionnaireViewItem.validationResult,
+            )
           }
-        MaterialTimePicker.Builder()
-          .setTitleText(R.string.select_time)
-          .setHour(selectedTime.hour)
-          .setMinute(selectedTime.minute)
-          .setTimeFormat(timeFormat)
-          .setInputMode(inputMode)
-          .build()
-          .apply {
-            addOnPositiveButtonClickListener {
-              with(LocalTime.of(this.hour, this.minute, 0)) {
-                timeInputEditText.setText(this.toLocalizedString(context))
-                setQuestionnaireItemViewItemAnswer(this)
-                timeInputEditText.clearFocus()
-              }
-            }
+        val requiredOptionalText =
+          remember(questionnaireViewItem) {
+            getRequiredOrOptionalText(questionnaireViewItem, context)
           }
-          .show(context.tryUnwrapContext()!!.supportFragmentManager, TAG)
+        val readOnly =
+          remember(questionnaireViewItem.questionnaireItem) {
+            questionnaireViewItem.questionnaireItem.readOnly
+          }
+        val questionnaireViewItemLocalTimeAnswer =
+          remember(questionnaireViewItem.answers) {
+            questionnaireViewItem.answers.singleOrNull()?.valueTimeType?.localTime
+          }
+        val initialTimeForSelection =
+          remember(questionnaireViewItemLocalTimeAnswer) {
+            questionnaireViewItemLocalTimeAnswer ?: LocalTime.now()
+          }
+        val questionnaireViewItemLocalTimeAnswerDisplay =
+          remember(questionnaireViewItemLocalTimeAnswer) {
+            questionnaireViewItemLocalTimeAnswer?.toLocalizedString(context)
+          }
+
+        val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
+
+        Column(
+          modifier =
+            Modifier.padding(
+              horizontal = dimensionResource(R.dimen.item_margin_horizontal),
+              vertical = dimensionResource(R.dimen.item_margin_vertical),
+            ),
+        ) {
+          Header(questionnaireViewItem)
+          questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
+          TimePickerItem(
+            modifier = Modifier.fillMaxWidth(),
+            initialStartTime = initialTimeForSelection,
+            timeSelectedDisplay = questionnaireViewItemLocalTimeAnswerDisplay,
+            enabled = !readOnly,
+            hint = stringResource(R.string.time),
+            supportingHelperText =
+              if (!validationMessage.isNullOrBlank()) validationMessage else requiredOptionalText,
+            isError = !validationMessage.isNullOrBlank(),
+          ) {
+            coroutineScope.launch { setQuestionnaireItemViewItemAnswer(questionnaireViewItem, it) }
+          }
+        }
       }
 
       /** Set the answer in the [QuestionnaireResponse]. */
-      private fun setQuestionnaireItemViewItemAnswer(localDateTime: LocalTime) =
-        context.lifecycleScope.launch {
-          questionnaireViewItem.setAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(TimeType(localDateTime.format(DateTimeFormatter.ISO_TIME))),
-          )
-        }
-
-      private fun clearPreviousState() {
-        timeInputEditText.isEnabled = true
-        timeInputLayout.isEnabled = true
-      }
+      private suspend fun setQuestionnaireItemViewItemAnswer(
+        questionnaireViewItem: QuestionnaireViewItem,
+        localDateTime: LocalTime,
+      ) =
+        questionnaireViewItem.setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(TimeType(localDateTime.format(DateTimeFormatter.ISO_TIME))),
+        )
     }
 
   private val TimeType.localTime
