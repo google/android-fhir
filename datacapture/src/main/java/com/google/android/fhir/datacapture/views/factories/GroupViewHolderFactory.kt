@@ -16,51 +16,43 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.view.View
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
-import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.views.GroupHeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.ErrorText
+import com.google.android.fhir.datacapture.views.compose.Header
+import com.google.android.fhir.datacapture.views.compose.MediaItem
 
-internal object GroupViewHolderFactory :
-  QuestionnaireItemAndroidViewHolderFactory(R.layout.group_header_view) {
+internal object GroupViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemAndroidViewHolderDelegate {
-      private lateinit var context: AppCompatActivity
-      private lateinit var header: GroupHeaderView
-      private lateinit var error: TextView
-      override lateinit var questionnaireViewItem: QuestionnaireViewItem
+    object : QuestionnaireItemComposeViewHolderDelegate {
 
-      override fun init(itemView: View) {
-        context = itemView.context.tryUnwrapContext()!!
-        header = itemView.findViewById(R.id.header)
-        error = itemView.findViewById(R.id.error)
-      }
-
-      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        header.bind(questionnaireViewItem)
-        displayValidationResult(questionnaireViewItem.validationResult)
-      }
-
-      private fun displayValidationResult(validationResult: ValidationResult) {
-        when (validationResult) {
-          is NotValidated,
-          Valid, -> error.visibility = View.GONE
-          is Invalid -> {
-            error.text = validationResult.getSingleStringValidationMessage()
-            error.visibility = View.VISIBLE
+      @Composable
+      override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
+        val validationMessage =
+          remember(questionnaireViewItem.validationResult) {
+            (questionnaireViewItem.validationResult as? Invalid)?.getSingleStringValidationMessage()
+              ?: ""
           }
-        }
-      }
 
-      override fun setReadOnly(isReadOnly: Boolean) {
-        // No-op
+        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+          Header(questionnaireViewItem)
+          if (validationMessage.isNotBlank()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            ErrorText(validationMessage)
+          }
+          Spacer(modifier = Modifier)
+          questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
+        }
       }
     }
 }
