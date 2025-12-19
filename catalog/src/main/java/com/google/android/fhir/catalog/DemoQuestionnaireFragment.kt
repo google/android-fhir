@@ -108,10 +108,6 @@ class DemoQuestionnaireFragment : Fragment() {
         NavHostFragment.findNavController(this).navigateUp()
         true
       }
-      com.google.android.fhir.datacapture.R.id.submit_questionnaire -> {
-        onSubmitQuestionnaireClick()
-        true
-      }
       R.id.error_menu -> {
         launchModalBottomSheetFragment()
         true
