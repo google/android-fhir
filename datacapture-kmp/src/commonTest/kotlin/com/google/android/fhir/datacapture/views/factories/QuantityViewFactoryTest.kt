@@ -33,6 +33,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.runComposeUiTest
+import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
+import com.google.android.fhir.datacapture.extensions.FhirR4String
+import com.google.android.fhir.datacapture.extensions.QuantityAnswerValue
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -58,12 +61,6 @@ import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-
-typealias FhirR4String = com.google.fhir.model.r4.String
-
-typealias FhirR4Boolean = com.google.fhir.model.r4.Boolean
-
-typealias QuantityAnswerValue = QuestionnaireResponse.Item.Answer.Value.Quantity
 
 fun quantity(
   value: BigDecimal? = null,
