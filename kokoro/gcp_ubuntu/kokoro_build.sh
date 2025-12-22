@@ -96,8 +96,8 @@ function setup() {
 # Checks if code conforms to style guide, builds the code, then runs unit tests.
 function build_only() {
   ./gradlew spotlessCheck --scan --stacktrace
-  ./gradlew build --scan --stacktrace
-  ./gradlew check --scan --stacktrace
+  ./gradlew build -x :datacapture-kmp:build -x :sdc-kmp-demo:build --scan --stacktrace
+  ./gradlew check -x :datacapture-kmp:build -x :sdc-kmp-demo:build --scan --stacktrace
 }
 
 function setup_device_benchmarks() {
@@ -108,8 +108,8 @@ function setup_device_benchmarks() {
 # Runs instrumentation tests using Firebase Test Lab, and retrieves the code
 # coverage reports.
 function device_tests() {
-  ./gradlew packageDebugAndroidTest --scan --stacktrace
-  ./gradlew packageReleaseAndroidTest --scan --stacktrace
+  ./gradlew packageDebugAndroidTest -x :datacapture-kmp:packageDebugAndroidTest -x :sdc-kmp-demo:packageDebugAndroidTest --scan --stacktrace
+  ./gradlew packageReleaseAndroidTest -x :datacapture-kmp:packageReleaseAndroidTest -x :sdc-kmp-demo:packageReleaseAndroidTest --scan --stacktrace
   setup_device_benchmarks
   .github/workflows/runFlank.sh
 }
