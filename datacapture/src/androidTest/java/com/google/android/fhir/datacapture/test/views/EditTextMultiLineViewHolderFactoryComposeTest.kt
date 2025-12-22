@@ -39,12 +39,13 @@ import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
 import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
-import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -52,7 +53,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class EditTextIntegerViewHolderFactoryInstrumentedTest {
+class EditTextMultiLineViewHolderFactoryComposeTest {
 
   @get:Rule
   val activityScenarioRule: ActivityScenarioRule<TestActivity> =
@@ -74,7 +75,7 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
   fun setup() {
     activityScenarioRule.scenario.onActivity { activity ->
       parent = FrameLayout(activity)
-      viewHolder = EditTextIntegerViewHolderFactory.create(parent)
+      viewHolder = EditTextMultiLineViewHolderFactory.create(parent)
       activity.setContentView(viewHolder.itemView)
     }
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
@@ -112,7 +113,7 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType(5)
+              value = StringType("Answer")
             },
           )
         },
@@ -120,7 +121,7 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("5")
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("Answer")
   }
 
   @Test
@@ -131,7 +132,7 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType(5)
+              value = StringType("Answer")
             },
           )
         },
@@ -153,7 +154,7 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun shouldSetQuestionnaireResponseItemAnswerIfTextIsValid() {
+  fun shouldSetQuestionnaireResponseItemAnswer() {
     var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -167,12 +168,12 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
       )
 
     viewHolder.bind(questionnaireViewItem)
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("13").also {
+    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("Answer").also {
       pendingTextChange += 1
     }
     composeTestRule.waitForIdle()
 
-    assertThat(answers!!.single().valueIntegerType.value).isEqualTo(13)
+    assertThat(answers!!.single().valueStringType.value).isEqualTo("Answer")
   }
 
   @Test
@@ -192,45 +193,19 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun shouldSetDraftAnswerIfTextIsInvalid() {
-    var draftAnswer: Any? = null
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, result ->
-          draftAnswer = result
-          pendingTextChange -= if (pendingTextChange > 0) 1 else 0
-        },
-      )
-    viewHolder.bind(questionnaireViewItem)
-    // The character in 1O2 is the letter O, not the number 0
-    composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextReplacement("1O2").also {
-      pendingTextChange += 1
-    }
-    composeTestRule.waitForIdle()
-    assertThat(draftAnswer as String).isEqualTo("1O2")
-  }
-
-  @Test
-  fun displayValidationResultShouldShowNoErrorMesssage() {
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(IntegerType("2"))
-          }
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(IntegerType("4"))
+            url = "http://hl7.org/fhir/StructureDefinition/minLength"
+            setValue(IntegerType("10"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType("3")
+              value = StringType("hello there")
             },
           )
         },
@@ -243,33 +218,34 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun displayValidationResultShouldShowErrorMessage() {
+  fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(IntegerType("2"))
-          }
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(IntegerType("4"))
+            url = "http://hl7.org/fhir/StructureDefinition/minLength"
+            setValue(IntegerType("10"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType("1")
+              value = StringType("hello")
             },
           )
         },
-        validationResult = Invalid(listOf("Minimum value allowed is:2")),
+        validationResult =
+          Invalid(
+            listOf("The minimum number of characters that are permitted in the answer is: 10"),
+          ),
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
 
     composeTestRule.onNodeWithContentDescription("Error").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Minimum value allowed is:2").assertIsDisplayed()
+    composeTestRule
+      .onNodeWithText("The minimum number of characters that are permitted in the answer is: 10")
+      .assertIsDisplayed()
   }
 
   @Test
@@ -401,34 +377,5 @@ class EditTextIntegerViewHolderFactoryInstrumentedTest {
     )
 
     composeTestRule.onNodeWithText("Optional").assertDoesNotExist()
-  }
-
-  @Test
-  fun bindAgainShouldRemovePreviousText() {
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-        draftAnswer = "9999999999",
-      ),
-    )
-
-    composeTestRule
-      .onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG, useUnmergedTree = true)
-      .assertTextEquals("9999999999")
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    composeTestRule
-      .onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG, useUnmergedTree = true)
-      .assertTextEquals("")
   }
 }

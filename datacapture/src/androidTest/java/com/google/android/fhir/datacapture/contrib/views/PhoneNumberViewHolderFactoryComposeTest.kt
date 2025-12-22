@@ -50,7 +50,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class PhoneNumberViewHolderFactoryInstrumentedTest {
+class PhoneNumberViewHolderFactoryComposeTest {
 
   @get:Rule
   val activityScenarioRule: ActivityScenarioRule<TestActivity> =
