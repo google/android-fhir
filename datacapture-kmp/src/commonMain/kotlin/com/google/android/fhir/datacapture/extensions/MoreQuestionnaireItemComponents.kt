@@ -670,12 +670,12 @@ internal val Questionnaire.Item.unit: Coding?
 //      }
 
 // Return expression if Questionnaire.Item has ENABLE WHEN EXPRESSION URL
-// val Questionnaire.Item.enableWhenExpression: Expression?
-//  get() {
-//    return this.extension
-//      .firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }
-//      ?.let { it.value as Expression }
-//  }
+val Questionnaire.Item.enableWhenExpression: Expression?
+  get() {
+    return this.extension
+      .firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }
+      ?.let { it.value?.asExpression()?.value }
+  }
 
 internal val Questionnaire.Item.variableExpressions: List<Expression>
   get() =
@@ -694,34 +694,36 @@ internal fun Questionnaire.Item.findVariableExpression(
 ): Expression? {
   return variableExpressions.find { variableName == it.name?.value }
 }
-//
-// /** Returns Calculated expression, or null */
-// internal val Questionnaire.Item.calculatedExpression: Expression?
-//  get() =
-//    this.getExtensionByUrl(EXTENSION_CALCULATED_EXPRESSION_URL)?.let {
-//      it.castToExpression(it.value)
-//    }
 
-// /** Returns list of extensions whose value is of type [Expression] */
-// internal val Questionnaire.Item.expressionBasedExtensions
-//  get() = this.extension.filter { it.value is Expression }
-//
-// /**
-// * Whether [item] has any expression directly referencing the current questionnaire item by link
-// ID
-// * (e.g. if [item] has an expression `%resource.item.where(linkId='this-question')` where
-// * `this-question` is the link ID of the current questionnaire item).
-// */
-// internal fun Questionnaire.Item.isReferencedBy(
-//  item: Questionnaire.Item,
-// ) =
-//  item.expressionBasedExtensions.any {
-//    it
-//      .castToExpression(it.value)
-//      .expression
-//      .replace(" ", "")
-//      .contains(Regex(".*linkId='${this.linkId}'.*"))
-//  }
+/** Returns Calculated expression, or null */
+internal val Questionnaire.Item.calculatedExpression: Expression?
+  get() {
+    return this.extension
+      .firstOrNull { it.url == EXTENSION_CALCULATED_EXPRESSION_URL }
+      ?.let { it.value?.asExpression()?.value }
+  }
+
+/** Returns list of extensions whose value is of type [Expression] */
+internal val Questionnaire.Item.expressionBasedExtensions
+  get() = this.extension.filter { it.value is Extension.Value.Expression }
+
+/**
+ * Whether [item] has any expression directly referencing the current questionnaire item by link ID
+ * (e.g. if [item] has an expression `%resource.item.where(linkId='this-question')` where
+ * `this-question` is the link ID of the current questionnaire item).
+ */
+internal fun Questionnaire.Item.isReferencedBy(
+  item: Questionnaire.Item,
+) =
+  item.expressionBasedExtensions.any {
+    it.value
+      ?.asExpression()
+      ?.value
+      ?.expression
+      ?.value
+      ?.replace(" ", "")
+      ?.contains(Regex(".*linkId='${this.linkId}'.*")) == true
+  }
 //
 // internal val Questionnaire.Item.answerExpression: Expression?
 //  get() =
@@ -782,7 +784,7 @@ internal data class ChoiceColumn(val path: String, val label: String?, val forDi
  *
  * @param dataList the source data to extract the answer option values. The data could be list of
  *   resources [Resource], identifiers [Identifier] or codes [Coding]
- * @return list of answer options [Questionnaire.QuestionnaireItemAnswerOptionComponent]
+ * @return list of answer options [Questionnaire.Item.AnswerOption]
  */
 // internal fun Questionnaire.Item.extractAnswerOptions(
 //  dataList: List<Base>,

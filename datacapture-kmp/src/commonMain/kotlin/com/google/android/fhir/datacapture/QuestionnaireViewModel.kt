@@ -22,6 +22,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.extensions.EXTENSION_LAST_LAUNCHED_TIMESTAMP
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.allItems
@@ -42,6 +43,7 @@ import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnder
 import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
 import com.google.android.fhir.datacapture.extensions.zipByLinkId
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.validation.Valid
@@ -396,14 +398,14 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
         // reinitialized in order for it to rebuild the pre-order map and parent map of
         // questionnaire response items to reflect the new structure of the questionnaire response
         // to correctly calculate calculate enable when statements.
-        //        enablementEvaluator =
-        //          EnablementEvaluator(
-        //            questionnaire,
-        //            questionnaireResponse,
-        //            questionnaireItemParentMap,
-        //            questionnaireLaunchContextMap,
-        //            xFhirQueryResolver,
-        //          )
+        enablementEvaluator =
+          EnablementEvaluator(
+            questionnaire,
+            questionnaireResponse.value,
+            questionnaireItemParentMap,
+            questionnaireLaunchContextMap,
+            xFhirQueryResolver,
+          )
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
 
@@ -412,10 +414,10 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
       modificationCount.update { it + 1 }
     }
 
-  /* private val expressionEvaluator: ExpressionEvaluator =
+  private val expressionEvaluator: ExpressionEvaluator =
     ExpressionEvaluator(
       questionnaire,
-      questionnaireResponse,
+      questionnaireResponse.value,
       questionnaireItemParentMap,
       questionnaireLaunchContextMap,
       xFhirQueryResolver,
@@ -424,25 +426,23 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
   private var enablementEvaluator: EnablementEvaluator =
     EnablementEvaluator(
       questionnaire,
-      questionnaireResponse,
+      questionnaireResponse.value,
       questionnaireItemParentMap,
       questionnaireLaunchContextMap,
       xFhirQueryResolver,
     )
-
-  private val answerOptionsEvaluator: EnabledAnswerOptionsEvaluator =
-    EnabledAnswerOptionsEvaluator(
-      questionnaire,
-      questionnaireResponse,
-      questionnaireItemParentMap,
-      questionnaireLaunchContextMap,
-      xFhirQueryResolver,
-      externalValueSetResolver,
-    )
-
-  private val questionnaireResponseItemValidator: QuestionnaireResponseItemValidator =
-    QuestionnaireResponseItemValidator(expressionEvaluator)
-   */
+  //    private val answerOptionsEvaluator: EnabledAnswerOptionsEvaluator =
+  //      EnabledAnswerOptionsEvaluator(
+  //        questionnaire,
+  //        questionnaireResponse,
+  //        questionnaireItemParentMap,
+  //        questionnaireLaunchContextMap,
+  //        xFhirQueryResolver,
+  //        externalValueSetResolver,
+  //      )
+  //
+  //    private val questionnaireResponseItemValidator: QuestionnaireResponseItemValidator =
+  //      QuestionnaireResponseItemValidator(expressionEvaluator)
 
   /**
    * Adds empty [QuestionnaireResponse.Item]s to `responseItems` so that each [Questionnaire.Item]
@@ -938,16 +938,16 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
   ): List<QuestionnaireAdapterItem> {
     // Hidden questions should not get QuestionnaireItemViewItem instances
     if (questionnaireItem.isHidden) return emptyList()
-    //    val enabled =
-    //      enablementEvaluator.evaluate(
-    //        questionnaireItem,
-    //        questionnaireResponseItem,
-    //      )
+    val enabled =
+      enablementEvaluator.evaluate(
+        questionnaireItem,
+        questionnaireResponseItem,
+      )
     //    // Disabled questions should not get QuestionnaireItemViewItem instances
-    //    if (!enabled) {
-    //      cacheDisabledQuestionnaireItemAnswers(questionnaireResponseItem)
-    //      return emptyList()
-    //    }
+    if (!enabled) {
+      cacheDisabledQuestionnaireItemAnswers(questionnaireResponseItem)
+      return emptyList()
+    }
 
     //    restoreFromDisabledQuestionnaireItemAnswersCache(questionnaireResponseItem)
 
@@ -966,12 +966,12 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     //      }
 
     // Set question text dynamically from CQL expression
-    //    questionnaireItem.textElement.cqfExpression?.let { expression ->
-    //      expressionEvaluator
-    //        .evaluateExpressionValue(questionnaireItem, questionnaireResponseItem, expression)
-    //        ?.primitiveValue()
-    //        ?.let { questionnaireResponseItem.text = it }
-    //    }
+    //        questionnaireItem.textElement.cqfExpression?.let { expression ->
+    //          expressionEvaluator
+    //            .evaluateExpressionValue(questionnaireItem, questionnaireResponseItem, expression)
+    //            ?.va()
+    //            ?.let { questionnaireResponseItem.text = it }
+    //        }
 
     //    val (enabledQuestionnaireAnswerOptions, disabledQuestionnaireResponseAnswers) =
     //      answerOptionsEvaluator.evaluate(

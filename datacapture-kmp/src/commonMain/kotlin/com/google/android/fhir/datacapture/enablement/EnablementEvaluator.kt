@@ -1,0 +1,265 @@
+/*
+ * Copyright 2022-2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.google.android.fhir.datacapture.enablement
+
+import com.google.android.fhir.datacapture.XFhirQueryResolver
+import com.google.android.fhir.datacapture.extensions.allItems
+import com.google.android.fhir.datacapture.extensions.enableWhenExpression
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
+import com.google.android.fhir.datacapture.fhirpath.convertToBoolean
+import com.google.fhir.model.r4.Questionnaire
+import com.google.fhir.model.r4.QuestionnaireResponse
+import com.google.fhir.model.r4.Resource
+
+/**
+ * Evaluator for the enablement status of a [Questionnaire.Item].
+ *
+ * This is done by locating the relevant [QuestionnaireResponse.Item]s specified by the linkIds in
+ * the `enableWhen` constraints, and checking if the answers (or lack thereof) satisfy the criteria
+ * in the `enableWhen` constraints. The `enableBehavior` value is then used to combine the
+ * evaluation results of different `enableWhen` constraints.
+ *
+ * For example, the following `enableWhen` constraint in a [Questionnaire.Item]
+ *
+ * ```
+ *     "enableWhen": [
+ *       {
+ *         "question": "vitaminKgiven",
+ *         "operator": "exists",
+ *         "answerBoolean": true
+ *       }
+ *     ],
+ * ```
+ *
+ * specifies that the [Questionnaire.Item] should be enabled only if the question with linkId
+ * `vitaminKgiven` has been answered.
+ *
+ * The enablement status typically determines whether the [Questionnaire.Item] is shown or hidden.
+ * However, it is also possible that only user interaction is enabled or disabled (e.g. grayed out)
+ * with the [Questionnaire.Item] always shown.
+ *
+ * The evaluator works in the context of a Questionnaire and the corresponding
+ * QuestionnaireResponse. It is the caller's responsibility to make sure to call the evaluator with
+ * QuestionnaireItems and QuestionnaireResponseItems that belong to the Questionnaire and the
+ * QuestionnaireResponse.
+ *
+ * For more information see
+ * [Questionnaire.item.enableWhen](https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableWhen)
+ * and
+ * [Questionnaire.item.enableBehavior](https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableBehavior)
+ * .
+ *
+ * @param questionnaire the [Questionnaire] where the expression belong to
+ * @param questionnaireResponse the [QuestionnaireResponse] related to the [Questionnaire]
+ * @param questionnaireItemParentMap the [Map] of items parent
+ * @param questionnaireLaunchContextMap the [Map] of launchContext names to their resource values
+ */
+internal class EnablementEvaluator(
+  private val questionnaire: Questionnaire,
+  private val questionnaireResponse: QuestionnaireResponse,
+  private val questionnaireItemParentMap: Map<Questionnaire.Item, Questionnaire.Item> = emptyMap(),
+  private val questionnaireLaunchContextMap: Map<String, Resource>? = emptyMap(),
+  private val xFhirQueryResolver: XFhirQueryResolver? = null,
+) {
+
+  private val expressionEvaluator =
+    ExpressionEvaluator(
+      questionnaire,
+      questionnaireResponse,
+      questionnaireItemParentMap,
+      questionnaireLaunchContextMap,
+      xFhirQueryResolver,
+    )
+
+  /**
+   * The pre-order traversal trace of the items in the [QuestionnaireResponse]. This essentially
+   * represents the order in which all items are displayed in the UI.
+   */
+  private val questionnaireResponseItemPreOrderList = questionnaireResponse.toBuilder().allItems
+
+  /** The map from each item in the [QuestionnaireResponse] to its parent. */
+  private val questionnaireResponseItemParentMap =
+    mutableMapOf<
+      QuestionnaireResponse.Item,
+      QuestionnaireResponse.Item,
+    >()
+
+  init {
+    /** Adds each child-parent pair in the [QuestionnaireResponse] to the parent map. */
+    fun buildParentList(item: QuestionnaireResponse.Item) {
+      for (child in item.item) {
+        questionnaireResponseItemParentMap[child] = item
+        buildParentList(child)
+      }
+      for (answer in item.answer) {
+        for (nestedItem in answer.item) {
+          buildParentList(nestedItem)
+        }
+      }
+    }
+
+    for (item in questionnaireResponse.item) {
+      buildParentList(item)
+    }
+  }
+
+  /**
+   * Returns whether [questionnaireItem] should be enabled.
+   *
+   * @param questionnaireItem the corresponding questionnaire item.
+   * @param questionnaireResponseItem the corresponding questionnaire response item.
+   */
+  suspend fun evaluate(
+    questionnaireItem: Questionnaire.Item,
+    questionnaireResponseItem: QuestionnaireResponse.Item,
+  ): Boolean {
+    val enableWhenList = questionnaireItem.enableWhen
+    val enableWhenExpression = questionnaireItem.enableWhenExpression
+
+    // The questionnaire item is enabled by default if there is no `enableWhen` constraint and no
+    // `enableWhenExpression`.
+    if (enableWhenList.isEmpty() && enableWhenExpression == null) return true
+
+    // Evaluate `enableWhenExpression`.
+    if (enableWhenExpression != null) {
+      return convertToBoolean(
+        expressionEvaluator.evaluateExpression(
+          questionnaireItem.enableWhenExpression!!,
+        ),
+      )
+    }
+
+    // Evaluate single `enableWhen` constraint.
+    if (enableWhenList.size == 1) {
+      return evaluateEnableWhen(
+        enableWhenList.single(),
+        questionnaireItem,
+        questionnaireResponseItem,
+      )
+    }
+
+    // Evaluate multiple `enableWhen` constraints and aggregate the results according to
+    // `enableBehavior` which specifies one of the two behaviors: 1) the questionnaire item is
+    // enabled if ALL `enableWhen` constraints are satisfied, or 2) the questionnaire item is
+    // enabled if ANY `enableWhen` constraint is satisfied.
+    return when (val value = questionnaireItem.enableBehavior?.value) {
+      Questionnaire.EnableWhenBehavior.All ->
+        enableWhenList.all { evaluateEnableWhen(it, questionnaireItem, questionnaireResponseItem) }
+      Questionnaire.EnableWhenBehavior.Any ->
+        enableWhenList.any { evaluateEnableWhen(it, questionnaireItem, questionnaireResponseItem) }
+      else -> throw IllegalStateException("Unrecognized enable when behavior $value")
+    }
+  }
+
+  /**
+   * Returns whether the `enableWhen` constraint is satisfied for the `questionnaireResponseItem`.
+   */
+  private fun evaluateEnableWhen(
+    enableWhen: Questionnaire.Item.EnableWhen,
+    questionnaireItem: Questionnaire.Item,
+    questionnaireResponseItem: QuestionnaireResponse.Item,
+  ): Boolean {
+    val targetQuestionnaireResponseItem: QuestionnaireResponse.Item? =
+      if (
+        questionnaireItem.type.value == Questionnaire.QuestionnaireItemType.Display &&
+          questionnaireResponseItem.linkId == enableWhen.question
+      ) {
+        questionnaireResponseItem
+      } else {
+        enableWhen.question.value?.let {
+          findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, it)
+        }
+      }
+    return if (Questionnaire.QuestionnaireItemOperator.Exists == enableWhen.operator.value) {
+      // True iff the answer value of the enable when is equal to whether an answer exists in the
+      // target questionnaire response item
+      enableWhen.answer.asBoolean()?.value?.value ==
+        !(targetQuestionnaireResponseItem == null ||
+          targetQuestionnaireResponseItem.answer.isEmpty())
+    } else {
+      // The `enableWhen` constraint evaluates to true if at least one answer has a value that
+      // satisfies the `enableWhen` operator and answer, with the exception of the `Exists`
+      // operator.
+      // See https://www.hl7.org/fhir/valueset-questionnaire-enable-operator.html.
+      targetQuestionnaireResponseItem?.answer?.any { enableWhen.predicate(it) } ?: false
+    }
+  }
+
+  /**
+   * Find a questionnaire response item in [QuestionnaireResponse] with the given `linkId` starting
+   * from the `origin`.
+   *
+   * This is used by the enableWhen logic to evaluate if a question should be enabled/displayed.
+   *
+   * If multiple questionnaire response items are present for the same question (same linkId),
+   * either as a result of repeated group or nested question under repeated answers, this returns
+   * the nearest question occurrence reachable by tracing first the "ancestor" axis and then the
+   * "preceding" axis and then the "following" axis.
+   *
+   * See
+   * https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableWhen.question.
+   */
+  private fun findEnableWhenQuestionnaireResponseItem(
+    origin: QuestionnaireResponse.Item,
+    linkId: String,
+  ): QuestionnaireResponse.Item? {
+    // Find the nearest ancestor with the linkId
+    var parent = questionnaireResponseItemParentMap[origin]
+    while (parent != null) {
+      if (parent.linkId.value == linkId) {
+        return parent
+      }
+      parent = questionnaireResponseItemParentMap[parent]
+    }
+
+    // Find the nearest item preceding the origin
+    val itemIndex = questionnaireResponseItemPreOrderList.indexOf(origin)
+    for (index in itemIndex - 1 downTo 0) {
+      if (questionnaireResponseItemPreOrderList[index].linkId.value == linkId) {
+        return questionnaireResponseItemPreOrderList[index]
+      }
+    }
+
+    // Find the nearest item succeeding the origin
+    for (index in itemIndex + 1 until questionnaireResponseItemPreOrderList.size) {
+      if (questionnaireResponseItemPreOrderList[index].linkId.value == linkId) {
+        return questionnaireResponseItemPreOrderList[index]
+      }
+    }
+
+    return null
+  }
+}
+
+/**
+ * The predicate to evaluate the status of the enableWhen on the `EnableWhen` `operator` and
+ * `Answer` value.
+ */
+private val Questionnaire.Item.EnableWhen.predicate: (QuestionnaireResponse.Item.Answer) -> Boolean
+  get() = {
+    when (operator.value) {
+      Questionnaire.QuestionnaireItemOperator.EqualTo -> it.value equalsFhirValue answer
+      Questionnaire.QuestionnaireItemOperator.NotEqualTo -> !(it.value equalsFhirValue answer)
+      Questionnaire.QuestionnaireItemOperator.GreaterThan -> (it.value compareFhirValue answer) > 0
+      Questionnaire.QuestionnaireItemOperator.GreaterThanOrEqualTo ->
+        (it.value compareFhirValue answer) >= 0
+      Questionnaire.QuestionnaireItemOperator.LessThan -> (it.value compareFhirValue answer) < 0
+      Questionnaire.QuestionnaireItemOperator.LessThanOrEqualTo ->
+        (it.value compareFhirValue answer) <= 0
+      else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
+    }
+  }
