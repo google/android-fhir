@@ -35,6 +35,7 @@ import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.isRepeatedGroup
+import com.google.android.fhir.datacapture.extensions.localizedTextAnnotatedString
 import com.google.android.fhir.datacapture.extensions.maxValue
 import com.google.android.fhir.datacapture.extensions.minValue
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
@@ -1021,11 +1022,11 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
               draftAnswer = draftAnswerMap[questionnaireResponseItem],
               enabledDisplayItems =
                 questionnaireItem.item.filter {
-                  it.isDisplayItem
-                  //                    enablementEvaluator.evaluate(
-                  //                      it,
-                  //                      questionnaireResponseItem,
-                  //                    )
+                  it.isDisplayItem &&
+                    enablementEvaluator.evaluate(
+                      it,
+                      questionnaireResponseItem,
+                    )
                 },
               questionViewTextConfiguration =
                 QuestionTextConfiguration(
@@ -1155,28 +1156,42 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     questionnaireItemList: List<Questionnaire.Item>,
     questionnaireResponseItemList: List<QuestionnaireResponse.Item>,
   ): List<QuestionnaireResponse.Item.Builder> {
-    //    val responseItemKeys = questionnaireResponseItemList.map { it.linkId }
+    val responseItemKeys = questionnaireResponseItemList.map { it.linkId }
     val result = mutableListOf<QuestionnaireResponse.Item.Builder>()
 
-    for ((_, questionnaireResponseItem) in
+    for ((questionnaireItem, questionnaireResponseItem) in
       questionnaireItemList.zip(questionnaireResponseItemList)) {
-      //      if (
-      //        responseItemKeys.contains(questionnaireItem.linkId) &&
-      //          enablementEvaluator.evaluate(questionnaireItem, questionnaireResponseItem)
-      //      ) {
-      //        questionnaireResponseItem.apply {
-      //          if (text.isNullOrBlank()) {
-      //            text = questionnaireItem.localizedTextSpanned?.toString()
-      //          }
-      //          // Nested group items
-      //          item = getEnabledResponseItems(questionnaireItem.item,
-      // questionnaireResponseItem.item)
-      //          // Nested question items
-      //          answer.forEach { it.item = getEnabledResponseItems(questionnaireItem.item,
-      // it.item) }
-      //        }
-      result.add(questionnaireResponseItem.toBuilder())
-      //      }
+      if (
+        responseItemKeys.contains(questionnaireItem.linkId) &&
+          enablementEvaluator.evaluate(questionnaireItem, questionnaireResponseItem)
+      ) {
+        questionnaireResponseItem.toBuilder().apply {
+          if (text?.value.isNullOrBlank()) {
+            text =
+              text.apply {
+                this?.value = questionnaireItem.localizedTextAnnotatedString?.toString()
+              }
+          }
+          // Nested group items
+          item =
+            getEnabledResponseItems(
+                questionnaireItem.item,
+                questionnaireResponseItem.item,
+              )
+              .toMutableList()
+
+          // Nested question items
+          answer.forEach {
+            it.item =
+              getEnabledResponseItems(
+                  questionnaireItem.item,
+                  it.item.map { itemBuilder -> itemBuilder.build() },
+                )
+                .toMutableList()
+          }
+        }
+        result.add(questionnaireResponseItem.toBuilder())
+      }
     }
     return result
   }
@@ -1189,15 +1204,14 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     if (questionnaire.isPaginated) {
       questionnaire.item.zip(questionnaireResponse.value.item).mapIndexed {
         index,
-        (questionnaireItem, _),
+        (questionnaireItem, questionnaireResponseItem),
         ->
         QuestionnairePage(
           index,
-          enabled = true,
-          //          enablementEvaluator.evaluate(
-          //            questionnaireItem,
-          //            questionnaireResponseItem,
-          //          ),
+          enablementEvaluator.evaluate(
+            questionnaireItem,
+            questionnaireResponseItem,
+          ),
           questionnaireItem.isHidden,
         )
       }

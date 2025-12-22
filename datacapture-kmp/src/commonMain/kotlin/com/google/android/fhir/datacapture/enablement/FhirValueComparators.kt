@@ -44,12 +44,16 @@ infix fun QuestionnaireResponse.Item.Answer.Value?.equalsFhirValue(
     is QuestionnaireResponse.Item.Answer.Value.String ->
       other is Questionnaire.Item.EnableWhen.Answer.String && this.value.value == other.value.value
     is QuestionnaireResponse.Item.Answer.Value.Uri ->
-      throw IllegalStateException("EnableWhen.Answer.Uri is not supported")
+      throw IllegalStateException("EnableWhen.Answer.Value.Uri is not supported")
     is QuestionnaireResponse.Item.Answer.Value.Coding ->
       other is Questionnaire.Item.EnableWhen.Answer.Coding && this.value == other.value
     is QuestionnaireResponse.Item.Answer.Value.Quantity ->
       other is Questionnaire.Item.EnableWhen.Answer.Quantity && this.value == other.value
-    else -> false
+    is QuestionnaireResponse.Item.Answer.Value.Attachment ->
+      throw IllegalStateException("EnableWhen.Answer.Value.Attachment is not supported")
+    is QuestionnaireResponse.Item.Answer.Value.Reference ->
+      throw IllegalStateException("EnableWhen.Answer.Value.Reference is not supported")
+    null -> throw IllegalStateException("EnableWhen.Answer.Value cannot be null")
   }
 }
 
