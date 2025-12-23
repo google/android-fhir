@@ -25,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -86,12 +85,10 @@ internal fun OutlinedEditTextFieldItem(
   }
   var isFocused by remember { mutableStateOf(false) }
 
-  // Update the local state when the initial inputText changes and the field is not focused
-  LaunchedEffect(inputText) {
-    if (!isFocused && textFieldValue.text != inputText) {
-      textFieldValue =
-        textFieldValue.copy(text = inputText, selection = TextRange(inputText.length))
-    }
+  // Synchronize local state when inputText changes from external source (e.g., view recycling)
+  // This runs synchronously before the first frame is rendered, ensuring correct display
+  if (!isFocused && textFieldValue.text != inputText) {
+    textFieldValue = TextFieldValue(text = inputText, selection = TextRange(inputText.length))
   }
 
   OutlinedTextField(
