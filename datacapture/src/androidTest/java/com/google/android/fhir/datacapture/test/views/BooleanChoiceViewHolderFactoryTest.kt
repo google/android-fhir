@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,42 +14,62 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.factories
+package com.google.android.fhir.datacapture.test.views
 
-import android.view.View
 import android.widget.FrameLayout
-import android.widget.RadioButton
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
-import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
-import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
+import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
+import com.google.android.fhir.datacapture.views.compose.REQUIRED_OPTIONAL_HEADER_TEXT_TAG
+import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.NO_CHOICE_RADIO_BUTTON_TAG
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
+import com.google.android.fhir.datacapture.views.factories.YES_CHOICE_RADIO_BUTTON_TAG
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType
-import org.hl7.fhir.r4.model.CodeableConcept
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class BooleanChoiceViewHolderFactoryTest {
-  private val parent =
-    FrameLayout(
-      Robolectric.buildActivity(AppCompatActivity::class.java).create().get().apply {
-        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      },
-    )
-  private val viewHolder = BooleanChoiceViewHolderFactory.create(parent)
+  @get:Rule
+  var activityScenarioRule: ActivityScenarioRule<TestActivity> =
+    ActivityScenarioRule(TestActivity::class.java)
+
+  @get:Rule val composeTestRule = createEmptyComposeRule()
+
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
+
+  @Before
+  fun setUp() {
+    activityScenarioRule.scenario.onActivity { activity ->
+      viewHolder = BooleanChoiceViewHolderFactory.create(FrameLayout(activity))
+      activity.setContentView(viewHolder.itemView)
+    }
+
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+  }
 
   @Test
   fun bind_shouldSetQuestionHeader() {
@@ -64,6 +84,9 @@ class BooleanChoiceViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
+
+    // synchronize
+    composeTestRule.waitForIdle()
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
@@ -80,6 +103,9 @@ class BooleanChoiceViewHolderFactoryTest {
       )
     viewHolder.bind(questionnaireViewItem)
 
+    // synchronize
+    composeTestRule.waitForIdle()
+
     assertThat(questionnaireViewItem.answers).isEmpty()
   }
 
@@ -94,10 +120,8 @@ class BooleanChoiceViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isChecked)
-      .isFalse()
-    assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).isChecked)
-      .isFalse()
+    composeTestRule.onNodeWithTag(YES_CHOICE_RADIO_BUTTON_TAG).assertIsNotSelected()
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).assertIsNotSelected()
   }
 
   @Test
@@ -115,6 +139,9 @@ class BooleanChoiceViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
     viewHolder.bind(questionnaireViewItem)
+
+    // synchronize
+    composeTestRule.waitForIdle()
 
     assertThat(questionnaireViewItem.answers.single().valueBooleanType.value).isTrue()
   }
@@ -135,10 +162,8 @@ class BooleanChoiceViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isChecked)
-      .isTrue()
-    assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).isChecked)
-      .isFalse()
+    composeTestRule.onNodeWithTag(YES_CHOICE_RADIO_BUTTON_TAG).assertIsSelected()
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).assertIsNotSelected()
   }
 
   @Test
@@ -156,6 +181,9 @@ class BooleanChoiceViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
     viewHolder.bind(questionnaireViewItem)
+
+    // synchronize
+    composeTestRule.waitForIdle()
 
     assertThat(questionnaireViewItem.answers.single().valueBooleanType.value).isFalse()
   }
@@ -176,10 +204,8 @@ class BooleanChoiceViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isChecked)
-      .isFalse()
-    assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).isChecked)
-      .isTrue()
+    composeTestRule.onNodeWithTag(YES_CHOICE_RADIO_BUTTON_TAG).assertIsNotSelected()
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).assertIsSelected()
   }
 
   @Test
@@ -193,7 +219,8 @@ class BooleanChoiceViewHolderFactoryTest {
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
     viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).performClick()
+    composeTestRule.onNodeWithTag(YES_CHOICE_RADIO_BUTTON_TAG).performClick()
+    composeTestRule.waitUntil { answerHolder != null }
 
     assertThat(answerHolder!!.single().valueBooleanType.value).isTrue()
   }
@@ -209,7 +236,8 @@ class BooleanChoiceViewHolderFactoryTest {
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
     viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).performClick()
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).performClick()
+    composeTestRule.waitUntil { answerHolder != null }
 
     assertThat(answerHolder!!.single().valueBooleanType.value).isFalse()
   }
@@ -231,7 +259,8 @@ class BooleanChoiceViewHolderFactoryTest {
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
     viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).performClick()
+    composeTestRule.onNodeWithTag(YES_CHOICE_RADIO_BUTTON_TAG).performClick()
+    composeTestRule.waitUntil { answerHolder != null }
 
     assertThat(answerHolder).isEmpty()
   }
@@ -252,12 +281,9 @@ class BooleanChoiceViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
     viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).performClick()
-
-    assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isChecked)
-      .isFalse()
-    assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).isChecked)
-      .isFalse()
+    composeTestRule.onNodeWithTag(YES_CHOICE_RADIO_BUTTON_TAG).performClick()
+    composeTestRule.onNodeWithTag(YES_CHOICE_RADIO_BUTTON_TAG).assertIsNotSelected()
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).assertIsNotSelected()
   }
 
   @Test
@@ -277,7 +303,8 @@ class BooleanChoiceViewHolderFactoryTest {
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
     viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).performClick()
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).performClick()
+    composeTestRule.waitUntil { answerHolder != null }
 
     assertThat(answerHolder).isEmpty()
   }
@@ -298,12 +325,10 @@ class BooleanChoiceViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
     viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).performClick()
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).performClick()
 
-    assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isChecked)
-      .isFalse()
-    assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).isChecked)
-      .isFalse()
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).assertIsNotSelected()
+    composeTestRule.onNodeWithTag(YES_CHOICE_RADIO_BUTTON_TAG).assertIsNotSelected()
   }
 
   @Test
@@ -317,8 +342,9 @@ class BooleanChoiceViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).text)
-      .isEqualTo("Missing answer for required field.")
+    composeTestRule
+      .onNodeWithTag(ERROR_TEXT_AT_HEADER_TEST_TAG)
+      .assertTextEquals("Missing answer for required field.")
   }
 
   @Test
@@ -338,8 +364,10 @@ class BooleanChoiceViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).text)
-      .isEqualTo("")
+    composeTestRule
+      .onNodeWithTag(ERROR_TEXT_AT_HEADER_TEST_TAG)
+      .assertIsNotDisplayed()
+      .assertDoesNotExist()
   }
 
   @Test
@@ -361,14 +389,13 @@ class BooleanChoiceViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat((viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isEnabled))
-      .isFalse()
-    assertThat((viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).isEnabled))
-      .isFalse()
+
+    composeTestRule.onNodeWithTag(YES_CHOICE_RADIO_BUTTON_TAG).assertIsNotEnabled()
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).assertIsNotEnabled()
   }
 
   @Test
-  fun `show asterisk`() {
+  fun showAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -382,12 +409,15 @@ class BooleanChoiceViewHolderFactoryTest {
       ),
     )
 
+    // synchronize
+    composeTestRule.waitForIdle()
+
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question *")
   }
 
   @Test
-  fun `hide asterisk`() {
+  fun hideAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -401,12 +431,15 @@ class BooleanChoiceViewHolderFactoryTest {
       ),
     )
 
+    // synchronize
+    composeTestRule.waitForIdle()
+
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question")
   }
 
   @Test
-  fun `shows required text`() {
+  fun showsRequiredText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -417,14 +450,14 @@ class BooleanChoiceViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
-      )
-      .isEqualTo("Required")
+    composeTestRule
+      .onNodeWithTag(REQUIRED_OPTIONAL_HEADER_TEXT_TAG)
+      .assertIsDisplayed()
+      .assertTextEquals("Required")
   }
 
   @Test
-  fun `hide required text`() {
+  fun hideRequiredText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -435,16 +468,14 @@ class BooleanChoiceViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
-      )
-      .isEmpty()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
-      .isEqualTo(View.GONE)
+    composeTestRule
+      .onNodeWithTag(REQUIRED_OPTIONAL_HEADER_TEXT_TAG)
+      .assertIsNotDisplayed()
+      .assertDoesNotExist()
   }
 
   @Test
-  fun `show optional text`() {
+  fun showOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
@@ -454,15 +485,14 @@ class BooleanChoiceViewHolderFactoryTest {
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true),
       ),
     )
-
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
-      )
-      .isEqualTo("Optional")
+    composeTestRule
+      .onNodeWithTag(REQUIRED_OPTIONAL_HEADER_TEXT_TAG)
+      .assertIsDisplayed()
+      .assertTextEquals("Optional")
   }
 
   @Test
-  fun `hide optional text`() {
+  fun hideOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
@@ -472,28 +502,9 @@ class BooleanChoiceViewHolderFactoryTest {
         questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false),
       ),
     )
-
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
-      )
-      .isEmpty()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
-      .isEqualTo(View.GONE)
+    composeTestRule
+      .onNodeWithTag(REQUIRED_OPTIONAL_HEADER_TEXT_TAG)
+      .assertIsNotDisplayed()
+      .assertDoesNotExist()
   }
-
-  private val displayCategoryExtensionWithInstructionsCode =
-    Extension().apply {
-      url = EXTENSION_DISPLAY_CATEGORY_URL
-      setValue(
-        CodeableConcept().apply {
-          coding =
-            listOf(
-              Coding().apply {
-                code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
-                system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-              },
-            )
-        },
-      )
-    }
 }
