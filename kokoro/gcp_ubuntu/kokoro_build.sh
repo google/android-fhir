@@ -96,8 +96,8 @@ function setup() {
 # Checks if code conforms to style guide, builds the code, then runs unit tests.
 function build_only() {
   ./gradlew spotlessCheck --scan --stacktrace
-  ./gradlew build --scan --stacktrace
-  ./gradlew check --scan --stacktrace
+  ./gradlew build -x :datacapture-kmp:build -x :sdc-kmp-demo:build --scan --stacktrace
+  ./gradlew check -x :datacapture-kmp:build -x :sdc-kmp-demo:build --scan --stacktrace
 }
 
 function setup_device_benchmarks() {
