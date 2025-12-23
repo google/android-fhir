@@ -97,7 +97,7 @@ function setup() {
 function build_only() {
   ./gradlew spotlessCheck --scan --stacktrace
   ./gradlew build -x :datacapture-kmp:build -x :sdc-kmp-demo:build --scan --stacktrace
-  ./gradlew check -x :datacapture-kmp:build -x :sdc-kmp-demo:build --scan --stacktrace
+  ./gradlew check -x :datacapture-kmp:check -x :sdc-kmp-demo:check --scan --stacktrace
 }
 
 function setup_device_benchmarks() {
