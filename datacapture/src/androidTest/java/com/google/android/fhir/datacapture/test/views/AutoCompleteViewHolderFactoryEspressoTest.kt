@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,30 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.factories
+package com.google.android.fhir.datacapture.test.views
 
-import android.view.View
-import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
-import android.widget.TextView
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.assertion.ViewAssertions
-import androidx.test.espresso.matcher.RootMatchers
-import androidx.test.espresso.matcher.ViewMatchers
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasTextExactly
+import androidx.compose.ui.test.isPopup
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.test.TestActivity
-import com.google.android.fhir.datacapture.test.utilities.delayMainThread
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.material.chip.ChipGroup
-import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_ANSWER_MENU_ITEM_TAG
+import com.google.android.fhir.datacapture.views.compose.MULTI_AUTO_COMPLETE_INPUT_CHIP_TAG
+import com.google.android.fhir.datacapture.views.compose.MULTI_AUTO_COMPLETE_TEXT_FIELD_TAG
+import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -43,19 +47,22 @@ import org.junit.Rule
 import org.junit.Test
 
 class AutoCompleteViewHolderFactoryEspressoTest {
-  @Rule
-  @JvmField
+  @get:Rule
   var activityScenarioRule: ActivityScenarioRule<TestActivity> =
     ActivityScenarioRule(TestActivity::class.java)
 
-  private lateinit var parent: FrameLayout
+  @get:Rule val composeTestRule = createEmptyComposeRule()
+
   private lateinit var viewHolder: QuestionnaireItemViewHolder
 
   @Before
   fun setup() {
-    activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
-    viewHolder = AutoCompleteViewHolderFactory.create(parent)
-    setTestLayout(viewHolder.itemView)
+    activityScenarioRule.scenario.onActivity { activity ->
+      viewHolder = AutoCompleteViewHolderFactory.create(FrameLayout(activity))
+      activity.setContentView(viewHolder.itemView)
+    }
+
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
   }
 
   @Test
@@ -67,16 +74,11 @@ class AutoCompleteViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
-
-    onView(ViewMatchers.withId(R.id.autoCompleteTextView)).perform(ViewActions.typeText("Coding 1"))
-    assertThat(
-        viewHolder.itemView
-          .findViewById<MaterialAutoCompleteTextView>(R.id.autoCompleteTextView)
-          .adapter
-          .count,
-      )
-      .isEqualTo(1)
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule
+      .onNodeWithTag(MULTI_AUTO_COMPLETE_TEXT_FIELD_TAG)
+      .performTextReplacement("Coding 1")
+    composeTestRule.onAllNodes(hasTestTag(DROP_DOWN_ANSWER_MENU_ITEM_TAG)).assertCountEquals(1)
   }
 
   @Test
@@ -89,23 +91,24 @@ class AutoCompleteViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
       )
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
+    viewHolder.bind(questionnaireViewItem)
 
-    onView(ViewMatchers.withId(R.id.autoCompleteTextView)).perform(ViewActions.typeText("Coding 3"))
-    runOnUI {
-      viewHolder.itemView
-        .findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
-        .showDropDown()
-    }
-    onView(ViewMatchers.withId(R.id.autoCompleteTextView)).perform(delayMainThread())
-    onView(ViewMatchers.withText("Coding 3"))
-      .inRoot(RootMatchers.isPlatformPopup())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.autoCompleteTextView).text.toString(),
+    composeTestRule
+      .onNodeWithTag(MULTI_AUTO_COMPLETE_TEXT_FIELD_TAG)
+      .performTextReplacement("Coding 3")
+
+    composeTestRule
+      .onNode(
+        hasTestTag(DROP_DOWN_ANSWER_MENU_ITEM_TAG) and
+          hasTextExactly("Coding 3") and
+          hasAnyAncestor(isPopup()),
       )
-      .isEmpty()
+      .assertIsDisplayed()
+      .performClick()
+
+    composeTestRule.onNodeWithTag(MULTI_AUTO_COMPLETE_TEXT_FIELD_TAG).assertTextEquals("")
+
+    composeTestRule.waitUntil { answerHolder != null }
     assertThat(answerHolder!!.map { it.valueCoding.display })
       .containsExactly("Coding 1", "Coding 5", "Coding 3")
   }
@@ -119,21 +122,8 @@ class AutoCompleteViewHolderFactoryEspressoTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    runOnUI { viewHolder.bind(questionnaireViewItem) }
-
-    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
-      .isEqualTo(2)
-  }
-
-  /** Method to run code snippet on UI/main thread */
-  private fun runOnUI(action: () -> Unit) {
-    activityScenarioRule.scenario.onActivity { action() }
-  }
-
-  /** Method to set content view for test activity */
-  private fun setTestLayout(view: View) {
-    activityScenarioRule.scenario.onActivity { activity -> activity.setContentView(view) }
-    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+    viewHolder.bind(questionnaireViewItem)
+    composeTestRule.onAllNodes(hasTestTag(MULTI_AUTO_COMPLETE_INPUT_CHIP_TAG)).assertCountEquals(2)
   }
 
   private fun answerOptions(repeats: Boolean, vararg options: String) =
