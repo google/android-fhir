@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,42 +14,68 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.factories
+package com.google.android.fhir.datacapture.test.views
 
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.core.view.get
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.identifierString
+import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
-import com.google.android.material.textfield.TextInputLayout
+import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
+import com.google.android.fhir.datacapture.views.compose.MULTI_AUTO_COMPLETE_INPUT_CHIP_TAG
+import com.google.android.fhir.datacapture.views.compose.MULTI_AUTO_COMPLETE_TEXT_FIELD_TAG
+import com.google.android.fhir.datacapture.views.compose.REQUIRED_OPTIONAL_HEADER_TEXT_TAG
+import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class AutoCompleteViewHolderFactoryTest {
-  private val parent =
-    FrameLayout(
-      Robolectric.buildActivity(AppCompatActivity::class.java).create().get().apply {
-        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      },
-    )
-  private val viewHolder = AutoCompleteViewHolderFactory.create(parent)
+  @get:Rule
+  val activityScenarioRule: ActivityScenarioRule<TestActivity> =
+    ActivityScenarioRule(TestActivity::class.java)
+
+  @get:Rule val composeTestRule = createEmptyComposeRule()
+
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
+
+  @Before
+  fun setUp() {
+    activityScenarioRule.scenario.onActivity { activity ->
+      viewHolder = AutoCompleteViewHolderFactory.create(FrameLayout(activity))
+      activity.setContentView(viewHolder.itemView)
+    }
+
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+  }
 
   @Test
   fun shouldSetQuestionHeader() {
@@ -61,6 +87,9 @@ class AutoCompleteViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
+
+    // Synchronize
+    composeTestRule.waitForIdle()
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question")
@@ -80,6 +109,7 @@ class AutoCompleteViewHolderFactoryTest {
             .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code")),
         )
       }
+
     viewHolder.bind(
       QuestionnaireViewItem(
         questionnaireItem,
@@ -88,7 +118,7 @@ class AutoCompleteViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
                 questionnaireItem.answerOption
-                  .first { it.value.displayString(parent.context) == "Test1 Code" }
+                  .first { it.value.displayString(viewHolder.itemView.context) == "Test1 Code" }
                   .valueCoding
             },
           )
@@ -98,8 +128,7 @@ class AutoCompleteViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
-      .isEqualTo(1)
+    composeTestRule.onAllNodes(hasTestTag(MULTI_AUTO_COMPLETE_INPUT_CHIP_TAG)).assertCountEquals(1)
   }
 
   @Test
@@ -132,14 +161,18 @@ class AutoCompleteViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
-                answers.first { it.value.displayString(parent.context) == "Test1 Code" }.valueCoding
+                answers
+                  .first { it.value.displayString(viewHolder.itemView.context) == "Test1 Code" }
+                  .valueCoding
             },
           )
 
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
-                answers.first { it.value.displayString(parent.context) == "Test2 Code" }.valueCoding
+                answers
+                  .first { it.value.displayString(viewHolder.itemView.context) == "Test2 Code" }
+                  .valueCoding
             },
           )
         },
@@ -149,8 +182,7 @@ class AutoCompleteViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
-      .isEqualTo(2)
+    composeTestRule.onAllNodes(hasTestTag(MULTI_AUTO_COMPLETE_INPUT_CHIP_TAG)).assertCountEquals(2)
   }
 
   @Test
@@ -198,7 +230,7 @@ class AutoCompleteViewHolderFactoryTest {
               value =
                 answers
                   .first {
-                    it.value.identifierString(parent.context) ==
+                    it.value.identifierString(viewHolder.itemView.context) ==
                       "http://answers/test-codes1.0|test2-code"
                   }
                   .valueCoding
@@ -211,8 +243,7 @@ class AutoCompleteViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
-      .isEqualTo(2)
+    composeTestRule.onAllNodes(hasTestTag(MULTI_AUTO_COMPLETE_INPUT_CHIP_TAG)).assertCountEquals(2)
   }
 
   @Test
@@ -245,7 +276,9 @@ class AutoCompleteViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
-                answers.first { it.value.displayString(parent.context) == "Test1 Code" }.valueCoding
+                answers
+                  .first { it.value.displayString(viewHolder.itemView.context) == "Test1 Code" }
+                  .valueCoding
             },
           )
         },
@@ -255,8 +288,7 @@ class AutoCompleteViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
-      .isEqualTo(1)
+    composeTestRule.onAllNodes(hasTestTag(MULTI_AUTO_COMPLETE_INPUT_CHIP_TAG)).assertCountEquals(1)
   }
 
   @Test
@@ -284,8 +316,10 @@ class AutoCompleteViewHolderFactoryTest {
       ),
     )
 
-    assertThat((viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer)[0] as Chip).text)
-      .isEqualTo("test1-code")
+    composeTestRule
+      .onAllNodes(hasTestTag(MULTI_AUTO_COMPLETE_INPUT_CHIP_TAG))
+      .onFirst()
+      .assertTextEquals("test1-code")
   }
 
   @Test
@@ -299,12 +333,14 @@ class AutoCompleteViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
-      .isEqualTo(View.VISIBLE)
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
-      .isEqualTo("Missing answer for required field.")
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isNotNull()
+    composeTestRule
+      .onNodeWithTag(MULTI_AUTO_COMPLETE_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.Error,
+          "Missing answer for required field.",
+        ),
+      )
   }
 
   @Test
@@ -331,14 +367,17 @@ class AutoCompleteViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
-      .isEqualTo(View.GONE)
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isNull()
+    composeTestRule
+      .onNodeWithTag(MULTI_AUTO_COMPLETE_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.keyNotDefined(
+          SemanticsProperties.Error,
+        ),
+      )
   }
 
   @Test
-  fun `hides error textview in the header`() {
+  fun hidesErrorTextviewInTheHeader() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
@@ -348,12 +387,14 @@ class AutoCompleteViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
-      .isEqualTo(View.GONE)
+    composeTestRule
+      .onNodeWithTag(ERROR_TEXT_AT_HEADER_TEST_TAG)
+      .assertIsNotDisplayed()
+      .assertDoesNotExist()
   }
 
   @Test
-  fun `show asterisk`() {
+  fun showAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -367,12 +408,15 @@ class AutoCompleteViewHolderFactoryTest {
       ),
     )
 
+    // Synchronize
+    composeTestRule.waitForIdle()
+
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question *")
   }
 
   @Test
-  fun `hide asterisk`() {
+  fun hideAsterisk() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -386,12 +430,15 @@ class AutoCompleteViewHolderFactoryTest {
       ),
     )
 
+    // Synchronize
+    composeTestRule.waitForIdle()
+
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question")
   }
 
   @Test
-  fun `shows required text`() {
+  fun showsRequiredText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -402,14 +449,14 @@ class AutoCompleteViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
-      )
-      .isEqualTo("Required")
+    composeTestRule
+      .onNodeWithTag(REQUIRED_OPTIONAL_HEADER_TEXT_TAG)
+      .assertIsDisplayed()
+      .assertTextEquals("Required")
   }
 
   @Test
-  fun `hide required text`() {
+  fun hideRequiredText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -420,16 +467,14 @@ class AutoCompleteViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
-      )
-      .isEmpty()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
-      .isEqualTo(View.GONE)
+    composeTestRule
+      .onNodeWithTag(REQUIRED_OPTIONAL_HEADER_TEXT_TAG)
+      .assertIsNotDisplayed()
+      .assertDoesNotExist()
   }
 
   @Test
-  fun `shows optional text`() {
+  fun showsOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
@@ -440,14 +485,14 @@ class AutoCompleteViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
-      )
-      .isEqualTo("Optional")
+    composeTestRule
+      .onNodeWithTag(REQUIRED_OPTIONAL_HEADER_TEXT_TAG)
+      .assertIsDisplayed()
+      .assertTextEquals("Optional")
   }
 
   @Test
-  fun `hide optional text`() {
+  fun hideOptionalText() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
@@ -458,11 +503,9 @@ class AutoCompleteViewHolderFactoryTest {
       ),
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
-      )
-      .isEmpty()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
-      .isEqualTo(View.GONE)
+    composeTestRule
+      .onNodeWithTag(REQUIRED_OPTIONAL_HEADER_TEXT_TAG)
+      .assertIsNotDisplayed()
+      .assertDoesNotExist()
   }
 }

@@ -74,6 +74,7 @@
     <!--  Auto Complete  -->
     <dimen name="auto_complete_chip_margin">10dp</dimen>
     <dimen name="auto_complete_chip_margin_bottom">50dp</dimen>
+    <dimen name="auto_complete_text_field_content_padding">16dp</dimen>
 
     <!--  Barcode  -->
     <dimen name="barcode_question_margin_end">8dp</dimen>
