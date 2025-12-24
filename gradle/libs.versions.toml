@@ -5,13 +5,14 @@ accompanist-themeadapter-material3 = "0.36.0"
 android-fhir-common = "0.1.0-alpha05"
 android-fhir-engine = "0.1.0-beta05"
 android-fhir-knowledge = "0.1.0-beta01"
+android-gradle-plugin = "8.13.0"
 androidx-activity = "1.7.2"
 androidx-activity-compose = "1.11.0"
 androidx-appcompat = "1.6.1"
 androidx-arch-core = "2.2.0"
 androidx-benchmark = "1.4.0-rc01"
 androidx-benchmark-macro = "1.4.0-rc01"
-androidx-compose-bom = "2025.10.01"
+androidx-compose-bom = "2025.11.01"
 androidx-compose-material3 = "1.4.0"
 androidx-compose-ui = "1.9.4"
 androidx-constraintlayout = "2.1.4"
@@ -20,6 +21,7 @@ androidx-datastore = "1.0.0"
 androidx-espresso = "3.5.1"
 androidx-fragment = "1.6.0"
 androidx-lifecycle = "2.8.7"
+androidx-lifecycle-viewmodel = "2.9.3"
 androidx-navigation = "2.6.0"
 androidx-navigation-compose = "2.9.5"
 androidx-recyclerview = "1.4.0"
@@ -32,32 +34,48 @@ androidx-test-runner = "1.5.0"
 androidx-tracing = "1.3.0"
 androidx-work = "2.8.1"
 apache-commons-compress = "1.21"
+compose-hotreload = "1.0.0-rc04"
+compose-multiplatform = "1.9.3"
 desugarJdkLibs = "2.0.3"
 dokka = "1.9.20"
 fhir-ucum = "1.0.3"
+fladleVersion = "0.17.4"
 glide = "4.16.0"
+gradle = "8.13.0"
 guava = "32.1.3-android"
 hapi-fhir = "6.8.0"
 hapi-fhir-core = "6.0.22"
+hapiFhirStructuresR4 = "6.10.0"
 json-assert = "1.5.1"
 json-tools-patch = "1.13"
 junit = "4.13.2"
-kotlin = "2.1.20"
-kotlinx-coroutines = "1.8.1"
-kotlinx-serialization-json = "1.8.1"
+kermit = "2.0.8"
+kotest = "6.0.7"
+kotlin = "2.2.20"
+kotlin-fhir = "1.0.0-beta02"
+kotlinpoet = "2.2.0"
+kotlinx-coroutines = "1.10.2"
+kotlinx-serialization-json = "1.9.0"
+kotlinxCoroutinesSwing = "1.10.2"
+kotlinxIoCore = "0.8.0"
+licenseeGradlePlugin = "1.8.0"
 logback-android = "3.0.0"
-material = "1.12.0"
+material = "1.13.0"
+materialIconsExtended = "1.7.3"
 mlkit-barcode-scanning = "16.1.1"
 mlkit-object-detection = "16.2.3"
 mlkit-object-detection-custom = "16.3.1"
 mockito-inline = "4.0.0"
 mockito-kotlin = "3.2.0"
+navigation-compose = "2.9.1"
 nimbus = "9.31"
 okhttp3 = "4.11.0"
 opencds-cqf-fhir = "3.8.0"
 play-services-location = "21.0.1"
 retrofit = "2.9.0"
 robolectric = "4.10.3"
+rulerGradlePlugin = "1.4.0"
+spotlessPluginGradle = "6.22.0"
 sqlcipher = "4.5.4"
 timber = "5.0.1"
 truth = "1.1.5"
@@ -94,6 +112,8 @@ androidx-fragment-testing = { module = "androidx.fragment:fragment-testing", ver
 androidx-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle-viewmodel" }
+androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle-viewmodel" }
 androidx-lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "androidx-lifecycle" }
 androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx-navigation" }
 androidx-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidx-navigation" }
@@ -117,26 +137,37 @@ androidx-tracing-tracing-ktx = { module = "androidx.tracing:tracing-ktx", versio
 androidx-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-work" }
 androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "androidx-work" }
+fladle = { module = "com.osacky.flank.gradle:fladle", version.ref = "fladleVersion" }
 apache-commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "apache-commons-compress" }
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdkLibs" }
 fhir-ucum = { module = "org.fhir:ucum", version.ref = "fhir-ucum" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 hapi-fhir-caching-guava = { module = "ca.uhn.hapi.fhir:hapi-fhir-caching-guava", version.ref = "hapi-fhir" }
 hapi-fhir-core-convertors = { module = "ca.uhn.hapi.fhir:org.hl7.fhir.convertors", version.ref = "hapi-fhir-core" }
 hapi-fhir-structures-r4 = { module = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4", version.ref = "hapi-fhir" }
+hapi-fhir-structures-r4-v6100 = { module = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4", version.ref = "hapiFhirStructuresR4" }
 hapi-fhir-validation = { module = "ca.uhn.hapi.fhir:hapi-fhir-validation", version.ref = "hapi-fhir" }
 hapi-fhir-validation-r4 = { module = "ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4", version.ref = "hapi-fhir" }
 json-assert = { module = "org.skyscreamer:jsonassert", version.ref = "json-assert" }
 json-tools-patch = { module = "com.github.java-json-tools:json-patch", version.ref = "json-tools-patch" }
 junit = { module = "junit:junit", version.ref = "junit" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+kotest-assertions-core = {module = "io.kotest:kotest-assertions-core", version.ref="kotest"}
+kotlin-fhir = { module = "com.google.fhir:fhir-model", version.ref = "kotlin-fhir" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-playservices = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinxCoroutinesSwing" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinxIoCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
+licensee-gradle-plugin = { module = "app.cash.licensee:licensee-gradle-plugin", version.ref = "licenseeGradlePlugin" }
 logback-android = { module = "com.github.tony19:logback-android", version.ref = "logback-android" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 mlkit-barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkit-barcode-scanning" }
@@ -148,6 +179,8 @@ nimbus = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbus" }
 okhttp3-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp3" }
 okhttp3-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp3" }
 okhttp3-mock-web-server = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp3" }
+material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
 opencds-cqf-fhir-cr = { module = "org.opencds.cqf.fhir:cqf-fhir-cr", version.ref = "opencds-cqf-fhir" }
 opencds-cqf-fhir-jackson = { module = "org.opencds.cqf.fhir:cqf-fhir-jackson", version.ref = "opencds-cqf-fhir" }
 opencds-cqf-fhir-utility = { module = "org.opencds.cqf.fhir:cqf-fhir-utility", version.ref = "opencds-cqf-fhir" }
@@ -155,6 +188,8 @@ play-services-location = { module = "com.google.android.gms:play-services-locati
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+ruler-gradle-plugin = { module = "com.spotify.ruler:ruler-gradle-plugin", version.ref = "rulerGradlePlugin" }
+spotless-plugin-gradle = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotlessPluginGradle" }
 sqlcipher = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlcipher" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
@@ -168,12 +203,19 @@ androidx-tracing = ["androidx-tracing-tracing", "androidx-tracing-tracing-androi
 
 [plugins]
 android-application = { id = "com.android.application" }
+android-application-build-src = { id = "com.android.application", version.ref = "android-gradle-plugin" }
+android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "android-gradle-plugin" }
 android-library = { id = "com.android.library" }
 android-test = { id = "com.android.test" }
 androidx-benchmark = { id = "androidx.benchmark" }
 androidx-navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+compose-hotreload = { id = "org.jetbrains.compose.hot-reload", version.ref = "compose-hotreload" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlin-android = { id = "org.jetbrains.kotlin.android" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization" }
+kotlin-serialization-build-src = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp" }
