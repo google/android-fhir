@@ -74,7 +74,7 @@ jobs:
         run: ./gradlew build -x :datacapture-kmp:build -x :sdc-kmp-demo:build --scan --full-stacktrace
 
       - name: Check with Gradle
-        run: ./gradlew check -x :datacapture-kmp:build -x :sdc-kmp-demo:build --scan --full-stacktrace
+        run: ./gradlew check -x :datacapture-kmp:check -x :sdc-kmp-demo:check --scan --full-stacktrace
 
       - name: Publish Maven packages to GitHub Packages
         if: ${{ github.event_name == 'push' }}
