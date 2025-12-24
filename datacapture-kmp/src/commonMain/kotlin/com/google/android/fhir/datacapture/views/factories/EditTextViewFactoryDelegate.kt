@@ -42,24 +42,24 @@ import com.google.android.fhir.datacapture.views.compose.EditTextFieldState
 import com.google.android.fhir.datacapture.views.compose.Header
 import com.google.android.fhir.datacapture.views.compose.MediaItem
 import com.google.android.fhir.datacapture.views.compose.UnitText
+import com.google.android.fhir.datacapture.views.compose.getRequiredOrOptionalText
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
-class EditTextViewHolderDelegate(
+class EditTextViewFactoryDelegate(
   private val keyboardOptions: KeyboardOptions,
   private val uiInputText: (QuestionnaireViewItem) -> String?,
   private val handleInput: suspend (String, QuestionnaireViewItem) -> Unit,
   private val isMultiLine: Boolean = false,
   private val validationMessageStringRes: StringResource,
   private val validationMessageStringResArgs: Array<Any> = emptyArray(),
-) : QuestionnaireItemComposeViewHolderDelegate {
+) : QuestionnaireItemViewFactory {
 
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
     val text = uiInputText(questionnaireViewItem) ?: ""
     val coroutineScope = rememberCoroutineScope()
-    val optionalHelperText = stringResource(Res.string.required_text_and_new_line)
-    val required = stringResource(Res.string.required)
+    val requiredOptionalText = getRequiredOrOptionalText(questionnaireViewItem)
     val validationMessage = getValidationErrorMessage(questionnaireViewItem)
     val composeViewQuestionnaireState =
       remember(questionnaireViewItem) {
@@ -68,8 +68,7 @@ class EditTextViewHolderDelegate(
           handleTextInputChange = { handleInput(it, questionnaireViewItem) },
           coroutineScope = coroutineScope,
           hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverAnnotatedString,
-          helperText = validationMessage.takeIf { !it.isNullOrBlank() }
-              ?: getRequiredOrOptionalText(questionnaireViewItem, required, optionalHelperText),
+          helperText = validationMessage.takeIf { !it.isNullOrBlank() } ?: requiredOptionalText,
           isError = !validationMessage.isNullOrBlank(),
           isReadOnly = questionnaireViewItem.questionnaireItem.readOnly?.value == true,
           keyboardOptions = keyboardOptions,
@@ -129,27 +128,3 @@ class EditTextViewHolderDelegate(
     }
   }
 }
-
-/**
- * Returns string identified by R.string.required if [QuestionnaireViewItem.showRequiredText] and
- * [com.google.fhir.model.r4.Questionnaire.Item.required] is true, or R.string.optional_text if
- * [QuestionnaireViewItem.showOptionalText] is true.
- */
-fun getRequiredOrOptionalText(
-  questionnaireViewItem: QuestionnaireViewItem,
-  requiredText: String,
-  optionalHelperText: String,
-) =
-  when {
-    (questionnaireViewItem.questionnaireItem.required?.value == true &&
-      questionnaireViewItem.questionViewTextConfiguration.showRequiredText) -> {
-      requiredText
-    }
-    (questionnaireViewItem.questionnaireItem.required?.value != true &&
-      questionnaireViewItem.questionViewTextConfiguration.showOptionalText) -> {
-      optionalHelperText
-    }
-    else -> {
-      null
-    }
-  }

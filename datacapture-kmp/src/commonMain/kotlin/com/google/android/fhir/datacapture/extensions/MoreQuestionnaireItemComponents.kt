@@ -618,24 +618,24 @@ internal val Questionnaire.Item.unit: Coding?
     }
     return null
   }
-//
-// /**
-// * The unit options for the quantity question.
-// *
-// * See http://hl7.org/fhir/R4/extension-questionnaire-unitoption.html.
-// */
-// internal val Questionnaire.Item.unitOption: List<Coding>
-//  get() {
-//    return this.extension
-//      .filter { it.url == EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL }
-//      .map { it.value as Coding }
-//      .plus(
-//        // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
-//        // quantity given as initial without value is for default unit reference purpose
-//        this.initial.map { it.value.asQuantity().toCoding() },
-//      )
-//      .distinctBy { it.code }
-//  }
+
+/**
+ * The unit options for the quantity question.
+ *
+ * See http://hl7.org/fhir/R4/extension-questionnaire-unitoption.html.
+ */
+internal val Questionnaire.Item.unitOption: List<Coding>
+  get() {
+    return this.extension
+      .filter { it.url == EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL }
+      .mapNotNull { it.value?.asCoding()?.value }
+      .plus(
+        // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
+        // quantity given as initial without value is for default unit reference purpose
+        this.initial.mapNotNull { it.value.asQuantity()?.value?.toCoding() },
+      )
+      .distinctBy { it.code }
+  }
 
 // ********************************************************************************************** //
 //                                                                                                //

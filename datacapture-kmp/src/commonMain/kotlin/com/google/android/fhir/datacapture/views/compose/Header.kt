@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.views.compose
 
 import android_fhir.datacapture_kmp.generated.resources.Res
 import android_fhir.datacapture_kmp.generated.resources.help
-import android_fhir.datacapture_kmp.generated.resources.optional_helper_text
 import android_fhir.datacapture_kmp.generated.resources.required
 import android_fhir.datacapture_kmp.generated.resources.space_asterisk
 import androidx.compose.foundation.layout.Column
@@ -71,16 +70,7 @@ fun Header(
     remember(questionnaireViewItem.questionnaireItem) { questionnaireViewItem.questionnaireItem }
   val questionnaireResponseItem =
     remember(questionnaireViewItem) { questionnaireViewItem.getQuestionnaireResponseItem() }
-  val requiredOptionalText =
-    when {
-      (questionnaireItem.required?.value == true &&
-        questionnaireViewItem.questionViewTextConfiguration.showRequiredText) ->
-        stringResource(Res.string.required)
-      (questionnaireItem.required?.value != true &&
-        questionnaireViewItem.questionViewTextConfiguration.showOptionalText) ->
-        stringResource(Res.string.optional_helper_text)
-      else -> null
-    }
+  val requiredOptionalText = getRequiredOrOptionalText(questionnaireViewItem)
 
   val prefixLocalizedText = questionnaireViewItem.questionnaireItem.localizedPrefixAnnotatedString
   val spaceAsterisk = stringResource(Res.string.space_asterisk)
@@ -183,7 +173,11 @@ internal fun PrefixQuestionTitle(
 ) {
   Row(modifier = Modifier.fillMaxWidth()) {
     if (!prefixLocalizedText.isNullOrBlank()) {
-      Text(prefixLocalizedText, style = QuestionnaireTheme.textStyles.questionText)
+      Text(
+        prefixLocalizedText,
+        style = QuestionnaireTheme.textStyles.questionText,
+        modifier = Modifier.testTag(PREFIX_HEADER_TAG),
+      )
 
       //      AndroidView(
       //        factory = {
@@ -206,7 +200,11 @@ internal fun PrefixQuestionTitle(
       Spacer(modifier = Modifier.width(5.dp))
     }
 
-    Text(questionLocalizedText, style = QuestionnaireTheme.textStyles.questionText)
+    Text(
+      questionLocalizedText,
+      style = QuestionnaireTheme.textStyles.questionText,
+      modifier = Modifier.testTag(QUESTION_HEADER_TAG),
+    )
     //    AndroidView(
     //      factory = {
     //        TextView(it).apply {
@@ -246,7 +244,11 @@ internal fun Help(
     verticalAlignment = Alignment.CenterVertically,
   ) {
     hintLocalizedText?.let {
-      Text(it, style = QuestionnaireTheme.textStyles.subtitleText)
+      Text(
+        it,
+        style = QuestionnaireTheme.textStyles.subtitleText,
+        modifier = Modifier.testTag(HINT_HEADER_TAG),
+      )
       //      AndroidView(
       //        modifier = Modifier.weight(0.7f),
       //        factory = {
@@ -317,7 +319,8 @@ internal fun Help(
           Text(
             it,
             modifier =
-              Modifier.padding(horizontal = QuestionnaireTheme.dimensions.helpTextMarginHorizontal)
+              Modifier.testTag(HELP_HEADER_TAG)
+                .padding(horizontal = QuestionnaireTheme.dimensions.helpTextMarginHorizontal)
                 .padding(bottom = QuestionnaireTheme.dimensions.helpTextMarginBottom),
             style = QuestionnaireTheme.textStyles.helpText,
           )
@@ -347,7 +350,11 @@ internal fun Help(
   }
 }
 
-const val ERROR_TEXT_AT_HEADER_TEST_TAG = "error_text_at_header"
-const val HELP_BUTTON_TAG = "helpButton"
-const val HELP_CARD_TAG = "helpCardView"
-const val HEADER_TAG = "headerView"
+const val ERROR_TEXT_AT_HEADER_TEST_TAG = "error-text-at-header"
+const val HELP_BUTTON_TAG = "help-button"
+const val HELP_CARD_TAG = "help-card-view"
+const val HELP_HEADER_TAG = "hint_text"
+const val HEADER_TAG = "header-View"
+const val HINT_HEADER_TAG = "hint_text"
+const val PREFIX_HEADER_TAG = "prefix_text"
+const val QUESTION_HEADER_TAG = "question_text"
