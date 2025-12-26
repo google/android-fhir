@@ -49,7 +49,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Switch to Java 17 from Eclipse Temurin distro
         uses: actions/setup-java@v4
