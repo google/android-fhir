@@ -47,6 +47,7 @@ import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineView
 import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuantityViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewFactory
+import com.google.android.fhir.datacapture.views.factories.SliderViewFactory
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 import kotlin.uuid.ExperimentalUuidApi
@@ -336,6 +337,7 @@ fun getQuestionnaireItemViewFactory(
     QuestionnaireViewHolderType.EDIT_TEXT_INTEGER -> EditTextIntegerViewFactory
     QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewFactory
     QuestionnaireViewHolderType.QUANTITY -> QuantityViewFactory
+    QuestionnaireViewHolderType.SLIDER -> SliderViewFactory
     else -> TODO()
   }
 }
