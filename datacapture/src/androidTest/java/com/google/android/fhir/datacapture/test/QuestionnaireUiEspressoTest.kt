@@ -59,7 +59,6 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.localDate
 import com.google.android.fhir.datacapture.extensions.localDateTime
-import com.google.android.fhir.datacapture.test.utilities.clickOnText
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.android.fhir.datacapture.validation.Valid
@@ -68,6 +67,8 @@ import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TA
 import com.google.android.fhir.datacapture.views.compose.HANDLE_INPUT_DEBOUNCE_TIME
 import com.google.android.fhir.datacapture.views.compose.PAGE_NAVIGATION_BUTTON_TAG
 import com.google.android.fhir.datacapture.views.compose.TIME_PICKER_INPUT_FIELD
+import com.google.android.fhir.datacapture.views.factories.NO_CHOICE_RADIO_BUTTON_TAG
+import com.google.android.fhir.datacapture.views.factories.YES_CHOICE_RADIO_BUTTON_TAG
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -115,13 +116,13 @@ class QuestionnaireUiEspressoTest {
       .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
       .assertIsDisplayed()
 
-    clickOnText("Yes")
+    composeTestRule.onNodeWithText("Yes").performClick()
 
     composeTestRule
       .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
       .assertIsNotDisplayed()
 
-    clickOnText("No")
+    composeTestRule.onNodeWithText("No").performClick()
 
     composeTestRule
       .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
@@ -132,8 +133,7 @@ class QuestionnaireUiEspressoTest {
   fun shouldHideNextButtonIfDisabled() {
     buildFragmentFromQuestionnaire("/layout_paginated.json", true)
 
-    val nextButtonText =
-      context.getString(com.google.android.fhir.datacapture.R.string.button_pagination_next)
+    val nextButtonText = context.getString(R.string.button_pagination_next)
     composeTestRule
       .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
       .performClick()
@@ -147,8 +147,7 @@ class QuestionnaireUiEspressoTest {
   fun shouldDisplayNextButtonIfEnabled() {
     buildFragmentFromQuestionnaire("/layout_paginated.json", true)
 
-    val nextButtonText =
-      context.getString(com.google.android.fhir.datacapture.R.string.button_pagination_next)
+    val nextButtonText = context.getString(R.string.button_pagination_next)
     composeTestRule
       .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
       .assertIsDisplayed()
@@ -537,13 +536,14 @@ class QuestionnaireUiEspressoTest {
   fun displayItems_shouldGetEnabled_withAnswerChoice() {
     buildFragmentFromQuestionnaire("/questionnaire_with_enabled_display_items.json")
 
-    onView(withId(R.id.hint)).check { view, _ ->
-      val hintVisibility = (view as TextView).visibility
-      assertThat(hintVisibility).isEqualTo(View.GONE)
-    }
+    // Synchronize
+    composeTestRule.waitForIdle()
+    onView(withId(R.id.hint)).check(doesNotExist())
 
-    onView(withId(R.id.yes_radio_button)).perform(ViewActions.click())
+    composeTestRule.onNodeWithTag(YES_CHOICE_RADIO_BUTTON_TAG).performClick()
 
+    // Synchronize
+    composeTestRule.waitForIdle()
     onView(withId(R.id.hint)).check { view, _ ->
       val hintVisibility = (view as TextView).visibility
       val hintText = view.text.toString()
@@ -551,8 +551,10 @@ class QuestionnaireUiEspressoTest {
       assertThat(hintText).isEqualTo("Text when yes is selected")
     }
 
-    onView(withId(R.id.no_radio_button)).perform(ViewActions.click())
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).performClick()
 
+    // Synchronize
+    composeTestRule.waitForIdle()
     onView(withId(R.id.hint)).check { view, _ ->
       val hintVisibility = (view as TextView).visibility
       val hintText = view.text.toString()
@@ -560,12 +562,11 @@ class QuestionnaireUiEspressoTest {
       assertThat(hintText).isEqualTo("Text when no is selected")
     }
 
-    onView(withId(R.id.no_radio_button)).perform(ViewActions.click())
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).performClick()
 
-    onView(withId(R.id.hint)).check { view, _ ->
-      val hintVisibility = (view as TextView).visibility
-      assertThat(hintVisibility).isEqualTo(View.GONE)
-    }
+    // Synchronize
+    composeTestRule.waitForIdle()
+    onView(withId(R.id.hint)).check(doesNotExist())
   }
 
   @Test
@@ -580,7 +581,7 @@ class QuestionnaireUiEspressoTest {
       assertThat(view).isNull()
     }
 
-    onView(CoreMatchers.allOf(withText("First Option"))).perform(ViewActions.click())
+    composeTestRule.onNodeWithText("First Option").performClick()
 
     onView(CoreMatchers.allOf(withText("Option Date"))).check { view, _ ->
       assertThat(view).isNull()
@@ -641,8 +642,7 @@ class QuestionnaireUiEspressoTest {
   fun progressBar_shouldProgress_onPaginationNext() {
     buildFragmentFromQuestionnaire("/layout_paginated.json")
 
-    val nextButtonText =
-      context.getString(com.google.android.fhir.datacapture.R.string.button_pagination_next)
+    val nextButtonText = context.getString(R.string.button_pagination_next)
     composeTestRule
       .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
       .performClick()
@@ -657,8 +657,7 @@ class QuestionnaireUiEspressoTest {
   fun progressBar_shouldBeGone_whenNavigatedToReviewScreen() {
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json", isReviewMode = true)
 
-    val reviewButtonText =
-      context.getString(com.google.android.fhir.datacapture.R.string.button_review)
+    val reviewButtonText = context.getString(R.string.button_review)
     composeTestRule
       .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
       .performClick()
@@ -675,8 +674,7 @@ class QuestionnaireUiEspressoTest {
   fun progressBar_shouldBeVisible_whenNavigatedToEditScreenFromReview() {
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json", isReviewMode = true)
 
-    val reviewButtonText =
-      context.getString(com.google.android.fhir.datacapture.R.string.button_review)
+    val reviewButtonText = context.getString(R.string.button_review)
     composeTestRule
       .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
       .performClick()
@@ -833,13 +831,13 @@ class QuestionnaireUiEspressoTest {
         )
       }
     buildFragmentFromQuestionnaire(questionnaire, isReviewMode = true, showReviewPageFirst = true)
-    onView(withId(com.google.android.fhir.datacapture.R.id.review_mode_edit_button))
+    onView(withId(R.id.review_mode_edit_button))
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     composeTestRule
       .onNode(
         hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and
           hasText(
-            context.getString(com.google.android.fhir.datacapture.R.string.submit_questionnaire),
+            context.getString(R.string.submit_questionnaire),
           ),
       )
       .assertIsDisplayed()
@@ -932,7 +930,7 @@ class QuestionnaireUiEspressoTest {
         hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and
           hasText(
             context.getString(
-              com.google.android.fhir.datacapture.R.string.button_pagination_previous,
+              R.string.button_pagination_previous,
             ),
           ),
       )
@@ -951,13 +949,13 @@ class QuestionnaireUiEspressoTest {
         )
       }
     buildFragmentFromQuestionnaire(questionnaire, showNavigationLongScroll = false)
-    onView(withId(com.google.android.fhir.datacapture.R.id.bottom_nav_container_frame))
+    onView(withId(R.id.bottom_nav_container_frame))
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     composeTestRule
       .onNode(
         hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and
           hasText(
-            context.getString(com.google.android.fhir.datacapture.R.string.submit_questionnaire),
+            context.getString(R.string.submit_questionnaire),
           ),
       )
       .assertIsDisplayed()
@@ -977,7 +975,7 @@ class QuestionnaireUiEspressoTest {
         )
       }
     buildFragmentFromQuestionnaire(questionnaire, showNavigationLongScroll = true)
-    onView(withId(com.google.android.fhir.datacapture.R.id.bottom_nav_container_frame))
+    onView(withId(R.id.bottom_nav_container_frame))
       .check(
         ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
       )
@@ -985,7 +983,7 @@ class QuestionnaireUiEspressoTest {
       .onNode(
         hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and
           hasText(
-            context.getString(com.google.android.fhir.datacapture.R.string.submit_questionnaire),
+            context.getString(R.string.submit_questionnaire),
           ),
       )
       .assertIsDisplayed()

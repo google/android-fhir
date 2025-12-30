@@ -281,7 +281,7 @@ class EditTextDecimalViewHolderFactoryComposeTest {
   }
 
   @Test
-  fun displayValidationResultShouldShowNoErrorMesssage() {
+  fun displayValidationResultShouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {

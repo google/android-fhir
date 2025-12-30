@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Update [mtrl_outlined_stroke_color] to improve contrast of outline stroke. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:color="?attr/colorPrimary" android:state_focused="true" />
+<item
+        android:alpha="0.87"
+        android:color="?attr/colorOnSurface"
+        android:state_hovered="true"
+    />
+<item
+        android:alpha="0.38"
+        android:color="?attr/colorOnSurface"
+        android:state_enabled="false"
+    />
+<item android:alpha="0.38" android:color="?attr/colorOnSurface" />
+</selector>
