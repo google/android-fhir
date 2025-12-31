@@ -360,6 +360,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
         }
       }
+
       if (questionnaireItem.shouldHaveNestedItemsUnderAnswers) {
         questionnaireResponseItem.copyNestedItemsToChildlessAnswers(questionnaireItem)
 
