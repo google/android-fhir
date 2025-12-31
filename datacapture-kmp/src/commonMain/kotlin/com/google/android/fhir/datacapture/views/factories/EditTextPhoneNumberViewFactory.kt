@@ -21,34 +21,31 @@ import android_fhir.datacapture_kmp.generated.resources.decimal_format_validatio
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import com.google.android.fhir.datacapture.extensions.DecimalAnswerValue
-import com.google.fhir.model.r4.Decimal
+import com.google.android.fhir.datacapture.extensions.FhirR4String
+import com.google.android.fhir.datacapture.extensions.StringAnswerValue
 import com.google.fhir.model.r4.QuestionnaireResponse
-import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 
-internal val EditTextDecimalViewFactory =
+internal val EditTextPhoneNumberViewFactory =
   EditTextViewFactoryDelegate(
-    KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
-    uiInputText = {
-      val questionnaireItemViewItemDecimalAnswer = it.answers.singleOrNull()?.value?.asDecimal()
-      val draftAnswer = it.draftAnswer?.toString()
-
-      when {
-        questionnaireItemViewItemDecimalAnswer == null && draftAnswer.isNullOrEmpty() -> ""
-        questionnaireItemViewItemDecimalAnswer != null ->
-          questionnaireItemViewItemDecimalAnswer.value.value?.toStringExpanded()
-        else -> draftAnswer
-      }
-    },
+    KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done),
+    uiInputText = { it.answers.singleOrNull()?.value?.asString()?.value?.value ?: "" },
     handleInput = { inputText, questionnaireViewItem ->
-      inputText.toDoubleOrNull()?.let {
-        questionnaireViewItem.setAnswer(
-          QuestionnaireResponse.Item.Answer(
-            value = DecimalAnswerValue(Decimal(value = it.toBigDecimal())),
-          ),
-        )
+      val input =
+        inputText.let {
+          if (it.isEmpty()) {
+            null
+          } else {
+            QuestionnaireResponse.Item.Answer(
+              value = StringAnswerValue(value = FhirR4String(value = it)),
+            )
+          }
+        }
+
+      if (input != null) {
+        questionnaireViewItem.setAnswer(input)
+      } else {
+        questionnaireViewItem.clearAnswer()
       }
-        ?: questionnaireViewItem.setDraftAnswer(inputText)
     },
     validationMessageStringRes = Res.string.decimal_format_validation_error_msg,
   )

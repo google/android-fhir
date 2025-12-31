@@ -44,6 +44,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewFactory
+import com.google.android.fhir.datacapture.views.factories.EditTextPhoneNumberViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuantityViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewFactory
@@ -336,6 +337,7 @@ fun getQuestionnaireItemViewFactory(
     QuestionnaireViewHolderType.EDIT_TEXT_INTEGER -> EditTextIntegerViewFactory
     QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewFactory
     QuestionnaireViewHolderType.QUANTITY -> QuantityViewFactory
+    QuestionnaireViewHolderType.PHONE_NUMBER -> EditTextPhoneNumberViewFactory
     else -> TODO()
   }
 }

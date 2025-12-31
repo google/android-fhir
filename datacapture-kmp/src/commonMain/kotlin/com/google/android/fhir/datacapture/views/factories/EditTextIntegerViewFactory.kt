@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.google.android.fhir.datacapture.NumberFormatter
+import com.google.android.fhir.datacapture.extensions.IntegerAnswerValue
 import com.google.fhir.model.r4.Integer as FhirInteger
 import com.google.fhir.model.r4.QuestionnaireResponse
 
@@ -44,7 +45,7 @@ internal val EditTextIntegerViewFactory =
         questionnaireViewItem.setAnswer(
           QuestionnaireResponse.Item.Answer(
             value =
-              QuestionnaireResponse.Item.Answer.Value.Integer(
+              IntegerAnswerValue(
                 FhirInteger(value = inputText.toInt()),
               ),
           ),

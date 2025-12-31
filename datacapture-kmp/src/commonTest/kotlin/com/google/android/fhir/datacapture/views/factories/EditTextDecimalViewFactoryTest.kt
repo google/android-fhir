@@ -29,6 +29,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.runComposeUiTest
+import com.google.android.fhir.datacapture.extensions.DecimalAnswerValue
+import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4String
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -39,7 +41,6 @@ import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TA
 import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
 import com.google.android.fhir.datacapture.views.compose.QUESTION_HEADER_TAG
 import com.google.android.fhir.datacapture.views.compose.UNIT_TEXT_TEST_TAG
-import com.google.fhir.model.r4.Boolean as FhirR4Boolean
 import com.google.fhir.model.r4.Code
 import com.google.fhir.model.r4.Coding
 import com.google.fhir.model.r4.Decimal
@@ -51,8 +52,6 @@ import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
-
-typealias DecimalAnswerValue = QuestionnaireResponse.Item.Answer.Value.Decimal
 
 @OptIn(ExperimentalTestApi::class)
 class EditTextDecimalViewFactoryTest {
