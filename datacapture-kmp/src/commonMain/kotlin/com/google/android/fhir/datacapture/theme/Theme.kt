@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2025 Google LLC
+ * Copyright 2021-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-/** Questionnaire theme dimensions matching the XML theme values. */
 @Immutable
 data class QuestionnaireDimensions(
   // Widget related
@@ -149,7 +148,6 @@ data class QuestionnaireDimensions(
   val errorIconMarginEnd: Dp = 4.dp,
 )
 
-/** Questionnaire theme shapes matching the XML theme values. */
 @Immutable
 data class QuestionnaireShapes(
   val attachmentPreviewPhoto: RoundedCornerShape = RoundedCornerShape(8.dp),
@@ -157,7 +155,6 @@ data class QuestionnaireShapes(
   val deleteRepeatedGroupButton: RoundedCornerShape = RoundedCornerShape(4.dp),
 )
 
-/** Questionnaire theme text styles matching the XML theme values. */
 @Immutable
 data class QuestionnaireTextStyles(
   val groupTypeQuestionText: TextStyle,
@@ -177,9 +174,30 @@ data class QuestionnaireTextStyles(
   val validationDialogTitle: TextStyle,
   val validationDialogBody: TextStyle,
   val titleText: TextStyle,
-)
+) {
+  internal constructor(
+    typography: Typography,
+  ) : this(
+    groupTypeQuestionText = typography.titleMedium,
+    questionText = typography.titleMedium,
+    reviewModeQuestionText = typography.titleMedium,
+    subtitleText = typography.bodyMedium,
+    helpHeaderText = typography.titleSmall,
+    helpText = typography.bodyMedium,
+    reviewModeAnswerText = typography.bodyMedium,
+    reviewModeNotAnsweredText = typography.bodyMedium,
+    dropDownText = typography.bodyLarge,
+    dropDownSelectedText = typography.bodyLarge,
+    errorText = typography.bodySmall,
+    attachmentUploadedLabel = typography.titleSmall,
+    attachmentPreviewTitle = typography.bodyLarge,
+    dialogTitle = typography.titleMedium,
+    validationDialogTitle = typography.headlineSmall,
+    validationDialogBody = typography.bodyMedium,
+    titleText = typography.titleLarge,
+  )
+}
 
-/** Questionnaire theme alpha values. */
 @Immutable
 data class QuestionnaireAlphas(
   val reviewModeAnswer: Float = 0.5f,
@@ -189,15 +207,13 @@ data class QuestionnaireAlphas(
 /** Local composition providers for Questionnaire theme. */
 val LocalQuestionnaireDimensions = staticCompositionLocalOf { QuestionnaireDimensions() }
 val LocalQuestionnaireShapes = staticCompositionLocalOf { QuestionnaireShapes() }
-val LocalQuestionnaireTextStyles =
-  staticCompositionLocalOf<QuestionnaireTextStyles> { error("No QuestionnaireTextStyles provided") }
+val LocalQuestionnaireTextStyles = staticCompositionLocalOf {
+  QuestionnaireTextStyles(Typography())
+}
 val LocalQuestionnaireAlphas = staticCompositionLocalOf { QuestionnaireAlphas() }
 
 /**
  * The default theme applied to the questionnaire rendered using Compose.
- *
- * This theme is a Compose migration of the XML Theme.Questionnaire theme. It provides Material 3
- * styling with customizable attributes for questionnaire components.
  *
  * To override the theme attributes, you can provide custom values through the composition locals:
  * - LocalQuestionnaireDimensions
@@ -214,6 +230,7 @@ val LocalQuestionnaireAlphas = staticCompositionLocalOf { QuestionnaireAlphas() 
  *
  * @param darkTheme Whether to use dark theme colors. Defaults to system theme.
  * @param dimensions Custom dimensions for the questionnaire. Defaults to QuestionnaireDimensions().
+ * @param textStyles Custom textStyles for the questionnaire.
  * @param shapes Custom shapes for the questionnaire. Defaults to QuestionnaireShapes().
  * @param alphas Custom alpha values for the questionnaire. Defaults to QuestionnaireAlphas().
  * @param content The composable content to be themed.
@@ -228,32 +245,12 @@ fun QuestionnaireTheme(
       lightColorScheme()
     },
   typography: Typography = Typography(),
+  textStyles: QuestionnaireTextStyles = QuestionnaireTextStyles(typography),
   dimensions: QuestionnaireDimensions = QuestionnaireDimensions(),
   shapes: QuestionnaireShapes = QuestionnaireShapes(),
   alphas: QuestionnaireAlphas = QuestionnaireAlphas(),
   content: @Composable () -> Unit,
 ) {
-  val questionnaireTextStyles =
-    QuestionnaireTextStyles(
-      groupTypeQuestionText = typography.titleMedium,
-      questionText = typography.titleMedium,
-      reviewModeQuestionText = typography.titleMedium,
-      subtitleText = typography.bodyMedium,
-      helpHeaderText = typography.titleSmall,
-      helpText = typography.bodyMedium,
-      reviewModeAnswerText = typography.bodyMedium,
-      reviewModeNotAnsweredText = typography.bodyMedium,
-      dropDownText = typography.bodyLarge,
-      dropDownSelectedText = typography.bodyLarge,
-      errorText = typography.bodySmall,
-      attachmentUploadedLabel = typography.titleSmall,
-      attachmentPreviewTitle = typography.bodyLarge,
-      dialogTitle = typography.titleMedium,
-      validationDialogTitle = typography.headlineSmall,
-      validationDialogBody = typography.bodyMedium,
-      titleText = typography.titleLarge,
-    )
-
   val materialShapes =
     Shapes(
       small = RoundedCornerShape(4.dp),
@@ -269,7 +266,7 @@ fun QuestionnaireTheme(
     CompositionLocalProvider(
       LocalQuestionnaireDimensions provides dimensions,
       LocalQuestionnaireShapes provides shapes,
-      LocalQuestionnaireTextStyles provides questionnaireTextStyles,
+      LocalQuestionnaireTextStyles provides textStyles,
       LocalQuestionnaireAlphas provides alphas,
     ) {
       content()
