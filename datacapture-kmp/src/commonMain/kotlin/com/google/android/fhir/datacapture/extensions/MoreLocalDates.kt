@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 Google LLC
+ * Copyright 2022-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,13 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
+import kotlinx.datetime.toLocalDateTime
 
 /**
  * Returns the first character that is not a letter in the given date pattern string (e.g. "/" for
@@ -29,7 +33,7 @@ internal fun getDateSeparator(localeDatePattern: String): Char? =
 
 /**
  * Converts date pattern to acceptable date pattern where 2 digits are expected for day(dd) and
- * month(MM) and 4 digits are expected for year(yyyy), e.g., dd/mm/yyyy is returned for d/M/yy"
+ * month(MM) and 4 digits are expected for year(yyyy), e.g., dd/mm/yyyy is returned for d/M/yy
  */
 internal fun canonicalizeDatePattern(datePattern: String): String {
   val datePatternSeparator = getDateSeparator(datePattern)
@@ -127,3 +131,17 @@ internal fun LocalDate.format(pattern: String? = null): String {
 internal fun getLocalizedDatePattern(): String {
   return "yyyy-MM-dd" // TODO: Make this locale-aware
 }
+
+internal fun parseLocalDateOrNull(dateToDisplay: String, pattern: String): LocalDate? {
+  return try {
+    parseDate(dateToDisplay, pattern)
+  } catch (_: IllegalArgumentException) {
+    null
+  }
+}
+
+@OptIn(ExperimentalTime::class)
+internal fun Long.toLocalDate(): LocalDate =
+  Instant.fromEpochMilliseconds(this).toLocalDateTime(ZONE_ID_UTC).date
+
+internal val ZONE_ID_UTC = TimeZone.of("UTC")

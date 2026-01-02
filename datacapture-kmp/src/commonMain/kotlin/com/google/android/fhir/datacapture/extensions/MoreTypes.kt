@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,10 +49,14 @@ typealias FhirR4String = com.google.fhir.model.r4.String
 
 typealias FhirR4Boolean = com.google.fhir.model.r4.Boolean
 
+typealias FhirR4DateType = com.google.fhir.model.r4.Date
+
 typealias QuantityAnswerValue = QuestionnaireResponse.Item.Answer.Value.Quantity
 
 typealias StringAnswerValue = QuestionnaireResponse.Item.Answer.Value.String
 
 typealias IntegerAnswerValue = QuestionnaireResponse.Item.Answer.Value.Integer
+
+typealias DateAnswerValue = QuestionnaireResponse.Item.Answer.Value.Date
 
 internal const val EXT_TRANSLATION = "http://hl7.org/fhir/StructureDefinition/translation"

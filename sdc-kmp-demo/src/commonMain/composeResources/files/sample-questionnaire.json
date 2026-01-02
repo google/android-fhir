@@ -52,6 +52,37 @@
       ]
     },
     {
+      "linkId": "date-picker",
+      "text": "Enter a date",
+      "type": "date",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
+          "valueString": "yyyy-mm-dd"
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1-most-recent",
+          "text": "Use keyboard entry or date picker",
+          "type": "display"
+        }
+      ]
+    },
+    {
       "linkId": "notes",
       "type": "text",
       "text": "Additional Notes",
