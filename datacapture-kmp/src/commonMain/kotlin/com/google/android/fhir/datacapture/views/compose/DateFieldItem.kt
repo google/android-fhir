@@ -63,7 +63,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun DatePickerItem(
+internal fun DateFieldItem(
   modifier: Modifier = Modifier,
   initialSelectedDateMillis: Long?,
   dateInput: DateInput,

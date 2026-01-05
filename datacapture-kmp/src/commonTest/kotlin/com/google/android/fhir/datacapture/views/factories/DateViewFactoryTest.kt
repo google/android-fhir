@@ -502,7 +502,7 @@ class DateViewFactoryTest {
               QuestionnaireResponse.Item.Answer(
                 value =
                   DateAnswerValue(
-                    value = FhirR4DateType(value = FhirDate.fromString("2026-00-01"))
+                    value = FhirR4DateType(value = FhirDate.fromString("2026-00-01")),
                   ),
               ),
             ),
@@ -579,7 +579,7 @@ class DateViewFactoryTest {
               QuestionnaireResponse.Item.Answer(
                 value =
                   DateAnswerValue(
-                    value = FhirR4DateType(value = FhirDate.fromString("2023-00-01"))
+                    value = FhirR4DateType(value = FhirDate.fromString("2023-00-01")),
                   ),
               ),
             ),

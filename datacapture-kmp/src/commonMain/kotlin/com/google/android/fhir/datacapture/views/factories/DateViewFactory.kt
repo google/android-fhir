@@ -40,9 +40,9 @@ import com.google.android.fhir.datacapture.extensions.parseLocalDateOrNull
 import com.google.android.fhir.datacapture.extensions.toLocalDate
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.DateFieldItem
 import com.google.android.fhir.datacapture.views.compose.DateInput
 import com.google.android.fhir.datacapture.views.compose.DateInputFormat
-import com.google.android.fhir.datacapture.views.compose.DatePickerItem
 import com.google.android.fhir.datacapture.views.compose.Header
 import com.google.android.fhir.datacapture.views.compose.MediaItem
 import com.google.android.fhir.datacapture.views.compose.getRequiredOrOptionalText
@@ -168,7 +168,7 @@ internal object DateViewFactory : QuestionnaireItemViewFactory {
       Header(questionnaireViewItem)
       questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
 
-      DatePickerItem(
+      DateFieldItem(
         modifier = Modifier.fillMaxWidth(),
         initialSelectedDateMillis = initialSelectedDateInMillis,
         selectableDates = selectableDates,

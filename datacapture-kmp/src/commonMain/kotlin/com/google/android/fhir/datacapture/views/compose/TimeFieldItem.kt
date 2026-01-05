@@ -16,6 +16,10 @@
 
 package com.google.android.fhir.datacapture.views.compose
 
+import android_fhir.datacapture_kmp.generated.resources.Res
+import android_fhir.datacapture_kmp.generated.resources.gm_schedule_24
+import android_fhir.datacapture_kmp.generated.resources.select_time
+import android_fhir.datacapture_kmp.generated.resources.time
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -34,24 +38,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
-import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.toLocalizedString
-import java.time.LocalTime
+import kotlinx.datetime.LocalTime
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun TimePickerItem(
+internal fun TimeFieldItem(
   modifier: Modifier = Modifier,
   timeSelectedDisplay: String?,
   initialStartTime: LocalTime,
@@ -61,7 +63,6 @@ internal fun TimePickerItem(
   isError: Boolean,
   onTimeChanged: (LocalTime) -> Unit,
 ) {
-  val context = LocalContext.current
   val focusManager = LocalFocusManager.current
   val keyboardController = LocalSoftwareKeyboardController.current
   var selectedTimeTextDisplay by
@@ -105,8 +106,8 @@ internal fun TimePickerItem(
           enabled = enabled,
         ) {
           Icon(
-            painterResource(R.drawable.gm_schedule_24),
-            contentDescription = stringResource(R.string.select_time),
+            painterResource(Res.drawable.gm_schedule_24),
+            contentDescription = stringResource(Res.string.select_time),
           )
         }
       },
@@ -132,8 +133,8 @@ internal fun TimePickerItem(
         onDismiss = { expanded = false },
       ) { hour, min,
         ->
-        val localTime = LocalTime.of(hour, min)
-        selectedTimeTextDisplay = localTime.toLocalizedString(context)
+        val localTime = LocalTime(hour, min)
+        selectedTimeTextDisplay = localTime.toLocalizedString()
         onTimeChanged(localTime)
       }
     }
@@ -143,12 +144,12 @@ internal fun TimePickerItem(
 @Composable
 @Preview
 fun PreviewTimePickerItem() {
-  TimePickerItem(
+  TimeFieldItem(
     Modifier,
     null,
-    LocalTime.now(),
+    LocalTime(11, 38),
     true,
-    stringResource(R.string.time),
+    stringResource(Res.string.time),
     null,
     false,
   ) {}

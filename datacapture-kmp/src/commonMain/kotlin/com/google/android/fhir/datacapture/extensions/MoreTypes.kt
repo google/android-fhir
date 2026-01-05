@@ -59,4 +59,6 @@ typealias IntegerAnswerValue = QuestionnaireResponse.Item.Answer.Value.Integer
 
 typealias DateAnswerValue = QuestionnaireResponse.Item.Answer.Value.Date
 
+typealias TimeAnswerValue = QuestionnaireResponse.Item.Answer.Value.Time
+
 internal const val EXT_TRANSLATION = "http://hl7.org/fhir/StructureDefinition/translation"
