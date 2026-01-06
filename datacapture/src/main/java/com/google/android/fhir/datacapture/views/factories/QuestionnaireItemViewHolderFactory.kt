@@ -19,13 +19,11 @@ package com.google.android.fhir.datacapture.views.factories
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
-import com.google.android.fhir.datacapture.QuestionnaireAdapterItem
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.MediaView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -96,25 +94,6 @@ class QuestionnaireItemViewHolder(
         delegate.bind(itemView as ComposeView, questionnaireViewItem)
       }
     }
-  }
-}
-
-/** The [RecyclerView.ViewHolder] for [QuestionnaireAdapterItem.RepeatedGroupHeader]. */
-internal class RepeatedGroupHeaderItemViewHolder(
-  itemView: View,
-) : RecyclerView.ViewHolder(itemView) {
-  private val header: TextView = itemView.findViewById(R.id.repeated_group_instance_header_title)
-  private val delete: View =
-    itemView.findViewById(R.id.repeated_group_instance_header_delete_button)
-
-  fun bind(repeatedGroupHeader: QuestionnaireAdapterItem.RepeatedGroupHeader) {
-    header.text =
-      header.context.getString(
-        R.string.repeated_group_title,
-        "${repeatedGroupHeader.index + 1}",
-        repeatedGroupHeader.title,
-      )
-    delete.setOnClickListener { repeatedGroupHeader.onDeleteClicked() }
   }
 }
 
