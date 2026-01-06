@@ -67,10 +67,10 @@ class TimeViewFactoryTest {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.Item(
-            linkId = FhirR4String(value = "time-item"),
-            type = Enumeration(value = Questionnaire.QuestionnaireItemType.Time),
-          )
-          .apply { text = "Question?" },
+          linkId = FhirR4String(value = "time-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Time),
+          text = FhirR4String(value = "Question?"),
+        ),
         QuestionnaireResponse.Item(linkId = FhirR4String(value = "time-item")),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
@@ -89,10 +89,10 @@ class TimeViewFactoryTest {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.Item(
-            linkId = FhirR4String(value = "time-item"),
-            type = Enumeration(value = Questionnaire.QuestionnaireItemType.Time),
-          )
-          .apply { text = "Question?" },
+          linkId = FhirR4String(value = "time-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Time),
+          text = FhirR4String(value = "Question?"),
+        ),
         QuestionnaireResponse.Item(
           linkId = FhirR4String(value = "time-item"),
           answer =
@@ -121,10 +121,10 @@ class TimeViewFactoryTest {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.Item(
-            linkId = FhirR4String(value = "time-item"),
-            type = Enumeration(value = Questionnaire.QuestionnaireItemType.Time),
-          )
-          .apply { text = "Question?" },
+          linkId = FhirR4String(value = "time-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Time),
+          text = FhirR4String(value = "Question?"),
+        ),
         QuestionnaireResponse.Item(
           linkId = FhirR4String(value = "time-item"),
           answer =

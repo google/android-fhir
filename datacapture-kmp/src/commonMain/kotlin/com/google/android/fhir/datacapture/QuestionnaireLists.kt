@@ -41,6 +41,7 @@ import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.factories.DateTimeViewFactory
 import com.google.android.fhir.datacapture.views.factories.DateViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewFactory
@@ -340,6 +341,7 @@ fun getQuestionnaireItemViewFactory(
     QuestionnaireViewHolderType.QUANTITY -> QuantityViewFactory
     QuestionnaireViewHolderType.DATE_PICKER -> DateViewFactory
     QuestionnaireViewHolderType.TIME_PICKER -> TimeViewFactory
+    QuestionnaireViewHolderType.DATE_TIME_PICKER -> DateTimeViewFactory
     else -> TODO()
   }
 }
