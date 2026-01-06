@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 Google LLC
+ * Copyright 2024-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,12 +31,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.ViewCompat
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.QUESTIONNAIRE_EDIT_LIST
 import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFactory
-import com.google.android.fhir.datacapture.extensions.inflate
 import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.RepeatedGroupAddItemViewHolder
 import com.google.android.fhir.datacapture.views.compose.PageBottomNavigationView
+import com.google.android.fhir.datacapture.views.compose.RepeatedGroupAddItem
+import com.google.android.fhir.datacapture.views.compose.RepeatedGroupHeaderItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewHolderFactory
@@ -55,7 +55,6 @@ import com.google.android.fhir.datacapture.views.factories.QuantityViewHolderFac
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewHolderFactory
-import com.google.android.fhir.datacapture.views.factories.RepeatedGroupHeaderItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.SliderViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.TimePickerViewHolderFactory
@@ -111,86 +110,47 @@ internal fun QuestionnaireEditList(
       },
       contentType = { it::class.simpleName },
     ) { adapterItem: QuestionnaireAdapterItem ->
-      if (adapterItem is QuestionnaireAdapterItem.Navigation) {
-        PageBottomNavigationView(adapterItem.questionnaireNavigationUIState)
-      } else {
-        AndroidView(
-          factory = { context ->
-            LinearLayout(context).apply {
-              orientation = LinearLayout.VERTICAL
-              ViewCompat.setNestedScrollingEnabled(this, false)
-            }
-          },
-          modifier = Modifier.fillMaxWidth(),
-          update = { view ->
-            val existingViewHolder = view.getTag(R.id.question_view_holder)
+      when (adapterItem) {
+        is QuestionnaireAdapterItem.Navigation -> {
+          PageBottomNavigationView(adapterItem.questionnaireNavigationUIState)
+        }
+        is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
+          RepeatedGroupAddItem(adapterItem.item)
+        }
+        is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+          RepeatedGroupHeaderItem(adapterItem)
+        }
+        is QuestionnaireAdapterItem.Question -> {
+          AndroidView(
+            factory = { context ->
+              LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                ViewCompat.setNestedScrollingEnabled(this, false)
+              }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            update = { view ->
+              val existingViewHolder = view.getTag(R.id.question_view_holder)
 
-            val createViews =
-              when {
-                existingViewHolder == null -> true
-                adapterItem is QuestionnaireAdapterItem.Question &&
-                  existingViewHolder !is QuestionnaireItemViewHolder -> true
-                adapterItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
-                  existingViewHolder !is RepeatedGroupHeaderItemViewHolder -> true
-                adapterItem is QuestionnaireAdapterItem.RepeatedGroupAddButton &&
-                  existingViewHolder !is RepeatedGroupAddItemViewHolder -> true
-                else -> false
-              }
-
-            if (createViews) {
-              view.removeAllViews()
-              when {
-                adapterItem is QuestionnaireAdapterItem.Question -> {
-                  val viewHolder =
-                    getQuestionnaireItemViewHolder(
-                      parent = view,
-                      questionnaireViewItem = adapterItem.item,
-                      questionnaireItemViewHolderMatchers = questionnaireItemViewHolderMatchers,
-                    )
-                  view.setTag(R.id.question_view_holder, viewHolder)
-                  view.addView(viewHolder.itemView)
-                  viewHolder.bind(adapterItem.item)
-                }
-                adapterItem is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-                  val viewHolder =
-                    RepeatedGroupHeaderItemViewHolder(
-                      view.inflate(R.layout.repeated_group_instance_header_view),
-                    )
-                  view.setTag(R.id.question_view_holder, viewHolder)
-                  view.addView(viewHolder.itemView)
-                  viewHolder.bind(adapterItem)
-                }
-                adapterItem is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
-                  val viewHolder =
-                    RepeatedGroupAddItemViewHolder(
-                      view.inflate(R.layout.add_repeated_item),
-                    )
-                  view.setTag(R.id.question_view_holder, viewHolder)
-                  view.addView(viewHolder.itemView)
-                  viewHolder.bind(adapterItem.item)
-                }
-              }
-            } else {
-              // Update existing view holder
-              when {
-                adapterItem is QuestionnaireAdapterItem.Question -> {
-                  (existingViewHolder as QuestionnaireItemViewHolder).bind(adapterItem.item)
-                }
-                adapterItem is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-                  (existingViewHolder as RepeatedGroupHeaderItemViewHolder).bind(
-                    adapterItem,
+              if (existingViewHolder == null) {
+                view.removeAllViews()
+                val viewHolder =
+                  getQuestionnaireItemViewHolder(
+                    parent = view,
+                    questionnaireViewItem = adapterItem.item,
+                    questionnaireItemViewHolderMatchers = questionnaireItemViewHolderMatchers,
                   )
-                }
-                adapterItem is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
-                  (existingViewHolder as RepeatedGroupAddItemViewHolder).bind(
-                    adapterItem.item,
-                  )
-                }
+                view.setTag(R.id.question_view_holder, viewHolder)
+                view.addView(viewHolder.itemView)
+                viewHolder.bind(adapterItem.item)
+              } else {
+                // Update existing view holder
+                (existingViewHolder as QuestionnaireItemViewHolder).bind(adapterItem.item)
               }
-            }
-          },
-          onReset = { view -> view.setTag(R.id.question_view_holder, null) },
-        )
+            },
+            onReset = { view -> view.setTag(R.id.question_view_holder, null) },
+          )
+        }
       }
     }
   }
@@ -243,7 +203,11 @@ private fun getQuestionnaireItemViewHolder(
     questionnaireItemViewHolderMatchers
       .find { it.matches(questionnaireViewItem.questionnaireItem) }
       ?.factory
-      ?: getQuestionnaireItemViewHolderFactory(getItemViewTypeForQuestion(questionnaireViewItem))
+      ?: getQuestionnaireItemViewHolderFactory(
+        getItemViewTypeForQuestion(
+          questionnaireViewItem,
+        ),
+      )
   return questionnaireViewHolderFactory.create(parent)
 }
 
@@ -297,9 +261,15 @@ private fun getItemViewTypeForQuestion(
     Questionnaire.QuestionnaireItemType.DATE -> QuestionnaireViewHolderType.DATE_PICKER
     Questionnaire.QuestionnaireItemType.TIME -> QuestionnaireViewHolderType.TIME_PICKER
     Questionnaire.QuestionnaireItemType.DATETIME -> QuestionnaireViewHolderType.DATE_TIME_PICKER
-    Questionnaire.QuestionnaireItemType.STRING -> getStringViewHolderType(questionnaireViewItem)
+    Questionnaire.QuestionnaireItemType.STRING ->
+      getStringViewHolderType(
+        questionnaireViewItem,
+      )
     Questionnaire.QuestionnaireItemType.TEXT -> QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE
-    Questionnaire.QuestionnaireItemType.INTEGER -> getIntegerViewHolderType(questionnaireViewItem)
+    Questionnaire.QuestionnaireItemType.INTEGER ->
+      getIntegerViewHolderType(
+        questionnaireViewItem,
+      )
     Questionnaire.QuestionnaireItemType.DECIMAL -> QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL
     Questionnaire.QuestionnaireItemType.CHOICE,
     Questionnaire.QuestionnaireItemType.REFERENCE, -> getChoiceViewHolderType(questionnaireViewItem)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -62,10 +63,13 @@ import com.google.android.fhir.datacapture.extensions.localDateTime
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.android.fhir.datacapture.validation.Valid
+import com.google.android.fhir.datacapture.views.compose.ADD_REPEATED_GROUP_BUTTON_TAG
 import com.google.android.fhir.datacapture.views.compose.DATE_TEXT_INPUT_FIELD
+import com.google.android.fhir.datacapture.views.compose.DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG
 import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
 import com.google.android.fhir.datacapture.views.compose.HANDLE_INPUT_DEBOUNCE_TIME
 import com.google.android.fhir.datacapture.views.compose.PAGE_NAVIGATION_BUTTON_TAG
+import com.google.android.fhir.datacapture.views.compose.REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG
 import com.google.android.fhir.datacapture.views.compose.TIME_PICKER_INPUT_FIELD
 import com.google.android.fhir.datacapture.views.factories.NO_CHOICE_RADIO_BUTTON_TAG
 import com.google.android.fhir.datacapture.views.factories.YES_CHOICE_RADIO_BUTTON_TAG
@@ -691,39 +695,42 @@ class QuestionnaireUiEspressoTest {
   @Test
   fun test_add_item_button_does_not_exist_for_non_repeated_groups() {
     buildFragmentFromQuestionnaire("/component_non_repeated_group.json")
-    onView(withId(R.id.add_item_to_repeated_group)).check(doesNotExist())
+    composeTestRule.onNodeWithTag(ADD_REPEATED_GROUP_BUTTON_TAG).assertDoesNotExist()
   }
 
   @Test
   fun test_repeated_group_is_added() {
     buildFragmentFromQuestionnaire("/component_repeated_group.json")
-    onView(withId(R.id.add_item_to_repeated_group)).perform(ViewActions.click())
+    composeTestRule.onNodeWithTag(ADD_REPEATED_GROUP_BUTTON_TAG).performClick()
 
     composeTestRule
       .onNodeWithTag(QuestionnaireFragment.QUESTIONNAIRE_EDIT_LIST)
       .assertExists()
       .assertIsDisplayed()
 
-    onView(withId(R.id.repeated_group_instance_header_title))
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+    composeTestRule.onNodeWithTag(REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG).assertIsDisplayed()
 
-    onView(withText(R.string.delete)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+    composeTestRule.onNodeWithTag(DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG).assertIsDisplayed()
   }
 
   @Test
   fun test_repeated_group_adds_multiple_items() {
     buildFragmentFromQuestionnaire("/component_multiple_repeated_group.json")
-    onView(allOf(withText("Add Repeated Group"))).perform(ViewActions.click())
+    composeTestRule
+      .onNode(hasTestTag(ADD_REPEATED_GROUP_BUTTON_TAG) and hasText("Add Repeated Group"))
+      .performClick()
+    composeTestRule.onNodeWithTag(DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG).assertIsDisplayed()
 
-    onView(allOf(withText(R.string.delete)))
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-
-    onView(
-        allOf(
-          withId(R.id.repeated_group_instance_header_title),
-        ),
-      )
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+    composeTestRule
+      .onNode(hasTestTag(ADD_REPEATED_GROUP_BUTTON_TAG) and hasText("Add Decimal Repeated Group"))
+      .performClick()
+    composeTestRule
+      .onAllNodes(hasTestTag(DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG))
+      .assertCountEquals(2)
+    composeTestRule
+      .onAllNodes(hasTestTag(REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG))
+      .assertCountEquals(2)
   }
 
   @Test
@@ -738,12 +745,9 @@ class QuestionnaireUiEspressoTest {
       .assertExists()
       .assertIsDisplayed()
 
-    onView(withId(R.id.repeated_group_instance_header_title))
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-
-    onView(withText(R.string.delete)).perform(ViewActions.click())
-
-    onView(withText(R.id.repeated_group_instance_header_title)).check(doesNotExist())
+    composeTestRule.onNodeWithTag(REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG).performClick()
+    composeTestRule.onNodeWithTag(REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG).assertDoesNotExist()
   }
 
   @Test
