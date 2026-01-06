@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
-import android.view.View
-import android.widget.Button
 import androidx.core.os.bundleOf
 import androidx.fragment.app.testing.launchFragment
 import androidx.fragment.app.testing.launchFragmentInContainer
@@ -27,13 +25,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.views.factories.DateTimePickerViewHolderFactory
 import com.google.common.truth.Truth.assertThat
-import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Before
@@ -115,214 +110,6 @@ class QuestionnaireFragmentTest {
     scenario.withFragment {
       assertThat(calculateProgressPercentage(count = 10, totalCount = 50)).isEqualTo(20)
     }
-  }
-
-  @Test
-  fun `review page should show both edit and submit button`() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          },
-        )
-      }
-    val questionnaireJson = parser.encodeResourceToString(questionnaire)
-    val scenario =
-      launchFragmentInContainer<QuestionnaireFragment>(
-        bundleOf(
-          EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
-          EXTRA_ENABLE_REVIEW_PAGE to true,
-          EXTRA_SHOW_REVIEW_PAGE_FIRST to true,
-        ),
-      )
-    scenario.moveToState(Lifecycle.State.RESUMED)
-    val view = scenario.withFragment { requireView() }
-
-    assertThat(view.findViewById<Button>(R.id.review_mode_edit_button).visibility)
-      .isEqualTo(View.VISIBLE)
-    assertThat(view.findViewById<Button>(R.id.submit_questionnaire).visibility)
-      .isEqualTo(View.VISIBLE)
-  }
-
-  @Test
-  fun `questionnaire submit button text should be editable`() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          },
-        )
-      }
-    val questionnaireJson = parser.encodeResourceToString(questionnaire)
-    val customButtonText = "Apply"
-    val scenario =
-      launchFragment<QuestionnaireFragment>(
-        QuestionnaireFragment.builder()
-          .setQuestionnaire(questionnaireJson)
-          .setSubmitButtonText(customButtonText)
-          .buildArgs(),
-      )
-
-    scenario.moveToState(Lifecycle.State.RESUMED)
-
-    val button =
-      scenario.withFragment { this.requireView().findViewById<Button>(R.id.submit_questionnaire) }
-
-    val buttonText = button.text.toString()
-    assertEquals(buttonText, customButtonText)
-  }
-
-  @Test
-  fun `should hide next button on last page`() {
-    val questionnaireJson =
-      """{
-  "resourceType": "Questionnaire",
-  "item": [
-    {
-      "linkId": "1",
-      "type": "group",
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [
-              {
-                "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "page",
-                "display": "Page"
-              }
-            ],
-            "text": "Page"
-          }
-        }
-      ],
-      "item": [
-        {
-          "linkId": "1.1",
-          "type": "display",
-          "text": "Item 1"
-        }
-      ]
-    },
-    {
-      "linkId": "2",
-      "type": "group",
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [
-              {
-                "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "page",
-                "display": "Page"
-              }
-            ],
-            "text": "Page"
-          }
-        }
-      ],
-      "item": [
-        {
-          "linkId": "2.1",
-          "type": "display",
-          "text": "Item 2"
-        }
-      ]
-    }
-  ]
-}
-"""
-    val scenario =
-      launchFragment<QuestionnaireFragment>(
-        bundleOf(
-          EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
-        ),
-      )
-    scenario.moveToState(Lifecycle.State.RESUMED)
-    val view = scenario.withFragment { requireView() }
-    view.findViewById<Button>(R.id.pagination_next_button).performClick()
-    assertThat(view.findViewById<Button>(R.id.pagination_next_button).visibility)
-      .isEqualTo(View.GONE)
-  }
-
-  @Test
-  fun `should hide previous button on first page`() {
-    val questionnaireJson =
-      """{
-  "resourceType": "Questionnaire",
-  "item": [
-    {
-      "linkId": "1",
-      "type": "group",
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [
-              {
-                "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "page",
-                "display": "Page"
-              }
-            ],
-            "text": "Page"
-          }
-        }
-      ],
-      "item": [
-        {
-          "linkId": "1.1",
-          "type": "display",
-          "text": "Item 1"
-        }
-      ]
-    },
-    {
-      "linkId": "2",
-      "type": "group",
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [
-              {
-                "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "page",
-                "display": "Page"
-              }
-            ],
-            "text": "Page"
-          }
-        }
-      ],
-      "item": [
-        {
-          "linkId": "2.1",
-          "type": "display",
-          "text": "Item 2"
-        }
-      ]
-    }
-  ]
-}
-"""
-    val scenario =
-      launchFragment<QuestionnaireFragment>(
-        bundleOf(
-          EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
-        ),
-      )
-    scenario.moveToState(Lifecycle.State.RESUMED)
-    val view = scenario.withFragment { requireView() }
-    assertThat(view.findViewById<Button>(R.id.pagination_previous_button).visibility)
-      .isEqualTo(View.GONE)
   }
 
   @Test
@@ -414,61 +201,6 @@ class QuestionnaireFragmentTest {
     scenario.moveToState(Lifecycle.State.RESUMED)
     scenario.withFragment {
       assertThat(this.questionnaireItemViewHolderFactoryMatchersProvider.get()).isEmpty()
-    }
-  }
-
-  fun `show bottom navigation container when setShowNavigationInDefaultLongScroll is set to false`() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          },
-        )
-      }
-    val questionnaireJson = parser.encodeResourceToString(questionnaire)
-    val scenario =
-      launchFragment<QuestionnaireFragment>(
-        QuestionnaireFragment.builder()
-          .setQuestionnaire(questionnaireJson)
-          .setShowNavigationInDefaultLongScroll(false)
-          .buildArgs(),
-      )
-    scenario.moveToState(Lifecycle.State.RESUMED)
-    scenario.withFragment {
-      val bottomNavContainer = requireView().findViewById<View>(R.id.bottom_nav_container_frame)
-      assertThat(bottomNavContainer.visibility).isEqualTo(View.VISIBLE)
-      assertThat(bottomNavContainer.findViewById<View>(R.id.submit_questionnaire).isEnabled)
-        .isTrue()
-    }
-  }
-
-  @Test
-  fun `hide the bottom navigation container when setShowNavigationInDefaultLongScroll is set to true`() {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          },
-        )
-      }
-    val questionnaireJson = parser.encodeResourceToString(questionnaire)
-    val scenario =
-      launchFragment<QuestionnaireFragment>(
-        QuestionnaireFragment.builder()
-          .setQuestionnaire(questionnaireJson)
-          .setShowNavigationInDefaultLongScroll(true)
-          .buildArgs(),
-      )
-    scenario.moveToState(Lifecycle.State.RESUMED)
-    scenario.withFragment {
-      val bottomNavContainer = requireView().findViewById<View>(R.id.bottom_nav_container_frame)
-      assertThat(bottomNavContainer.visibility).isEqualTo(View.GONE)
     }
   }
 
