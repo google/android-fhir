@@ -35,6 +35,7 @@ import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4Integer
 import com.google.android.fhir.datacapture.extensions.FhirR4String
 import com.google.android.fhir.datacapture.extensions.StringAnswerValue
+import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -56,7 +57,7 @@ import kotlin.test.Test
 class EditTextPhoneNumberViewFactoryTest {
   @Composable
   fun QuestionnaireEditTextPhoneNumberView(questionnaireViewItem: QuestionnaireViewItem) {
-    EditTextPhoneNumberViewFactory.Content(questionnaireViewItem)
+    QuestionnaireTheme { EditTextPhoneNumberViewFactory.Content(questionnaireViewItem) }
   }
 
   @Test
