@@ -13,7 +13,7 @@ plugins {
 }
 
 kotlin {
-  jvmToolchain(11)
+  jvmToolchain(21)
 
   androidLibrary {
     namespace = "com.google.android.fhir.datacapture"
@@ -33,6 +33,7 @@ kotlin {
         )
       }
     }
+
     packaging {
       resources.excludes.addAll(
         listOf("META-INF/ASL2.0", "META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"),
@@ -101,7 +102,15 @@ kotlin {
       }
     }
 
-    commonTest { dependencies { implementation(libs.kotlin.test) } }
+    commonTest {
+      dependencies {
+        implementation(libs.kotlin.test)
+        implementation(libs.kotest.assertions.core)
+
+        @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+        implementation(compose.uiTest)
+      }
+    }
 
     androidMain {
       resources.srcDir("res")
@@ -142,6 +151,7 @@ kotlin {
         implementation(libs.androidx.test.core)
         implementation(libs.androidx.test.ext.junit)
         implementation(libs.androidx.compose.ui.test.junit4)
+        implementation(libs.androidx.compose.ui.test.manifest)
         implementation(libs.androidx.test.core)
         /* implementation(libs.androidx.test.espresso.contrib) {
           // build fails with error "Duplicate class found" (org.checkerframework.checker.*)

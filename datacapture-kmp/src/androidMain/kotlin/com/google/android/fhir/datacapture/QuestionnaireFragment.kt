@@ -34,7 +34,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemComposeViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewFactory
 import com.google.fhir.model.r4.Questionnaire
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -52,9 +52,9 @@ class QuestionnaireFragment : Fragment() {
 
   /**
    * Provides a [QuestionnaireItemViewHolderFactoryMatcher]s which are used to evaluate whether a
-   * custom [QuestionnaireItemComposeViewHolderFactory] should be used to render a given
-   * questionnaire item. The provider may be provided by the application developer via
-   * [DataCaptureConfig], otherwise default no-op implementation is used.
+   * custom [QuestionnaireItemViewFactory] should be used to render a given questionnaire item. The
+   * provider may be provided by the application developer via [DataCaptureConfig], otherwise
+   * default no-op implementation is used.
    */
   @VisibleForTesting
   val questionnaireItemViewHolderFactoryMatchersProvider:

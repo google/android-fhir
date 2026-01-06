@@ -26,13 +26,13 @@ import com.google.fhir.model.r4.QuestionnaireResponse
 import com.google.fhir.model.r4.String as FhirString
 
 /**
- * Implementation of [EditTextViewHolderDelegate] used in [EditTextSingleLineViewHolderFactory] and
- * [EditTextMultiLineViewHolderFactory].
+ * Implementation of [EditTextViewFactoryDelegate] used in [EditTextSingleLineViewFactory] and
+ * [EditTextMultiLineViewFactory].
  *
  * Any `ViewHolder` containing a `EditText` view that collects text data should use this class.
  */
 internal fun createEditTextStringViewHolderDelegate(multiLine: Boolean = false) =
-  EditTextViewHolderDelegate(
+  EditTextViewFactoryDelegate(
     KeyboardOptions(
       keyboardType = KeyboardType.Text,
       capitalization = KeyboardCapitalization.Sentences,

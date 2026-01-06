@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.datacapture
 
-import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemComposeViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewFactory
 import com.google.fhir.model.r4.Questionnaire
 
 /**
@@ -28,8 +28,8 @@ import com.google.fhir.model.r4.Questionnaire
  * for more information.
  */
 data class QuestionnaireItemViewHolderFactoryMatcher(
-  /** The custom [QuestionnaireItemComposeViewHolderFactory] to use. */
-  val factory: QuestionnaireItemComposeViewHolderFactory,
+  /** The custom [QuestionnaireItemViewFactory] to use. */
+  val factory: QuestionnaireItemViewFactory,
   /**
    * A predicate function which, given a [Questionnaire.Item], returns true if the factory should
    * apply to that item.

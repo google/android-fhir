@@ -82,6 +82,12 @@
     <string
         name="mime_type_wrong_media_format_validation_error_msg"
     >Error: Wrong media format</string>
+    <string
+        name="media_not_saved_validation_error_msg"
+    >Error: Media not saved</string>
+    <string
+        name="camera_permission_denied_error_msg"
+    >Error: Camera permission not granted</string>
     <string name="uploaded">Uploaded</string>
     <string name="image_uploaded">Image uploaded</string>
     <string name="file_uploaded">File uploaded</string>

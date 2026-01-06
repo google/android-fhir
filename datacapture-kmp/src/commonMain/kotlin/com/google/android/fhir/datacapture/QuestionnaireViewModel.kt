@@ -967,12 +967,12 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     //      }
 
     // Set question text dynamically from CQL expression
-    //        questionnaireItem.textElement.cqfExpression?.let { expression ->
-    //          expressionEvaluator
-    //            .evaluateExpressionValue(questionnaireItem, questionnaireResponseItem, expression)
-    //            ?.va()
-    //            ?.let { questionnaireResponseItem.text = it }
-    //        }
+    //    questionnaireItem.textElement.cqfExpression?.let { expression ->
+    //      expressionEvaluator
+    //        .evaluateExpressionValue(questionnaireItem, questionnaireResponseItem, expression)
+    //        ?.primitiveValue()
+    //        ?.let { questionnaireResponseItem.text = it }
+    //    }
 
     //    val (enabledQuestionnaireAnswerOptions, disabledQuestionnaireResponseAnswers) =
     //      answerOptionsEvaluator.evaluate(
