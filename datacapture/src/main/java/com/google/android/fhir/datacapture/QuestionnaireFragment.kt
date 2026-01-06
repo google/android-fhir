@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
 import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.views.NavigationViewHolder
+import com.google.android.fhir.datacapture.views.compose.PageBottomNavigationView
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.launch
@@ -106,7 +106,7 @@ class QuestionnaireFragment : Fragment() {
     // This container frame floats at the bottom of the view to make navigation controls visible at
     // all times when the user scrolls. Use
     // [QuestionnaireFragment.Builder.setShowNavigationInDefaultLongScroll] to disable this.
-    val bottomNavContainerFrame = view.findViewById<View>(R.id.bottom_nav_container_frame)
+    val bottomNavContainerFrame = view.findViewById<ComposeView>(R.id.bottom_nav_container_frame)
 
     viewModel.setOnCancelButtonClickListener {
       QuestionnaireCancelDialogFragment()
@@ -159,7 +159,9 @@ class QuestionnaireFragment : Fragment() {
 
               questionnaireReviewComposeView.visibility = View.VISIBLE
               questionnaireReviewComposeView.setContent {
-                Mdc3Theme { QuestionnaireReviewList(state.items) }
+                Mdc3Theme {
+                  QuestionnaireReviewList(state.items.filterIsInstance<ReviewAdapterItem>())
+                }
               }
               questionnaireEditComposeView.visibility = View.GONE
 
@@ -175,8 +177,9 @@ class QuestionnaireFragment : Fragment() {
               // Set bottom navigation
               if (state.bottomNavItem != null) {
                 bottomNavContainerFrame.visibility = View.VISIBLE
-                NavigationViewHolder(bottomNavContainerFrame)
-                  .bind(state.bottomNavItem.questionnaireNavigationUIState)
+                bottomNavContainerFrame.setContent {
+                  PageBottomNavigationView(state.bottomNavItem.questionnaireNavigationUIState)
+                }
               } else {
                 bottomNavContainerFrame.visibility = View.GONE
               }
@@ -212,8 +215,9 @@ class QuestionnaireFragment : Fragment() {
               // Set bottom navigation
               if (state.bottomNavItem != null) {
                 bottomNavContainerFrame.visibility = View.VISIBLE
-                NavigationViewHolder(bottomNavContainerFrame)
-                  .bind(state.bottomNavItem.questionnaireNavigationUIState)
+                bottomNavContainerFrame.setContent {
+                  PageBottomNavigationView(state.bottomNavItem.questionnaireNavigationUIState)
+                }
               } else {
                 bottomNavContainerFrame.visibility = View.GONE
               }

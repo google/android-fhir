@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 Google LLC
+ * Copyright 2024-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,11 +31,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.ViewCompat
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.QUESTIONNAIRE_EDIT_LIST
 import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFactory
-import com.google.android.fhir.datacapture.extensions.inflate
 import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
-import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.PageBottomNavigationView
 import com.google.android.fhir.datacapture.views.compose.RepeatedGroupAddItem
 import com.google.android.fhir.datacapture.views.compose.RepeatedGroupHeaderItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
@@ -112,13 +111,16 @@ internal fun QuestionnaireEditList(
       contentType = { it::class.simpleName },
     ) { adapterItem: QuestionnaireAdapterItem ->
       when (adapterItem) {
+        is QuestionnaireAdapterItem.Navigation -> {
+          PageBottomNavigationView(adapterItem.questionnaireNavigationUIState)
+        }
         is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
           RepeatedGroupAddItem(adapterItem.item)
         }
         is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
           RepeatedGroupHeaderItem(adapterItem)
         }
-        else -> {
+        is QuestionnaireAdapterItem.Question -> {
           AndroidView(
             factory = { context ->
               LinearLayout(context).apply {
@@ -130,50 +132,20 @@ internal fun QuestionnaireEditList(
             update = { view ->
               val existingViewHolder = view.getTag(R.id.question_view_holder)
 
-              val createViews =
-                when {
-                  existingViewHolder == null -> true
-                  adapterItem is QuestionnaireAdapterItem.Question &&
-                    existingViewHolder !is QuestionnaireItemViewHolder -> true
-                  adapterItem is QuestionnaireAdapterItem.Navigation &&
-                    existingViewHolder !is NavigationViewHolder -> true
-                  else -> false
-                }
-
-              if (createViews) {
+              if (existingViewHolder == null) {
                 view.removeAllViews()
-                when {
-                  adapterItem is QuestionnaireAdapterItem.Question -> {
-                    val viewHolder =
-                      getQuestionnaireItemViewHolder(
-                        parent = view,
-                        questionnaireViewItem = adapterItem.item,
-                        questionnaireItemViewHolderMatchers = questionnaireItemViewHolderMatchers,
-                      )
-                    view.setTag(R.id.question_view_holder, viewHolder)
-                    view.addView(viewHolder.itemView)
-                    viewHolder.bind(adapterItem.item)
-                  }
-                  adapterItem is QuestionnaireAdapterItem.Navigation -> {
-                    val viewHolder =
-                      NavigationViewHolder(view.inflate(R.layout.pagination_navigation_view))
-                    view.setTag(R.id.question_view_holder, viewHolder)
-                    view.addView(viewHolder.itemView)
-                    viewHolder.bind(adapterItem.questionnaireNavigationUIState)
-                  }
-                }
+                val viewHolder =
+                  getQuestionnaireItemViewHolder(
+                    parent = view,
+                    questionnaireViewItem = adapterItem.item,
+                    questionnaireItemViewHolderMatchers = questionnaireItemViewHolderMatchers,
+                  )
+                view.setTag(R.id.question_view_holder, viewHolder)
+                view.addView(viewHolder.itemView)
+                viewHolder.bind(adapterItem.item)
               } else {
                 // Update existing view holder
-                when {
-                  adapterItem is QuestionnaireAdapterItem.Question -> {
-                    (existingViewHolder as QuestionnaireItemViewHolder).bind(adapterItem.item)
-                  }
-                  adapterItem is QuestionnaireAdapterItem.Navigation -> {
-                    (existingViewHolder as NavigationViewHolder).bind(
-                      adapterItem.questionnaireNavigationUIState,
-                    )
-                  }
-                }
+                (existingViewHolder as QuestionnaireItemViewHolder).bind(adapterItem.item)
               }
             },
             onReset = { view -> view.setTag(R.id.question_view_holder, null) },
@@ -185,7 +157,7 @@ internal fun QuestionnaireEditList(
 }
 
 @Composable
-internal fun QuestionnaireReviewList(items: List<QuestionnaireAdapterItem>) {
+internal fun QuestionnaireReviewList(items: List<ReviewAdapterItem>) {
   LazyColumn {
     items(
       items = items,
@@ -193,39 +165,29 @@ internal fun QuestionnaireReviewList(items: List<QuestionnaireAdapterItem>) {
         when (item) {
           is QuestionnaireAdapterItem.Question -> item.id
               ?: throw IllegalStateException("Missing id for the Question: $item")
-          is QuestionnaireAdapterItem.RepeatedGroupHeader -> item.id
           is QuestionnaireAdapterItem.Navigation -> "navigation"
-          is QuestionnaireAdapterItem.RepeatedGroupAddButton -> item.id
-              ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
         }
       },
-    ) { item: QuestionnaireAdapterItem ->
-      AndroidView(
-        factory = { context ->
-          LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            when (item) {
-              is QuestionnaireAdapterItem.Question -> {
-                val viewHolder = ReviewViewHolderFactory.create(this)
-                viewHolder.bind(item.item)
-                addView(viewHolder.itemView)
-              }
-              is QuestionnaireAdapterItem.Navigation -> {
-                val viewHolder = NavigationViewHolder(inflate(R.layout.pagination_navigation_view))
-                viewHolder.bind(item.questionnaireNavigationUIState)
-                addView(viewHolder.itemView)
-              }
-              is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-                TODO("Not implemented yet")
-              }
-              is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
-                TODO("Not implemented yet")
+    ) { item ->
+      if (item is QuestionnaireAdapterItem.Navigation) {
+        PageBottomNavigationView(item.questionnaireNavigationUIState)
+      } else {
+        AndroidView(
+          factory = { context ->
+            LinearLayout(context).apply {
+              orientation = LinearLayout.VERTICAL
+              when {
+                item is QuestionnaireAdapterItem.Question -> {
+                  val viewHolder = ReviewViewHolderFactory.create(this)
+                  viewHolder.bind(item.item)
+                  addView(viewHolder.itemView)
+                }
               }
             }
-          }
-        },
-        modifier = Modifier.fillMaxWidth(),
-      )
+          },
+          modifier = Modifier.fillMaxWidth(),
+        )
+      }
     }
   }
 }
@@ -241,7 +203,11 @@ private fun getQuestionnaireItemViewHolder(
     questionnaireItemViewHolderMatchers
       .find { it.matches(questionnaireViewItem.questionnaireItem) }
       ?.factory
-      ?: getQuestionnaireItemViewHolderFactory(getItemViewTypeForQuestion(questionnaireViewItem))
+      ?: getQuestionnaireItemViewHolderFactory(
+        getItemViewTypeForQuestion(
+          questionnaireViewItem,
+        ),
+      )
   return questionnaireViewHolderFactory.create(parent)
 }
 
@@ -295,9 +261,15 @@ private fun getItemViewTypeForQuestion(
     Questionnaire.QuestionnaireItemType.DATE -> QuestionnaireViewHolderType.DATE_PICKER
     Questionnaire.QuestionnaireItemType.TIME -> QuestionnaireViewHolderType.TIME_PICKER
     Questionnaire.QuestionnaireItemType.DATETIME -> QuestionnaireViewHolderType.DATE_TIME_PICKER
-    Questionnaire.QuestionnaireItemType.STRING -> getStringViewHolderType(questionnaireViewItem)
+    Questionnaire.QuestionnaireItemType.STRING ->
+      getStringViewHolderType(
+        questionnaireViewItem,
+      )
     Questionnaire.QuestionnaireItemType.TEXT -> QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE
-    Questionnaire.QuestionnaireItemType.INTEGER -> getIntegerViewHolderType(questionnaireViewItem)
+    Questionnaire.QuestionnaireItemType.INTEGER ->
+      getIntegerViewHolderType(
+        questionnaireViewItem,
+      )
     Questionnaire.QuestionnaireItemType.DECIMAL -> QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL
     Questionnaire.QuestionnaireItemType.CHOICE,
     Questionnaire.QuestionnaireItemType.REFERENCE, -> getChoiceViewHolderType(questionnaireViewItem)
