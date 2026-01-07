@@ -24,8 +24,11 @@ import com.ionspin.kotlin.bignum.integer.BigInteger
  * Compares a QuestionnaireResponse answer value with an EnableWhen answer value. Handles the sealed
  * interfaces used in Kotlin FHIR models.
  */
+// TODO handle when the other type is Questionnaire.Item.EnableWhen.Answer and when it's just raw
+// primitive value represented as kotlin 'Any'. We should not throw errors when type is not
+// Questionnaire.Item.EnableWhen.Answer.
 infix fun QuestionnaireResponse.Item.Answer.Value?.equalsFhirValue(
-  other: Questionnaire.Item.EnableWhen.Answer?,
+  other: Any?,
 ): Boolean {
   return when (this) {
     is QuestionnaireResponse.Item.Answer.Value.Boolean ->
@@ -61,8 +64,11 @@ infix fun QuestionnaireResponse.Item.Answer.Value?.equalsFhirValue(
  * Compares a QuestionnaireResponse answer value with an EnableWhen answer value for ordering.
  * Returns negative if this < other, 0 if equal, positive if this > other.
  */
+// TODO handle when the other type is Questionnaire.Item.EnableWhen.Answer and when it's just raw
+// primitive value represented as kotlin 'Any'. We should not throw errors when type is not
+// Questionnaire.Item.EnableWhen.Answer.
 infix fun QuestionnaireResponse.Item.Answer.Value?.compareFhirValue(
-  other: Questionnaire.Item.EnableWhen.Answer?,
+  other: Any?,
 ): Int {
   return when (this) {
     is QuestionnaireResponse.Item.Answer.Value.Decimal -> {

@@ -53,7 +53,10 @@ import com.google.android.fhir.datacapture.extensions.validateLaunchContextExten
 import com.google.android.fhir.datacapture.extensions.zipByLinkId
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.convertToString
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -460,9 +463,9 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
       xFhirQueryResolver,
       externalValueSetResolver,
     )
-  //
-  //    private val questionnaireResponseItemValidator: QuestionnaireResponseItemValidator =
-  //      QuestionnaireResponseItemValidator(expressionEvaluator)
+
+  private val questionnaireResponseItemValidator: QuestionnaireResponseItemValidator =
+    QuestionnaireResponseItemValidator(expressionEvaluator)
 
   /**
    * Adds empty [QuestionnaireResponse.Item]s to `responseItems` so that each [Questionnaire.Item]
@@ -564,20 +567,19 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
    * the UI update to show errors in case there are any validation errors.
    */
   internal suspend fun validateQuestionnaireAndUpdateUI(): Map<String, List<ValidationResult>> =
-    emptyMap()
-  //    QuestionnaireResponseValidator.validateQuestionnaireResponse(
-  //        questionnaire,
-  //        questionnaireResponse,
-  //        questionnaireItemParentMap,
-  //        questionnaireLaunchContextMap,
-  //        xFhirQueryResolver,
-  //      )
-  //      .also { result ->
-  //        if (result.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {
-  //          // Update UI of current page if necessary
-  //          validateCurrentPageItems {}
-  //        }
-  //      }
+    QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse.value,
+        questionnaireItemParentMap,
+        questionnaireLaunchContextMap,
+        xFhirQueryResolver,
+      )
+      .also { result ->
+        if (result.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {
+          // Update UI of current page if necessary
+          validateCurrentPageItems {}
+        }
+      }
 
   internal fun goToPreviousPage() {
     when (entryMode) {
@@ -1004,18 +1006,18 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     restoreFromDisabledQuestionnaireItemAnswersCache(questionnaireResponseItem)
 
     // Determine the validation result, which will be displayed on the item itself
-    //    val validationResult =
-    //      if (
-    //        modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
-    //          isInReviewModeFlow.value
-    //      ) {
-    //        questionnaireResponseItemValidator.validate(
-    //          questionnaireItem,
-    //          questionnaireResponseItem,
-    //        )
-    //      } else {
-    //        NotValidated
-    //      }
+    val validationResult =
+      if (
+        modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
+          isInReviewModeFlow.value
+      ) {
+        questionnaireResponseItemValidator.validate(
+          questionnaireItem,
+          questionnaireResponseItem,
+        )
+      } else {
+        NotValidated
+      }
 
     // Set question text dynamically from CQL expression
     questionnaireItem.text?.cqfExpression?.let { expression ->
@@ -1048,7 +1050,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
             QuestionnaireViewItem(
               questionnaireItem,
               questionnaireResponseItem,
-              validationResult = NotValidated,
+              validationResult = validationResult,
               answersChangedCallback = answersChangedCallback,
               enabledAnswerOptions = enabledQuestionnaireAnswerOptions,
               minAnswerValue =
