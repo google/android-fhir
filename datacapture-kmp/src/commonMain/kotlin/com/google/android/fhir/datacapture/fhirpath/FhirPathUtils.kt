@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ fun convertToBoolean(result: List<Any>): Boolean {
   return result.isNotEmpty()
 }
 
-internal fun convertResultToString(results: List<Any>): String {
+internal fun convertToString(results: List<Any>): String {
   return when {
     results.isEmpty() -> ""
     results.size == 1 -> convertSingleResultToString(results.first())
@@ -58,18 +58,24 @@ internal fun extractResourceTypeFromPath(fhirPath: String): String? {
 }
 
 internal fun evaluateFhirPathToString(
-  fhirPath: String,
+  expression: String,
   resource: Resource?,
 ): String {
   return try {
     if (resource == null) {
       ""
     } else {
-      val results = evaluateFhirPath(fhirPath, resource).toList()
-      convertResultToString(results)
+      val results = evaluateFhirPath(expression, resource).toList()
+      convertToString(results)
     }
   } catch (throwable: Throwable) {
-    Logger.e("Error evaluating fhirPath expression $fhirPath to string", throwable)
+    Logger.e("Error evaluating fhirPath expression $expression to string", throwable)
     ""
   }
 }
+
+/**
+ * Evaluates the expressions over list of resources [Resource] and joins to space separated string
+ */
+internal fun evaluateToDisplay(expressions: List<String>, data: Resource) =
+  expressions.joinToString(" ") { evaluateFhirPathToString(it, data) }

@@ -16,12 +16,7 @@
 
 package com.google.android.fhir.datacapture.extensions
 
-import com.google.fhir.model.r4.Expression
+import com.google.fhir.model.r4.QuestionnaireResponse
 
-internal val Expression.isXFhirQuery: Boolean
-  get() =
-    Expression.ExpressionLanguage.Application_X_Fhir_Query.getCode() ==
-      this.language.value?.getCode()
-
-internal val Expression.isFhirPath: Boolean
-  get() = Expression.ExpressionLanguage.Text_Fhirpath.getCode() == this.language.value?.getCode()
+internal fun List<QuestionnaireResponse.Item.Answer>.hasDifferentAnswerSet(answers: List<Any>) =
+  this.size != answers.size || this.map { it.value }.zip(answers).any { (v1, v2) -> v1 != v2 }

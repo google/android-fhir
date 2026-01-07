@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,24 +143,21 @@ internal class ExpressionEvaluator(
    *
    * %resource = [QuestionnaireResponse] %context = [QuestionnaireResponse.Item]
    */
-  suspend fun evaluateExpression(expression: Expression): List<Any> {
+  fun evaluateExpression(expression: Expression?): List<Any> {
+    if (expression == null) return emptyList()
     return evaluateFhirPath(expression.expression?.value ?: "", questionnaireResponse) as List<Any>
   }
 
   /**
-   * Returns single [Any] evaluation value result of an expression, including cqf-expression and
+   * Returns a list of [Any] evaluation value result of an expression, including cqf-expression and
    * cqf-calculatedValue expressions
    */
-  suspend fun evaluateExpressionValue(
-    questionnaireItem: Questionnaire.Item,
-    questionnaireResponseItem: QuestionnaireResponse.Item?,
-    expression: Expression,
-  ): Any? {
+  fun evaluateExpressionValue(expression: Expression): List<Any>? {
     if (!expression.isFhirPath) {
       throw UnsupportedOperationException("${expression.language} not supported yet")
     }
     return try {
-      evaluateExpression(expression).singleOrNull()
+      evaluateExpression(expression)
     } catch (e: Exception) {
       Logger.w("Could not evaluate expression ${expression.expression} with FHIRPathEngine", e)
       null
@@ -367,7 +364,7 @@ internal class ExpressionEvaluator(
         val resourceType = extractResourceTypeFromPath(fhirPath)
         val evaluatedResult =
           evaluateFhirPathToString(
-            fhirPath = fhirPath,
+            expression = fhirPath,
             resource = launchContextMap[resourceType],
           )
 

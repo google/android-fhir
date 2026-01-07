@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,21 +23,28 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.expressions.EnabledAnswerOptionsEvaluator
 import com.google.android.fhir.datacapture.extensions.EXTENSION_LAST_LAUNCHED_TIMESTAMP
 import com.google.android.fhir.datacapture.extensions.EntryMode
+import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
+import com.google.android.fhir.datacapture.extensions.FhirR4String
 import com.google.android.fhir.datacapture.extensions.allItems
+import com.google.android.fhir.datacapture.extensions.calculatedExpression
 import com.google.android.fhir.datacapture.extensions.copyNestedItemsToChildlessAnswers
+import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
+import com.google.android.fhir.datacapture.extensions.forEachItemPair
+import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.isRepeatedGroup
 import com.google.android.fhir.datacapture.extensions.localizedTextAnnotatedString
-import com.google.android.fhir.datacapture.extensions.maxValue
-import com.google.android.fhir.datacapture.extensions.minValue
+import com.google.android.fhir.datacapture.extensions.maxValueCqfCalculatedValueExpression
+import com.google.android.fhir.datacapture.extensions.minValueCqfCalculatedValueExpression
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
@@ -45,21 +52,31 @@ import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
 import com.google.android.fhir.datacapture.extensions.zipByLinkId
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
+import com.google.android.fhir.datacapture.fhirpath.convertToString
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.fhir.model.r4.Attachment
 import com.google.fhir.model.r4.Canonical
+import com.google.fhir.model.r4.Coding
+import com.google.fhir.model.r4.Date
 import com.google.fhir.model.r4.DateTime
+import com.google.fhir.model.r4.Decimal
 import com.google.fhir.model.r4.Enumeration
 import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.FhirDateTime
 import com.google.fhir.model.r4.FhirR4Json
+import com.google.fhir.model.r4.Integer
+import com.google.fhir.model.r4.Quantity
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
+import com.google.fhir.model.r4.Reference
 import com.google.fhir.model.r4.Resource
+import com.google.fhir.model.r4.Time
+import com.google.fhir.model.r4.Uri
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -212,6 +229,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
    * user, etc. is "in context" at the time the questionnaire response is being completed:
    * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
    */
+  @Suppress("UNCHECKED_CAST")
   private val questionnaireLaunchContextMap: Map<String, Resource>? =
     if (state.contains(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP)) {
 
@@ -410,7 +428,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
 
-      //      updateAnswerWithAffectedCalculatedExpression(questionnaireItem)
+      updateAnswerWithAffectedCalculatedExpression(questionnaireItem)
 
       modificationCount.update { it + 1 }
     }
@@ -432,15 +450,16 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
       questionnaireLaunchContextMap,
       xFhirQueryResolver,
     )
-  //    private val answerOptionsEvaluator: EnabledAnswerOptionsEvaluator =
-  //      EnabledAnswerOptionsEvaluator(
-  //        questionnaire,
-  //        questionnaireResponse,
-  //        questionnaireItemParentMap,
-  //        questionnaireLaunchContextMap,
-  //        xFhirQueryResolver,
-  //        externalValueSetResolver,
-  //      )
+
+  private val answerOptionsEvaluator: EnabledAnswerOptionsEvaluator =
+    EnabledAnswerOptionsEvaluator(
+      questionnaire,
+      questionnaireResponse.value,
+      questionnaireItemParentMap,
+      questionnaireLaunchContextMap,
+      xFhirQueryResolver,
+      externalValueSetResolver,
+    )
   //
   //    private val questionnaireResponseItemValidator: QuestionnaireResponseItemValidator =
   //      QuestionnaireResponseItemValidator(expressionEvaluator)
@@ -574,8 +593,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
         currentPageIndexFlow.value = previousPageIndex
       }
       else -> {
-        // TODO log with Nappier/Kermit
-        //        Logger.w("Previous questions and submitted answers cannot be viewed or edited.")
+        Logger.w("Previous questions and submitted answers cannot be viewed or edited.")
       }
     }
   }
@@ -644,7 +662,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
       .withIndex()
       .onEach {
         if (it.index == 0) {
-          //          initializeCalculatedExpressions()
+          initializeCalculatedExpressions()
           modificationCount.update { count -> count + 1 }
         }
       }
@@ -664,9 +682,9 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
    * Travers all [com.google.android.fhir.datacapture.extensions.calculatedExpression] within a
    * [Questionnaire] and evaluate them.
    */
-  /* private suspend fun initializeCalculatedExpressions() {
+  private suspend fun initializeCalculatedExpressions() {
     expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
-    questionnaire.forEachItemPair(questionnaireResponse) {
+    questionnaire.forEachItemPair(questionnaireResponse.value) {
       questionnaireItem,
       questionnaireResponseItem,
       ->
@@ -674,7 +692,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
         updateAnswerWithCalculatedExpression(questionnaireItem, questionnaireResponseItem)
       }
     }
-  }*/
+  }
 
   /**
    * Updates all items that has
@@ -689,7 +707,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
    * @param questionnaireItem The questionnaire item referenced by other items through
    *   [com.google.android.fhir.datacapture.extensions.calculatedExpression].
    */
-  /*private suspend fun updateAnswerWithAffectedCalculatedExpression(
+  private suspend fun updateAnswerWithAffectedCalculatedExpression(
     questionnaireItem: Questionnaire.Item,
   ) {
     expressionEvaluator
@@ -698,7 +716,9 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
       )
       .forEach { (questionnaireItem, calculatedAnswers) ->
         // update all response item with updated values
-        questionnaireResponse.allItems
+        questionnaireResponse.value
+          .toBuilder()
+          .allItems
           // Item answer should not be modified and touched by user;
           // https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-calculatedExpression.html
           .filter {
@@ -708,15 +728,32 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
           .forEach { questionnaireResponseItem ->
             // update and notify only if new answer has changed to prevent any event loop
             if (questionnaireResponseItem.answer.hasDifferentAnswerSet(calculatedAnswers)) {
-              questionnaireResponseItem.answer =
-                calculatedAnswers.map {
-                  val value = it.asExpectedType(questionnaireItem.type)
-                  QuestionnaireResponse.Item.Answer().setValue(value)
-                }
+              questionnaireResponseItem.toBuilder().apply {
+                answer =
+                  calculatedAnswers.mapNotNullTo(mutableListOf()) {
+                    when (it) {
+                      is FhirR4Boolean -> QuestionnaireResponse.Item.Answer.Value.Boolean(it)
+                      is Decimal -> QuestionnaireResponse.Item.Answer.Value.Decimal(it)
+                      is Integer -> QuestionnaireResponse.Item.Answer.Value.Integer(it)
+                      is FhirR4String -> QuestionnaireResponse.Item.Answer.Value.String(it)
+                      is Coding -> QuestionnaireResponse.Item.Answer.Value.Coding(it)
+                      is Reference -> QuestionnaireResponse.Item.Answer.Value.Reference(it)
+                      is Date -> QuestionnaireResponse.Item.Answer.Value.Date(it)
+                      is DateTime -> QuestionnaireResponse.Item.Answer.Value.DateTime(it)
+                      is Time -> QuestionnaireResponse.Item.Answer.Value.Time(it)
+                      is Uri -> QuestionnaireResponse.Item.Answer.Value.Uri(it)
+                      is Attachment -> QuestionnaireResponse.Item.Answer.Value.Attachment(it)
+                      is Quantity -> QuestionnaireResponse.Item.Answer.Value.Quantity(it)
+                      else -> null
+                    }?.let { item ->
+                      QuestionnaireResponse.Item.Answer.Builder().apply { value = item }
+                    }
+                  }
+              }
             }
           }
       }
-  }*/
+  }
 
   /**
    * Updates the answer(s) in the questionnaire response item with the evaluation result of the
@@ -727,23 +764,37 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
    *
    * Do nothing, otherwise.
    */
-  /*private suspend fun updateAnswerWithCalculatedExpression(
+  private suspend fun updateAnswerWithCalculatedExpression(
     questionnaireItem: Questionnaire.Item,
     questionnaireResponseItem: QuestionnaireResponse.Item,
   ) {
     if (questionnaireItem.calculatedExpression == null) return
     if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem)) return
-    val answers =
-      expressionEvaluator.evaluateCalculatedExpression(
-        questionnaireItem,
-        questionnaireResponseItem,
-      )
+    val answers = expressionEvaluator.evaluateCalculatedExpression(questionnaireItem)
     if (answers.isEmpty()) return
     if (questionnaireResponseItem.answer.hasDifferentAnswerSet(answers)) {
-      questionnaireResponseItem.answer =
-        answers.map { QuestionnaireResponse.Item.Answer().apply { value = it } }
+      questionnaireResponseItem.toBuilder().apply {
+        answer =
+          answers.mapNotNullTo(mutableListOf()) {
+            when (it) {
+              is FhirR4Boolean -> QuestionnaireResponse.Item.Answer.Value.Boolean(it)
+              is Decimal -> QuestionnaireResponse.Item.Answer.Value.Decimal(it)
+              is Integer -> QuestionnaireResponse.Item.Answer.Value.Integer(it)
+              is FhirR4String -> QuestionnaireResponse.Item.Answer.Value.String(it)
+              is Coding -> QuestionnaireResponse.Item.Answer.Value.Coding(it)
+              is Reference -> QuestionnaireResponse.Item.Answer.Value.Reference(it)
+              is Date -> QuestionnaireResponse.Item.Answer.Value.Date(it)
+              is DateTime -> QuestionnaireResponse.Item.Answer.Value.DateTime(it)
+              is Time -> QuestionnaireResponse.Item.Answer.Value.Time(it)
+              is Uri -> QuestionnaireResponse.Item.Answer.Value.Uri(it)
+              is Attachment -> QuestionnaireResponse.Item.Answer.Value.Attachment(it)
+              is Quantity -> QuestionnaireResponse.Item.Answer.Value.Quantity(it)
+              else -> null
+            }?.let { item -> QuestionnaireResponse.Item.Answer.Builder().apply { value = item } }
+          }
+      }
     }
-  }*/
+  }
 
   private fun removeDisabledAnswers(
     questionnaireItem: Questionnaire.Item,
@@ -950,7 +1001,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
       return emptyList()
     }
 
-    //    restoreFromDisabledQuestionnaireItemAnswersCache(questionnaireResponseItem)
+    restoreFromDisabledQuestionnaireItemAnswersCache(questionnaireResponseItem)
 
     // Determine the validation result, which will be displayed on the item itself
     //    val validationResult =
@@ -967,25 +1018,24 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     //      }
 
     // Set question text dynamically from CQL expression
-    //    questionnaireItem.textElement.cqfExpression?.let { expression ->
-    //      expressionEvaluator
-    //        .evaluateExpressionValue(questionnaireItem, questionnaireResponseItem, expression)
-    //        ?.primitiveValue()
-    //        ?.let { questionnaireResponseItem.text = it }
-    //    }
+    questionnaireItem.text?.cqfExpression?.let { expression ->
+      val result = expressionEvaluator.evaluateExpressionValue(expression) ?: emptyList()
 
-    //    val (enabledQuestionnaireAnswerOptions, disabledQuestionnaireResponseAnswers) =
-    //      answerOptionsEvaluator.evaluate(
-    //        questionnaireItem,
-    //        questionnaireResponseItem,
-    //      )
-    //    if (disabledQuestionnaireResponseAnswers.isNotEmpty()) {
-    //      removeDisabledAnswers(
-    //        questionnaireItem,
-    //        questionnaireResponseItem,
-    //        disabledQuestionnaireResponseAnswers,
-    //      )
-    //    }
+      questionnaireResponseItem.text?.toBuilder()?.apply { this.value = convertToString(result) }
+    }
+
+    val (enabledQuestionnaireAnswerOptions, disabledQuestionnaireResponseAnswers) =
+      answerOptionsEvaluator.evaluate(
+        questionnaireItem,
+        questionnaireResponseItem,
+      )
+    if (disabledQuestionnaireResponseAnswers.isNotEmpty()) {
+      removeDisabledAnswers(
+        questionnaireItem,
+        questionnaireResponseItem,
+        disabledQuestionnaireResponseAnswers,
+      )
+    }
 
     val items = buildList {
       val itemHelpCard = questionnaireItem.item.firstOrNull { it.isHelpCode }
@@ -1000,25 +1050,15 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = answersChangedCallback,
-              enabledAnswerOptions = emptyList(),
-              minAnswerValue = questionnaireItem.minValue,
-              //                questionnaireItem.minValueCqfCalculatedValueExpression
-              //                  ?.let {
-              //                  expressionEvaluator.evaluateExpressionValue(
-              //                    questionnaireItem,
-              //                    questionnaireResponseItem,
-              //                    it,
-              //                  )
-              //                }
-
-              maxAnswerValue = questionnaireItem.maxValue,
-              //                questionnaireItem.maxValueCqfCalculatedValueExpression?.let {
-              //                  expressionEvaluator.evaluateExpressionValue(
-              //                    questionnaireItem,
-              //                    questionnaireResponseItem,
-              //                    it,
-              //                  )
-              //                }
+              enabledAnswerOptions = enabledQuestionnaireAnswerOptions,
+              minAnswerValue =
+                questionnaireItem.minValueCqfCalculatedValueExpression?.let {
+                  expressionEvaluator.evaluateExpressionValue(it)
+                },
+              maxAnswerValue =
+                questionnaireItem.maxValueCqfCalculatedValueExpression?.let {
+                  expressionEvaluator.evaluateExpressionValue(it)
+                },
               draftAnswer = draftAnswerMap[questionnaireResponseItem],
               enabledDisplayItems =
                 questionnaireItem.item.filter {
@@ -1132,25 +1172,30 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
   private fun cacheDisabledQuestionnaireItemAnswers(
     questionnaireResponseItem: QuestionnaireResponse.Item,
   ) {
-    //    if (questionnaireResponseItem.answer.isNotEmpty()) {
-    //      responseItemToAnswersMapForDisabledQuestionnaireItem[questionnaireResponseItem] =
-    //        questionnaireResponseItem.answer
-    //      questionnaireResponseItem.answer = listOf()
-    //    }
+    if (questionnaireResponseItem.answer.isNotEmpty()) {
+      responseItemToAnswersMapForDisabledQuestionnaireItem[questionnaireResponseItem] =
+        questionnaireResponseItem.answer
+      questionnaireResponseItem.toBuilder().apply { answer = mutableListOf() }
+    }
   }
 
   /**
    * If the questionnaire item was previously disabled, check the cache to restore previous answers.
    */
-  //  private fun restoreFromDisabledQuestionnaireItemAnswersCache(
-  //    questionnaireResponseItem: QuestionnaireResponse.Item,
-  //  ) {
-  //    if
-  // (responseItemToAnswersMapForDisabledQuestionnaireItem.contains(questionnaireResponseItem)) {
-  //      questionnaireResponseItem.answer =
-  //        responseItemToAnswersMapForDisabledQuestionnaireItem.remove(questionnaireResponseItem)
-  //    }
-  //  }
+  private fun restoreFromDisabledQuestionnaireItemAnswersCache(
+    questionnaireResponseItem: QuestionnaireResponse.Item,
+  ) {
+    if (responseItemToAnswersMapForDisabledQuestionnaireItem.contains(questionnaireResponseItem)) {
+      questionnaireResponseItem.toBuilder().apply {
+        answer =
+          responseItemToAnswersMapForDisabledQuestionnaireItem
+            .remove(questionnaireResponseItem)
+            ?.map { it.toBuilder() }
+            ?.toMutableList()
+            ?: mutableListOf()
+      }
+    }
+  }
 
   private suspend fun getEnabledResponseItems(
     questionnaireItemList: List<Questionnaire.Item>,

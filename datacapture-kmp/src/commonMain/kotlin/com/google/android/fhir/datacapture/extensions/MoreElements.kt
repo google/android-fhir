@@ -16,12 +16,12 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import com.google.fhir.model.r4.Element
 import com.google.fhir.model.r4.Expression
 
-internal val Expression.isXFhirQuery: Boolean
-  get() =
-    Expression.ExpressionLanguage.Application_X_Fhir_Query.getCode() ==
-      this.language.value?.getCode()
+internal const val EXTENSION_CQF_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/StructureDefinition/cqf-expression"
 
-internal val Expression.isFhirPath: Boolean
-  get() = Expression.ExpressionLanguage.Text_Fhirpath.getCode() == this.language.value?.getCode()
+internal val Element.cqfExpression: Expression?
+  get() =
+    this.extension.find { it.url == EXTENSION_CQF_EXPRESSION_URL }?.value?.asExpression()?.value
