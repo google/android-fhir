@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture.contrib.views.locationwidget
 import android.view.View
 import com.google.android.fhir.datacapture.extensions.itemControlCode
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
-import com.google.android.fhir.datacapture.views.GroupHeaderView
+import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemAndroidViewHolderDelegate
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemAndroidViewHolderFactory
@@ -30,7 +30,7 @@ object LocationWidgetViewHolderFactory :
   QuestionnaireItemAndroidViewHolderFactory(R.layout.location_widget_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemAndroidViewHolderDelegate {
-      private lateinit var headerView: GroupHeaderView
+      private lateinit var headerView: HeaderView
       private lateinit var locationWidgetButton: MaterialButton
 
       override lateinit var questionnaireViewItem: QuestionnaireViewItem

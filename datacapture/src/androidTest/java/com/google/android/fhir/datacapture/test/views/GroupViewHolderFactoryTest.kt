@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,35 +14,55 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.factories
+package com.google.android.fhir.datacapture.test.views
 
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.views.GroupHeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_TAG
+import com.google.android.fhir.datacapture.views.compose.HEADER_TAG
+import com.google.android.fhir.datacapture.views.factories.GroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class GroupViewHolderFactoryTest {
-  private val parent =
-    FrameLayout(
-      Robolectric.buildActivity(AppCompatActivity::class.java).create().get().apply {
-        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      },
-    )
-  private val viewHolder = GroupViewHolderFactory.create(parent)
+  @get:Rule
+  val activityScenarioRule: ActivityScenarioRule<TestActivity> =
+    ActivityScenarioRule(TestActivity::class.java)
+
+  @get:Rule val composeTestRule = createEmptyComposeRule()
+
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
+
+  @Before
+  fun setUp() {
+    activityScenarioRule.scenario.onActivity { activity ->
+      viewHolder = GroupViewHolderFactory.create(FrameLayout(activity))
+      activity.setContentView(viewHolder.itemView)
+    }
+
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+  }
 
   @Test
   fun shouldSetQuestionHeader() {
@@ -54,6 +74,8 @@ class GroupViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
+
+    composeTestRule.waitForIdle()
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Group header")
@@ -69,9 +91,9 @@ class GroupViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
-      .isEqualTo("Missing answer for required field.")
+    composeTestRule
+      .onNodeWithTag(ERROR_TEXT_TAG)
+      .assertTextEquals("Missing answer for required field.")
   }
 
   @Test
@@ -96,8 +118,7 @@ class GroupViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isEqualTo("")
+    composeTestRule.onNodeWithTag(ERROR_TEXT_TAG).assertDoesNotExist()
   }
 
   @Test
@@ -121,21 +142,12 @@ class GroupViewHolderFactoryTest {
       ),
     )
 
+    composeTestRule.waitForIdle()
+
     assertThat(
-        viewHolder.itemView
-          .findViewById<GroupHeaderView>(R.id.header)
-          .findViewById<TextView>(R.id.hint)
-          .text
-          .isNullOrEmpty(),
+        viewHolder.itemView.findViewById<TextView?>(R.id.hint),
       )
-      .isTrue()
-    assertThat(
-        viewHolder.itemView
-          .findViewById<GroupHeaderView>(R.id.header)
-          .findViewById<TextView>(R.id.hint)
-          .visibility,
-      )
-      .isEqualTo(View.GONE)
+      .isNull()
   }
 
   @Test
@@ -148,8 +160,7 @@ class GroupViewHolderFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       ),
     )
-    assertThat(viewHolder.itemView.findViewById<GroupHeaderView>(R.id.header).visibility)
-      .isEqualTo(View.VISIBLE)
+    composeTestRule.onNodeWithTag(HEADER_TAG).assertIsDisplayed()
   }
 
   @Test
@@ -163,7 +174,6 @@ class GroupViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<GroupHeaderView>(R.id.header).visibility)
-      .isEqualTo(View.GONE)
+    composeTestRule.onNodeWithTag(HEADER_TAG).assertIsNotDisplayed()
   }
 }
