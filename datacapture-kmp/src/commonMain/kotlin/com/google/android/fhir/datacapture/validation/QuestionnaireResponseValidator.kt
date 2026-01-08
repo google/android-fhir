@@ -144,9 +144,9 @@ object QuestionnaireResponseValidator {
   ): Map<String, List<ValidationResult>> {
     checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }
     when {
-      questionnaireItem.type.value == Questionnaire.QuestionnaireItemType.Display ||
-        questionnaireItem.type.value == Questionnaire.QuestionnaireItemType.Group &&
-          questionnaireItem.repeats?.value == false ->
+      questionnaireItem.type.value == Questionnaire.QuestionnaireItemType.Display -> Unit
+      (questionnaireItem.type.value == Questionnaire.QuestionnaireItemType.Group &&
+        questionnaireItem.repeats?.value == false) ->
         // Nested items under group
         // http://www.hl7.org/fhir/questionnaireresponse-definitions.html#QuestionnaireResponse.item.item
         validateQuestionnaireResponseItems(
@@ -300,55 +300,61 @@ object QuestionnaireResponseValidator {
   ) {
     if (value == null) return
     val answerType = value::class.simpleName
-    when (value) {
-      is QuestionnaireResponse.Item.Answer.Value.Attachment ->
-        require(answerType == "Attachment") {
-          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
-        }
-      is QuestionnaireResponse.Item.Answer.Value.Boolean ->
+    when (questionnaireItemType) {
+      Questionnaire.QuestionnaireItemType.Boolean ->
         require(answerType == "Boolean") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
-      is QuestionnaireResponse.Item.Answer.Value.Coding ->
-        require(answerType == "Coding" || answerType == "Code") {
-          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
-        }
-      is QuestionnaireResponse.Item.Answer.Value.Date ->
-        require(answerType == "Date") {
-          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
-        }
-      is QuestionnaireResponse.Item.Answer.Value.DateTime ->
-        require(answerType == "DateTime") {
-          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
-        }
-      is QuestionnaireResponse.Item.Answer.Value.Decimal ->
+      Questionnaire.QuestionnaireItemType.Decimal ->
         require(answerType == "Decimal") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
-      is QuestionnaireResponse.Item.Answer.Value.Integer ->
+      Questionnaire.QuestionnaireItemType.Integer ->
         require(answerType == "Integer") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
-      is QuestionnaireResponse.Item.Answer.Value.Quantity ->
-        require(answerType == "Quantity") {
+      Questionnaire.QuestionnaireItemType.Date ->
+        require(answerType == "Date") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
-      is QuestionnaireResponse.Item.Answer.Value.Reference ->
-        require(answerType == "Reference") {
+      Questionnaire.QuestionnaireItemType.DateTime ->
+        require(answerType == "DateTime") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
-      is QuestionnaireResponse.Item.Answer.Value.String ->
-        require(answerType == "String") {
-          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
-        }
-      is QuestionnaireResponse.Item.Answer.Value.Time ->
+      Questionnaire.QuestionnaireItemType.Time ->
         require(answerType == "Time") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
-      is QuestionnaireResponse.Item.Answer.Value.Uri ->
-        require(answerType == "Uri") {
+      Questionnaire.QuestionnaireItemType.String ->
+        require(answerType == "String") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
+      Questionnaire.QuestionnaireItemType.Text ->
+        require(answerType == "String") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.Url ->
+        require(answerType == "Url") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.Choice,
+      Questionnaire.QuestionnaireItemType.Open_Choice, ->
+        require(answerType == "Coding" || answerType == "String") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.Attachment ->
+        require(answerType == "Attachment") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.Reference ->
+        require(answerType == "Reference") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.Quantity ->
+        require(answerType == "Quantity") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      else -> Unit
     }
   }
 }

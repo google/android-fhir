@@ -184,10 +184,7 @@ internal class ExpressionEvaluator(
         // TODO: Pass the questionnaire response item corresponding to the
         //  questionnaire item with the calculated expression for the FHIRPath supplement
         //  `%context`.
-        val updatedAnswer =
-          evaluateExpression(
-            item.calculatedExpression!!,
-          )
+        val updatedAnswer = evaluateExpression(item.calculatedExpression!!)
         item to updatedAnswer
       }
   }
