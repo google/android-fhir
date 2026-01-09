@@ -252,14 +252,32 @@ internal class EnablementEvaluator(
 private val Questionnaire.Item.EnableWhen.predicate: (QuestionnaireResponse.Item.Answer) -> Boolean
   get() = {
     when (operator.value) {
-      Questionnaire.QuestionnaireItemOperator.EqualTo -> it.value equalsFhirValue answer
-      Questionnaire.QuestionnaireItemOperator.NotEqualTo -> !(it.value equalsFhirValue answer)
-      Questionnaire.QuestionnaireItemOperator.GreaterThan -> (it.value compareFhirValue answer) > 0
+      Questionnaire.QuestionnaireItemOperator.EqualTo ->
+        it.value equalsFhirValue answer.getActualValue()
+      Questionnaire.QuestionnaireItemOperator.NotEqualTo ->
+        !(it.value equalsFhirValue answer.getActualValue())
+      Questionnaire.QuestionnaireItemOperator.GreaterThan ->
+        (it.value compareFhirValue answer.getActualValue()) > 0
       Questionnaire.QuestionnaireItemOperator.GreaterThanOrEqualTo ->
-        (it.value compareFhirValue answer) >= 0
-      Questionnaire.QuestionnaireItemOperator.LessThan -> (it.value compareFhirValue answer) < 0
+        it.value compareFhirValue answer.getActualValue() >= 0
+      Questionnaire.QuestionnaireItemOperator.LessThan ->
+        (it.value compareFhirValue answer.getActualValue()) < 0
       Questionnaire.QuestionnaireItemOperator.LessThanOrEqualTo ->
-        (it.value compareFhirValue answer) <= 0
+        (it.value compareFhirValue answer.getActualValue()) <= 0
       else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
     }
+  }
+
+private fun Questionnaire.Item.EnableWhen.Answer.getActualValue(): Any? =
+  when (this) {
+    is Questionnaire.Item.EnableWhen.Answer.Boolean -> this.asBoolean()?.value
+    is Questionnaire.Item.EnableWhen.Answer.Coding -> this.asCoding()?.value
+    is Questionnaire.Item.EnableWhen.Answer.Date -> this.asDate()?.value
+    is Questionnaire.Item.EnableWhen.Answer.DateTime -> this.asDateTime()?.value
+    is Questionnaire.Item.EnableWhen.Answer.Decimal -> this.asDecimal()?.value
+    is Questionnaire.Item.EnableWhen.Answer.Integer -> this.asInteger()?.value
+    is Questionnaire.Item.EnableWhen.Answer.Quantity -> this.asQuantity()?.value
+    is Questionnaire.Item.EnableWhen.Answer.Reference -> this.asReference()?.value
+    is Questionnaire.Item.EnableWhen.Answer.String -> this.asString()?.value
+    is Questionnaire.Item.EnableWhen.Answer.Time -> this.asTime()?.value
   }

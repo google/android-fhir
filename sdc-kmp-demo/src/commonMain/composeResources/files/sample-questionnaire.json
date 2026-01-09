@@ -29,7 +29,7 @@
       "required": false
     },
     {
-      "linkId": "1",
+      "linkId": "quantity",
       "text": "Enter length",
       "type": "quantity",
       "extension": [
@@ -48,6 +48,13 @@
             "code": "[in_i]",
             "display": "inch"
           }
+        }
+      ],
+      "enableWhen": [
+        {
+          "question": "age",
+          "operator": "<=",
+          "answerInteger": 18
         }
       ]
     },

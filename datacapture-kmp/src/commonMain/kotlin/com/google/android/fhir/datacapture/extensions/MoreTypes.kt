@@ -51,6 +51,8 @@ typealias FhirR4String = com.google.fhir.model.r4.String
 
 typealias FhirR4Boolean = com.google.fhir.model.r4.Boolean
 
+typealias FhirR4Decimal = com.google.fhir.model.r4.Decimal
+
 typealias QuantityAnswerValue = QuestionnaireResponse.Item.Answer.Value.Quantity
 
 typealias StringAnswerValue = QuestionnaireResponse.Item.Answer.Value.String
