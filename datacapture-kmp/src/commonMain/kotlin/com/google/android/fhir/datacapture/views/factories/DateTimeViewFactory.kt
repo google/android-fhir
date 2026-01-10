@@ -34,15 +34,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.DateTimeAnswerValue
-import com.google.android.fhir.datacapture.extensions.ZONE_ID_UTC
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
-import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
-import com.google.android.fhir.datacapture.extensions.getLocalizedDatePattern
 import com.google.android.fhir.datacapture.extensions.itemMedia
-import com.google.android.fhir.datacapture.extensions.parseLocalDateOrNull
-import com.google.android.fhir.datacapture.extensions.toLocalizedString
+import com.google.android.fhir.datacapture.parseLocalDateOrNull
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.DateFieldItem
@@ -73,11 +70,12 @@ internal object DateTimeViewFactory : QuestionnaireItemViewFactory {
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
     val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
+    val localDateTimeFormatter = remember { DataCapture.getConfiguration().localDateTimeFormatter }
     val itemReadOnly =
       remember(questionnaireViewItem.questionnaireItem) {
         questionnaireViewItem.questionnaireItem.readOnly?.value ?: false
       }
-    val localDatePattern = remember { getLocalizedDatePattern() }
+    val localDatePattern = remember { localDateTimeFormatter.localDateShortFormatPattern }
     val datePatternSeparator =
       remember(localDatePattern) { getDateSeparator(localDatePattern) ?: '/' }
     val canonicalizedDatePattern =
@@ -96,23 +94,26 @@ internal object DateTimeViewFactory : QuestionnaireItemViewFactory {
         )
       }
 
-    val questionnaireItemViewItemDateTimeAnswer =
-      remember(questionnaireViewItem.answers) {
-        (questionnaireViewItem.answers.singleOrNull()?.value?.asDateTime()?.value?.value
-            as? FhirDateTime.DateTime)
-          ?.dateTime
+    var questionnaireItemViewItemAnswerLocalDateTime by
+      remember(questionnaireViewItem) {
+        mutableStateOf(
+          (questionnaireViewItem.answers.singleOrNull()?.value?.asDateTime()?.value?.value
+              as? FhirDateTime.DateTime)
+            ?.dateTime,
+        )
       }
+
     val questionnaireItemViewItemDate =
-      remember(questionnaireItemViewItemDateTimeAnswer) {
-        questionnaireItemViewItemDateTimeAnswer?.date
+      remember(questionnaireItemViewItemAnswerLocalDateTime) {
+        questionnaireItemViewItemAnswerLocalDateTime?.date
       }
     val questionnaireViewItemLocalTime =
-      remember(questionnaireItemViewItemDateTimeAnswer) {
-        questionnaireItemViewItemDateTimeAnswer?.time
+      remember(questionnaireItemViewItemAnswerLocalDateTime) {
+        questionnaireItemViewItemAnswerLocalDateTime?.time
       }
     val questionnaireItemAnswerDateInMillis =
       remember(questionnaireItemViewItemDate) {
-        questionnaireItemViewItemDate?.atStartOfDayIn(ZONE_ID_UTC)?.toEpochMilliseconds()
+        questionnaireItemViewItemDate?.atStartOfDayIn(TimeZone.UTC)?.toEpochMilliseconds()
       }
     val initialSelectedDateInMillis =
       remember(questionnaireItemAnswerDateInMillis) {
@@ -122,24 +123,24 @@ internal object DateTimeViewFactory : QuestionnaireItemViewFactory {
       remember(questionnaireViewItem.draftAnswer) { questionnaireViewItem.draftAnswer as? String }
     val dateInput =
       remember(dateInputFormat, questionnaireItemViewItemDate, draftAnswer) {
-        questionnaireItemViewItemDate?.format(dateInputFormat.pattern)?.let {
-          DateInput(it, questionnaireItemViewItemDate)
-        }
+        questionnaireItemViewItemDate
+          ?.let { localDateTimeFormatter.format(it, dateInputFormat.pattern) }
+          ?.let { DateInput(it, questionnaireItemViewItemDate) }
           ?: DateInput(display = draftAnswer ?: "", null)
       }
 
     val questionnaireViewItemLocalTimeAnswerDisplay =
       remember(questionnaireViewItemLocalTime) {
-        questionnaireViewItemLocalTime?.toLocalizedString() ?: ""
+        questionnaireViewItemLocalTime?.let { localDateTimeFormatter.localizedTimeString(it) } ?: ""
       }
     val initialTimeSelection =
       remember(questionnaireViewItemLocalTime) {
         questionnaireViewItemLocalTime
           ?: Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time
       }
-    var timeInputEnabled by
+    val timeInputEnabled =
       remember(questionnaireItemViewItemDate) {
-        mutableStateOf(!itemReadOnly && questionnaireItemViewItemDate != null)
+        !itemReadOnly && questionnaireItemViewItemDate != null
       }
 
     val selectableDates = remember { object : SelectableDates {} }
@@ -195,23 +196,24 @@ internal object DateTimeViewFactory : QuestionnaireItemViewFactory {
               ?: getRequiredOrOptionalText(questionnaireViewItem),
           isError = !dateValidationMessage.isNullOrBlank(),
           enabled = !itemReadOnly,
-          parseStringToLocalDate = { str, pattern -> parseLocalDateOrNull(str, pattern) },
+          parseStringToLocalDate = { str, pattern ->
+            localDateTimeFormatter.parseLocalDateOrNull(str, pattern)
+          },
           onDateInputEntry = {
             val (display, date) = it
-            coroutineScope.launch {
-              if (date != null) {
-                val dateTime =
-                  LocalDateTime(
-                    date,
-                    LocalTime(0, 0),
-                  )
+            if (date != null) {
+              val dateTime =
+                LocalDateTime(
+                  date,
+                  LocalTime(0, 0),
+                )
+              coroutineScope.launch {
                 setQuestionnaireItemViewItemAnswer(questionnaireViewItem, dateTime)
-              } else {
-                questionnaireViewItem.setDraftAnswer(display)
               }
+              questionnaireItemViewItemAnswerLocalDateTime = dateTime
+            } else {
+              coroutineScope.launch { questionnaireViewItem.setDraftAnswer(display) }
             }
-
-            timeInputEnabled = date != null
           },
         )
 

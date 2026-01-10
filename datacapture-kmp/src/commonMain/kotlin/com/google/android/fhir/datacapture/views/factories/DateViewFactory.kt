@@ -25,19 +25,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SelectableDates
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.DateAnswerValue
 import com.google.android.fhir.datacapture.extensions.FhirR4DateType
-import com.google.android.fhir.datacapture.extensions.ZONE_ID_UTC
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
-import com.google.android.fhir.datacapture.extensions.dateEntryFormatOrSystemDefault
-import com.google.android.fhir.datacapture.extensions.format
+import com.google.android.fhir.datacapture.extensions.entryFormat
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
 import com.google.android.fhir.datacapture.extensions.itemMedia
-import com.google.android.fhir.datacapture.extensions.parseLocalDateOrNull
 import com.google.android.fhir.datacapture.extensions.toLocalDate
+import com.google.android.fhir.datacapture.isValidDateEntryFormat
+import com.google.android.fhir.datacapture.parseLocalDateOrNull
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.DateFieldItem
@@ -53,6 +56,7 @@ import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import org.jetbrains.compose.resources.stringResource
 
@@ -62,13 +66,21 @@ internal object DateViewFactory : QuestionnaireItemViewFactory {
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
     val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
+    val localDateTimeFormatter = remember { DataCapture.getConfiguration().localDateTimeFormatter }
     val isReadOnly =
       remember(questionnaireViewItem) {
         questionnaireViewItem.questionnaireItem.readOnly?.value ?: false
       }
     val dateEntryFormat =
       remember(questionnaireViewItem) {
-        questionnaireViewItem.questionnaireItem.dateEntryFormatOrSystemDefault
+        val entryFormat = questionnaireViewItem.questionnaireItem.entryFormat
+        with(localDateTimeFormatter) {
+          if (isValidDateEntryFormat(entryFormat?.let { canonicalizeDatePattern(it) })) {
+            entryFormat!!
+          } else {
+            localDateShortFormatPattern
+          }
+        }
       }
     val datePatternSeparator =
       remember(dateEntryFormat) { getDateSeparator(dateEntryFormat) ?: '/' }
@@ -87,16 +99,18 @@ internal object DateViewFactory : QuestionnaireItemViewFactory {
           datePatternSeparator,
         )
       }
-    val questionnaireItemAnswerLocalDate =
-      remember(questionnaireViewItem.answers) {
-        (questionnaireViewItem.answers.singleOrNull()?.value?.asDate()?.value?.value
-            as? FhirDate.Date)
-          ?.date
+    var questionnaireItemAnswerLocalDate by
+      remember(questionnaireViewItem) {
+        mutableStateOf(
+          (questionnaireViewItem.answers.singleOrNull()?.value?.asDate()?.value?.value
+              as? FhirDate.Date)
+            ?.date,
+        )
       }
 
     val questionnaireItemAnswerDateInMillis =
       remember(questionnaireItemAnswerLocalDate) {
-        questionnaireItemAnswerLocalDate?.atStartOfDayIn(ZONE_ID_UTC)?.toEpochMilliseconds()
+        questionnaireItemAnswerLocalDate?.atStartOfDayIn(TimeZone.UTC)?.toEpochMilliseconds()
       }
     val initialSelectedDateInMillis =
       remember(questionnaireItemAnswerDateInMillis) {
@@ -106,9 +120,9 @@ internal object DateViewFactory : QuestionnaireItemViewFactory {
       remember(questionnaireViewItem.draftAnswer) { questionnaireViewItem.draftAnswer as? String }
     val dateInput =
       remember(dateInputFormat, questionnaireItemAnswerLocalDate, draftAnswer) {
-        questionnaireItemAnswerLocalDate?.format(dateInputFormat.pattern)?.let {
-          DateInput(it, questionnaireItemAnswerLocalDate)
-        }
+        questionnaireItemAnswerLocalDate
+          ?.let { localDateTimeFormatter.format(it, dateInputFormat.pattern) }
+          ?.let { DateInput(it, questionnaireItemAnswerLocalDate) }
           ?: DateInput(display = draftAnswer ?: "", null)
       }
 
@@ -179,20 +193,26 @@ internal object DateViewFactory : QuestionnaireItemViewFactory {
             ?: getRequiredOrOptionalText(questionnaireViewItem),
         isError = !validationMessage.isNullOrBlank(),
         enabled = !(isReadOnly || prohibitInput),
-        parseStringToLocalDate = { str, pattern -> parseLocalDateOrNull(str, pattern) },
+        parseStringToLocalDate = { str, pattern ->
+          localDateTimeFormatter.parseLocalDateOrNull(str, pattern)
+        },
         onDateInputEntry = {
           val (display, date) = it
-          if (date != null) {
-            coroutineScope.launch {
+          coroutineScope.launch {
+            if (date != null) {
               setQuestionnaireItemViewItemAnswer(questionnaireViewItem, date)
-            }
-          } else {
-            coroutineScope.launch {
-              parseDateOnTextChanged(
-                questionnaireViewItem,
-                display,
-                dateInputFormat.pattern,
-              )
+              questionnaireItemAnswerLocalDate = date
+            } else {
+              // Each time the user types in a character, parse the string and if it can be parsed
+              // into a date,
+              // set the answer in the [QuestionnaireResponse], otherwise, set the draft answer.
+              val localDate =
+                localDateTimeFormatter.parseLocalDateOrNull(display, dateInputFormat.pattern)
+              if (localDate != null) {
+                setQuestionnaireItemViewItemAnswer(questionnaireViewItem, localDate)
+              } else {
+                questionnaireViewItem.setDraftAnswer(display)
+              }
             }
           }
         },
@@ -206,12 +226,12 @@ internal object DateViewFactory : QuestionnaireItemViewFactory {
     val min =
       (questionnaireViewItem.minAnswerValue?.asDate()?.value?.value as? FhirDate.Date)
         ?.date
-        ?.atStartOfDayIn(ZONE_ID_UTC)
+        ?.atStartOfDayIn(TimeZone.UTC)
         ?.toEpochMilliseconds()
     val max =
       (questionnaireViewItem.maxAnswerValue?.asDate()?.value?.value as? FhirDate.Date)
         ?.date
-        ?.atStartOfDayIn(ZONE_ID_UTC)
+        ?.atStartOfDayIn(TimeZone.UTC)
         ?.toEpochMilliseconds()
 
     return if (min != null && max != null && min > max) {
@@ -231,26 +251,7 @@ internal object DateViewFactory : QuestionnaireItemViewFactory {
         value = DateAnswerValue(value = FhirR4DateType(value = FhirDate.Date(date = localDate))),
       ),
     )
-
-  /**
-   * Each time the user types in a character, parse the string and if it can be parsed into a date,
-   * set the answer in the [QuestionnaireResponse], otherwise, set the draft answer.
-   */
-  private suspend fun parseDateOnTextChanged(
-    questionnaireViewItem: QuestionnaireViewItem,
-    dateToDisplay: String,
-    pattern: String,
-  ) {
-    val localDate = parseLocalDateOrNull(dateToDisplay, pattern)
-    if (localDate != null) {
-      setQuestionnaireItemViewItemAnswer(questionnaireViewItem, localDate)
-    } else {
-      questionnaireViewItem.setDraftAnswer(dateToDisplay)
-    }
-  }
 }
-
-internal const val TAG = "date-picker"
 
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun selectableDates(minDateMillis: Long?, maxDateMillis: Long?) =

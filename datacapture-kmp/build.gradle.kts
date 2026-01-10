@@ -17,8 +17,8 @@ kotlin {
 
   androidLibrary {
     namespace = "com.google.android.fhir.datacapture"
-    compileSdk = 36
-    minSdk = 24
+    compileSdk = Sdk.COMPILE_SDK
+    minSdk = Sdk.MIN_SDK
     withJava()
     withHostTestBuilder {}
     withDeviceTestBuilder { sourceSetTreeName = "test" }

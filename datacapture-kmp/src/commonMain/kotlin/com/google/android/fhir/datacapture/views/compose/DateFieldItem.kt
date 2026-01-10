@@ -51,7 +51,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import com.google.android.fhir.datacapture.extensions.format
+import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.toLocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -79,6 +79,7 @@ internal fun DateFieldItem(
   val focusManager = LocalFocusManager.current
   val keyboardController = LocalSoftwareKeyboardController.current
   val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
+  val localDateTimeFormatter = remember { DataCapture.getConfiguration().localDateTimeFormatter }
 
   var dateInputDisplay by
     remember(dateInput) {
@@ -184,7 +185,7 @@ internal fun DateFieldItem(
       selectableDates,
       onDateSelected = { dateMillis ->
         dateMillis?.toLocalDate()?.let {
-          val dateDisplay = it.format(dateInputFormat.pattern)
+          val dateDisplay = localDateTimeFormatter.format(it, dateInputFormat.pattern)
           dateInputDisplay =
             dateInputDisplay.copy(
               text = dateDisplay,
@@ -252,10 +253,13 @@ data class DateInputFormat(val pattern: String, val delimiter: Char) {
   val delimiterExistsInPattern = delimiterIndex.isNotEmpty()
 
   fun isTextValid(text: String): Boolean =
-    text.length <= pattern.length &&
-      text
-        .filterIndexed { index, ch -> ch.isDigit() || (ch == delimiter && index in delimiterIndex) }
-        .isNotEmpty()
+    (text.length <= pattern.length &&
+        text
+          .filterIndexed { index, ch ->
+            ch.isDigit() || (ch == delimiter && index in delimiterIndex)
+          }
+          .isNotEmpty())
+      .or(text.isEmpty())
 }
 
 const val DATE_TEXT_INPUT_FIELD = "date_picker_text_field"

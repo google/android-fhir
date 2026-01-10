@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -250,10 +250,13 @@ data class DateInputFormat(val pattern: String, val delimiter: Char) {
   val delimiterExistsInPattern = delimiterIndex.isNotEmpty()
 
   fun isTextValid(text: String): Boolean =
-    text.length <= pattern.length &&
-      text
-        .filterIndexed { index, ch -> ch.isDigit() || (ch == delimiter && index in delimiterIndex) }
-        .isNotEmpty()
+    (text.length <= pattern.length &&
+        text
+          .filterIndexed { index, ch ->
+            ch.isDigit() || (ch == delimiter && index in delimiterIndex)
+          }
+          .isNotEmpty())
+      .or(text.isEmpty())
 }
 
 const val DATE_TEXT_INPUT_FIELD = "date_picker_text_field"

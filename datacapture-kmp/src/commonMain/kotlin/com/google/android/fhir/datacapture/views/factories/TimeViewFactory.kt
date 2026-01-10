@@ -26,9 +26,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.TimeAnswerValue
 import com.google.android.fhir.datacapture.extensions.itemMedia
-import com.google.android.fhir.datacapture.extensions.toLocalizedString
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.Header
@@ -52,6 +52,7 @@ object TimeViewFactory : QuestionnaireItemViewFactory {
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
     val requiredTextNewLineStringResource = stringResource(Res.string.required_text_and_new_line)
+    val localDateTimeFormatter = remember { DataCapture.getConfiguration().localDateTimeFormatter }
     val validationMessage =
       remember(questionnaireViewItem.validationResult) {
         val validationMessage =
@@ -71,7 +72,7 @@ object TimeViewFactory : QuestionnaireItemViewFactory {
         questionnaireViewItem.questionnaireItem.readOnly?.value ?: false
       }
     val questionnaireViewItemLocalTimeAnswer =
-      remember(questionnaireViewItem.answers) {
+      remember(questionnaireViewItem) {
         questionnaireViewItem.answers.singleOrNull()?.value?.asTime()?.value?.value
       }
     val initialTimeForSelection =
@@ -81,7 +82,7 @@ object TimeViewFactory : QuestionnaireItemViewFactory {
       }
     val questionnaireViewItemLocalTimeAnswerDisplay =
       remember(questionnaireViewItemLocalTimeAnswer) {
-        questionnaireViewItemLocalTimeAnswer?.toLocalizedString()
+        questionnaireViewItemLocalTimeAnswer?.let { localDateTimeFormatter.localizedTimeString(it) }
       }
 
     val coroutineScope = rememberCoroutineScope { Dispatchers.Main }

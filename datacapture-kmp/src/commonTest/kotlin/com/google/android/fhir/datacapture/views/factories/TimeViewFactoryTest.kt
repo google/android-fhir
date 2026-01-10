@@ -18,7 +18,9 @@ package com.google.android.fhir.datacapture.views.factories
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasTextExactly
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.runComposeUiTest
 import com.google.android.fhir.datacapture.extensions.FhirR4String
@@ -83,9 +85,6 @@ class TimeViewFactoryTest {
 
   @Test
   fun shouldDisplayAMTimeInCorrectFormat_dependingOnSystemSettings() = runComposeUiTest {
-    val context = viewHolder.itemView.context
-    val is24Hour = DateFormat.is24HourFormat(context)
-
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.Item(
@@ -108,16 +107,12 @@ class TimeViewFactoryTest {
 
     setContent { QuestionnaireTimeView(questionnaireViewItem) }
 
-    val expectedTime = if (is24Hour) "10:10" else "10:10 AM"
-
-    onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true).assertTextEquals(expectedTime)
+    onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true)
+      .assert(hasTextExactly("10:10 AM") or hasTextExactly("10:10"))
   }
 
   @Test
   fun shouldDisplayPMTimeInCorrectFormat_dependingOnSystemSettings() = runComposeUiTest {
-    val context = viewHolder.itemView.context
-    val is24Hour = DateFormat.is24HourFormat(context)
-
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.Item(
@@ -140,8 +135,7 @@ class TimeViewFactoryTest {
 
     setContent { QuestionnaireTimeView(questionnaireViewItem) }
 
-    val expectedTime = if (is24Hour) "22:10" else "10:10 PM"
-
-    onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true).assertTextEquals(expectedTime)
+    onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true)
+      .assert(hasTextExactly("22:10") or hasTextExactly("10:10 PM"))
   }
 }

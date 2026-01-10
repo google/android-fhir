@@ -55,12 +55,6 @@
       "linkId": "date-item",
       "text": "Enter a date",
       "type": "date",
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
-          "valueString": "yyyy-mm-dd"
-        }
-      ],
       "item": [
         {
           "extension": [
@@ -86,12 +80,6 @@
       "linkId": "time-item",
       "text": "Enter a time",
       "type": "time",
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
-          "valueString": "hh-mm"
-        }
-      ],
       "item": [
         {
           "extension": [
