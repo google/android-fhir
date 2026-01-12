@@ -204,7 +204,7 @@ internal class EnabledAnswerOptionsEvaluator(
         val xFhirExpressionString =
           expressionEvaluator.createXFhirQueryFromExpression(answerExpression, variablesMap)
         if (answerExpressionMap.containsKey(xFhirExpressionString)) {
-          answerExpressionMap[xFhirExpressionString]
+          return answerExpressionMap[xFhirExpressionString]!!
         }
 
         val data = xFhirExpressionString?.let { xFhirQueryResolver.resolve(it) } ?: emptyList()
