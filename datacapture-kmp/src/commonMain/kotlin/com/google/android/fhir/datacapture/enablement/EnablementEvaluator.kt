@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.enablement
 
 import com.google.android.fhir.datacapture.XFhirQueryResolver
-import com.google.android.fhir.datacapture.extensions.allItems
 import com.google.android.fhir.datacapture.extensions.enableWhenExpression
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.convertToBoolean
@@ -89,7 +88,7 @@ internal class EnablementEvaluator(
    * The pre-order traversal trace of the items in the [QuestionnaireResponse]. This essentially
    * represents the order in which all items are displayed in the UI.
    */
-  private val questionnaireResponseItemPreOrderList = questionnaireResponse.toBuilder().allItems
+  private val questionnaireResponseItemPreOrderList = mutableListOf<QuestionnaireResponse.Item>()
 
   /** The map from each item in the [QuestionnaireResponse] to its parent. */
   private val questionnaireResponseItemParentMap =
@@ -101,12 +100,14 @@ internal class EnablementEvaluator(
   init {
     /** Adds each child-parent pair in the [QuestionnaireResponse] to the parent map. */
     fun buildParentList(item: QuestionnaireResponse.Item) {
+      questionnaireResponseItemPreOrderList.add(item)
       for (child in item.item) {
         questionnaireResponseItemParentMap[child] = item
         buildParentList(child)
       }
       for (answer in item.answer) {
         for (nestedItem in answer.item) {
+          questionnaireResponseItemParentMap[nestedItem] = item
           buildParentList(nestedItem)
         }
       }

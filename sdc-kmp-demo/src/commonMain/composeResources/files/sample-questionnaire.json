@@ -14,7 +14,7 @@
       "linkId": "age",
       "type": "integer",
       "text": "Age",
-      "required": false
+      "required": true
     },
     {
       "linkId": "height",
