@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import androidx.compose.ui.text.AnnotatedString
+import com.google.android.fhir.datacapture.extensions.elementValue
 import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.localizedTextAnnotatedString
 import com.google.android.fhir.datacapture.extensions.maxValue
@@ -203,7 +204,7 @@ data class QuestionnaireViewItem(
   fun isAnswerOptionSelected(
     answerOption: Questionnaire.Item.AnswerOption,
   ): Boolean {
-    return answers.any { it.value == answerOption.value }
+    return answers.any { it.elementValue == answerOption.elementValue }
   }
 
   /**

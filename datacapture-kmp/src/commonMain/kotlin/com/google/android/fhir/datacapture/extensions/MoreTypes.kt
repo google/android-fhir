@@ -16,11 +16,14 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import androidx.compose.ui.text.intl.Locale
 import com.google.fhir.model.r4.Coding
 import com.google.fhir.model.r4.Quantity
 import com.google.fhir.model.r4.QuestionnaireResponse
 
-internal fun com.google.fhir.model.r4.String.getLocalizedText(lang: String = "en"): String? {
+internal fun com.google.fhir.model.r4.String.getLocalizedText(
+  lang: String = Locale.current.toLanguageTag(),
+): String? {
   return getTranslation(lang) ?: getTranslation(lang.split("-").firstOrNull()) ?: value
 }
 
