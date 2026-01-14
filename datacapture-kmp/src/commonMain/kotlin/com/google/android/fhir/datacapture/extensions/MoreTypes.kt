@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,8 @@ internal fun Coding.hasDisplay() = !this.display?.value.isNullOrBlank()
 typealias FhirR4String = com.google.fhir.model.r4.String
 
 typealias FhirR4Boolean = com.google.fhir.model.r4.Boolean
+
+typealias BooleanAnswerValue = QuestionnaireResponse.Item.Answer.Value.Boolean
 
 typealias QuantityAnswerValue = QuestionnaireResponse.Item.Answer.Value.Quantity
 
