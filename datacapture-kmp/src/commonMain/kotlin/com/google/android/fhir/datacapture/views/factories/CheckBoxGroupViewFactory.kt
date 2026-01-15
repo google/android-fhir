@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,10 +37,11 @@ import com.google.android.fhir.datacapture.extensions.choiceOrientation
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.itemMedia
+import com.google.android.fhir.datacapture.extensions.optionExclusive
 import com.google.android.fhir.datacapture.extensions.toQuestionnaireResponseItemAnswer
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.ChoiceRadioButton
+import com.google.android.fhir.datacapture.views.compose.ChoiceCheckbox
 import com.google.android.fhir.datacapture.views.compose.Header
 import com.google.android.fhir.datacapture.views.compose.MediaItem
 import com.google.fhir.model.r4.Questionnaire
@@ -49,7 +49,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
-internal object RadioGroupViewFactory : QuestionnaireItemViewFactory {
+internal object CheckBoxGroupViewFactory : QuestionnaireItemViewFactory {
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
     val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
@@ -61,26 +61,46 @@ internal object RadioGroupViewFactory : QuestionnaireItemViewFactory {
       remember(questionnaireViewItem) {
         questionnaireViewItem.questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
       }
-    val notAnsweredTextString = stringResource(Res.string.not_answered)
     val enabledAnswerOptions =
       remember(questionnaireViewItem) { questionnaireViewItem.enabledAnswerOptions }
-    var selectedAnswerOption by
+    val notAnsweredTextString = stringResource(Res.string.not_answered)
+    var selectedAnswerOptions by
       remember(questionnaireViewItem) {
         mutableStateOf(
-          enabledAnswerOptions.singleOrNull { questionnaireViewItem.isAnswerOptionSelected(it) },
+          enabledAnswerOptions.filter { questionnaireViewItem.isAnswerOptionSelected(it) }.toSet(),
         )
       }
-    val onAnswerOptionChoiceChange: suspend (Questionnaire.Item.AnswerOption) -> Unit =
-      { answerOption ->
-        if (selectedAnswerOption != answerOption) {
-          selectedAnswerOption = answerOption
-          questionnaireViewItem.setAnswer(
-            answerOption.toQuestionnaireResponseItemAnswer(),
-          )
-        } else {
-          // Deselect an answerOption
-          selectedAnswerOption = null
-          questionnaireViewItem.clearAnswer()
+
+    val onAnswerOptionCheckedChange: suspend (Questionnaire.Item.AnswerOption, Boolean) -> Unit =
+      { answerOption, checked ->
+        when {
+          checked && answerOption.optionExclusive -> {
+            // If this answer option has optionExclusive extension, deselect other options
+            selectedAnswerOptions = setOf(answerOption)
+            questionnaireViewItem.setAnswer(
+              answerOption.toQuestionnaireResponseItemAnswer(),
+            )
+          }
+          checked -> {
+            // Deselect any optionExclusive answer options
+            val exclusiveOptions = enabledAnswerOptions.filter { it.optionExclusive }.toSet()
+            selectedAnswerOptions = (selectedAnswerOptions - exclusiveOptions) + answerOption
+
+            // Add the answer
+            val answers =
+              questionnaireViewItem.answers + answerOption.toQuestionnaireResponseItemAnswer()
+            // Remove exclusive options from answers
+            val newAnswers =
+              answers.filterNot { answer -> exclusiveOptions.any { it.value == answer.value } }
+            questionnaireViewItem.setAnswer(*newAnswers.toTypedArray())
+          }
+          else -> {
+            // Remove the answer
+            selectedAnswerOptions = selectedAnswerOptions - answerOption
+            questionnaireViewItem.removeAnswer(
+              answerOption.toQuestionnaireResponseItemAnswer(),
+            )
+          }
         }
       }
 
@@ -102,44 +122,46 @@ internal object RadioGroupViewFactory : QuestionnaireItemViewFactory {
       when (choiceOrientationType) {
         ChoiceOrientationTypes.HORIZONTAL -> {
           FlowRow(
-            modifier = Modifier.selectableGroup().fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement =
               Arrangement.spacedBy(QuestionnaireTheme.dimensions.optionItemMarginHorizontal),
             verticalArrangement =
               Arrangement.spacedBy(QuestionnaireTheme.dimensions.optionItemMarginVertical),
           ) {
-            enabledAnswerOptions.forEach {
-              ChoiceRadioButton(
+            enabledAnswerOptions.forEach { answerOption ->
+              ChoiceCheckbox(
                 label =
-                  remember(it) {
-                    AnnotatedString(it.value.displayString(ifNull = notAnsweredTextString))
+                  remember(answerOption) {
+                    AnnotatedString(answerOption.value.displayString(notAnsweredTextString))
                   },
-                selected = it == selectedAnswerOption,
+                checked = answerOption in selectedAnswerOptions,
                 enabled = !readOnly,
-                modifier = Modifier.weight(1f).testTag(RADIO_OPTION_TAG),
-                image = it.itemAnswerOptionImage(),
+                modifier = Modifier.weight(1f).testTag(CHECKBOX_OPTION_TAG),
+                image = answerOption.itemAnswerOptionImage(),
               ) {
-                coroutineScope.launch { onAnswerOptionChoiceChange(it) }
+                coroutineScope.launch { onAnswerOptionCheckedChange(answerOption, it) }
               }
             }
           }
         }
         ChoiceOrientationTypes.VERTICAL -> {
           Column(
-            modifier = Modifier.selectableGroup().fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement =
               Arrangement.spacedBy(QuestionnaireTheme.dimensions.optionItemMarginVertical),
           ) {
-            enabledAnswerOptions.forEach {
-              ChoiceRadioButton(
+            enabledAnswerOptions.forEach { answerOption ->
+              ChoiceCheckbox(
                 label =
-                  remember(it) { AnnotatedString(it.value.displayString(notAnsweredTextString)) },
-                selected = it == selectedAnswerOption,
+                  remember(answerOption) {
+                    AnnotatedString(answerOption.value.displayString(notAnsweredTextString))
+                  },
+                checked = answerOption in selectedAnswerOptions,
                 enabled = !readOnly,
-                modifier = Modifier.fillMaxWidth().testTag(RADIO_OPTION_TAG),
-                image = it.itemAnswerOptionImage(),
+                modifier = Modifier.fillMaxWidth().testTag(CHECKBOX_OPTION_TAG),
+                image = answerOption.itemAnswerOptionImage(),
               ) {
-                coroutineScope.launch { onAnswerOptionChoiceChange(it) }
+                coroutineScope.launch { onAnswerOptionCheckedChange(answerOption, it) }
               }
             }
           }
@@ -149,4 +171,4 @@ internal object RadioGroupViewFactory : QuestionnaireItemViewFactory {
   }
 }
 
-const val RADIO_OPTION_TAG = "radio_group_option"
+internal const val CHECKBOX_OPTION_TAG = "checkbox_group_option"

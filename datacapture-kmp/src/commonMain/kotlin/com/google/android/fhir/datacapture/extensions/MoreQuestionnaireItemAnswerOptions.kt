@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.decodeToImageBitmap
 import com.google.fhir.model.r4.Element
 import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.Questionnaire
+import com.google.fhir.model.r4.QuestionnaireResponse
 
 internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive"
@@ -79,6 +80,38 @@ val Questionnaire.Item.AnswerOption.elementValue: Element
       is Questionnaire.Item.AnswerOption.Value.Time ->
         (value as Questionnaire.Item.AnswerOption.Value.Time).value
     }
+
+fun Questionnaire.Item.AnswerOption.toQuestionnaireResponseItemAnswer():
+  QuestionnaireResponse.Item.Answer =
+  QuestionnaireResponse.Item.Answer(
+    value =
+      when (value) {
+        is Questionnaire.Item.AnswerOption.Value.Integer ->
+          IntegerAnswerValue(
+            value = (value as Questionnaire.Item.AnswerOption.Value.Integer).value,
+          )
+        is Questionnaire.Item.AnswerOption.Value.Coding ->
+          QuestionnaireResponse.Item.Answer.Value.Coding(
+            value = (value as Questionnaire.Item.AnswerOption.Value.Coding).value,
+          )
+        is Questionnaire.Item.AnswerOption.Value.Date ->
+          QuestionnaireResponse.Item.Answer.Value.Date(
+            value = (value as Questionnaire.Item.AnswerOption.Value.Date).value,
+          )
+        is Questionnaire.Item.AnswerOption.Value.Reference ->
+          QuestionnaireResponse.Item.Answer.Value.Reference(
+            value = (value as Questionnaire.Item.AnswerOption.Value.Reference).value,
+          )
+        is Questionnaire.Item.AnswerOption.Value.String ->
+          QuestionnaireResponse.Item.Answer.Value.String(
+            value = (value as Questionnaire.Item.AnswerOption.Value.String).value,
+          )
+        is Questionnaire.Item.AnswerOption.Value.Time ->
+          QuestionnaireResponse.Item.Answer.Value.Time(
+            value = (value as Questionnaire.Item.AnswerOption.Value.Time).value,
+          )
+      },
+  )
 
 /**
  * Returns what to display on the UI depending on the [QuestionnaireItemAnswerOptionValue]. Used to
