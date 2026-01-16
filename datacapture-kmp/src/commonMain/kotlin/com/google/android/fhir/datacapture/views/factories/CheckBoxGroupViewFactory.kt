@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android_fhir.datacapture_kmp.generated.resources.Res
-import android_fhir.datacapture_kmp.generated.resources.not_answered
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -47,7 +45,6 @@ import com.google.android.fhir.datacapture.views.compose.MediaItem
 import com.google.fhir.model.r4.Questionnaire
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.stringResource
 
 internal object CheckBoxGroupViewFactory : QuestionnaireItemViewFactory {
   @Composable
@@ -63,7 +60,6 @@ internal object CheckBoxGroupViewFactory : QuestionnaireItemViewFactory {
       }
     val enabledAnswerOptions =
       remember(questionnaireViewItem) { questionnaireViewItem.enabledAnswerOptions }
-    val notAnsweredTextString = stringResource(Res.string.not_answered)
     var selectedAnswerOptions by
       remember(questionnaireViewItem) {
         mutableStateOf(
@@ -131,9 +127,7 @@ internal object CheckBoxGroupViewFactory : QuestionnaireItemViewFactory {
             enabledAnswerOptions.forEach { answerOption ->
               ChoiceCheckbox(
                 label =
-                  remember(answerOption) {
-                    AnnotatedString(answerOption.value.displayString(notAnsweredTextString))
-                  },
+                  remember(answerOption) { AnnotatedString(answerOption.value.displayString()) },
                 checked = answerOption in selectedAnswerOptions,
                 enabled = !readOnly,
                 modifier = Modifier.weight(1f).testTag(CHECKBOX_OPTION_TAG),
@@ -153,9 +147,7 @@ internal object CheckBoxGroupViewFactory : QuestionnaireItemViewFactory {
             enabledAnswerOptions.forEach { answerOption ->
               ChoiceCheckbox(
                 label =
-                  remember(answerOption) {
-                    AnnotatedString(answerOption.value.displayString(notAnsweredTextString))
-                  },
+                  remember(answerOption) { AnnotatedString(answerOption.value.displayString()) },
                 checked = answerOption in selectedAnswerOptions,
                 enabled = !readOnly,
                 modifier = Modifier.fillMaxWidth().testTag(CHECKBOX_OPTION_TAG),

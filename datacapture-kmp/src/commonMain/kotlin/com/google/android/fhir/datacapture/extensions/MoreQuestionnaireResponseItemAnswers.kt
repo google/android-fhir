@@ -21,30 +21,31 @@ import com.google.fhir.model.r4.QuestionnaireResponse
 
 val QuestionnaireResponse.Item.Answer.elementValue: Element?
   get() =
-    when (this.value) {
-      is QuestionnaireResponse.Item.Answer.Value.Attachment ->
-        (value as QuestionnaireResponse.Item.Answer.Value.Attachment).value
-      is QuestionnaireResponse.Item.Answer.Value.Boolean ->
-        (value as QuestionnaireResponse.Item.Answer.Value.Boolean).value
-      is QuestionnaireResponse.Item.Answer.Value.Coding ->
-        (value as QuestionnaireResponse.Item.Answer.Value.Coding).value
-      is QuestionnaireResponse.Item.Answer.Value.Date ->
-        (value as QuestionnaireResponse.Item.Answer.Value.Date).value
-      is QuestionnaireResponse.Item.Answer.Value.DateTime ->
-        (value as QuestionnaireResponse.Item.Answer.Value.DateTime).value
-      is QuestionnaireResponse.Item.Answer.Value.Decimal ->
-        (value as QuestionnaireResponse.Item.Answer.Value.Decimal).value
-      is QuestionnaireResponse.Item.Answer.Value.Integer ->
-        (value as QuestionnaireResponse.Item.Answer.Value.Integer).value
-      is QuestionnaireResponse.Item.Answer.Value.Quantity ->
-        (value as QuestionnaireResponse.Item.Answer.Value.Quantity).value
-      is QuestionnaireResponse.Item.Answer.Value.Reference ->
-        (value as QuestionnaireResponse.Item.Answer.Value.Reference).value
-      is QuestionnaireResponse.Item.Answer.Value.String ->
-        (value as QuestionnaireResponse.Item.Answer.Value.String).value
-      is QuestionnaireResponse.Item.Answer.Value.Time ->
-        (value as QuestionnaireResponse.Item.Answer.Value.Time).value
-      is QuestionnaireResponse.Item.Answer.Value.Uri ->
-        (value as QuestionnaireResponse.Item.Answer.Value.Uri).value
-      null -> null
+    this.value?.let {
+      when (it) {
+        is QuestionnaireResponse.Item.Answer.Value.Attachment ->
+          (value as QuestionnaireResponse.Item.Answer.Value.Attachment).value
+        is QuestionnaireResponse.Item.Answer.Value.Boolean ->
+          (value as QuestionnaireResponse.Item.Answer.Value.Boolean).value
+        is QuestionnaireResponse.Item.Answer.Value.Coding ->
+          (value as QuestionnaireResponse.Item.Answer.Value.Coding).value
+        is QuestionnaireResponse.Item.Answer.Value.Date ->
+          (value as QuestionnaireResponse.Item.Answer.Value.Date).value
+        is QuestionnaireResponse.Item.Answer.Value.DateTime ->
+          (value as QuestionnaireResponse.Item.Answer.Value.DateTime).value
+        is QuestionnaireResponse.Item.Answer.Value.Decimal ->
+          (value as QuestionnaireResponse.Item.Answer.Value.Decimal).value
+        is QuestionnaireResponse.Item.Answer.Value.Integer ->
+          (value as QuestionnaireResponse.Item.Answer.Value.Integer).value
+        is QuestionnaireResponse.Item.Answer.Value.Quantity ->
+          (value as QuestionnaireResponse.Item.Answer.Value.Quantity).value
+        is QuestionnaireResponse.Item.Answer.Value.Reference ->
+          (value as QuestionnaireResponse.Item.Answer.Value.Reference).value
+        is QuestionnaireResponse.Item.Answer.Value.String ->
+          (value as QuestionnaireResponse.Item.Answer.Value.String).value
+        is QuestionnaireResponse.Item.Answer.Value.Time ->
+          (value as QuestionnaireResponse.Item.Answer.Value.Time).value
+        is QuestionnaireResponse.Item.Answer.Value.Uri ->
+          (value as QuestionnaireResponse.Item.Answer.Value.Uri).value
+      }
     }

@@ -113,16 +113,27 @@ fun Questionnaire.Item.AnswerOption.toQuestionnaireResponseItemAnswer():
       },
   )
 
+val Questionnaire.Item.AnswerOption.Value.id: String?
+  get() =
+    when (this) {
+      is Questionnaire.Item.AnswerOption.Value.Reference -> value.id
+      is Questionnaire.Item.AnswerOption.Value.Coding -> value.id
+      is Questionnaire.Item.AnswerOption.Value.Date -> value.id
+      is Questionnaire.Item.AnswerOption.Value.Integer -> value.id
+      is Questionnaire.Item.AnswerOption.Value.String -> value.id
+      is Questionnaire.Item.AnswerOption.Value.Time -> value.id
+    }
+
 /**
  * Returns what to display on the UI depending on the [QuestionnaireItemAnswerOptionValue]. Used to
  * get the display representation for item answer options.
  */
-fun QuestionnaireItemAnswerOptionValue.displayString(ifNull: String = ""): String =
-  getDisplayString(this) ?: ifNull
+fun QuestionnaireItemAnswerOptionValue.displayString(): String = getDisplayString(this) ?: ""
 
 private fun getDisplayString(type: QuestionnaireItemAnswerOptionValue): String? =
   when (type) {
     is Questionnaire.Item.AnswerOption.Value.Coding -> type.value.display?.getLocalizedText()
+        ?: type.value.code?.value
     is Questionnaire.Item.AnswerOption.Value.Date -> TODO("Requires locale based formatting")
     is Questionnaire.Item.AnswerOption.Value.Integer -> type.value.value?.toString()
     is Questionnaire.Item.AnswerOption.Value.Reference -> type.value.display?.value

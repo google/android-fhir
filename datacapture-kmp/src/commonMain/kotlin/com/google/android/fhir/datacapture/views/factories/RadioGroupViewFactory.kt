@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android_fhir.datacapture_kmp.generated.resources.Res
-import android_fhir.datacapture_kmp.generated.resources.not_answered
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -47,7 +45,6 @@ import com.google.android.fhir.datacapture.views.compose.MediaItem
 import com.google.fhir.model.r4.Questionnaire
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.stringResource
 
 internal object RadioGroupViewFactory : QuestionnaireItemViewFactory {
   @Composable
@@ -61,7 +58,6 @@ internal object RadioGroupViewFactory : QuestionnaireItemViewFactory {
       remember(questionnaireViewItem) {
         questionnaireViewItem.questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
       }
-    val notAnsweredTextString = stringResource(Res.string.not_answered)
     val enabledAnswerOptions =
       remember(questionnaireViewItem) { questionnaireViewItem.enabledAnswerOptions }
     var selectedAnswerOption by
@@ -110,10 +106,7 @@ internal object RadioGroupViewFactory : QuestionnaireItemViewFactory {
           ) {
             enabledAnswerOptions.forEach {
               ChoiceRadioButton(
-                label =
-                  remember(it) {
-                    AnnotatedString(it.value.displayString(ifNull = notAnsweredTextString))
-                  },
+                label = remember(it) { AnnotatedString(it.value.displayString()) },
                 selected = it == selectedAnswerOption,
                 enabled = !readOnly,
                 modifier = Modifier.weight(1f).testTag(RADIO_OPTION_TAG),
@@ -132,8 +125,7 @@ internal object RadioGroupViewFactory : QuestionnaireItemViewFactory {
           ) {
             enabledAnswerOptions.forEach {
               ChoiceRadioButton(
-                label =
-                  remember(it) { AnnotatedString(it.value.displayString(notAnsweredTextString)) },
+                label = remember(it) { AnnotatedString(it.value.displayString()) },
                 selected = it == selectedAnswerOption,
                 enabled = !readOnly,
                 modifier = Modifier.fillMaxWidth().testTag(RADIO_OPTION_TAG),
