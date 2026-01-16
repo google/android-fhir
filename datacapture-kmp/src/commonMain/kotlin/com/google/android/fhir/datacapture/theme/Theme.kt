@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2025 Google LLC
+ * Copyright 2021-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +88,7 @@ data class QuestionnaireDimensions(
   // Auto Complete
   val autoCompleteChipMargin: Dp = 10.dp,
   val autoCompleteChipMarginBottom: Dp = 50.dp,
+  val autoCompleteTextFieldContentPadding: Dp = 16.dp,
 
   // Barcode
   val barcodeQuestionMarginEnd: Dp = 8.dp,

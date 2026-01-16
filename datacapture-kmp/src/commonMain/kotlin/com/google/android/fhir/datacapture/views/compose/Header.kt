@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,7 +150,11 @@ internal fun Header(
 
     // Required/Optional Text
     if (showRequiredOrOptionalText && !requiredOptionalText.isNullOrBlank()) {
-      Text(text = requiredOptionalText, style = QuestionnaireTheme.typography.bodyMedium)
+      Text(
+        text = requiredOptionalText,
+        style = QuestionnaireTheme.typography.bodyMedium,
+        modifier = Modifier.testTag(REQUIRED_OPTIONAL_HEADER_TEXT_TAG),
+      )
     }
 
     // Validation Error
@@ -351,6 +355,7 @@ internal fun Help(
 }
 
 const val ERROR_TEXT_AT_HEADER_TEST_TAG = "error-text-at-header"
+const val REQUIRED_OPTIONAL_HEADER_TEXT_TAG = "required_optional_header_text"
 const val HELP_BUTTON_TAG = "help-button"
 const val HELP_CARD_TAG = "help-card-view"
 const val HELP_HEADER_TAG = "hint_text"
