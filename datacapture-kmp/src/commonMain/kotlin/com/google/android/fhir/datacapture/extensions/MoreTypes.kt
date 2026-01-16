@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,10 @@ internal fun Quantity.toCoding(): Coding =
 internal fun Coding.hasCode() = !this.code?.value.isNullOrBlank()
 
 internal fun Coding.hasDisplay() = !this.display?.value.isNullOrBlank()
+
+internal fun Coding.hasSystem() = !this.system?.value.isNullOrBlank()
+
+internal fun Coding.hasVersion() = !this.version?.value.isNullOrBlank()
 
 typealias FhirR4String = com.google.fhir.model.r4.String
 
