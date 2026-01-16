@@ -1091,12 +1091,29 @@ class DropDownViewFactoryTest {
     questionnaireItem =
       QuestionnaireViewItem(
         createAnswerOptions(*answerOptions.toTypedArray()),
-        responseValueStringOptions().copy(answer = selectedAnswers!!),
+        responseValueStringOptions()
+          .copy(
+            answer =
+              listOf(
+                QuestionnaireResponse.Item.Answer(
+                  value = StringAnswerValue(value = FhirR4String(value = "Coding 1")),
+                ),
+              ),
+          ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> selectedAnswers = answers },
       )
-    waitUntil { selectedAnswers != null }
+
+    onNodeWithTag(DROP_DOWN_TEXT_FIELD_TAG)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.EditableText,
+          AnnotatedString("Coding 1"),
+        ),
+      )
     onNodeWithTag(CLEAR_TEXT_ICON_BUTTON_TAG).performClick()
+    waitUntil { selectedAnswers != null }
+
     selectedAnswers.shouldBeEmpty()
   }
 
@@ -1152,7 +1169,7 @@ class DropDownViewFactoryTest {
                   Questionnaire.Item.AnswerOption.Value.Reference(
                     value =
                       Reference(
-                        reference = FhirR4String(value = "ref_1"),
+                        id = "ref_1",
                         display = FhirR4String(value = "Reference"),
                       ),
                   ),
@@ -1162,7 +1179,7 @@ class DropDownViewFactoryTest {
                   Questionnaire.Item.AnswerOption.Value.Reference(
                     value =
                       Reference(
-                        reference = FhirR4String(value = "ref_2"),
+                        id = "ref_2",
                         display = FhirR4String(value = "Reference"),
                       ),
                   ),

@@ -46,8 +46,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.elementValue
+import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.toAnnotatedString
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
+import com.google.fhir.model.r4.Element
+import com.google.fhir.model.r4.Questionnaire
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,7 +72,7 @@ internal fun DropDownItem(
     remember(selectedOption, options) { mutableStateOf(selectedOption) }
   val selectedOptionDisplay by
     remember(selectedDropDownAnswerOption) {
-      derivedStateOf { selectedDropDownAnswerOption?.answerOptionString ?: "" }
+      derivedStateOf { selectedDropDownAnswerOption?.displayString ?: "" }
     }
 
   LaunchedEffect(selectedDropDownAnswerOption) {
@@ -94,7 +99,7 @@ internal fun DropDownItem(
       label = { labelText?.let { Text(it) } },
       supportingText = { supportingText?.let { Text(it) } },
       leadingIcon =
-        selectedDropDownAnswerOption?.answerOptionImage?.let {
+        selectedDropDownAnswerOption?.iconImage?.let {
           {
             Icon(
               it,
@@ -127,16 +132,16 @@ internal fun DropDownAnswerMenuItem(
     modifier = Modifier.testTag(DROP_DOWN_ANSWER_MENU_ITEM_TAG),
     text = {
       Text(
-        answerOption.answerOptionAnnotatedString(),
+        answerOption.displayAnnotatedString(),
         style = QuestionnaireTheme.textStyles.dropDownText,
       )
     },
     leadingIcon =
-      answerOption.answerOptionImage?.let {
+      answerOption.iconImage?.let {
         {
           Icon(
             it,
-            contentDescription = answerOption.answerOptionString,
+            contentDescription = answerOption.displayString,
           )
         }
       },
@@ -172,7 +177,7 @@ internal fun AutoCompleteDropDownItem(
     remember(selectedDropDownAnswerOption) {
       // When an option is selected, the filter is no longer active.
       inFilterMode = false
-      val stringValue = selectedDropDownAnswerOption?.answerOptionString ?: ""
+      val stringValue = selectedDropDownAnswerOption?.displayString ?: ""
       mutableStateOf(TextFieldValue(stringValue, selection = TextRange(stringValue.length)))
     }
 
@@ -180,7 +185,7 @@ internal fun AutoCompleteDropDownItem(
   val filteredOptions =
     remember(options, selectedOptionDisplay, inFilterMode) {
       if (inFilterMode) {
-        options.filter { it.answerOptionString.contains(selectedOptionDisplay.text, true) }
+        options.filter { it.displayString.contains(selectedOptionDisplay.text, true) }
       } else {
         // When not in filter mode, all options are displayed.
         options
@@ -191,7 +196,10 @@ internal fun AutoCompleteDropDownItem(
     if (selectedDropDownAnswerOption != null) {
       focusManager.clearFocus()
     }
-    onDropDownAnswerOptionSelected(selectedDropDownAnswerOption)
+
+    if (selectedDropDownAnswerOption != selectedOption) {
+      onDropDownAnswerOptionSelected(selectedDropDownAnswerOption)
+    }
   }
 
   ExposedDropdownMenuBox(
@@ -218,11 +226,11 @@ internal fun AutoCompleteDropDownItem(
       label = { labelText?.let { Text(it) } },
       supportingText = { supportingText?.let { Text(it) } },
       leadingIcon =
-        selectedDropDownAnswerOption?.answerOptionImage?.let {
+        selectedDropDownAnswerOption?.iconImage?.let {
           {
             Icon(
               it,
-              contentDescription = selectedDropDownAnswerOption!!.answerOptionString,
+              contentDescription = selectedDropDownAnswerOption!!.displayString,
               modifier = Modifier.testTag(DROP_DOWN_TEXT_FIELD_LEADING_ICON_TAG),
             )
           }
@@ -263,13 +271,22 @@ internal fun AutoCompleteDropDownItem(
 }
 
 internal data class DropDownAnswerOption(
-  val answerId: String,
-  val answerOptionString: String,
-  val answerOptionImage: ImageBitmap? = null,
+  val elementValue: Element,
+  val displayString: String,
+  val iconImage: ImageBitmap? = null,
 ) {
-  override fun toString(): String = this.answerOptionString
+  override fun toString(): String = this.displayString
 
-  fun answerOptionAnnotatedString() = answerOptionString.toAnnotatedString()
+  fun displayAnnotatedString() = displayString.toAnnotatedString()
+
+  companion object {
+    fun of(answerOption: Questionnaire.Item.AnswerOption): DropDownAnswerOption =
+      DropDownAnswerOption(
+        answerOption.elementValue,
+        answerOption.value.displayString(),
+        answerOption.itemAnswerOptionImage(),
+      )
+  }
 }
 
 const val CLEAR_TEXT_ICON_BUTTON_TAG = "clear_field_text"

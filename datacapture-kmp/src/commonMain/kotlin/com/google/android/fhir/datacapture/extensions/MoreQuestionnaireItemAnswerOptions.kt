@@ -125,35 +125,15 @@ val Questionnaire.Item.AnswerOption.Value.id: String?
     }
 
 /**
- * Returns the unique identifier of a [QuestionnaireItemAnswerOptionValue]. Used to differentiate
- * between item answer options that may have similar display strings
- */
-fun QuestionnaireItemAnswerOptionValue.identifierString(ifNull: String): String =
-  this.id
-    ?: when (this) {
-      is Questionnaire.Item.AnswerOption.Value.Coding ->
-        arrayOf(
-            "${value.system?.value.orEmpty()}${value.version?.value.orEmpty()}",
-            value.code?.value.orEmpty(),
-          )
-          .joinToString(
-            if (value.hasSystem().or(value.hasVersion()) && value.hasCode()) "|" else "",
-          )
-      is Questionnaire.Item.AnswerOption.Value.Reference -> value.reference?.value
-          ?: displayString(ifNull)
-      else -> displayString(ifNull)
-    }
-
-/**
  * Returns what to display on the UI depending on the [QuestionnaireItemAnswerOptionValue]. Used to
  * get the display representation for item answer options.
  */
-fun QuestionnaireItemAnswerOptionValue.displayString(ifNull: String = ""): String =
-  getDisplayString(this) ?: ifNull
+fun QuestionnaireItemAnswerOptionValue.displayString(): String = getDisplayString(this) ?: ""
 
 private fun getDisplayString(type: QuestionnaireItemAnswerOptionValue): String? =
   when (type) {
     is Questionnaire.Item.AnswerOption.Value.Coding -> type.value.display?.getLocalizedText()
+        ?: type.value.code?.value
     is Questionnaire.Item.AnswerOption.Value.Date -> TODO("Requires locale based formatting")
     is Questionnaire.Item.AnswerOption.Value.Integer -> type.value.value?.toString()
     is Questionnaire.Item.AnswerOption.Value.Reference -> type.value.display?.value
