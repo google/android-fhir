@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_ANSWER_MENU_ITEM_TAG
-import com.google.android.fhir.datacapture.views.compose.MULTI_AUTO_COMPLETE_INPUT_CHIP_TAG
-import com.google.android.fhir.datacapture.views.compose.MULTI_AUTO_COMPLETE_TEXT_FIELD_TAG
+import com.google.android.fhir.datacapture.views.components.DROP_DOWN_ANSWER_MENU_ITEM_TAG
+import com.google.android.fhir.datacapture.views.components.MULTI_AUTO_COMPLETE_INPUT_CHIP_TAG
+import com.google.android.fhir.datacapture.views.components.MULTI_AUTO_COMPLETE_TEXT_FIELD_TAG
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat

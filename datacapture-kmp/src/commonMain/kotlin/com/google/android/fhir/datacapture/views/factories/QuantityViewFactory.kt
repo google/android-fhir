@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 Google LLC
+ * Copyright 2022-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,13 +47,13 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.DropDownAnswerOption
-import com.google.android.fhir.datacapture.views.compose.DropDownItem
-import com.google.android.fhir.datacapture.views.compose.EditTextFieldItem
-import com.google.android.fhir.datacapture.views.compose.EditTextFieldState
-import com.google.android.fhir.datacapture.views.compose.Header
-import com.google.android.fhir.datacapture.views.compose.MediaItem
-import com.google.android.fhir.datacapture.views.compose.getRequiredOrOptionalText
+import com.google.android.fhir.datacapture.views.components.DropDownAnswerOption
+import com.google.android.fhir.datacapture.views.components.DropDownItem
+import com.google.android.fhir.datacapture.views.components.EditTextFieldItem
+import com.google.android.fhir.datacapture.views.components.EditTextFieldState
+import com.google.android.fhir.datacapture.views.components.Header
+import com.google.android.fhir.datacapture.views.components.MediaItem
+import com.google.android.fhir.datacapture.views.components.getRequiredOrOptionalText
 import com.google.fhir.model.r4.Coding
 import com.google.fhir.model.r4.Decimal
 import com.google.fhir.model.r4.Quantity

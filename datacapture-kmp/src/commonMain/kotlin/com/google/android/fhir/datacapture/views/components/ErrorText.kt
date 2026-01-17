@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.compose
+package com.google.android.fhir.datacapture.views.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -22,8 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.dimensionResource
-import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 
 @Composable
 internal fun ErrorText(validationMessage: String) {
@@ -32,7 +31,7 @@ internal fun ErrorText(validationMessage: String) {
     style = MaterialTheme.typography.bodySmall,
     color = MaterialTheme.colorScheme.error,
     modifier =
-      Modifier.padding(start = dimensionResource(R.dimen.error_text_margin_horizontal))
+      Modifier.padding(start = QuestionnaireTheme.dimensions.errorTextMarginHorizontal)
         .testTag(ERROR_TEXT_TAG),
   )
 }

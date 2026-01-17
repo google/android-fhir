@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.compose
+package com.google.android.fhir.datacapture.views.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,19 +39,18 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
-import com.google.android.fhir.datacapture.R
+import androidx.compose.ui.unit.dp
+import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 internal fun EditTextFieldItem(modifier: Modifier, textFieldState: EditTextFieldState) {
@@ -120,7 +120,7 @@ internal fun OutlinedEditTextFieldItem(
     isError = isError,
     trailingIcon = {
       if (isError) {
-        Icon(painter = painterResource(R.drawable.error_24px), contentDescription = "Error")
+        Icon(imageVector = Icons.Default.Error, contentDescription = "Error")
       }
     },
     readOnly = isReadOnly,
@@ -136,19 +136,19 @@ internal fun OutlinedEditTextFieldItem(
 @Composable
 internal fun UnitText(unitString: String) {
   Box(
-    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.item_margin_horizontal)),
+    modifier = Modifier.padding(horizontal = 16.dp),
     contentAlignment = Alignment.Center,
   ) {
     Text(
       unitString,
-      style = MaterialTheme.typography.bodyMedium,
+      style = QuestionnaireTheme.typography.bodyMedium,
       modifier = Modifier.testTag(UNIT_TEXT_TEST_TAG),
     )
   }
 }
 
 @Composable
-@Preview(showSystemUi = true)
+@Preview()
 internal fun PreviewQuestionnaireItemEditText() {
   OutlinedEditTextFieldItem(
     inputText = "Input",

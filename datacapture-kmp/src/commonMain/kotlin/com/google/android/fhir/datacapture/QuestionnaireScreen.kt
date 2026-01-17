@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,12 @@
 package com.google.android.fhir.datacapture
 
 import android_fhir.datacapture_kmp.generated.resources.Res
-import android_fhir.datacapture_kmp.generated.resources.add_repeated_group_item
 import android_fhir.datacapture_kmp.generated.resources.button_pagination_next
 import android_fhir.datacapture_kmp.generated.resources.button_pagination_previous
 import android_fhir.datacapture_kmp.generated.resources.button_review
 import android_fhir.datacapture_kmp.generated.resources.cancel_questionnaire
-import android_fhir.datacapture_kmp.generated.resources.delete
 import android_fhir.datacapture_kmp.generated.resources.edit_button_text
 import android_fhir.datacapture_kmp.generated.resources.questionnaire_review_mode_title
-import android_fhir.datacapture_kmp.generated.resources.repeated_group_title
 import android_fhir.datacapture_kmp.generated.resources.submit_questionnaire
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,16 +47,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
-import com.google.fhir.model.r4.QuestionnaireResponse
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -250,7 +243,7 @@ private fun ReviewModeContent(
     },
   ) { innerPadding ->
     Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-      QuestionnaireReviewList(items = state.items)
+      QuestionnaireReviewList(items = state.items.filterIsInstance<ReviewAdapterItem>())
     }
   }
 }
@@ -388,68 +381,6 @@ fun QuestionnaireBottomNavigation(
             }
           }
         }
-      }
-    }
-  }
-}
-
-@Composable
-internal fun RepeatedGroupHeaderItem(
-  repeatedGroupHeader: QuestionnaireAdapterItem.RepeatedGroupHeader,
-) {
-  Row(
-    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-    horizontalArrangement = Arrangement.SpaceBetween,
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Text(
-      text =
-        stringResource(
-          Res.string.repeated_group_title,
-          "${repeatedGroupHeader.index + 1}",
-          repeatedGroupHeader.title,
-        ),
-      style = QuestionnaireTheme.typography.titleMedium,
-      fontWeight = FontWeight.SemiBold,
-      modifier = Modifier.weight(1f),
-    )
-
-    OutlinedButton(
-      onClick = repeatedGroupHeader.onDeleteClicked,
-    ) {
-      Text(text = stringResource(Res.string.delete))
-    }
-  }
-}
-
-@Composable
-internal fun RepeatedGroupAddButtonItem(
-  addButtonItem: QuestionnaireAdapterItem.RepeatedGroupAddButton,
-) {
-  val scope = rememberCoroutineScope()
-
-  if (addButtonItem.item.questionnaireItem.repeats?.value == true) {
-    Box(
-      modifier = Modifier.padding(vertical = 8.dp),
-      contentAlignment = Alignment.Center,
-    ) {
-      Button(
-        onClick = {
-          scope.launch {
-            addButtonItem.item.addAnswer(
-              QuestionnaireResponse.Item.Answer(),
-            )
-          }
-        },
-        enabled = addButtonItem.item.questionnaireItem.readOnly?.value != true,
-      ) {
-        Text(
-          text =
-            stringResource(
-              Res.string.add_repeated_group_item,
-              // TODO addButtonItem.item.questionText ?: "",
-            ),
-        )
       }
     }
   }

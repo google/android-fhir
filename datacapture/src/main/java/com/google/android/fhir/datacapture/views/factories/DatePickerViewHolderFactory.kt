@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 Google LLC
+ * Copyright 2022-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,11 +42,11 @@ import com.google.android.fhir.datacapture.extensions.parseLocalDateOrNull
 import com.google.android.fhir.datacapture.extensions.toLocalDate
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.DateInput
-import com.google.android.fhir.datacapture.views.compose.DateInputFormat
-import com.google.android.fhir.datacapture.views.compose.DatePickerItem
-import com.google.android.fhir.datacapture.views.compose.Header
-import com.google.android.fhir.datacapture.views.compose.MediaItem
+import com.google.android.fhir.datacapture.views.components.DateInput
+import com.google.android.fhir.datacapture.views.components.DateInputFormat
+import com.google.android.fhir.datacapture.views.components.DatePickerItem
+import com.google.android.fhir.datacapture.views.components.Header
+import com.google.android.fhir.datacapture.views.components.MediaItem
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.time.LocalDate
 import java.time.ZoneId
