@@ -46,7 +46,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun RepeatedGroupAddItem(questionnaireViewItem: QuestionnaireViewItem) {
+internal fun RepeatedGroupAddItem(questionnaireViewItem: QuestionnaireViewItem) {
   val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
   val questionText =
     remember(questionnaireViewItem) { questionnaireViewItem.questionText?.toString() ?: "" }
@@ -103,4 +103,4 @@ fun RepeatedGroupAddItem(questionnaireViewItem: QuestionnaireViewItem) {
   }
 }
 
-const val ADD_REPEATED_GROUP_BUTTON_TAG = "addRepeatedGroupButton"
+internal const val ADD_REPEATED_GROUP_BUTTON_TAG = "addRepeatedGroupButton"

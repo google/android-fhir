@@ -17,16 +17,10 @@
 package com.google.android.fhir.datacapture
 
 import android_fhir.datacapture_kmp.generated.resources.Res
-import android_fhir.datacapture_kmp.generated.resources.button_pagination_next
-import android_fhir.datacapture_kmp.generated.resources.button_pagination_previous
-import android_fhir.datacapture_kmp.generated.resources.button_review
-import android_fhir.datacapture_kmp.generated.resources.cancel_questionnaire
 import android_fhir.datacapture_kmp.generated.resources.edit_button_text
 import android_fhir.datacapture_kmp.generated.resources.questionnaire_review_mode_title
-import android_fhir.datacapture_kmp.generated.resources.submit_questionnaire
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,13 +28,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
+import com.google.android.fhir.datacapture.views.components.PageNavigationItem
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -200,9 +192,7 @@ private fun EditModeContent(
     },
     bottomBar = {
       if (bottomNavItem != null) {
-        QuestionnaireBottomNavigation(
-          navigationState = bottomNavItem.questionnaireNavigationUIState,
-        )
+        PageNavigationItem(bottomNavItem.questionnaireNavigationUIState)
       }
     },
   ) { innerPadding ->
@@ -236,8 +226,8 @@ private fun ReviewModeContent(
     },
     bottomBar = {
       if (bottomNavItem != null) {
-        QuestionnaireBottomNavigation(
-          navigationState = bottomNavItem.questionnaireNavigationUIState,
+        PageNavigationItem(
+          bottomNavItem.questionnaireNavigationUIState,
         )
       }
     },
@@ -272,115 +262,6 @@ fun QuestionnaireTitleBar(
           contentDescription = "Edit",
         )
         Text(text = stringResource(Res.string.edit_button_text))
-      }
-    }
-  }
-}
-
-@Composable
-fun QuestionnaireBottomNavigation(
-  navigationState: QuestionnaireNavigationUIState,
-  modifier: Modifier = Modifier,
-) {
-  Column(modifier = modifier) {
-    HorizontalDivider()
-
-    Surface(
-      modifier = Modifier.fillMaxWidth(),
-      color = QuestionnaireTheme.colorScheme.surface,
-    ) {
-      Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-      ) {
-        // Cancel button (start)
-        when (val cancelState = navigationState.navCancel) {
-          is QuestionnaireNavigationViewUIState.Enabled -> {
-            OutlinedButton(
-              onClick = cancelState.onClickAction,
-            ) {
-              Text(
-                text = cancelState.labelText ?: stringResource(Res.string.cancel_questionnaire),
-              )
-            }
-          }
-          QuestionnaireNavigationViewUIState.Hidden -> {
-            /* Hidden */
-          }
-        }
-
-        // Spacer to push navigation buttons to the end
-        Row(
-          modifier = Modifier.weight(1f),
-          horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End),
-          verticalAlignment = Alignment.CenterVertically,
-        ) {
-          // Previous button
-          when (val previousState = navigationState.navPrevious) {
-            is QuestionnaireNavigationViewUIState.Enabled -> {
-              OutlinedButton(
-                onClick = previousState.onClickAction,
-              ) {
-                Text(
-                  text = previousState.labelText
-                      ?: stringResource(Res.string.button_pagination_previous),
-                )
-              }
-            }
-            QuestionnaireNavigationViewUIState.Hidden -> {
-              /* Hidden */
-            }
-          }
-
-          // Next button
-          when (val nextState = navigationState.navNext) {
-            is QuestionnaireNavigationViewUIState.Enabled -> {
-              Button(
-                onClick = nextState.onClickAction,
-              ) {
-                Text(
-                  text = nextState.labelText ?: stringResource(Res.string.button_pagination_next),
-                )
-              }
-            }
-            QuestionnaireNavigationViewUIState.Hidden -> {
-              /* Hidden */
-            }
-          }
-
-          // Review button
-          when (val reviewState = navigationState.navReview) {
-            is QuestionnaireNavigationViewUIState.Enabled -> {
-              Button(
-                onClick = reviewState.onClickAction,
-              ) {
-                Text(
-                  text = reviewState.labelText ?: stringResource(Res.string.button_review),
-                )
-              }
-            }
-            QuestionnaireNavigationViewUIState.Hidden -> {
-              /* Hidden */
-            }
-          }
-
-          // Submit button
-          when (val submitState = navigationState.navSubmit) {
-            is QuestionnaireNavigationViewUIState.Enabled -> {
-              Button(
-                onClick = submitState.onClickAction,
-              ) {
-                Text(
-                  text = submitState.labelText ?: stringResource(Res.string.submit_questionnaire),
-                )
-              }
-            }
-            QuestionnaireNavigationViewUIState.Hidden -> {
-              /* Hidden */
-            }
-          }
-        }
       }
     }
   }

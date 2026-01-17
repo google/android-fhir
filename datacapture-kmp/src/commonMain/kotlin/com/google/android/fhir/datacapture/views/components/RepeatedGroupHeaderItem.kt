@@ -87,5 +87,5 @@ internal fun RepeatedGroupHeaderItem(
   }
 }
 
-const val DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG = "delete_repeated_group_item_button"
-const val REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG = "repeated_group_instance_header_title"
+internal const val DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG = "delete_repeated_group_item_button"
+internal const val REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG = "repeated_group_instance_header_title"

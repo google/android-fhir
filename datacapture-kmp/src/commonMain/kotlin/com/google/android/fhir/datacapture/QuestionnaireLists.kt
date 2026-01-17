@@ -41,6 +41,7 @@ import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.components.PageNavigationItem
 import com.google.android.fhir.datacapture.views.components.RepeatedGroupAddItem
 import com.google.android.fhir.datacapture.views.components.RepeatedGroupHeaderItem
 import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewFactory
@@ -103,6 +104,7 @@ internal fun QuestionnaireEditList(
               ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
         }
       },
+      contentType = { it::class.simpleName },
     ) { adapterItem: QuestionnaireAdapterItem ->
       when (adapterItem) {
         is QuestionnaireAdapterItem.Question -> {
@@ -112,7 +114,7 @@ internal fun QuestionnaireEditList(
           questionnaireItemViewHolderDelegate.Content(adapterItem.item)
         }
         is QuestionnaireAdapterItem.Navigation -> {
-          QuestionnaireBottomNavigation(adapterItem.questionnaireNavigationUIState)
+          PageNavigationItem(adapterItem.questionnaireNavigationUIState)
         }
         is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
           RepeatedGroupHeaderItem(adapterItem)
@@ -137,6 +139,7 @@ internal fun QuestionnaireReviewList(items: List<ReviewAdapterItem>) {
           is QuestionnaireAdapterItem.Navigation -> "navigation"
         }
       },
+      contentType = { it::class.simpleName },
     ) { item: ReviewAdapterItem ->
       when (item) {
         is QuestionnaireAdapterItem.Question -> {
@@ -146,8 +149,8 @@ internal fun QuestionnaireReviewList(items: List<ReviewAdapterItem>) {
           )
         }
         is QuestionnaireAdapterItem.Navigation -> {
-          QuestionnaireBottomNavigation(
-            navigationState = item.questionnaireNavigationUIState,
+          PageNavigationItem(
+            item.questionnaireNavigationUIState,
             modifier = Modifier.fillMaxWidth(),
           )
         }
