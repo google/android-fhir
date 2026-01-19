@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,37 +14,32 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture.test.views.compose
 
-import android.view.View
-import android.widget.Button
-import android.widget.FrameLayout
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.fhir.datacapture.R
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.common.truth.Truth.assertThat
+import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.ADD_REPEATED_GROUP_BUTTON_TAG
+import com.google.android.fhir.datacapture.views.compose.RepeatedGroupAddItem
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
-class RepeatedGroupAddItemViewHolderTest {
+@RunWith(AndroidJUnit4::class)
+class RepeatedGroupAddItemTest {
 
-  private val parent =
-    FrameLayout(
-      Robolectric.buildActivity(AppCompatActivity::class.java).create().get().apply {
-        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      },
-    )
-  private val viewHolder: RepeatedGroupAddItemViewHolder =
-    RepeatedGroupAddItemViewHolder.create(parent)
+  @get:Rule val composeTestRule = createComposeRule()
 
   @Test
   fun testRepeatedGroupIsReadOnlyDisablesAddButton() {
-    viewHolder.bind(
+    val viewItem =
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           text = "Question?"
@@ -55,32 +50,28 @@ class RepeatedGroupAddItemViewHolderTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-    assertThat(
-        (viewHolder.itemView.findViewById<Button>(R.id.add_item_to_repeated_group).isEnabled),
       )
-      .isFalse()
+
+    composeTestRule.setContent { RepeatedGroupAddItem(viewItem) }
+    composeTestRule.onNodeWithTag(ADD_REPEATED_GROUP_BUTTON_TAG).assertIsNotEnabled()
   }
 
   @Test
   fun repeatingGroup_shouldHaveAddItemButtonVisible() {
-    viewHolder.bind(
+    val viewItem =
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { repeats = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-
-    assertThat(viewHolder.itemView.findViewById<View>(R.id.add_item_to_repeated_group).visibility)
-      .isEqualTo(View.VISIBLE)
+      )
+    composeTestRule.setContent { RepeatedGroupAddItem(viewItem) }
+    composeTestRule.onNodeWithTag(ADD_REPEATED_GROUP_BUTTON_TAG).assertIsDisplayed()
   }
 
   @Test
   fun testRepeatedGroupIsNotReadOnlyEnablesAddButton() {
-    viewHolder.bind(
+    val viewItem =
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           text = "Question?"
@@ -91,11 +82,8 @@ class RepeatedGroupAddItemViewHolderTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
-    )
-    assertThat(
-        (viewHolder.itemView.findViewById<Button>(R.id.add_item_to_repeated_group).isEnabled),
       )
-      .isTrue()
+    composeTestRule.setContent { RepeatedGroupAddItem(viewItem) }
+    composeTestRule.onNodeWithTag(ADD_REPEATED_GROUP_BUTTON_TAG).assertIsEnabled()
   }
 }
