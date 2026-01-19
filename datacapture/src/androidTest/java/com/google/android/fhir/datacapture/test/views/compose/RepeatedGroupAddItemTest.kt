@@ -24,8 +24,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.components.ADD_REPEATED_GROUP_BUTTON_TAG
-import com.google.android.fhir.datacapture.views.components.RepeatedGroupAddItem
+import com.google.android.fhir.datacapture.views.compose.ADD_REPEATED_GROUP_BUTTON_TAG
+import com.google.android.fhir.datacapture.views.compose.RepeatedGroupAddItem
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Rule

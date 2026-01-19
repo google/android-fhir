@@ -1,5 +1,5 @@
 /*
- * Copyright 2025-2026 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,11 +49,11 @@ import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.components.CLEAR_TEXT_ICON_BUTTON_TAG
-import com.google.android.fhir.datacapture.views.components.DROP_DOWN_ANSWER_MENU_ITEM_TAG
-import com.google.android.fhir.datacapture.views.components.DROP_DOWN_TEXT_FIELD_LEADING_ICON_TAG
-import com.google.android.fhir.datacapture.views.components.DROP_DOWN_TEXT_FIELD_TAG
-import com.google.android.fhir.datacapture.views.components.ERROR_TEXT_AT_HEADER_TEST_TAG
+import com.google.android.fhir.datacapture.views.compose.CLEAR_TEXT_ICON_BUTTON_TAG
+import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_ANSWER_MENU_ITEM_TAG
+import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_TEXT_FIELD_LEADING_ICON_TAG
+import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_TEXT_FIELD_TAG
+import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
 import com.google.android.fhir.datacapture.views.factories.DropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.common.truth.Truth.assertThat

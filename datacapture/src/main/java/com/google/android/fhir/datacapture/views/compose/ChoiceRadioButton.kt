@@ -1,5 +1,5 @@
 /*
- * Copyright 2025-2026 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.components
+package com.google.android.fhir.datacapture.views.compose
 
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.background
@@ -24,12 +24,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -45,16 +44,16 @@ import androidx.core.graphics.drawable.toBitmap
 import com.google.android.fhir.datacapture.R
 
 @Composable
-internal fun ChoiceCheckbox(
+internal fun ChoiceRadioButton(
   label: AnnotatedString,
-  checked: Boolean,
+  selected: Boolean,
   enabled: Boolean,
   modifier: Modifier = Modifier,
   image: Drawable? = null,
-  onCheckedChange: (Boolean) -> Unit,
+  onClick: () -> Unit,
 ) {
   val backgroundColor =
-    if (checked) {
+    if (selected) {
       MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
     } else {
       MaterialTheme.colorScheme.surface
@@ -62,14 +61,14 @@ internal fun ChoiceCheckbox(
 
   val borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f)
   val textColor =
-    if (checked) {
+    if (selected) {
       MaterialTheme.colorScheme.primary
     } else {
       MaterialTheme.colorScheme.onSurface
     }
 
   val shape =
-    if (checked) {
+    if (selected) {
       RoundedCornerShape(4.dp)
     } else {
       RoundedCornerShape(8.dp)
@@ -81,17 +80,17 @@ internal fun ChoiceCheckbox(
         .clip(shape)
         .background(backgroundColor)
         .then(
-          if (!checked) {
+          if (!selected) {
             Modifier.border(1.dp, borderColor, shape)
           } else {
             Modifier
           },
         )
-        .toggleable(
-          value = checked,
+        .selectable(
+          selected = selected,
           enabled = enabled,
-          role = Role.Checkbox,
-          onValueChange = onCheckedChange,
+          role = Role.RadioButton,
+          onClick = onClick,
         )
         .padding(
           start = dimensionResource(R.dimen.option_item_between_text_and_icon_padding),
@@ -101,16 +100,10 @@ internal fun ChoiceCheckbox(
         ),
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    Checkbox(
-      checked = checked,
-      onCheckedChange = null,
+    RadioButton(
+      selected = selected,
+      onClick = null,
       enabled = enabled,
-      colors =
-        CheckboxDefaults.colors(
-          checkedColor = MaterialTheme.colorScheme.primary,
-          uncheckedColor = MaterialTheme.colorScheme.onSurface,
-          checkmarkColor = MaterialTheme.colorScheme.surface,
-        ),
     )
     // Display image
     image?.let { drawable ->
@@ -118,7 +111,7 @@ internal fun ChoiceCheckbox(
       Icon(
         bitmap = drawable.toBitmap().asImageBitmap(),
         contentDescription = null,
-        modifier = Modifier.testTag(CHOICE_CHECKBOX_IMAGE_TAG).size(24.dp),
+        modifier = Modifier.testTag(CHOICE_RADIO_BUTTON_IMAGE_TAG).size(24.dp),
       )
     }
     Spacer(
@@ -133,4 +126,4 @@ internal fun ChoiceCheckbox(
   }
 }
 
-const val CHOICE_CHECKBOX_IMAGE_TAG = "checkbox_option_icon"
+const val CHOICE_RADIO_BUTTON_IMAGE_TAG = "radio_button_option_icon"

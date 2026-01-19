@@ -1,5 +1,5 @@
 /*
- * Copyright 2025-2026 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ import androidx.core.content.ContextCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.views.components.DROP_DOWN_TEXT_FIELD_TAG
-import com.google.android.fhir.datacapture.views.components.DropDownItem
+import com.google.android.fhir.datacapture.views.compose.DROP_DOWN_TEXT_FIELD_TAG
+import com.google.android.fhir.datacapture.views.compose.DropDownItem
 import com.google.android.fhir.datacapture.views.factories.DropDownAnswerOption
 import org.junit.Rule
 import org.junit.Test

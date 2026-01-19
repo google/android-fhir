@@ -34,9 +34,9 @@ import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFa
 import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.components.PageBottomNavigationView
-import com.google.android.fhir.datacapture.views.components.RepeatedGroupAddItem
-import com.google.android.fhir.datacapture.views.components.RepeatedGroupHeaderItem
+import com.google.android.fhir.datacapture.views.compose.PageBottomNavigationView
+import com.google.android.fhir.datacapture.views.compose.RepeatedGroupAddItem
+import com.google.android.fhir.datacapture.views.compose.RepeatedGroupHeaderItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewHolderFactory

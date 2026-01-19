@@ -1,5 +1,5 @@
 /*
- * Copyright 2025-2026 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,11 +39,11 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.components.ERROR_TEXT_AT_HEADER_TEST_TAG
-import com.google.android.fhir.datacapture.views.components.HEADER_TAG
-import com.google.android.fhir.datacapture.views.components.HELP_BUTTON_TAG
-import com.google.android.fhir.datacapture.views.components.HELP_CARD_TAG
-import com.google.android.fhir.datacapture.views.components.Header
+import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
+import com.google.android.fhir.datacapture.views.compose.HEADER_TAG
+import com.google.android.fhir.datacapture.views.compose.HELP_BUTTON_TAG
+import com.google.android.fhir.datacapture.views.compose.HELP_CARD_TAG
+import com.google.android.fhir.datacapture.views.compose.Header
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
