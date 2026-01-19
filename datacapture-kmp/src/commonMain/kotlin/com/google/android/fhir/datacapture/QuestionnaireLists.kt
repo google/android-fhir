@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025 Google LLC
+ * Copyright 2024-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +41,14 @@ import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.components.PageNavigationItem
+import com.google.android.fhir.datacapture.views.components.RepeatedGroupAddItem
+import com.google.android.fhir.datacapture.views.components.RepeatedGroupHeaderItem
 import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewFactory
+import com.google.android.fhir.datacapture.views.factories.GroupViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuantityViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewFactory
 import com.google.fhir.model.r4.Questionnaire
@@ -100,6 +104,7 @@ internal fun QuestionnaireEditList(
               ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
         }
       },
+      contentType = { it::class.simpleName },
     ) { adapterItem: QuestionnaireAdapterItem ->
       when (adapterItem) {
         is QuestionnaireAdapterItem.Question -> {
@@ -109,13 +114,13 @@ internal fun QuestionnaireEditList(
           questionnaireItemViewHolderDelegate.Content(adapterItem.item)
         }
         is QuestionnaireAdapterItem.Navigation -> {
-          QuestionnaireBottomNavigation(adapterItem.questionnaireNavigationUIState)
+          PageNavigationItem(adapterItem.questionnaireNavigationUIState)
         }
         is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
           RepeatedGroupHeaderItem(adapterItem)
         }
         is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
-          RepeatedGroupAddButtonItem(adapterItem)
+          RepeatedGroupAddItem(adapterItem.item)
         }
       }
     }
@@ -123,7 +128,7 @@ internal fun QuestionnaireEditList(
 }
 
 @Composable
-internal fun QuestionnaireReviewList(items: List<QuestionnaireAdapterItem>) {
+internal fun QuestionnaireReviewList(items: List<ReviewAdapterItem>) {
   LazyColumn {
     items(
       items = items,
@@ -131,13 +136,11 @@ internal fun QuestionnaireReviewList(items: List<QuestionnaireAdapterItem>) {
         when (item) {
           is QuestionnaireAdapterItem.Question -> item.id
               ?: throw IllegalStateException("Missing id for the Question: $item")
-          is QuestionnaireAdapterItem.RepeatedGroupHeader -> item.id
           is QuestionnaireAdapterItem.Navigation -> "navigation"
-          is QuestionnaireAdapterItem.RepeatedGroupAddButton -> item.id
-              ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
         }
       },
-    ) { item: QuestionnaireAdapterItem ->
+      contentType = { it::class.simpleName },
+    ) { item: ReviewAdapterItem ->
       when (item) {
         is QuestionnaireAdapterItem.Question -> {
           QuestionnaireReviewItem(
@@ -146,16 +149,10 @@ internal fun QuestionnaireReviewList(items: List<QuestionnaireAdapterItem>) {
           )
         }
         is QuestionnaireAdapterItem.Navigation -> {
-          QuestionnaireBottomNavigation(
-            navigationState = item.questionnaireNavigationUIState,
+          PageNavigationItem(
+            item.questionnaireNavigationUIState,
             modifier = Modifier.fillMaxWidth(),
           )
-        }
-        is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-          // TODO not implemented
-        }
-        is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
-          //  TODO not implemented
         }
       }
     }
@@ -336,6 +333,7 @@ fun getQuestionnaireItemViewFactory(
     QuestionnaireViewHolderType.EDIT_TEXT_INTEGER -> EditTextIntegerViewFactory
     QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewFactory
     QuestionnaireViewHolderType.QUANTITY -> QuantityViewFactory
+    QuestionnaireViewHolderType.GROUP -> GroupViewFactory
     else -> TODO()
   }
 }
