@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 Google LLC
+ * Copyright 2022-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,19 @@
 
 package com.google.android.fhir.datacapture.validation
 
-sealed class ValidationResult
+sealed interface ValidationResult {
+  fun getSingleStringValidationMessage(): String?
+}
 
-object NotValidated : ValidationResult()
+object NotValidated : ValidationResult {
+  override fun getSingleStringValidationMessage() = null
+}
 
-object Valid : ValidationResult()
+object Valid : ValidationResult {
+  override fun getSingleStringValidationMessage() = null
+}
 
-data class Invalid(private val validationMessages: List<String>) : ValidationResult() {
-  fun getSingleStringValidationMessage() = this.validationMessages.joinToString(separator = "\n")
+data class Invalid(private val validationMessages: List<String>) : ValidationResult {
+  override fun getSingleStringValidationMessage() =
+    this.validationMessages.joinToString(separator = "\n")
 }

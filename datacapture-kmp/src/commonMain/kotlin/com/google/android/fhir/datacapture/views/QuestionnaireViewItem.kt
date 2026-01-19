@@ -195,11 +195,6 @@ data class QuestionnaireViewItem(
   //    return questionnaireResponseItem.answer.joinToString { it.value.displayString(context) }
   //  }
   //
-  //
-  //  val questionTextAnnotatedString: AnnotatedString? by lazy {
-  //    questionnaireResponseItem.text?.toAnnotatedString()
-  //      ?: questionnaireItem.text?.toElement().localizedTextAnnotatedString()
-  //  }
 
   fun isAnswerOptionSelected(
     answerOption: Questionnaire.Item.AnswerOption,
