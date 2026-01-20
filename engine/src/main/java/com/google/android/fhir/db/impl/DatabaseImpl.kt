@@ -200,6 +200,15 @@ internal class DatabaseImpl(
       ?: throw ResourceNotFoundException(type.name, id)
   }
 
+  override suspend fun selectResources(type: ResourceType, vararg ids: String): List<Resource> {
+    val resources =
+      resourceDao.getResources(resourceIds = ids, resourceType = type)?.takeIf { it.isNotEmpty() }
+        ?: throw ResourceNotFoundException(type.name, *ids)
+    return resources.pmap(Dispatchers.Default) {
+      FhirContext.forR4Cached().newJsonParser().parseResource(it) as Resource
+    }
+  }
+
   override suspend fun insertSyncedResources(resources: List<Resource>) {
     db.withTransaction { insertRemote(*resources.toTypedArray()) }
   }
