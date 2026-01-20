@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.runComposeUiTest
 import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4String
-import com.google.android.fhir.datacapture.extensions.StringAnswerValue
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -93,7 +92,10 @@ class EditTextMultiLineViewFactoryTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = StringAnswerValue(value = FhirR4String(value = "Answer")),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.String(
+                        value = FhirR4String(value = "Answer"),
+                      ),
                   ),
                 ),
             ),
@@ -120,7 +122,10 @@ class EditTextMultiLineViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = StringAnswerValue(value = FhirR4String(value = "Answer")),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.String(
+                      value = FhirR4String(value = "Answer"),
+                    ),
                 ),
               ),
           ),
@@ -209,7 +214,10 @@ class EditTextMultiLineViewFactoryTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = StringAnswerValue(value = FhirR4String(value = "hello there")),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.String(
+                        value = FhirR4String(value = "hello there"),
+                      ),
                   ),
                 ),
             ),
@@ -244,7 +252,10 @@ class EditTextMultiLineViewFactoryTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = StringAnswerValue(value = FhirR4String(value = "hello")),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.String(
+                        value = FhirR4String(value = "hello"),
+                      ),
                   ),
                 ),
             ),

@@ -37,7 +37,6 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_SLIDER_STEP_VALU
 import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4Integer
 import com.google.android.fhir.datacapture.extensions.FhirR4String
-import com.google.android.fhir.datacapture.extensions.IntegerAnswerValue
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -136,7 +135,10 @@ class SliderViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = IntegerAnswerValue(value = FhirR4Integer(value = 10)),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Integer(
+                    value = FhirR4Integer(value = 10),
+                  ),
               ),
             ),
         ),
@@ -518,10 +520,16 @@ class SliderViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = IntegerAnswerValue(value = FhirR4Integer(value = 10)),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Integer(
+                      value = FhirR4Integer(value = 10),
+                    ),
                 ),
                 QuestionnaireResponse.Item.Answer(
-                  value = IntegerAnswerValue(value = FhirR4Integer(value = 10)),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Integer(
+                      value = FhirR4Integer(value = 10),
+                    ),
                 ),
               ),
           ),
@@ -575,7 +583,10 @@ class SliderViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = IntegerAnswerValue(value = FhirR4Integer(value = 75)),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Integer(
+                    value = FhirR4Integer(value = 75),
+                  ),
               ),
             ),
         ),
@@ -628,7 +639,10 @@ class SliderViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = IntegerAnswerValue(value = FhirR4Integer(value = 25)),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Integer(
+                    value = FhirR4Integer(value = 25),
+                  ),
               ),
             ),
         ),
@@ -750,7 +764,10 @@ class SliderViewFactoryTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = IntegerAnswerValue(value = FhirR4Integer(value = 10)),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.Integer(
+                        value = FhirR4Integer(value = 10),
+                      ),
                   ),
                 ),
             ),
@@ -794,7 +811,10 @@ class SliderViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = IntegerAnswerValue(value = FhirR4Integer(value = 12)),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Integer(
+                      value = FhirR4Integer(value = 12),
+                    ),
                 ),
               ),
           ),
