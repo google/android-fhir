@@ -16,10 +16,6 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android_fhir.datacapture_kmp.generated.resources.Res
-import android_fhir.datacapture_kmp.generated.resources.open_choice_other
-import android_fhir.datacapture_kmp.generated.resources.open_choice_other_add_another
-import android_fhir.datacapture_kmp.generated.resources.save
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -66,7 +62,6 @@ import com.google.fhir.model.r4.Uri
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainInOrder
 import kotlin.test.Test
-import org.jetbrains.compose.resources.getString
 
 @OptIn(ExperimentalTestApi::class)
 class DialogSelectViewFactoryTest {
@@ -96,7 +91,7 @@ class DialogSelectViewFactoryTest {
     onNodeWithText("Coding 1").performClick()
     onNodeWithText("Coding 3").performClick()
     onNodeWithText("Coding 5").performClick()
-    onNodeWithText(getString(Res.string.save)).performClick()
+    onNodeWithText("Save").performClick()
 
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
       .assertTextEquals("Coding 1, Coding 3, Coding 5")
@@ -155,7 +150,7 @@ class DialogSelectViewFactoryTest {
       onNodeWithText("Coding 1").performClick()
       onNodeWithText("Coding 3").performClick()
       onNodeWithText("Coding Exclusive").performClick()
-      onNodeWithText(getString(Res.string.save)).performClick()
+      onNodeWithText("Save").performClick()
 
       onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
         .assertTextEquals("Coding Exclusive")
@@ -214,7 +209,7 @@ class DialogSelectViewFactoryTest {
       onNodeWithText("Coding Exclusive").performClick()
       onNodeWithText("Coding 1").performClick()
       onNodeWithText("Coding 3").performClick()
-      onNodeWithText(getString(Res.string.save)).performClick()
+      onNodeWithText("Save").performClick()
 
       onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
         .assertTextEquals("Coding 1, Coding 3")
@@ -287,7 +282,7 @@ class DialogSelectViewFactoryTest {
       onNodeWithText("Coding 3").performClick()
       onNodeWithText("Coding Exclusive 1").performClick()
       onNodeWithText("Coding Exclusive 2").performClick()
-      onNodeWithText(getString(Res.string.save)).performClick()
+      onNodeWithText("Save").performClick()
 
       onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
         .assertTextEquals("Coding Exclusive 2")
@@ -360,7 +355,7 @@ class DialogSelectViewFactoryTest {
       onNodeWithText("Coding Exclusive 2").performClick()
       onNodeWithText("Coding 1").performClick()
       onNodeWithText("Coding 3").performClick()
-      onNodeWithText(getString(Res.string.save)).performClick()
+      onNodeWithText("Save").performClick()
 
       onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
         .assertTextEquals("Coding 1, Coding 3")
@@ -385,7 +380,7 @@ class DialogSelectViewFactoryTest {
 
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
-    onNodeWithText(getString(Res.string.save)).performClick()
+    onNodeWithText("Save").performClick()
 
     // When nothing is selected, the field should be empty
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).assertTextEquals("").assertIsDisplayed()
@@ -432,7 +427,7 @@ class DialogSelectViewFactoryTest {
 
     onNodeWithText("Coding 2").performClick()
     onNodeWithText("Coding 1").performClick()
-    onNodeWithText(getString(Res.string.save)).performClick()
+    onNodeWithText("Save").performClick()
 
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).assertTextEquals("Coding 1").assertIsDisplayed()
     answerHolder!!
@@ -456,7 +451,7 @@ class DialogSelectViewFactoryTest {
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
     onNodeWithText("Coding 2").performClick()
-    onNodeWithText(getString(Res.string.save)).performClick()
+    onNodeWithText("Save").performClick()
 
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).assertTextEquals("Coding 2")
     answerHolder!!
@@ -477,7 +472,7 @@ class DialogSelectViewFactoryTest {
     setContent { QuestionnaireDialogSelect(questionnaireViewItem) }
 
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
-    onNodeWithText(getString(Res.string.save)).performClick()
+    onNodeWithText("Save").performClick()
 
     // When nothing is selected, the field should be empty
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).assertTextEquals("").assertIsDisplayed()
@@ -603,12 +598,12 @@ class DialogSelectViewFactoryTest {
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
     // Select "Other" option
-    val otherText = getString(Res.string.open_choice_other)
+    val otherText = "Other"
     onNodeWithTag(OPTION_CHOICE_LIST_TAG).performScrollToNode(hasText(otherText))
     onNodeWithText(otherText).performClick()
 
     // "Add Another" button should be displayed in multi-select mode
-    onNodeWithText(getString(Res.string.open_choice_other_add_another)).assertIsDisplayed()
+    onNodeWithText("Add another answer").assertIsDisplayed()
   }
 
   @Test
@@ -653,13 +648,13 @@ class DialogSelectViewFactoryTest {
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
     // Select and then unselect "Other" option
-    val otherText = getString(Res.string.open_choice_other)
+    val otherText = "Other"
     onNodeWithTag(OPTION_CHOICE_LIST_TAG).performScrollToNode(hasText(otherText))
     onNodeWithText(otherText).performClick()
     onNodeWithText(otherText).performClick()
 
     // "Add Another" button should not be displayed when "Other" is unselected
-    onNodeWithText(getString(Res.string.open_choice_other_add_another)).assertDoesNotExist()
+    onNodeWithText("Add another answer").assertDoesNotExist()
   }
 
   @Test
@@ -704,12 +699,12 @@ class DialogSelectViewFactoryTest {
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
     // Select "Other" option
-    val otherText = getString(Res.string.open_choice_other)
+    val otherText = "Other"
     onNodeWithTag(OPTION_CHOICE_LIST_TAG).performScrollToNode(hasText(otherText))
     onNodeWithText(otherText).performClick()
 
     // Click "Add Another" button
-    val addAnotherText = getString(Res.string.open_choice_other_add_another)
+    val addAnotherText = "Add another answer"
     onNodeWithTag(OPTION_CHOICE_LIST_TAG).performScrollToNode(hasText(addAnotherText))
     onNodeWithText(addAnotherText).performClick()
 
@@ -774,7 +769,7 @@ class DialogSelectViewFactoryTest {
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
     // Select "Other" option
-    val otherText = getString(Res.string.open_choice_other)
+    val otherText = "Other"
     onNodeWithTag(OPTION_CHOICE_LIST_TAG).performScrollToNode(hasText(otherText))
     onNodeWithText(otherText).performClick()
 
@@ -782,7 +777,7 @@ class DialogSelectViewFactoryTest {
     onNodeWithText("Coding Exclusive").performClick()
 
     // "Add Another" button should not be displayed when exclusive option is selected
-    onNodeWithText(getString(Res.string.open_choice_other_add_another)).assertDoesNotExist()
+    onNodeWithText("Add another answer").assertDoesNotExist()
   }
 
   @Test
@@ -843,12 +838,12 @@ class DialogSelectViewFactoryTest {
       onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
       // Select "Other" option
-      val otherText = getString(Res.string.open_choice_other)
+      val otherText = "Other"
       onNodeWithTag(OPTION_CHOICE_LIST_TAG).performScrollToNode(hasText(otherText))
       onNodeWithText(otherText).performClick()
 
       // Click "Add Another" button
-      onNodeWithText(getString(Res.string.open_choice_other_add_another)).performClick()
+      onNodeWithText("Add another answer").performClick()
 
       // Select exclusive option
       onNodeWithText("Coding Exclusive").performClick()
@@ -856,7 +851,7 @@ class DialogSelectViewFactoryTest {
       // "Add Another" button and edit text should not be displayed when exclusive option is
       // selected
       onAllNodes(hasTestTag(OTHER_OPTION_TEXT_FIELD_TAG)).assertCountEquals(0)
-      onNodeWithText(getString(Res.string.open_choice_other_add_another)).assertDoesNotExist()
+      onNodeWithText("Add another answer").assertDoesNotExist()
     }
 
   @Test
@@ -1106,7 +1101,7 @@ class DialogSelectViewFactoryTest {
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
     onNode(hasTestTag(OPTION_CHOICE_TAG) and hasText("Coding 2")).performClick()
-    onNodeWithText(getString(Res.string.save)).performClick()
+    onNodeWithText("Save").performClick()
 
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
       .assert(
@@ -1120,7 +1115,7 @@ class DialogSelectViewFactoryTest {
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG).performClick()
 
     onNode(hasTestTag(OPTION_CHOICE_TAG) and hasText("Coding 2")).performClick()
-    onNodeWithText(getString(Res.string.save)).performClick()
+    onNodeWithText("Save").performClick()
 
     onNodeWithTag(MULTI_SELECT_TEXT_FIELD_TAG)
       .assert(
