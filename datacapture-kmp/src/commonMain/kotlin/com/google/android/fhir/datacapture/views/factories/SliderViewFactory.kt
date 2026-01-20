@@ -42,6 +42,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 internal object SliderViewFactory : QuestionnaireItemViewFactory {
+  private const val SLIDER_DEFAULT_STEP_SIZE = 1
+  private const val SLIDER_DEFAULT_VALUE_FROM = 0.0F
+  private const val SLIDER_DEFAULT_VALUE_TO = 100.0F
+
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
     val validationMessage =
@@ -110,11 +114,7 @@ internal object SliderViewFactory : QuestionnaireItemViewFactory {
       Valid, -> null
       is Invalid -> validationResult.getSingleStringValidationMessage()
     }
+
+  private fun getFloatValue(extensionValue: Extension.Value?, ifNull: Float) =
+    extensionValue?.asInteger()?.value?.value?.toFloat() ?: ifNull
 }
-
-private const val SLIDER_DEFAULT_STEP_SIZE = 1
-private const val SLIDER_DEFAULT_VALUE_FROM = 0.0F
-private const val SLIDER_DEFAULT_VALUE_TO = 100.0F
-
-private fun getFloatValue(extensionValue: Extension.Value?, ifNull: Float) =
-  extensionValue?.asInteger()?.value?.value?.toFloat() ?: ifNull

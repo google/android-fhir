@@ -31,8 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import kotlin.math.roundToInt
 
+internal const val SLIDER_TAG = "slider"
+
 @Composable
-fun SliderItem(
+internal fun SliderItem(
   position: Float,
   steps: Int,
   valueRange: ClosedFloatingPointRange<Float>,
@@ -58,5 +60,3 @@ fun SliderItem(
     )
   }
 }
-
-const val SLIDER_TAG = "slider"
