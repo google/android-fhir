@@ -124,7 +124,7 @@ internal class EnablementEvaluator(
    * @param questionnaireItem the corresponding questionnaire item.
    * @param questionnaireResponseItem the corresponding questionnaire response item.
    */
-  suspend fun evaluate(
+  fun evaluate(
     questionnaireItem: Questionnaire.Item,
     questionnaireResponseItem: QuestionnaireResponse.Item,
   ): Boolean {
@@ -185,18 +185,22 @@ internal class EnablementEvaluator(
           findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, it)
         }
       }
+
+    if (targetQuestionnaireResponseItem == null) {
+      return false
+    }
+
     return if (Questionnaire.QuestionnaireItemOperator.Exists == enableWhen.operator.value) {
       // True iff the answer value of the enable when is equal to whether an answer exists in the
       // target questionnaire response item
       enableWhen.answer.asBoolean()?.value?.value ==
-        !(targetQuestionnaireResponseItem == null ||
-          targetQuestionnaireResponseItem.answer.isEmpty())
+        !targetQuestionnaireResponseItem.answer.isEmpty()
     } else {
       // The `enableWhen` constraint evaluates to true if at least one answer has a value that
       // satisfies the `enableWhen` operator and answer, with the exception of the `Exists`
       // operator.
       // See https://www.hl7.org/fhir/valueset-questionnaire-enable-operator.html.
-      targetQuestionnaireResponseItem?.answer?.any { enableWhen.predicate(it) } ?: false
+      targetQuestionnaireResponseItem.answer.any { enableWhen.predicate(it) }
     }
   }
 
@@ -269,16 +273,16 @@ private val Questionnaire.Item.EnableWhen.predicate: (QuestionnaireResponse.Item
     }
   }
 
-private fun Questionnaire.Item.EnableWhen.Answer.getActualValue(): Any? =
+private fun Questionnaire.Item.EnableWhen.Answer.getActualValue(): Any =
   when (this) {
-    is Questionnaire.Item.EnableWhen.Answer.Boolean -> this.asBoolean()?.value
-    is Questionnaire.Item.EnableWhen.Answer.Coding -> this.asCoding()?.value
-    is Questionnaire.Item.EnableWhen.Answer.Date -> this.asDate()?.value
-    is Questionnaire.Item.EnableWhen.Answer.DateTime -> this.asDateTime()?.value
-    is Questionnaire.Item.EnableWhen.Answer.Decimal -> this.asDecimal()?.value
-    is Questionnaire.Item.EnableWhen.Answer.Integer -> this.asInteger()?.value
-    is Questionnaire.Item.EnableWhen.Answer.Quantity -> this.asQuantity()?.value
-    is Questionnaire.Item.EnableWhen.Answer.Reference -> this.asReference()?.value
-    is Questionnaire.Item.EnableWhen.Answer.String -> this.asString()?.value
-    is Questionnaire.Item.EnableWhen.Answer.Time -> this.asTime()?.value
+    is Questionnaire.Item.EnableWhen.Answer.Boolean -> this.value
+    is Questionnaire.Item.EnableWhen.Answer.Coding -> this.value
+    is Questionnaire.Item.EnableWhen.Answer.Date -> this.value
+    is Questionnaire.Item.EnableWhen.Answer.DateTime -> this.value
+    is Questionnaire.Item.EnableWhen.Answer.Decimal -> this.value
+    is Questionnaire.Item.EnableWhen.Answer.Integer -> this.value
+    is Questionnaire.Item.EnableWhen.Answer.Quantity -> this.value
+    is Questionnaire.Item.EnableWhen.Answer.Reference -> this.value
+    is Questionnaire.Item.EnableWhen.Answer.String -> this.value
+    is Questionnaire.Item.EnableWhen.Answer.Time -> this.value
   }
