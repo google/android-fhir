@@ -442,10 +442,10 @@ class ResourceDatabaseMigrationTest {
 
     helper.createDatabase(DB_NAME, 9).apply {
       execSQL(
-        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('$patient1ResourceUuid', 'Patient', '$patient1', '$patient1');",
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('$patient1ResourceUuid', 'Patient', '$patient1Id', '$patient1');",
       )
       execSQL(
-        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('$patient2ResourceUuid', 'Patient', '$patient2', '$patient2');",
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('$patient2ResourceUuid', 'Patient', '$patient2Id', '$patient2');",
       )
 
       close()
@@ -482,6 +482,58 @@ class ResourceDatabaseMigrationTest {
 
     assertThat(patientResult1).isEqualTo(patient2)
     assertThat(patientResult2).isEqualTo(patient1)
+  }
+
+  @Test
+  fun migrate10to11_should_execute_with_no_exception(): Unit = runBlocking {
+    val patient1Id = "patient-001"
+    val patient1ResourceUuid = "8874FC39-6BA3-49AB-B9E4-C6FE64F64118"
+    val patientGivenName = "Nigo"
+    val patientJsonString =
+      Patient()
+        .apply {
+          id = patient1Id
+          addName(
+            HumanName().apply { addGiven(patientGivenName) },
+          )
+        }
+        .let { iParser.encodeResourceToString(it) }
+
+    helper.createDatabase(DB_NAME, 10).apply {
+      execSQL(
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('$patient1ResourceUuid', 'Patient', '$patient1Id', '$patientJsonString');",
+      )
+      execSQL(
+        "INSERT INTO StringIndexEntity (resourceUuid, resourceType, index_name, index_path, index_value) VALUES ('$patient1ResourceUuid', 'Patient', 'given', 'Patient.name.given', '$patientGivenName');",
+      )
+
+      close()
+    }
+
+    val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 11, true, Migration_10_11)
+
+    val queryResultJson: String?
+    migratedDatabase.let { database ->
+      database
+        .query(
+          """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceUuid IN (SELECT resourceUuid
+                       FROM StringIndexEntity
+                       WHERE resourceType = 'Patient'
+                         AND index_name = 'given'
+                         AND index_value = '$patientGivenName');
+                """
+            .trimIndent(),
+        )
+        .let {
+          it.moveToFirst()
+          queryResultJson = it.getString(0)
+        }
+    }
+    migratedDatabase.close()
+    assertThat(queryResultJson).isEqualTo(patientJsonString)
   }
 
   companion object {

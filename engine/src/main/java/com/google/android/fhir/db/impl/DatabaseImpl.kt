@@ -116,6 +116,7 @@ internal class DatabaseImpl(
             MIGRATION_7_8,
             Migration_8_9,
             Migration_9_10,
+            Migration_10_11,
           )
         }
         .build()
