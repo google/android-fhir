@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 import com.google.fhir.model.r4.Resource
 import com.google.fhir.model.r4.String as FhirString
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.TimeZone
@@ -537,33 +539,31 @@ fun Questionnaire.Item.hasMimeTypeOnly(type: String): Boolean {
   return mimeTypes.all { it.substringBefore("/") == type }
 }
 
-// /** The maximum size of an attachment in Bytes. */
-// internal val Questionnaire.Item.maxSizeInBytes: BigDecimal?
-//  get() =
-//    (extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.valueAsPrimitive as DecimalType?)
-//      ?.value
-//
-// private val BYTES_PER_KIB = BigDecimal(1024)
-//
-// /** The maximum size of an attachment in Kibibytes. */
-// internal val Questionnaire.Item.maxSizeInKiBs: BigDecimal?
-//  get() = maxSizeInBytes?.div(BYTES_PER_KIB)
-//
-// private val BYTES_PER_MIB = BigDecimal(1048576)
-//
-// /** The maximum size of an attachment in Mebibytes. */
-// internal val Questionnaire.Item.maxSizeInMiBs: BigDecimal?
-//  get() = maxSizeInBytes?.div(BYTES_PER_MIB)
-//
-// /** The default maximum size of an attachment is 1 Mebibytes. */
-// private val DEFAULT_SIZE = BigDecimal(1048576)
-//
-// /** Returns true if given size is above maximum size allowed. */
-// internal fun Questionnaire.Item.isGivenSizeOverLimit(
-//  size: BigDecimal,
-// ): Boolean {
-//  return size > (maxSizeInBytes ?: DEFAULT_SIZE)
-// }
+/** The maximum size of an attachment in Bytes. */
+internal val Questionnaire.Item.maxSizeInBytes: BigDecimal?
+  get() = extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.value?.asDecimal()?.value?.value
+
+private val BYTES_PER_KIB = 1024.toBigDecimal()
+
+/** The maximum size of an attachment in Kibibytes. */
+internal val Questionnaire.Item.maxSizeInKiBs: BigDecimal?
+  get() = maxSizeInBytes?.div(BYTES_PER_KIB)
+
+private val BYTES_PER_MIB = 1048576.toBigDecimal()
+
+/** The maximum size of an attachment in Mebibytes. */
+internal val Questionnaire.Item.maxSizeInMiBs: BigDecimal?
+  get() = maxSizeInBytes?.div(BYTES_PER_MIB)
+
+/** The default maximum size of an attachment is 1 Mebibytes. */
+internal val DEFAULT_SIZE = 1048576.toBigDecimal()
+
+/** Returns true if given size is above maximum size allowed. */
+internal fun Questionnaire.Item.isGivenSizeOverLimit(
+  size: BigDecimal,
+): Boolean {
+  return size > (maxSizeInBytes ?: DEFAULT_SIZE)
+}
 
 /** A media that is attached to a [Questionnaire.Item]. */
 internal val Questionnaire.Item.itemMedia: Attachment?
