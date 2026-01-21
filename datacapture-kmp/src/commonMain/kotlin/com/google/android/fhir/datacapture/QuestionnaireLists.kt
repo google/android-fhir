@@ -43,6 +43,7 @@ import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.DateTimeViewFactory
 import com.google.android.fhir.datacapture.views.factories.DateViewFactory
+import com.google.android.fhir.datacapture.views.factories.DisplayViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewFactory
@@ -339,6 +340,7 @@ fun getQuestionnaireItemViewFactory(
     QuestionnaireViewHolderType.EDIT_TEXT_INTEGER -> EditTextIntegerViewFactory
     QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewFactory
     QuestionnaireViewHolderType.QUANTITY -> QuantityViewFactory
+    QuestionnaireViewHolderType.DISPLAY -> DisplayViewFactory
     QuestionnaireViewHolderType.DATE_PICKER -> DateViewFactory
     QuestionnaireViewHolderType.TIME_PICKER -> TimeViewFactory
     QuestionnaireViewHolderType.DATE_TIME_PICKER -> DateTimeViewFactory
