@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,9 @@ import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABA
 import java.time.Duration
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SQLiteDatabaseHook
-import net.sqlcipher.database.SQLiteOpenHelper
+import net.zetetic.database.sqlcipher.SQLiteDatabase
+import net.zetetic.database.sqlcipher.SQLiteDatabaseHook
+import net.zetetic.database.sqlcipher.SQLiteOpenHelper
 import timber.log.Timber
 
 /** A [SupportSQLiteOpenHelper] which initializes a [SQLiteDatabase] with a passphrase. */
@@ -41,7 +41,7 @@ internal class SQLCipherSupportHelper(
 ) : SupportSQLiteOpenHelper {
 
   init {
-    SQLiteDatabase.loadLibs(configuration.context)
+    System.loadLibrary("sqlcipher")
   }
 
   private val standardHelper =
@@ -51,7 +51,6 @@ internal class SQLCipherSupportHelper(
         configuration.name,
         /* factory= */ null,
         configuration.callback.version,
-        hook,
       ) {
       override fun onCreate(db: SQLiteDatabase) {
         configuration.callback.onCreate(db)
@@ -89,12 +88,12 @@ internal class SQLCipherSupportHelper(
       }
       val key = runBlocking { getPassphraseWithRetry() }
       return try {
-        standardHelper.getWritableDatabase(key)
+        standardHelper.writableDatabase
       } catch (ex: SQLiteException) {
         if (databaseErrorStrategy == DatabaseErrorStrategy.RECREATE_AT_OPEN) {
           Timber.w("Fail to open database. Recreating database.")
           configuration.context.getDatabasePath(databaseName).delete()
-          standardHelper.getWritableDatabase(key)
+          standardHelper.writableDatabase
         } else {
           throw ex
         }

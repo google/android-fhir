@@ -76,7 +76,7 @@ retrofit = "2.9.0"
 robolectric = "4.10.3"
 rulerGradlePlugin = "1.4.0"
 spotlessPluginGradle = "6.22.0"
-sqlcipher = "4.5.4"
+sqlcipher-android = "4.12.0"
 timber = "5.0.1"
 truth = "1.1.5"
 uiautomator = "2.3.0"
@@ -190,7 +190,7 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 ruler-gradle-plugin = { module = "com.spotify.ruler:ruler-gradle-plugin", version.ref = "rulerGradlePlugin" }
 spotless-plugin-gradle = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotlessPluginGradle" }
-sqlcipher = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlcipher" }
+sqlcipher = { module = "net.zetetic:sqlcipher-android", version.ref = "sqlcipher-android" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
 woodstox = { module = "com.fasterxml.woodstox:woodstox-core", version.ref = "woodstox" }
