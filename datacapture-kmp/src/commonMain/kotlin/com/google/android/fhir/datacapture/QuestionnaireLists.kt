@@ -41,6 +41,8 @@ import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.factories.DateTimeViewFactory
+import com.google.android.fhir.datacapture.views.factories.DateViewFactory
 import com.google.android.fhir.datacapture.views.factories.DisplayViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewFactory
@@ -48,6 +50,7 @@ import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineView
 import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuantityViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewFactory
+import com.google.android.fhir.datacapture.views.factories.TimeViewFactory
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 import kotlin.uuid.ExperimentalUuidApi
@@ -338,6 +341,9 @@ fun getQuestionnaireItemViewFactory(
     QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewFactory
     QuestionnaireViewHolderType.QUANTITY -> QuantityViewFactory
     QuestionnaireViewHolderType.DISPLAY -> DisplayViewFactory
+    QuestionnaireViewHolderType.DATE_PICKER -> DateViewFactory
+    QuestionnaireViewHolderType.TIME_PICKER -> TimeViewFactory
+    QuestionnaireViewHolderType.DATE_TIME_PICKER -> DateTimeViewFactory
     else -> TODO()
   }
 }

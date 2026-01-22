@@ -15,11 +15,11 @@ plugins {
 
 android {
   namespace = "com.example.sdckmpdemo"
-  compileSdk = 36
+  compileSdk = Sdk.COMPILE_SDK
 
   defaultConfig {
     applicationId = "com.example.sdckmpdemo"
-    minSdk = 24
+    minSdk = Sdk.MIN_SDK
     targetSdk = 36
     versionCode = 1
     versionName = "1.0"
