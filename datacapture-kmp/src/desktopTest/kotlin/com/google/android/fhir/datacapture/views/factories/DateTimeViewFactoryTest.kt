@@ -40,6 +40,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.text.AnnotatedString
 import com.google.android.fhir.datacapture.extensions.DateTimeAnswerValue
 import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4String
@@ -62,7 +63,7 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import kotlin.test.Ignore
+import java.util.Locale
 import kotlin.test.Test
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.UtcOffset
@@ -126,6 +127,7 @@ class DateTimeViewFactoryTest {
 
   @Test
   fun showDateFormatLabelInLowerCase() = runComposeUiTest {
+    Locale.setDefault(Locale.US)
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.Item(
@@ -143,11 +145,12 @@ class DateTimeViewFactoryTest {
       )
 
     setContent { QuestionnaireDateTimeView(questionnaireViewItem) }
-    onNodeWithTag(DATE_TEXT_INPUT_FIELD).assertTextEquals("dd/mm/yyyy", includeEditableText = false)
+    onNodeWithTag(DATE_TEXT_INPUT_FIELD).assertTextEquals("mm/dd/yyyy", includeEditableText = false)
   }
 
   @Test
   fun shouldSetDateTimeInput() = runComposeUiTest {
+    Locale.setDefault(Locale.US)
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.Item(
@@ -180,13 +183,16 @@ class DateTimeViewFactoryTest {
 
     setContent { QuestionnaireDateTimeView(questionnaireViewItem) }
 
-    onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true).assertTextEquals("05/01/2020")
+    onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true).assertTextEquals("01/05/2020")
     onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true)
-      .assert(hasTextExactly("01:30") or hasTextExactly("1:30 AM"))
+      .assert(
+        hasTextExactly("1:30\u202FAM"),
+      ) //  U+202F (Narrow No-Break Space - NNBSP) for time formatting in US Locale
   }
 
   @Test
   fun parseDateTextInputInUSLocale() = runComposeUiTest {
+    Locale.setDefault(Locale.US)
     var answer: QuestionnaireResponse.Item.Answer? = null
     val itemViewItem =
       QuestionnaireViewItem(
@@ -219,7 +225,7 @@ class DateTimeViewFactoryTest {
       )
     setContent { QuestionnaireDateTimeView(itemViewItem) }
 
-    onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("19/11/2020")
+    onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("11/19/2020")
     waitUntil { answer != null }
 
     val dateTime = (answer!!.value?.asDateTime()?.value?.value as? FhirDateTime.DateTime)?.dateTime
@@ -230,141 +236,133 @@ class DateTimeViewFactoryTest {
   }
 
   @Test
-  @Ignore("TODO: Locale")
-  fun parseDateTextInputInJapanLocale() =
-    runComposeUiTest {
-      //    Locale.setDefault(Locale.JAPAN)
-      //    var answer: QuestionnaireResponse.Item.Answer? = null
-      //    val itemViewItem =
-      //      QuestionnaireViewItem(
-      //        Questionnaire.Item(
-      //          linkId = FhirR4String(value = "datetime-item"),
-      //          type = Enumeration(value = Questionnaire.QuestionnaireItemType.DateTime),
-      //          text = FhirR4String(value = "Question?"),
-      //        ),
-      //        QuestionnaireResponse.Item(
-      //          linkId = FhirR4String(value = "datetime-item"),
-      //          answer =
-      //            listOf(
-      //              QuestionnaireResponse.Item.Answer(
-      //                value =
-      //                  DateTimeAnswerValue(
-      //                    value =
-      //                      DateTime(
-      //                        value =
-      //                          FhirDateTime.DateTime(
-      //                            dateTime = LocalDateTime(2020, 1, 5, 1, 30),
-      //                            utcOffset = UtcOffset.ZERO,
-      //                          ),
-      //                      ),
-      //                  ),
-      //              ),
-      //            ),
-      //        ),
-      //        validationResult = NotValidated,
-      //        answersChangedCallback = { _, _, result, _ -> answer = result.singleOrNull() },
-      //      )
-      //    setContent { QuestionnaireDateTimeView(itemViewItem) }
-      //
-      //    onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("2020/11/19")
-      //    waitUntil { answer != null }
-      //
-      //    val dateTime = (answer!!.value?.asDateTime()?.value?.value as?
-      // FhirDateTime.DateTime)?.dateTime
-      //    dateTime.shouldNotBeNull()
-      //    dateTime.day.shouldBe(19)
-      //    dateTime.month.shouldBe(10)
-      //    dateTime.year.shouldBe(2020)
-    }
+  fun parseDateTextInputInJapanLocale() = runComposeUiTest {
+    Locale.setDefault(Locale.JAPAN)
+    var answer: QuestionnaireResponse.Item.Answer? = null
+    val itemViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "datetime-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.DateTime),
+          text = FhirR4String(value = "Question?"),
+        ),
+        QuestionnaireResponse.Item(
+          linkId = FhirR4String(value = "datetime-item"),
+          answer =
+            listOf(
+              QuestionnaireResponse.Item.Answer(
+                value =
+                  DateTimeAnswerValue(
+                    value =
+                      DateTime(
+                        value =
+                          FhirDateTime.DateTime(
+                            dateTime = LocalDateTime(2020, 1, 5, 1, 30),
+                            utcOffset = UtcOffset.ZERO,
+                          ),
+                      ),
+                  ),
+              ),
+            ),
+        ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, result, _ -> answer = result.singleOrNull() },
+      )
+    setContent { QuestionnaireDateTimeView(itemViewItem) }
+
+    onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("2020/11/19")
+    waitUntil { answer != null }
+
+    val dateTime = (answer!!.value?.asDateTime()?.value?.value as? FhirDateTime.DateTime)?.dateTime
+    dateTime.shouldNotBeNull()
+    dateTime.day.shouldBe(19)
+    dateTime.month.number.shouldBe(11)
+    dateTime.year.shouldBe(2020)
+  }
 
   @Test
-  @Ignore("TODO: Locale")
-  fun ifDateInputIsInvalidThenClearTheAnswer() =
-    runComposeUiTest {
-      //    Locale.setDefault(Locale.JAPAN)
-      //    var answers: List<QuestionnaireResponse.Item.Answer>? = null
-      //    var draftAnswer: Any? = null
-      //    val itemViewItem =
-      //      QuestionnaireViewItem(
-      //        Questionnaire.Item(
-      //          linkId = FhirR4String(value = "datetime-item"),
-      //          type = Enumeration(value = Questionnaire.QuestionnaireItemType.DateTime),
-      //          text = FhirR4String(value = "Question?"),
-      //        ),
-      //        QuestionnaireResponse.Item(
-      //          linkId = FhirR4String(value = "datetime-item"),
-      //          answer =
-      //            listOf(
-      //              QuestionnaireResponse.Item.Answer(
-      //                value =
-      //                  DateTimeAnswerValue(
-      //                    value =
-      //                      DateTime(
-      //                        value =
-      //                          FhirDateTime.DateTime(
-      //                            dateTime = LocalDateTime(2020, 1, 5, 1, 30),
-      //                            utcOffset = UtcOffset.ZERO,
-      //                          ),
-      //                      ),
-      //                  ),
-      //              ),
-      //            ),
-      //        ),
-      //        validationResult = NotValidated,
-      //        answersChangedCallback = { _, _, result, draft ->
-      //          answers = result
-      //          draftAnswer = draft
-      //        },
-      //      )
-      //    setContent { QuestionnaireDateTimeView(itemViewItem) }
-      //
-      //    onNodeWithTag(DATE_TEXT_INPUT_FIELD)
-      //      .performTextReplacement("2020/11")
-      //    waitUntil { answers != null }
-      //
-      //    answers!!.shouldBeEmpty()
-      //    (draftAnswer as String).shouldBe("202011")
-    }
+  fun ifDateInputIsInvalidThenClearTheAnswer() = runComposeUiTest {
+    Locale.setDefault(Locale.JAPAN)
+    var answers: List<QuestionnaireResponse.Item.Answer>? = null
+    var draftAnswer: Any? = null
+    val itemViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "datetime-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.DateTime),
+          text = FhirR4String(value = "Question?"),
+        ),
+        QuestionnaireResponse.Item(
+          linkId = FhirR4String(value = "datetime-item"),
+          answer =
+            listOf(
+              QuestionnaireResponse.Item.Answer(
+                value =
+                  DateTimeAnswerValue(
+                    value =
+                      DateTime(
+                        value =
+                          FhirDateTime.DateTime(
+                            dateTime = LocalDateTime(2020, 1, 5, 1, 30),
+                            utcOffset = UtcOffset.ZERO,
+                          ),
+                      ),
+                  ),
+              ),
+            ),
+        ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, result, draft ->
+          answers = result
+          draftAnswer = draft
+        },
+      )
+    setContent { QuestionnaireDateTimeView(itemViewItem) }
+
+    onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("2020/11")
+    waitUntil { answers != null }
+
+    answers!!.shouldBeEmpty()
+    (draftAnswer as String).shouldBe("2020/11")
+  }
 
   @Test
-  @Ignore("TODO: Locale")
-  fun doNotClearTheTextFieldInputOnInvalidDate() =
-    runComposeUiTest {
-      //    Locale.setDefault(Locale.JAPAN)
-      //    val itemViewItem =
-      //      QuestionnaireViewItem(
-      //        Questionnaire.Item(
-      //          linkId = FhirR4String(value = "datetime-item"),
-      //          type = Enumeration(value = Questionnaire.QuestionnaireItemType.DateTime),
-      //          text = FhirR4String(value = "Question?"),
-      //        ),
-      //        QuestionnaireResponse.Item(
-      //          linkId = FhirR4String(value = "datetime-item"),
-      //          answer =
-      //            listOf(
-      //              QuestionnaireResponse.Item.Answer(
-      //                value =
-      //                  DateTimeAnswerValue(
-      //                    value =
-      //                      DateTime(
-      //                        value =
-      //                          FhirDateTime.DateTime(
-      //                            dateTime = LocalDateTime(2020, 1, 5, 1, 30),
-      //                            utcOffset = UtcOffset.ZERO,
-      //                          ),
-      //                      ),
-      //                  ),
-      //              ),
-      //            ),
-      //        ),
-      //        validationResult = NotValidated,
-      //        answersChangedCallback = { _, _, _, _ -> },
-      //      )
-      //    setContent { QuestionnaireDateTimeView(itemViewItem) }
-      //    onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("2020/11")
-      //
-      //    onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true).assertTextEquals("2020/11")
-    }
+  fun doNotClearTheTextFieldInputOnInvalidDate() = runComposeUiTest {
+    Locale.setDefault(Locale.JAPAN)
+    val itemViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "datetime-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.DateTime),
+          text = FhirR4String(value = "Question?"),
+        ),
+        QuestionnaireResponse.Item(
+          linkId = FhirR4String(value = "datetime-item"),
+          answer =
+            listOf(
+              QuestionnaireResponse.Item.Answer(
+                value =
+                  DateTimeAnswerValue(
+                    value =
+                      DateTime(
+                        value =
+                          FhirDateTime.DateTime(
+                            dateTime = LocalDateTime(2020, 1, 5, 1, 30),
+                            utcOffset = UtcOffset.ZERO,
+                          ),
+                      ),
+                  ),
+              ),
+            ),
+        ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    setContent { QuestionnaireDateTimeView(itemViewItem) }
+    onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("2020/11")
+
+    onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true).assertTextEquals("2020/11")
+  }
 
   @Test
   fun clearQuestionnaireResponseAnswerOnDraftAnswerUpdate() = runComposeUiTest {
@@ -459,6 +457,7 @@ class DateTimeViewFactoryTest {
 
   @Test
   fun displayDraftAnswerInTheTextFieldOfRecycledItems() = runComposeUiTest {
+    Locale.setDefault(Locale.US)
     var questionnaireItem by
       mutableStateOf(
         QuestionnaireViewItem(
@@ -491,7 +490,7 @@ class DateTimeViewFactoryTest {
       )
 
     setContent { QuestionnaireDateTimeView(questionnaireItem) }
-    onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true).assertTextEquals("05/01/2020")
+    onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true).assertTextEquals("01/05/2020")
 
     questionnaireItem =
       QuestionnaireViewItem(
@@ -515,6 +514,7 @@ class DateTimeViewFactoryTest {
 
   @Test
   fun displayAnAnswerInTheTextFieldOfPartiallyAnsweredRecycledItem() = runComposeUiTest {
+    Locale.setDefault(Locale.US)
     var questionnaireItem by
       mutableStateOf(
         QuestionnaireViewItem(
@@ -566,7 +566,7 @@ class DateTimeViewFactoryTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true).assertTextEquals("05/01/2020")
+    onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true).assertTextEquals("01/05/2020")
   }
 
   @Test
@@ -767,6 +767,8 @@ class DateTimeViewFactoryTest {
 
   @Test
   fun ifTheDraftAnswerIsInvalidDisplayTheErrorMessage() = runComposeUiTest {
+    Locale.setDefault(Locale.US)
+
     val itemViewItem =
       QuestionnaireViewItem(
         Questionnaire.Item(
@@ -791,13 +793,14 @@ class DateTimeViewFactoryTest {
       .assert(
         SemanticsMatcher.expectValue(
           SemanticsProperties.Error,
-          "Date format needs to be dd/mm/yyyy (e.g. 31/01/2023)",
+          "Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)",
         ),
       )
   }
 
   @Test
   fun showDateFormatInLowerCaseInTheErrorMessage() = runComposeUiTest {
+    Locale.setDefault(Locale.US)
     val itemViewItem =
       QuestionnaireViewItem(
         Questionnaire.Item(
@@ -820,7 +823,7 @@ class DateTimeViewFactoryTest {
       .assert(
         SemanticsMatcher.expectValue(
           SemanticsProperties.Error,
-          "Date format needs to be dd/mm/yyyy (e.g. 31/01/2023)",
+          "Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)",
         ),
       )
   }
@@ -876,6 +879,7 @@ class DateTimeViewFactoryTest {
   @Test
   fun bindMultipleTimesWithSeparateQuestionnaireItemViewItemShouldShowProperDateAndTime() =
     runComposeUiTest {
+      Locale.setDefault(Locale.US)
       var questionnaireViewItem by
         mutableStateOf(
           QuestionnaireViewItem(
@@ -910,8 +914,14 @@ class DateTimeViewFactoryTest {
 
       setContent { QuestionnaireDateTimeView(questionnaireViewItem) }
 
-      onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true).assertTextEquals("05/01/2020")
-      onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true).assert(hasTextExactly("01:30"))
+      onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true).assertTextEquals("01/05/2020")
+      onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true)
+        .assert(
+          SemanticsMatcher.expectValue(
+            SemanticsProperties.EditableText,
+            AnnotatedString("1:30\u202FAM"),
+          ), // U+202F (Narrow No-Break Space - NNBSP) for time formatting in US Locale
+        )
 
       questionnaireViewItem =
         QuestionnaireViewItem(
@@ -943,8 +953,14 @@ class DateTimeViewFactoryTest {
           answersChangedCallback = { _, _, _, _ -> },
         )
 
-      onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true).assertTextEquals("05/01/2021")
-      onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true).assert(hasTextExactly("02:30"))
+      onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true).assertTextEquals("01/05/2021")
+      onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true)
+        .assert(
+          SemanticsMatcher.expectValue(
+            SemanticsProperties.EditableText,
+            AnnotatedString("2:30\u202FAM"),
+          ), // U+202F (Narrow No-Break Space - NNBSP) for time formatting in US Locale
+        )
 
       questionnaireViewItem =
         QuestionnaireViewItem(

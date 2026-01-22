@@ -1,5 +1,5 @@
 /*
- * Copyright 2025-2026 Google LLC
+ * Copyright 2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import com.google.fhir.model.r4.Enumeration
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 import com.google.fhir.model.r4.Time
+import java.util.Locale
 import kotlin.test.Test
 import kotlinx.datetime.LocalTime
 
@@ -84,7 +85,36 @@ class TimeViewFactoryTest {
   }
 
   @Test
-  fun shouldDisplayAMTimeInCorrectFormat_dependingOnSystemSettings() = runComposeUiTest {
+  fun shouldDisplayAMTimeInCorrectFormat_Locale_Japan() = runComposeUiTest {
+    Locale.setDefault(Locale.JAPAN)
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "time-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Time),
+          text = FhirR4String(value = "Question?"),
+        ),
+        QuestionnaireResponse.Item(
+          linkId = FhirR4String(value = "time-item"),
+          answer =
+            listOf(
+              QuestionnaireResponse.Item.Answer(
+                value = TimeAnswerValue(value = Time(value = LocalTime.parse("10:10:00"))),
+              ),
+            ),
+        ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    setContent { QuestionnaireTimeView(questionnaireViewItem) }
+
+    onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true).assert(hasTextExactly("10:10"))
+  }
+
+  @Test
+  fun shouldDisplayAMTimeInCorrectFormat_Locale_US() = runComposeUiTest {
+    Locale.setDefault(Locale.US)
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.Item(
@@ -108,11 +138,14 @@ class TimeViewFactoryTest {
     setContent { QuestionnaireTimeView(questionnaireViewItem) }
 
     onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true)
-      .assert(hasTextExactly("10:10 AM") or hasTextExactly("10:10"))
+      .assert(
+        hasTextExactly("10:10\u202FAM"),
+      ) //  U+202F (Narrow No-Break Space - NNBSP) for time formatting in US Locale
   }
 
   @Test
-  fun shouldDisplayPMTimeInCorrectFormat_dependingOnSystemSettings() = runComposeUiTest {
+  fun shouldDisplayPMTimeInCorrectFormat_Locale_US() = runComposeUiTest {
+    Locale.setDefault(Locale.US)
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.Item(
@@ -136,6 +169,36 @@ class TimeViewFactoryTest {
     setContent { QuestionnaireTimeView(questionnaireViewItem) }
 
     onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true)
-      .assert(hasTextExactly("22:10") or hasTextExactly("10:10 PM"))
+      .assert(
+        hasTextExactly("10:10\u202FPM"),
+      ) //  U+202F (Narrow No-Break Space - NNBSP) for time formatting in US Locale
+  }
+
+  @Test
+  fun shouldDisplayPMTimeInCorrectFormat_Locale_Japan() = runComposeUiTest {
+    Locale.setDefault(Locale.JAPAN)
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "time-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Time),
+          text = FhirR4String(value = "Question?"),
+        ),
+        QuestionnaireResponse.Item(
+          linkId = FhirR4String(value = "time-item"),
+          answer =
+            listOf(
+              QuestionnaireResponse.Item.Answer(
+                value = TimeAnswerValue(value = Time(value = LocalTime.parse("22:10:00"))),
+              ),
+            ),
+        ),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    setContent { QuestionnaireTimeView(questionnaireViewItem) }
+
+    onNodeWithTag(TIME_PICKER_INPUT_FIELD, useUnmergedTree = true).assert(hasTextExactly("22:10"))
   }
 }
