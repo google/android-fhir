@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android_fhir.datacapture_kmp.generated.resources.Res
-import android_fhir.datacapture_kmp.generated.resources.select_date
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,7 +64,6 @@ import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.number
-import org.jetbrains.compose.resources.getString
 
 @OptIn(ExperimentalTestApi::class)
 class DateViewFactoryTest {
@@ -827,7 +824,7 @@ class DateViewFactoryTest {
     setContent { QuestionnaireDateView(questionnaireViewItem) }
 
     onNodeWithTag(DATE_TEXT_INPUT_FIELD).assertIsNotEnabled()
-    onNodeWithContentDescription(getString(Res.string.select_date)).assertIsNotEnabled()
+    onNodeWithContentDescription("Select date").assertIsNotEnabled()
   }
 
   @Test
