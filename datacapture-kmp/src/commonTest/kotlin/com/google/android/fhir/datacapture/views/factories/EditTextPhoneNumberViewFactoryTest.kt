@@ -34,7 +34,6 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4Integer
 import com.google.android.fhir.datacapture.extensions.FhirR4String
-import com.google.android.fhir.datacapture.extensions.StringAnswerValue
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -131,7 +130,10 @@ class EditTextPhoneNumberViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = StringAnswerValue(value = FhirR4String(value = "+12345678910")),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.String(
+                    value = FhirR4String(value = "+12345678910"),
+                  ),
               ),
             ),
         ),
@@ -177,7 +179,10 @@ class EditTextPhoneNumberViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = StringAnswerValue(value = FhirR4String(value = "+12345678910")),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.String(
+                      value = FhirR4String(value = "+12345678910"),
+                    ),
                 ),
               ),
           ),
@@ -336,7 +341,10 @@ class EditTextPhoneNumberViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = StringAnswerValue(value = FhirR4String(value = "hello there")),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.String(
+                    value = FhirR4String(value = "hello there"),
+                  ),
               ),
             ),
         ),
@@ -382,7 +390,10 @@ class EditTextPhoneNumberViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = StringAnswerValue(value = FhirR4String(value = "+1234567891011")),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.String(
+                    value = FhirR4String(value = "+1234567891011"),
+                  ),
               ),
             ),
         ),

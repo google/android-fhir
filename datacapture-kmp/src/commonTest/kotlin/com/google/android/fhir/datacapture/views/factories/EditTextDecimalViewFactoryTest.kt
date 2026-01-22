@@ -29,7 +29,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.runComposeUiTest
-import com.google.android.fhir.datacapture.extensions.DecimalAnswerValue
 import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4String
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
@@ -96,7 +95,10 @@ class EditTextDecimalViewFactoryTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = DecimalAnswerValue(value = Decimal(value = "1.1".toBigDecimal())),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.Decimal(
+                        value = Decimal(value = "1.1".toBigDecimal()),
+                      ),
                   ),
                 ),
             ),
@@ -123,7 +125,10 @@ class EditTextDecimalViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = DecimalAnswerValue(value = Decimal(value = "1.1".toBigDecimal())),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Decimal(
+                      value = Decimal(value = "1.1".toBigDecimal()),
+                    ),
                 ),
               ),
           ),
@@ -173,7 +178,10 @@ class EditTextDecimalViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = DecimalAnswerValue(value = Decimal(value = "1.1".toBigDecimal())),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Decimal(
+                    value = Decimal(value = "1.1".toBigDecimal()),
+                  ),
               ),
             ),
         ),
@@ -214,7 +222,10 @@ class EditTextDecimalViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = DecimalAnswerValue(value = Decimal(value = "1.1".toBigDecimal())),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Decimal(
+                      value = Decimal(value = "1.1".toBigDecimal()),
+                    ),
                 ),
               ),
           ),
@@ -333,7 +344,10 @@ class EditTextDecimalViewFactoryTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = DecimalAnswerValue(value = Decimal(value = "3.3".toBigDecimal())),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.Decimal(
+                        value = Decimal(value = "3.3".toBigDecimal()),
+                      ),
                   ),
                 ),
             ),
@@ -372,7 +386,10 @@ class EditTextDecimalViewFactoryTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = DecimalAnswerValue(value = Decimal(value = "1.1".toBigDecimal())),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.Decimal(
+                        value = Decimal(value = "1.1".toBigDecimal()),
+                      ),
                   ),
                 ),
             ),
@@ -608,7 +625,10 @@ class EditTextDecimalViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = DecimalAnswerValue(value = Decimal(value = "124.5".toBigDecimal())),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Decimal(
+                      value = Decimal(value = "124.5".toBigDecimal()),
+                    ),
                 ),
               ),
           ),
@@ -628,7 +648,10 @@ class EditTextDecimalViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = DecimalAnswerValue(value = Decimal(value = "124.578".toBigDecimal())),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Decimal(
+                      value = Decimal(value = "124.578".toBigDecimal()),
+                    ),
                 ),
               ),
           ),

@@ -22,7 +22,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.google.android.fhir.datacapture.extensions.FhirR4String
-import com.google.android.fhir.datacapture.extensions.StringAnswerValue
 import com.google.fhir.model.r4.QuestionnaireResponse
 
 internal val EditTextPhoneNumberViewFactory =
@@ -36,7 +35,8 @@ internal val EditTextPhoneNumberViewFactory =
             null
           } else {
             QuestionnaireResponse.Item.Answer(
-              value = StringAnswerValue(value = FhirR4String(value = it)),
+              value =
+                QuestionnaireResponse.Item.Answer.Value.String(value = FhirR4String(value = it)),
             )
           }
         }

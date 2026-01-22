@@ -30,7 +30,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.test.runComposeUiTest
-import com.google.android.fhir.datacapture.extensions.DecimalAnswerValue
 import com.google.android.fhir.datacapture.extensions.FhirR4String
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -76,7 +75,10 @@ class EditTextViewFactoryDelegateTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = DecimalAnswerValue(value = Decimal(value = 1.toBigDecimal())),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.Decimal(
+                        value = Decimal(value = 1.toBigDecimal()),
+                      ),
                   ),
                 ),
             ),
@@ -98,7 +100,10 @@ class EditTextViewFactoryDelegateTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = DecimalAnswerValue(value = Decimal(value = 1.1.toBigDecimal())),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Decimal(
+                      value = Decimal(value = 1.1.toBigDecimal()),
+                    ),
                 ),
               ),
           ),

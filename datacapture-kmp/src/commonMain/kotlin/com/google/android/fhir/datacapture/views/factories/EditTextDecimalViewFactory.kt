@@ -21,7 +21,6 @@ import android_fhir.datacapture_kmp.generated.resources.decimal_format_validatio
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import com.google.android.fhir.datacapture.extensions.DecimalAnswerValue
 import com.google.fhir.model.r4.Decimal
 import com.google.fhir.model.r4.QuestionnaireResponse
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
@@ -44,7 +43,8 @@ internal val EditTextDecimalViewFactory =
       inputText.toDoubleOrNull()?.let {
         questionnaireViewItem.setAnswer(
           QuestionnaireResponse.Item.Answer(
-            value = DecimalAnswerValue(Decimal(value = it.toBigDecimal())),
+            value =
+              QuestionnaireResponse.Item.Answer.Value.Decimal(Decimal(value = it.toBigDecimal())),
           ),
         )
       }

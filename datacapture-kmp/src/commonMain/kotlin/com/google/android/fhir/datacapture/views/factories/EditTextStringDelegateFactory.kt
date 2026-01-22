@@ -22,7 +22,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import com.google.android.fhir.datacapture.extensions.StringAnswerValue
 import com.google.fhir.model.r4.QuestionnaireResponse
 import com.google.fhir.model.r4.String as FhirString
 
@@ -46,7 +45,7 @@ internal fun createEditTextStringViewHolderDelegate(multiLine: Boolean = false) 
       } else {
         questionnaireViewItem.setAnswer(
           QuestionnaireResponse.Item.Answer(
-            value = StringAnswerValue(FhirString(value = inputText)),
+            value = QuestionnaireResponse.Item.Answer.Value.String(FhirString(value = inputText)),
           ),
         )
       }
