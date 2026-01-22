@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
+import android_fhir.datacapture_kmp.generated.resources.Res
+import android_fhir.datacapture_kmp.generated.resources.min_value_less_than_max_value_validation_error_msg
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -40,6 +42,7 @@ import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.QuestionnaireResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 
 internal object SliderViewFactory : QuestionnaireItemViewFactory {
   private const val SLIDER_DEFAULT_STEP_SIZE = 1
@@ -66,7 +69,13 @@ internal object SliderViewFactory : QuestionnaireItemViewFactory {
         getFloatValue(questionnaireViewItem.maxAnswerValue, ifNull = SLIDER_DEFAULT_VALUE_TO)
       }
 
-    check(minValue < maxValue) { "minValue $minValue must be smaller than maxValue $maxValue" }
+    check(minValue < maxValue) {
+      stringResource(
+        Res.string.min_value_less_than_max_value_validation_error_msg,
+        minValue,
+        maxValue,
+      )
+    }
     val stepSize =
       remember(questionnaireViewItem) {
         questionnaireViewItem.questionnaireItem.sliderStepValue ?: SLIDER_DEFAULT_STEP_SIZE

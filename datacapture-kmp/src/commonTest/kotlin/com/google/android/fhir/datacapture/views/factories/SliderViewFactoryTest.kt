@@ -544,7 +544,7 @@ class SliderViewFactoryTest {
     }
 
   @Test
-  fun displayValidationResult_noError_shouldShowNoErrorMessage() = runComposeUiTest {
+  fun displayValidationResultNoErrorShouldShowNoErrorMessage() = runComposeUiTest {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.Item(
@@ -600,7 +600,7 @@ class SliderViewFactoryTest {
   }
 
   @Test
-  fun displayValidationResult_error_shouldShowErrorMessage() = runComposeUiTest {
+  fun displayValidationResultErrorShouldShowErrorMessage() = runComposeUiTest {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.Item(
@@ -693,7 +693,7 @@ class SliderViewFactoryTest {
   }
 
   @Test
-  fun bind_readOnly_shouldDisableView() = runComposeUiTest {
+  fun bindReadOnlyShouldDisableView() = runComposeUiTest {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.Item(
