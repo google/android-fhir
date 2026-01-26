@@ -16,177 +16,214 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.util.Base64
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runComposeUiTest
-import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.FhirR4String
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.fhir.model.r4.Attachment
+import com.google.fhir.model.r4.Base64Binary
+import com.google.fhir.model.r4.Code
+import com.google.fhir.model.r4.Enumeration
+import com.google.fhir.model.r4.Extension
+import com.google.fhir.model.r4.Questionnaire
+import com.google.fhir.model.r4.QuestionnaireResponse
 import kotlin.test.Test
-import org.hl7.fhir.r4.model.Attachment
-import org.hl7.fhir.r4.model.CodeType
-import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.junit.Test
 
 @OptIn(ExperimentalTestApi::class)
 class AttachmentViewFactoryTest {
+
+  @Composable
+  fun QuestionnaireAttachmentView(questionnaireViewItem: QuestionnaireViewItem) {
+    AttachmentViewFactory.Content(questionnaireViewItem)
+  }
 
   @Test
   fun shouldDisplayTakePhotoAndUploadPhotoButton() = runComposeUiTest {
     val questionnaireItemView =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("image/*"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+          extension =
+            listOf(
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "image/*")),
+              ),
+            ),
+        ),
+        QuestionnaireResponse.Item(linkId = FhirR4String(value = "attachment-item")),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    viewHolder.bind(questionnaireItemView)
+    setContent { QuestionnaireAttachmentView(questionnaireItemView) }
 
-    val context = viewHolder.itemView.context
     onNodeWithTag(TAKE_PHOTO_BUTTON_TAG).assertIsDisplayed()
     onNodeWithTag(UPLOAD_FILE_BUTTON_TAG).assertIsDisplayed()
-    onNodeWithTag(UPLOAD_FILE_BUTTON_TAG).assertTextEquals(context.getString(R.string.upload_photo))
+    onNodeWithTag(UPLOAD_FILE_BUTTON_TAG).assertTextEquals("Upload Photo")
   }
 
   @Test
   fun shouldDisplayUploadAudioButton() = runComposeUiTest {
     val questionnaireItemView =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("audio/*"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+          extension =
+            listOf(
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "audio/*")),
+              ),
+            ),
+        ),
+        QuestionnaireResponse.Item(linkId = FhirR4String(value = "attachment-item")),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    viewHolder.bind(questionnaireItemView)
+    setContent { QuestionnaireAttachmentView(questionnaireItemView) }
 
     onNodeWithTag(UPLOAD_FILE_BUTTON_TAG).assertIsDisplayed()
-    val context = viewHolder.itemView.context
-    onNodeWithTag(UPLOAD_FILE_BUTTON_TAG).assertTextEquals(context.getString(R.string.upload_audio))
+    onNodeWithTag(UPLOAD_FILE_BUTTON_TAG).assertTextEquals("Upload Audio")
   }
 
   @Test
   fun shouldDisplayUploadVideoButton() = runComposeUiTest {
     val questionnaireItemView =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("video/*"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+          extension =
+            listOf(
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "video/*")),
+              ),
+            ),
+        ),
+        QuestionnaireResponse.Item(linkId = FhirR4String(value = "attachment-item")),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    viewHolder.bind(questionnaireItemView)
+    setContent { QuestionnaireAttachmentView(questionnaireItemView) }
 
     onNodeWithTag(UPLOAD_FILE_BUTTON_TAG).assertIsDisplayed()
-    val context = viewHolder.itemView.context
-    onNodeWithTag(UPLOAD_FILE_BUTTON_TAG).assertTextEquals(context.getString(R.string.upload_video))
+    onNodeWithTag(UPLOAD_FILE_BUTTON_TAG).assertTextEquals("Upload Video")
   }
 
   @Test
   fun shouldDisplayUploadDocumentButton() = runComposeUiTest {
     val questionnaireItemView =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("application/pdf"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+          extension =
+            listOf(
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "application/pdf")),
+              ),
+            ),
+        ),
+        QuestionnaireResponse.Item(linkId = FhirR4String(value = "attachment-item")),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    viewHolder.bind(questionnaireItemView)
+    setContent { QuestionnaireAttachmentView(questionnaireItemView) }
 
     onNodeWithTag(UPLOAD_FILE_BUTTON_TAG).assertIsDisplayed()
-    val context = viewHolder.itemView.context
-    onNodeWithTag(UPLOAD_FILE_BUTTON_TAG)
-      .assertTextEquals(context.getString(R.string.upload_document))
+    onNodeWithTag(UPLOAD_FILE_BUTTON_TAG).assertTextEquals("Upload Document")
   }
 
   @Test
   fun shouldDisplayTakePhotoAndUploadFileButton() = runComposeUiTest {
     val questionnaireItemView =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("image/*"))
-          }
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("application/pdf"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+          extension =
+            listOf(
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "image/*")),
+              ),
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "application/pdf")),
+              ),
+            ),
+        ),
+        QuestionnaireResponse.Item(linkId = FhirR4String(value = "attachment-item")),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    viewHolder.bind(questionnaireItemView)
+    setContent { QuestionnaireAttachmentView(questionnaireItemView) }
 
-    val context = viewHolder.itemView.context
     onNodeWithTag(TAKE_PHOTO_BUTTON_TAG).assertIsDisplayed()
     onNodeWithTag(UPLOAD_FILE_BUTTON_TAG).assertIsDisplayed()
-    onNodeWithTag(UPLOAD_FILE_BUTTON_TAG).assertTextEquals(context.getString(R.string.upload_file))
+    onNodeWithTag(UPLOAD_FILE_BUTTON_TAG).assertTextEquals("Upload File")
   }
 
   @Test
   fun shouldDisplayImagePreviewFromAnswer() = runComposeUiTest {
     val questionnaireItemView =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("image/*"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                Attachment().apply {
-                  title = "IMG_1"
-                  data =
-                    Base64.decode(
-                      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                      Base64.DEFAULT,
-                    )
-                  contentType = "image/*"
-                }
-            },
-          )
-        },
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+          extension =
+            listOf(
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "image/*")),
+              ),
+            ),
+        ),
+        QuestionnaireResponse.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          answer =
+            listOf(
+              QuestionnaireResponse.Item.Answer(
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Attachment(
+                    value =
+                      Attachment(
+                        title = FhirR4String(value = "IMG_1"),
+                        contentType = Code(value = "image/*"),
+                        data =
+                          Base64Binary(
+                            value = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                          ),
+                      ),
+                  ),
+              ),
+            ),
+        ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    viewHolder.bind(questionnaireItemView)
+    setContent { QuestionnaireAttachmentView(questionnaireItemView) }
 
     onNodeWithTag(ATTACHMENT_MEDIA_PREVIEW_TAG).assertIsDisplayed()
     onNodeWithText("IMG_1").assertIsDisplayed()
@@ -196,33 +233,42 @@ class AttachmentViewFactoryTest {
   fun shouldDisplayAudioFilePreviewFromAnswer() = runComposeUiTest {
     val questionnaireItemView =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("audio/*"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                Attachment().apply {
-                  title = "Audio File"
-                  data =
-                    Base64.decode(
-                      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                      Base64.DEFAULT,
-                    )
-                  contentType = "audio/*"
-                }
-            },
-          )
-        },
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+          extension =
+            listOf(
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "audio/*")),
+              ),
+            ),
+        ),
+        QuestionnaireResponse.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          answer =
+            listOf(
+              QuestionnaireResponse.Item.Answer(
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Attachment(
+                    value =
+                      Attachment(
+                        title = FhirR4String(value = "Audio File"),
+                        contentType = Code(value = "audio/*"),
+                        data =
+                          Base64Binary(
+                            value = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                          ),
+                      ),
+                  ),
+              ),
+            ),
+        ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    viewHolder.bind(questionnaireItemView)
+    setContent { QuestionnaireAttachmentView(questionnaireItemView) }
 
     onNodeWithTag(ATTACHMENT_MEDIA_PREVIEW_TAG).assertIsDisplayed()
     onNodeWithText("Audio File").assertIsDisplayed()
@@ -232,33 +278,42 @@ class AttachmentViewFactoryTest {
   fun shouldDisplayVideoFilePreviewFromAnswer() = runComposeUiTest {
     val questionnaireItemView =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("video/*"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                Attachment().apply {
-                  title = "Video File"
-                  data =
-                    Base64.decode(
-                      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                      Base64.DEFAULT,
-                    )
-                  contentType = "video/*"
-                }
-            },
-          )
-        },
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+          extension =
+            listOf(
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "video/*")),
+              ),
+            ),
+        ),
+        QuestionnaireResponse.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          answer =
+            listOf(
+              QuestionnaireResponse.Item.Answer(
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Attachment(
+                    value =
+                      Attachment(
+                        title = FhirR4String(value = "Video File"),
+                        contentType = Code(value = "video/*"),
+                        data =
+                          Base64Binary(
+                            value = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                          ),
+                      ),
+                  ),
+              ),
+            ),
+        ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    viewHolder.bind(questionnaireItemView)
+    setContent { QuestionnaireAttachmentView(questionnaireItemView) }
 
     onNodeWithTag(ATTACHMENT_MEDIA_PREVIEW_TAG).assertIsDisplayed()
     onNodeWithText("Video File").assertIsDisplayed()
@@ -268,33 +323,42 @@ class AttachmentViewFactoryTest {
   fun shouldDisplayDocumentFilePreviewFromAnswer() = runComposeUiTest {
     val questionnaireItemView =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("application/pdf"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                Attachment().apply {
-                  title = "Document File"
-                  data =
-                    Base64.decode(
-                      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                      Base64.DEFAULT,
-                    )
-                  contentType = "application/pdf"
-                }
-            },
-          )
-        },
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+          extension =
+            listOf(
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "application/pdf")),
+              ),
+            ),
+        ),
+        QuestionnaireResponse.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          answer =
+            listOf(
+              QuestionnaireResponse.Item.Answer(
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Attachment(
+                    value =
+                      Attachment(
+                        title = FhirR4String(value = "Document File"),
+                        contentType = Code(value = "application/pdf"),
+                        data =
+                          Base64Binary(
+                            value = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                          ),
+                      ),
+                  ),
+              ),
+            ),
+        ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    viewHolder.bind(questionnaireItemView)
+    setContent { QuestionnaireAttachmentView(questionnaireItemView) }
 
     onNodeWithTag(ATTACHMENT_MEDIA_PREVIEW_TAG).assertIsDisplayed()
     onNodeWithText("Document File").assertIsDisplayed()
@@ -304,203 +368,248 @@ class AttachmentViewFactoryTest {
   fun doNotShowPreviewIfAnswerDoesNotHaveAttachment() = runComposeUiTest {
     val questionnaireItemView =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("image/*"))
-          }
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("application/pdf"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { addAnswer(null) },
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+          extension =
+            listOf(
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "image/*")),
+              ),
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "application/pdf")),
+              ),
+            ),
+        ),
+        QuestionnaireResponse.Item(linkId = FhirR4String(value = "attachment-item")),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    viewHolder.bind(questionnaireItemView)
+    setContent { QuestionnaireAttachmentView(questionnaireItemView) }
 
-    onNodeWithTag(ATTACHMENT_MEDIA_PREVIEW_TAG).assertIsNotDisplayed().assertDoesNotExist()
+    onNodeWithTag(ATTACHMENT_MEDIA_PREVIEW_TAG).assertDoesNotExist()
   }
 
   @Test
   fun doNotShowPreviewOfPreviousAnswerAttachmentForCurrentAnswerItem() = runComposeUiTest {
-    val questionnaireItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("image/*"))
-          }
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("application/pdf"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                Attachment().apply {
-                  title = "IMG_1.jpeg"
-                  data =
-                    Base64.decode(
-                      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                      Base64.DEFAULT,
-                    )
-                  contentType = "image/jpeg"
-                }
-            },
-          )
-        },
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
+    var questionnaireViewItem by
+      mutableStateOf(
+        QuestionnaireViewItem(
+          Questionnaire.Item(
+            linkId = FhirR4String(value = "attachment-item"),
+            type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+            extension =
+              listOf(
+                Extension(
+                  url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                  value = Extension.Value.Code(value = Code(value = "image/*")),
+                ),
+                Extension(
+                  url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                  value = Extension.Value.Code(value = Code(value = "application/pdf")),
+                ),
+              ),
+          ),
+          QuestionnaireResponse.Item(
+            linkId = FhirR4String(value = "attachment-item"),
+            answer =
+              listOf(
+                QuestionnaireResponse.Item.Answer(
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Attachment(
+                      value =
+                        Attachment(
+                          title = FhirR4String(value = "IMG_1.jpeg"),
+                          contentType = Code(value = "image/jpeg"),
+                          data =
+                            Base64Binary(
+                              value = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                            ),
+                        ),
+                    ),
+                ),
+              ),
+          ),
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+        ),
       )
 
-    viewHolder.bind(questionnaireItem)
+    setContent { QuestionnaireAttachmentView(questionnaireViewItem) }
 
     onNodeWithTag(ATTACHMENT_MEDIA_PREVIEW_TAG).assertIsDisplayed()
 
-    val questionnaireItemWithNullAnswer =
+    questionnaireViewItem =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("image/*"))
-          }
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("application/pdf"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { addAnswer(null) },
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+          extension =
+            listOf(
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "image/*")),
+              ),
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "application/pdf")),
+              ),
+            ),
+        ),
+        QuestionnaireResponse.Item(linkId = FhirR4String(value = "attachment-item")),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    viewHolder.bind(questionnaireItemWithNullAnswer)
-
-    onNodeWithTag(ATTACHMENT_MEDIA_PREVIEW_TAG).assertIsNotDisplayed().assertDoesNotExist()
+    onNodeWithTag(ATTACHMENT_MEDIA_PREVIEW_TAG).assertDoesNotExist()
   }
 
   @Test
   fun showPreviewReplacesPreviewOfPreviousAnswerAttachmentForCurrentAnswerItem() =
     runComposeUiTest {
-      val questionnaireItem =
-        QuestionnaireViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            addExtension().apply {
-              url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-              setValue(CodeType("image/*"))
-            }
-            addExtension().apply {
-              url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-              setValue(CodeType("application/pdf"))
-            }
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value =
-                  Attachment().apply {
-                    title = "IMG_1.jpeg"
-                    data =
-                      Base64.decode(
-                        "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                        Base64.DEFAULT,
-                      )
-                    contentType = "image/jpeg"
-                  }
-              },
-            )
-          },
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, _, _ -> },
+      var questionnaireViewItem by
+        mutableStateOf(
+          QuestionnaireViewItem(
+            Questionnaire.Item(
+              linkId = FhirR4String(value = "attachment-item"),
+              type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+              extension =
+                listOf(
+                  Extension(
+                    url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                    value = Extension.Value.Code(value = Code(value = "image/*")),
+                  ),
+                  Extension(
+                    url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                    value = Extension.Value.Code(value = Code(value = "application/pdf")),
+                  ),
+                ),
+            ),
+            QuestionnaireResponse.Item(
+              linkId = FhirR4String(value = "attachment-item"),
+              answer =
+                listOf(
+                  QuestionnaireResponse.Item.Answer(
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.Attachment(
+                        value =
+                          Attachment(
+                            title = FhirR4String(value = "IMG_1.jpeg"),
+                            contentType = Code(value = "image/jpeg"),
+                            data =
+                              Base64Binary(
+                                value = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                              ),
+                          ),
+                      ),
+                  ),
+                ),
+            ),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _, _ -> },
+          ),
         )
 
-      viewHolder.bind(questionnaireItem)
+      setContent { QuestionnaireAttachmentView(questionnaireViewItem) }
 
       onNodeWithTag(ATTACHMENT_MEDIA_PREVIEW_TAG).assertIsDisplayed()
       onNodeWithText("IMG_1.jpeg").assertIsDisplayed()
 
-      val questionnaireItemWithDocumentAnswer =
+      questionnaireViewItem =
         QuestionnaireViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            addExtension().apply {
-              url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-              setValue(CodeType("image/*"))
-            }
-            addExtension().apply {
-              url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-              setValue(CodeType("application/pdf"))
-            }
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value =
-                  Attachment().apply {
-                    title = "Yellow Doc"
-                    data =
-                      Base64.decode(
-                        "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                        Base64.DEFAULT,
-                      )
-                    contentType = "application/pdf"
-                  }
-              },
-            )
-          },
+          Questionnaire.Item(
+            linkId = FhirR4String(value = "attachment-item"),
+            type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+            extension =
+              listOf(
+                Extension(
+                  url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                  value = Extension.Value.Code(value = Code(value = "image/*")),
+                ),
+                Extension(
+                  url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                  value = Extension.Value.Code(value = Code(value = "application/pdf")),
+                ),
+              ),
+          ),
+          QuestionnaireResponse.Item(
+            linkId = FhirR4String(value = "attachment-item"),
+            answer =
+              listOf(
+                QuestionnaireResponse.Item.Answer(
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Attachment(
+                      value =
+                        Attachment(
+                          title = FhirR4String(value = "Yellow Doc"),
+                          contentType = Code(value = "application/pdf"),
+                          data =
+                            Base64Binary(
+                              value = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                            ),
+                        ),
+                    ),
+                ),
+              ),
+          ),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
         )
 
-      viewHolder.bind(questionnaireItemWithDocumentAnswer)
-
       onNodeWithTag(ATTACHMENT_MEDIA_PREVIEW_TAG).assertIsDisplayed()
-      onNodeWithText("IMG_1.jpeg").assertIsNotDisplayed().assertDoesNotExist()
+      onNodeWithText("IMG_1.jpeg").assertDoesNotExist()
       onNodeWithText("Yellow Doc").assertIsDisplayed()
     }
 
   @Test
   fun deleteRemovesPreviewOfAnswerAttachment() = runComposeUiTest {
-    val questionnaireItem =
+    val questionnaireViewItem =
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/mimeType"
-            setValue(CodeType("image/*"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                Attachment().apply {
-                  title = "IMG_1.jpeg"
-                  data =
-                    Base64.decode(
-                      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                      Base64.DEFAULT,
-                    )
-                  contentType = "image/jpeg"
-                }
-            },
-          )
-        },
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          type = Enumeration(value = Questionnaire.QuestionnaireItemType.Attachment),
+          extension =
+            listOf(
+              Extension(
+                url = "http://hl7.org/fhir/StructureDefinition/mimeType",
+                value = Extension.Value.Code(value = Code(value = "image/*")),
+              ),
+            ),
+        ),
+        QuestionnaireResponse.Item(
+          linkId = FhirR4String(value = "attachment-item"),
+          answer =
+            listOf(
+              QuestionnaireResponse.Item.Answer(
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Attachment(
+                    value =
+                      Attachment(
+                        title = FhirR4String(value = "IMG_1.jpeg"),
+                        contentType = Code(value = "image/jpeg"),
+                        data =
+                          Base64Binary(
+                            value = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                          ),
+                      ),
+                  ),
+              ),
+            ),
+        ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    viewHolder.bind(questionnaireItem)
-    val deleteText = viewHolder.itemView.context.getString(R.string.delete)
+    setContent { QuestionnaireAttachmentView(questionnaireViewItem) }
 
     onNodeWithTag(ATTACHMENT_MEDIA_PREVIEW_TAG).assertIsDisplayed()
     onNodeWithText("IMG_1.jpeg").assertIsDisplayed()
-    onNodeWithContentDescription(deleteText).assertIsDisplayed().performClick()
+    onNodeWithContentDescription("Delete").assertIsDisplayed().performClick()
 
-    onNodeWithTag(ATTACHMENT_MEDIA_PREVIEW_TAG).assertIsNotDisplayed()
-    onNodeWithContentDescription(deleteText).assertIsNotDisplayed()
+    onNodeWithTag(ATTACHMENT_MEDIA_PREVIEW_TAG).assertDoesNotExist()
+    onNodeWithContentDescription("Delete").assertDoesNotExist()
   }
 }

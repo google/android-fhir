@@ -519,6 +519,7 @@ val Questionnaire.Item.mimeTypes: List<String>
       .filter { it.url == EXTENSION_MIME_TYPE }
       .map { (it.value?.asCode()?.value)?.value.toString() }
       .filter { it.isNotEmpty() }
+      .ifEmpty { listOf("*/*") }
   }
 
 /** Currently supported mime types. */
