@@ -76,6 +76,9 @@ jobs:
       - name: Check with Gradle
         run: ./gradlew check -x :datacapture-kmp:check -x :sdc-kmp-demo:check --scan --full-stacktrace
 
+      - name: Run tests for datacapture Kotlin Multiplatform desktop environment
+        run: ./gradlew :datacapture-kmp:desktopTest
+
       - name: Publish Maven packages to GitHub Packages
         if: ${{ github.event_name == 'push' }}
         run: ./gradlew publish

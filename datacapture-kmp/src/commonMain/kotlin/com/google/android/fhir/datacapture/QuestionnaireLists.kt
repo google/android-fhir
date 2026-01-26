@@ -41,6 +41,9 @@ import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewFactory
+import com.google.android.fhir.datacapture.views.factories.CheckBoxGroupViewFactory
+import com.google.android.fhir.datacapture.views.factories.DialogSelectViewFactory
 import com.google.android.fhir.datacapture.views.factories.DisplayViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewFactory
@@ -48,6 +51,7 @@ import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineView
 import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuantityViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewFactory
+import com.google.android.fhir.datacapture.views.factories.RadioGroupViewFactory
 import com.google.android.fhir.datacapture.views.factories.SliderViewFactory
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
@@ -340,6 +344,10 @@ fun getQuestionnaireItemViewFactory(
     QuestionnaireViewHolderType.QUANTITY -> QuantityViewFactory
     QuestionnaireViewHolderType.DISPLAY -> DisplayViewFactory
     QuestionnaireViewHolderType.SLIDER -> SliderViewFactory
+    QuestionnaireViewHolderType.BOOLEAN_TYPE_PICKER -> BooleanChoiceViewFactory
+    QuestionnaireViewHolderType.RADIO_GROUP -> RadioGroupViewFactory
+    QuestionnaireViewHolderType.CHECK_BOX_GROUP -> CheckBoxGroupViewFactory
+    QuestionnaireViewHolderType.DIALOG_SELECT -> DialogSelectViewFactory
     else -> TODO()
   }
 }
