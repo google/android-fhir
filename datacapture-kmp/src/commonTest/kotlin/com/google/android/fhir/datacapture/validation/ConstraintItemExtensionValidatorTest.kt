@@ -80,7 +80,7 @@ class ConstraintItemExtensionValidatorTest {
           extension =
             mutableListOf(
               Extension.Builder(
-                  url = "http://hl7.org/fhir/StructureDefinition/questionnaire-constraint"
+                  url = "http://hl7.org/fhir/StructureDefinition/questionnaire-constraint",
                 )
                 .apply {
                   extension =
@@ -137,7 +137,7 @@ class ConstraintItemExtensionValidatorTest {
           extension =
             mutableListOf(
               Extension.Builder(
-                  url = "http://hl7.org/fhir/StructureDefinition/questionnaire-constraint"
+                  url = "http://hl7.org/fhir/StructureDefinition/questionnaire-constraint",
                 )
                 .apply {
                   extension =

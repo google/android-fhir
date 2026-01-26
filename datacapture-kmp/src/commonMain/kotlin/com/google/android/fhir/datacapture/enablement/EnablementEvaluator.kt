@@ -137,9 +137,18 @@ internal class EnablementEvaluator(
 
     // Evaluate `enableWhenExpression`.
     if (enableWhenExpression != null) {
+      val variables =
+        mutableMapOf<String, Any?>().apply {
+          put("resource", questionnaireResponse)
+          put("context", questionnaireResponseItem)
+          put("questionnaire", questionnaire)
+          put("qItem", questionnaireItem)
+          questionnaireLaunchContextMap?.let { putAll(it) }
+        }
       return convertToBoolean(
         expressionEvaluator.evaluateExpression(
           questionnaireItem.enableWhenExpression!!,
+          variables,
         ),
       )
     }

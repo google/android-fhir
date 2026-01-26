@@ -69,7 +69,7 @@ class RegexValidatorTest {
               Extension.Builder(url = REGEX_EXTENSION_URL).apply {
                 value =
                   Extension.Value.String(
-                    value = FhirString.Builder().apply { value = "^[0-9]+$" }.build()
+                    value = FhirString.Builder().apply { value = "^[0-9]+$" }.build(),
                   )
               },
             )
@@ -106,7 +106,7 @@ class RegexValidatorTest {
               Extension.Builder(url = REGEX_EXTENSION_URL).apply {
                 value =
                   Extension.Value.String(
-                    value = FhirString.Builder().apply { value = "^[0-9]+$" }.build()
+                    value = FhirString.Builder().apply { value = "^[0-9]+$" }.build(),
                   )
               },
             )

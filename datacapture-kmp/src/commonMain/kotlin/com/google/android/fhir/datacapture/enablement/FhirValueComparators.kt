@@ -132,7 +132,7 @@ infix fun QuestionnaireResponse.Item.Answer.Value?.compareFhirValue(
     is QuestionnaireResponse.Item.Answer.Value.Integer -> {
       if (otherValue !is Integer) {
         throw IllegalStateException(
-          "The other value is not of type integer. Actual type: ${otherValue::class}"
+          "The other value is not of type integer. Actual type: ${otherValue::class}",
         )
       }
       val thisVal = this.value.value!!

@@ -35,7 +35,6 @@ import com.google.fhir.model.r4.String
 import com.google.fhir.model.r4.Time
 import com.google.fhir.model.r4.Uri
 import com.google.fhir.model.r4.terminologies.PublicationStatus
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -130,36 +129,36 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  @Ignore // TODO resolve after custom variables on expression is supported by kotlin-fhirpath
   fun `evaluate() should evaluate enableWhenExpression`() = runTest {
     val questionnaireJson =
       """
         {
-  "resourceType": "Questionnaire",
-      "item": [
-        {
-          "linkId": "1",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
-          "type": "choice",
-          "text": "Gender"
-        },
-        {
-          "extension": [
+          "resourceType": "Questionnaire",
+          "status": "active",
+          "item": [
             {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
-              "valueExpression": {
-                "language": "text/fhirpath",
-                "expression": "%resource.repeat(item).where(linkId='1').answer.value.code ='female'"
-              }
+              "linkId": "1",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
+              "type": "choice",
+              "text": "Gender"
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "%resource.repeat(item).where(linkId='1').answer.value.code ='female'"
+                  }
+                }
+              ],
+              "linkId" : "2",
+              "text": "Have you had mammogram before?(enableWhenExpression = only when gender is female)",
+              "type": "choice",
+              "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
             }
-          ],
-          "linkId" : "2",
-          "text": "Have you had mammogram before?(enableWhenExpression = only when gender is female)",
-          "type": "choice",
-          "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
+          ]
         }
-      ]
-}
 
             """
         .trimIndent()
@@ -167,24 +166,25 @@ class EnablementEvaluatorTest {
     val questionnaireResponseJson =
       """
         {
-    "resourceType": "QuestionnaireResponse",
-    "item": [
-        {
-            "linkId": "1",
-            "answer": [
-                {
-                    "valueCoding": {
-                        "system": "http://hl7.org/fhir/administrative-gender",
-                        "code": "female",
-                        "display": "Female"
-                    }
-                }
-            ]
-        },
-        {
-            "linkId": "2"
-        }
-    ]
+          "resourceType": "QuestionnaireResponse",
+          "status": "completed",
+          "item": [
+              {
+                  "linkId": "1",
+                  "answer": [
+                      {
+                          "valueCoding": {
+                              "system": "http://hl7.org/fhir/administrative-gender",
+                              "code": "female",
+                              "display": "Female"
+                          }
+                      }
+                  ]
+              },
+              {
+                  "linkId": "2"
+              }
+          ]
       }
             """
         .trimIndent()
@@ -197,49 +197,47 @@ class EnablementEvaluatorTest {
     val questionnaireResponse =
       json.decodeFromString(questionnaireResponseJson) as QuestionnaireResponse
 
-    runTest {
-      assertNotNull(questionnaireItem)
-      assertTrue(
-        EnablementEvaluator(questionnaire, questionnaireResponse)
-          .evaluate(
-            questionnaireItem,
-            questionnaireResponse.item[1],
-          ),
-      )
-    }
+    assertNotNull(questionnaireItem)
+    assertTrue(
+      EnablementEvaluator(questionnaire, questionnaireResponse)
+        .evaluate(
+          questionnaireItem,
+          questionnaireResponse.item[1],
+        ),
+    )
   }
 
   @Test
-  @Ignore // TODO resolve after custom variables on expression is supported by kotlin-fhirpath
   fun `evaluate() should evaluate false enableWhenExpression`() = runTest {
     val questionnaireJson =
       """
         {
-  "resourceType": "Questionnaire",
-      "item": [
-        {
-          "linkId": "1",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
-          "type": "choice",
-          "text": "Gender"
-        },
-        {
-          "extension": [
+          "resourceType": "Questionnaire",
+          "status": "active",
+          "item": [
             {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
-              "valueExpression": {
-                "language": "text/fhirpath",
-                "expression": "%resource.repeat(item).where(linkId='1').answer.value.code ='female'"
-              }
+              "linkId": "1",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
+              "type": "choice",
+              "text": "Gender"
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "%resource.repeat(item).where(linkId='1').answer.value.code ='female'"
+                  }
+                }
+              ],
+              "linkId" : "2",
+              "text": "Have you had mammogram before?(enableWhenExpression = only when gender is female)",
+              "type": "choice",
+              "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
             }
-          ],
-          "linkId" : "2",
-          "text": "Have you had mammogram before?(enableWhenExpression = only when gender is female)",
-          "type": "choice",
-          "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
+          ]
         }
-      ]
-}
 
             """
         .trimIndent()
@@ -247,24 +245,25 @@ class EnablementEvaluatorTest {
     val questionnaireResponseJson =
       """
         {
-    "resourceType": "QuestionnaireResponse",
-    "item": [
-        {
-            "linkId": "1",
-            "answer": [
-                {
-                    "valueCoding": {
-                        "system": "http://hl7.org/fhir/administrative-gender",
-                        "code": "male",
-                        "display": "Male"
-                    }
-                }
-            ]
-        },
-        {
-            "linkId": "2"
-        }
-    ]
+          "resourceType": "QuestionnaireResponse",
+          "status": "completed",
+          "item": [
+              {
+                  "linkId": "1",
+                  "answer": [
+                      {
+                          "valueCoding": {
+                              "system": "http://hl7.org/fhir/administrative-gender",
+                              "code": "male",
+                              "display": "Male"
+                          }
+                      }
+                  ]
+              },
+              {
+                  "linkId": "2"
+              }
+          ]
       }
             """
         .trimIndent()
@@ -285,36 +284,36 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  @Ignore // TODO resolve after custom variables on expression is supported by kotlin-fhirpath
   fun `evaluate() should evaluate enableWhenExpression with %context fhirpath supplement literal`() =
     runTest {
       val questionnaireJson =
         """
     {
       "resourceType": "Questionnaire",
-          "item": [
+      "status": "active",
+      "item": [
+        {
+          "linkId": "1",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
+          "type": "choice",
+          "text": "Gender"
+        },
+        {
+          "extension": [
             {
-              "linkId": "1",
-              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
-              "type": "choice",
-              "text": "Gender"
-            },
-            {
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
-                  "valueExpression": {
-                    "language": "text/fhirpath",
-                    "expression": "%resource.repeat(item).where(linkId='1').answer.value.code = %context.linkId"
-                  }
-                }
-              ],
-              "linkId" : "female",
-              "text": "Have you had mammogram before?(enableWhenExpression = only when gender is female)",
-              "type": "choice",
-              "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+              "valueExpression": {
+                "language": "text/fhirpath",
+                "expression": "%resource.repeat(item).where(linkId='1').answer.value.code = %context.linkId"
+              }
             }
-          ]
+          ],
+          "linkId" : "female",
+          "text": "Have you had mammogram before?(enableWhenExpression = only when gender is female)",
+          "type": "choice",
+          "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
+        }
+      ]
     }
                 """
           .trimIndent()
@@ -323,6 +322,7 @@ class EnablementEvaluatorTest {
         """
     {
       "resourceType": "QuestionnaireResponse",
+      "status": "completed",
       "item": [
         {
           "linkId": "1",
@@ -362,31 +362,31 @@ class EnablementEvaluatorTest {
     }
 
   @Test
-  @Ignore // TODO resolve after custom variables on expression is supported by kotlin-fhirpath
   fun `evaluate() should evaluate enableWhenExpression with %questionnaire fhirpath supplement`() =
     runTest {
       val questionnaireJson =
         """
     {
       "resourceType": "Questionnaire",
-      "subjectType": "Practitioner",
-          "item": [
+      "subjectType": [ "Practitioner" ],
+      "status": "active",
+      "item": [
+        {
+          "extension": [
             {
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
-                  "valueExpression": {
-                    "language": "text/fhirpath",
-                    "expression": "%questionnaire.subjectType='Practitioner'"
-                  }
-                }
-              ],
-              "linkId" : "contribution",
-              "text": "Contribution",
-              "type": "choice",
-              "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+              "valueExpression": {
+                "language": "text/fhirpath",
+                "expression": "%questionnaire.subjectType='Practitioner'"
+              }
             }
-          ]
+          ],
+          "linkId" : "contribution",
+          "text": "Contribution",
+          "type": "choice",
+          "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
+        }
+      ]
     }
                 """
           .trimIndent()
@@ -395,6 +395,7 @@ class EnablementEvaluatorTest {
         """
     {
       "resourceType": "QuestionnaireResponse",
+      "status": "completed",
       "item": [
         {
           "linkId": "contribution",
@@ -427,31 +428,31 @@ class EnablementEvaluatorTest {
     }
 
   @Test
-  @Ignore // TODO resolve after custom variables on expression is supported by kotlin-fhirpath
   fun `evaluate() should evaluate enableWhenExpression with %qItem fhirpath supplement`() =
     runTest {
       val questionnaireJson =
         """
     {
-      "resourceType": "Questionnaire",
-      "subjectType": "Practitioner",
-          "item": [
-            {
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
-                  "valueExpression": {
-                    "language": "text/fhirpath",
-                    "expression": "%qItem.text = 'Contribution'"
-                  }
+        "resourceType": "Questionnaire",
+        "subjectType": [ "Practitioner" ],
+        "status": "active",
+        "item": [
+          {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+                "valueExpression": {
+                  "language": "text/fhirpath",
+                  "expression": "%qItem.text = 'Contribution'"
                 }
-              ],
-              "linkId" : "contribution",
-              "text": "Contribution",
-              "type": "choice",
-              "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
-            }
-          ]
+              }
+            ],
+            "linkId" : "contribution",
+            "text": "Contribution",
+            "type": "choice",
+            "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
+          }
+        ]
     }
                 """
           .trimIndent()
@@ -460,6 +461,7 @@ class EnablementEvaluatorTest {
         """
     {
       "resourceType": "QuestionnaireResponse",
+      "status": "completed",
       "item": [
         {
           "linkId": "contribution",

@@ -94,7 +94,7 @@ internal class ExpressionEvaluator(
    * If we apply regex to the expression "X + Y", it returns nothing as there are no matching groups
    * in this expression
    */
-  private val variableRegex = Regex("[%]([A-Za-z0-9\\-]{1,64})")
+  private val variableRegex = Regex("%([A-Za-z0-9\\-]{1,64})")
 
   /**
    * Finds all the matching occurrences of FHIRPaths in x-fhir-query. See:
@@ -142,11 +142,15 @@ internal class ExpressionEvaluator(
    *
    * %resource = [QuestionnaireResponse] %context = [QuestionnaireResponse.Item]
    */
-  fun evaluateExpression(expression: Expression?): List<Any> {
+  fun evaluateExpression(
+    expression: Expression?,
+    variables: Map<String, Any?> = emptyMap(),
+  ): List<Any> {
     if (expression == null) return emptyList()
     return r4FhirPathEngine.evaluateExpression(
       expression.expression?.value ?: "",
-      questionnaireResponse
+      questionnaireResponse,
+      variables,
     ) as List<Any>
   }
 
@@ -170,7 +174,7 @@ internal class ExpressionEvaluator(
    * Returns a list of pair of item and the calculated and evaluated value for all items with
    * calculated expression extension, which is dependent on value of updated response
    */
-  suspend fun evaluateAllAffectedCalculatedExpressions(
+  fun evaluateAllAffectedCalculatedExpressions(
     questionnaireItem: Questionnaire.Item,
   ): List<ItemToAnswersPair> {
     return questionnaire.item
@@ -195,10 +199,18 @@ internal class ExpressionEvaluator(
    * Returns the evaluated value of [calculatedExpression] from the given [questionnaireItem]. A
    * [NullPointerException] will be thrown if [calculatedExpression] is not present.
    */
-  suspend fun evaluateCalculatedExpression(
+  fun evaluateCalculatedExpression(
     questionnaireItem: Questionnaire.Item,
+    questionnaireResponseItem: QuestionnaireResponse.Item? = null,
   ): List<Any> {
-    return evaluateExpression(questionnaireItem.calculatedExpression!!)
+    val variables =
+      mutableMapOf<String, Any?>().apply {
+        put("questionnaire", questionnaire)
+        put("qItem", questionnaireItem)
+        questionnaireResponseItem?.let { put("context", it) }
+        questionnaireLaunchContextMap?.let { putAll(it) }
+      }
+    return evaluateExpression(questionnaireItem.calculatedExpression!!, variables)
   }
 
   /**
@@ -317,7 +329,7 @@ internal class ExpressionEvaluator(
    * Creates an x-fhir-query string for evaluation. For this, it evaluates both variables and
    * fhir-paths in the expression.
    */
-  internal suspend fun createXFhirQueryFromExpression(
+  internal fun createXFhirQueryFromExpression(
     expression: Expression,
     variablesMap: Map<String, Any?> = emptyMap(),
   ): String? {

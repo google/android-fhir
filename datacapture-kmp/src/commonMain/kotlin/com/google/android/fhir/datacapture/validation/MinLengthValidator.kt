@@ -48,7 +48,7 @@ internal object MinLengthValidator :
     messageGenerator = { constraintValue: Any ->
       getString(
         Res.string.min_length_validation_error_msg,
-        getMinLengthValue(constraintValue).toString()
+        getMinLengthValue(constraintValue).toString(),
       )
     },
   )

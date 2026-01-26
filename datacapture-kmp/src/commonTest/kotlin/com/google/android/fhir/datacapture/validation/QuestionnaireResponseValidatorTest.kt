@@ -43,7 +43,7 @@ class QuestionnaireResponseValidatorTest {
     val questionnaireResponse =
       QuestionnaireResponse.Builder(
           status =
-            Enumeration(QuestionnaireResponse.QuestionnaireResponseStatus.Completed.getCode())
+            Enumeration(QuestionnaireResponse.QuestionnaireResponseStatus.Completed.getCode()),
         )
         .apply {
           this.item.add(
@@ -67,7 +67,7 @@ class QuestionnaireResponseValidatorTest {
     val validationResults =
       QuestionnaireResponseValidator.validateQuestionnaireResponse(
         questionnaire,
-        questionnaireResponse
+        questionnaireResponse,
       )
 
     assertTrue(validationResults.values.flatten().all { it is Valid })
@@ -89,7 +89,7 @@ class QuestionnaireResponseValidatorTest {
     val questionnaireResponse =
       QuestionnaireResponse.Builder(
           status =
-            Enumeration(QuestionnaireResponse.QuestionnaireResponseStatus.Completed.getCode())
+            Enumeration(QuestionnaireResponse.QuestionnaireResponseStatus.Completed.getCode()),
         )
         .apply {
           this.item.add(
@@ -103,7 +103,7 @@ class QuestionnaireResponseValidatorTest {
     val validationResults =
       QuestionnaireResponseValidator.validateQuestionnaireResponse(
         questionnaire,
-        questionnaireResponse
+        questionnaireResponse,
       )
 
     assertEquals(1, validationResults.size)

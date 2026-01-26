@@ -67,7 +67,7 @@ class QuestionnaireResponseItemValidatorTest {
         .build()
     val questionnaireResponse =
       QuestionnaireResponse.Builder(
-          status = Enumeration(value = QuestionnaireResponse.QuestionnaireResponseStatus.Completed)
+          status = Enumeration(value = QuestionnaireResponse.QuestionnaireResponseStatus.Completed),
         )
         .apply {
           this.item.add(
@@ -149,7 +149,7 @@ class QuestionnaireResponseItemValidatorTest {
     val questionnaireResponse =
       QuestionnaireResponse.Builder(
           status =
-            Enumeration(QuestionnaireResponse.QuestionnaireResponseStatus.Completed.getCode())
+            Enumeration(QuestionnaireResponse.QuestionnaireResponseStatus.Completed.getCode()),
         )
         .apply {
           this.item.add(
@@ -175,10 +175,10 @@ class QuestionnaireResponseItemValidatorTest {
 
     assertTrue(validationResult is Invalid)
     assertTrue(
-      validationResult.getSingleStringValidationMessage().contains("Minimum value allowed is:100")
+      validationResult.getSingleStringValidationMessage().contains("Minimum value allowed is:100"),
     )
     assertTrue(
-      validationResult.getSingleStringValidationMessage().contains("Maximum value allowed is:200")
+      validationResult.getSingleStringValidationMessage().contains("Maximum value allowed is:200"),
     )
   }
 
@@ -198,7 +198,7 @@ class QuestionnaireResponseItemValidatorTest {
     val questionnaireResponse =
       QuestionnaireResponse.Builder(
           status =
-            Enumeration(QuestionnaireResponse.QuestionnaireResponseStatus.Completed.getCode())
+            Enumeration(QuestionnaireResponse.QuestionnaireResponseStatus.Completed.getCode()),
         )
         .apply {
           this.item.add(
@@ -227,7 +227,7 @@ class QuestionnaireResponseItemValidatorTest {
     assertTrue(
       invalidValidationResult
         .getSingleStringValidationMessage()
-        .contains("Missing answer for required field.")
+        .contains("Missing answer for required field."),
     )
   }
 }
