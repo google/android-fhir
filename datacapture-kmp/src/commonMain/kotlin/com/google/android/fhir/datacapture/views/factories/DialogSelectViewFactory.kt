@@ -52,6 +52,7 @@ import com.google.android.fhir.datacapture.views.compose.OptionDialogSelect
 import com.google.android.fhir.datacapture.views.compose.OptionSelectOption
 import com.google.android.fhir.datacapture.views.compose.SelectedOptions
 import com.google.android.fhir.datacapture.views.compose.getRequiredOrOptionalText
+import com.google.android.fhir.datacapture.views.isAnswerOptionSelected
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 import kotlinx.coroutines.Dispatchers

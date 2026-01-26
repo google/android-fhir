@@ -197,12 +197,6 @@ data class QuestionnaireViewItem(
   //  }
   //
 
-  fun isAnswerOptionSelected(
-    answerOption: Questionnaire.Item.AnswerOption,
-  ): Boolean {
-    return answers.any { it.elementValue == answerOption.elementValue }
-  }
-
   /**
    * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem] have the
    * same [Questionnaire.Item] and [QuestionnaireResponse.Item].
@@ -245,4 +239,10 @@ data class QuestionnaireViewItem(
     }
     return validationResult == other.validationResult
   }
+}
+
+internal fun QuestionnaireViewItem.isAnswerOptionSelected(
+  answerOption: Questionnaire.Item.AnswerOption,
+): Boolean {
+  return answers.any { it.elementValue == answerOption.elementValue }
 }

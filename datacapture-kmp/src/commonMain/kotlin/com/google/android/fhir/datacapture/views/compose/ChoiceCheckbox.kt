@@ -41,6 +41,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 
+internal const val CHOICE_CHECKBOX_IMAGE_TAG = "checkbox_option_icon"
+
 @Composable
 internal fun ChoiceCheckbox(
   label: AnnotatedString,
@@ -128,5 +130,3 @@ internal fun ChoiceCheckbox(
     Spacer(modifier = Modifier.width(QuestionnaireTheme.dimensions.optionItemAfterTextPadding))
   }
 }
-
-const val CHOICE_CHECKBOX_IMAGE_TAG = "checkbox_option_icon"

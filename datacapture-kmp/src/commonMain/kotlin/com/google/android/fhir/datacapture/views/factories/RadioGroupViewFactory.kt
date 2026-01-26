@@ -42,6 +42,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.ChoiceRadioButton
 import com.google.android.fhir.datacapture.views.compose.Header
 import com.google.android.fhir.datacapture.views.compose.MediaItem
+import com.google.android.fhir.datacapture.views.isAnswerOptionSelected
 import com.google.fhir.model.r4.Questionnaire
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
