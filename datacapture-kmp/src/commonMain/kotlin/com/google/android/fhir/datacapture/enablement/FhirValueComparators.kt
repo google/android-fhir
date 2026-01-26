@@ -24,6 +24,7 @@ import com.google.fhir.model.r4.Coding
 import com.google.fhir.model.r4.Date
 import com.google.fhir.model.r4.DateTime
 import com.google.fhir.model.r4.Decimal
+import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.Integer
 import com.google.fhir.model.r4.Quantity
 import com.google.fhir.model.r4.QuestionnaireResponse
@@ -40,33 +41,55 @@ infix fun QuestionnaireResponse.Item.Answer.Value?.equalsFhirValue(
 ): Boolean {
   if (this == null || other == null) return false
 
+  val otherValue =
+    if (other is Extension.Value) {
+      when (other) {
+        is Extension.Value.Boolean -> other.asBoolean()?.value
+        is Extension.Value.Decimal -> other.asDecimal()?.value
+        is Extension.Value.Integer -> other.asInteger()?.value
+        is Extension.Value.Date -> other.asDate()?.value
+        is Extension.Value.DateTime -> other.asDateTime()?.value
+        is Extension.Value.Time -> other.asTime()?.value
+        is Extension.Value.String -> other.asString()?.value
+        is Extension.Value.Uri -> other.asUri()?.value
+        is Extension.Value.Coding -> other.asCoding()?.value
+        is Extension.Value.Quantity -> other.asQuantity()?.value
+        is Extension.Value.Reference -> other.asReference()?.value
+        else -> null
+      }
+    } else {
+      other
+    }
+
+  if (otherValue == null) return false
+
   return when (this) {
     is QuestionnaireResponse.Item.Answer.Value.Boolean ->
-      other is FhirR4Boolean && this.value.value == other.value
+      otherValue is FhirR4Boolean && this.value.value == otherValue.value
     is QuestionnaireResponse.Item.Answer.Value.Decimal ->
-      other is FhirR4Decimal && this.value.value == other.value
+      otherValue is FhirR4Decimal && this.value.value == otherValue.value
     is QuestionnaireResponse.Item.Answer.Value.Integer ->
-      other is Integer && this.value.value == other.value
+      otherValue is Integer && this.value.value == otherValue.value
     is QuestionnaireResponse.Item.Answer.Value.Date ->
-      other is Date && this.value.value == other.value
+      otherValue is Date && this.value.value == otherValue.value
     is QuestionnaireResponse.Item.Answer.Value.DateTime ->
-      other is DateTime && this.value.value == other.value
+      otherValue is DateTime && this.value.value == otherValue.value
     is QuestionnaireResponse.Item.Answer.Value.Time ->
-      other is Time && this.value.value == other.value
+      otherValue is Time && this.value.value == otherValue.value
     is QuestionnaireResponse.Item.Answer.Value.String ->
-      other is FhirR4String && this.value.value == other.value
+      otherValue is FhirR4String && this.value.value == otherValue.value
     is QuestionnaireResponse.Item.Answer.Value.Coding ->
-      other is Coding &&
-        this.value.system?.value == other.system?.value &&
-        this.value.code?.value == other.code?.value
+      otherValue is Coding &&
+        this.value.system?.value == otherValue.system?.value &&
+        this.value.code?.value == otherValue.code?.value
     is QuestionnaireResponse.Item.Answer.Value.Quantity ->
-      other is Quantity && this.value.value?.value == other.value?.value
+      otherValue is Quantity && this.value.value?.value == otherValue.value?.value
     is QuestionnaireResponse.Item.Answer.Value.Uri ->
-      other is Uri && this.value.value == other.value
+      otherValue is Uri && this.value.value == otherValue.value
     is QuestionnaireResponse.Item.Answer.Value.Attachment ->
-      other is Attachment && this.value == other
+      otherValue is Attachment && this.value == otherValue
     is QuestionnaireResponse.Item.Answer.Value.Reference ->
-      other is Reference && this.value.reference?.value == other.reference?.value
+      otherValue is Reference && this.value.reference?.value == otherValue.reference?.value
   }
 }
 
@@ -79,61 +102,81 @@ infix fun QuestionnaireResponse.Item.Answer.Value?.compareFhirValue(
 ): Int {
   if (this == null || other == null) return 0
 
+  val otherValue =
+    if (other is Extension.Value) {
+      when (other) {
+        is Extension.Value.Decimal -> other.asDecimal()?.value
+        is Extension.Value.Integer -> other.asInteger()?.value
+        is Extension.Value.Date -> other.asDate()?.value
+        is Extension.Value.DateTime -> other.asDateTime()?.value
+        is Extension.Value.Time -> other.asTime()?.value
+        is Extension.Value.String -> other.asString()?.value
+        is Extension.Value.Quantity -> other.asQuantity()?.value
+        else -> null
+      }
+    } else {
+      other
+    }
+
+  if (otherValue == null) return 0
+
   return when (this) {
     is QuestionnaireResponse.Item.Answer.Value.Decimal -> {
-      if (other !is Decimal) {
+      if (otherValue !is Decimal) {
         throw IllegalStateException("The other value is not of type decimal")
       }
       val thisVal = this.value.value!!
-      val otherVal = other.value!!
+      val otherVal = otherValue.value!!
       thisVal.compareTo(otherVal)
     }
     is QuestionnaireResponse.Item.Answer.Value.Integer -> {
-      if (other !is Integer) {
-        throw IllegalStateException("The other value is not of type integer")
+      if (otherValue !is Integer) {
+        throw IllegalStateException(
+          "The other value is not of type integer. Actual type: ${otherValue::class}"
+        )
       }
       val thisVal = this.value.value!!
-      val otherVal = other.value!!
+      val otherVal = otherValue.value!!
       thisVal.compareTo(otherVal)
     }
     is QuestionnaireResponse.Item.Answer.Value.Date -> {
-      if (other !is Date) {
+      if (otherValue !is Date) {
         throw IllegalStateException("The other value is not of type date")
       }
       val thisVal = this.value.value!!.toString()
-      val otherVal = other.value!!.toString()
+      val otherVal = otherValue.value!!.toString()
       thisVal.compareTo(otherVal)
     }
     is QuestionnaireResponse.Item.Answer.Value.DateTime -> {
-      if (other !is DateTime) {
+      if (otherValue !is DateTime) {
         throw IllegalStateException("The other value is not of type datetime")
       }
       val thisVal = this.value.value!!.toString()
-      val otherVal = other.value!!.toString()
+      val otherVal = otherValue.value!!.toString()
       thisVal.compareTo(otherVal)
     }
     is QuestionnaireResponse.Item.Answer.Value.Time -> {
-      if (other !is Time) {
+      if (otherValue !is Time) {
         throw IllegalStateException("The other value is not of type time")
       }
       val thisVal = this.value.value!!
-      val otherVal = other.value!!
+      val otherVal = otherValue.value!!
       thisVal.compareTo(otherVal)
     }
     is QuestionnaireResponse.Item.Answer.Value.String -> {
-      if (other !is FhirR4String) {
+      if (otherValue !is FhirR4String) {
         throw IllegalStateException("The other value is not of type string")
       }
       val thisVal = this.value.value!!
-      val otherVal = other.value!!
+      val otherVal = otherValue.value!!
       thisVal.compareTo(otherVal)
     }
     is QuestionnaireResponse.Item.Answer.Value.Quantity -> {
-      if (other !is Quantity) {
+      if (otherValue !is Quantity) {
         throw IllegalStateException("The other value is not of type quantity")
       }
       val thisVal = this.value.value!!.value!!
-      val otherVal = other.value!!.value!!
+      val otherVal = otherValue.value!!.value!!
       thisVal.compareTo(otherVal)
     }
     is QuestionnaireResponse.Item.Answer.Value.Attachment,

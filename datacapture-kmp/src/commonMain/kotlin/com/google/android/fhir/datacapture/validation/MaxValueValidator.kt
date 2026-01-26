@@ -19,6 +19,8 @@ package com.google.android.fhir.datacapture.validation
 import android_fhir.datacapture_kmp.generated.resources.Res
 import android_fhir.datacapture_kmp.generated.resources.max_value_validation_error_msg
 import com.google.android.fhir.datacapture.enablement.compareFhirValue
+import com.google.fhir.model.r4.Extension
+import com.google.fhir.model.r4.Integer
 import com.google.fhir.model.r4.QuestionnaireResponse
 import org.jetbrains.compose.resources.getString
 
@@ -35,7 +37,14 @@ internal object MaxValueValidator :
     messageGenerator = { constraintValue: Any ->
       getString(
         Res.string.max_value_validation_error_msg,
-        constraintValue.toString(),
+        getValue(constraintValue).toString(),
       )
     },
   )
+
+private fun getValue(constraintValue: Any): Int? =
+  when (constraintValue) {
+    is Integer -> constraintValue.value
+    is Extension.Value.Integer -> constraintValue.asInteger()?.value?.value
+    else -> null
+  }

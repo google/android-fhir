@@ -19,7 +19,9 @@ package com.google.android.fhir.datacapture.validation
 import android_fhir.datacapture_kmp.generated.resources.Res
 import android_fhir.datacapture_kmp.generated.resources.regex_validation_error_msg
 import co.touchlab.kermit.Logger
+import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.QuestionnaireResponse
+import com.google.fhir.model.r4.String
 import org.jetbrains.compose.resources.getString
 
 internal const val REGEX_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/regex"
@@ -33,20 +35,27 @@ internal const val REGEX_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinitio
 internal object RegexValidator :
   AnswerExtensionConstraintValidator(
     url = REGEX_EXTENSION_URL,
-    predicate =
-      predicate@{ constraintValue: Any, answer: QuestionnaireResponse.Item.Answer,
-        ->
-        if (constraintValue !is String || answer.value == null) {
+    predicate = predicate@{ constraintValue: Any, answer: QuestionnaireResponse.Item.Answer ->
+        val regex = getValue(constraintValue)
+        if (regex == null || answer.value == null) {
           return@predicate false
         }
         try {
-          !constraintValue.toRegex().matches(answer.value!!.asString()?.value.toString())
+          val answerString = answer.value!!.asString()?.value?.value ?: ""
+          !regex.toRegex().matches(answerString)
         } catch (e: IllegalArgumentException) {
-          Logger.w("Can't parse regex: $constraintValue", e)
+          Logger.w("Can't parse regex: $regex", e)
           false
         }
       },
     messageGenerator = { constraintValue: Any ->
-      getString(Res.string.regex_validation_error_msg, constraintValue.toString())
+      getString(Res.string.regex_validation_error_msg, getValue(constraintValue) as kotlin.String)
     },
   )
+
+private fun getValue(constraintValue: Any): kotlin.String? =
+  when (constraintValue) {
+    is String -> constraintValue.value
+    is Extension.Value.String -> constraintValue.asString()?.value?.value
+    else -> null
+  }

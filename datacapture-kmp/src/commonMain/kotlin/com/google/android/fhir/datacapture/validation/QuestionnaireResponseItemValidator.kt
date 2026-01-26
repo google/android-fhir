@@ -59,6 +59,7 @@ internal class QuestionnaireResponseItemValidator(
         questionnaireResponseItem.answer.map { answer ->
           validator.validate(questionnaireItem, answer) {
             expressionEvaluator.evaluateExpressionValue(it)
+              ?: expressionEvaluator.evaluateExpression(it)
           }
         }
       }

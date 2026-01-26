@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.validation
 
 import android_fhir.datacapture_kmp.generated.resources.Res
 import android_fhir.datacapture_kmp.generated.resources.min_length_validation_error_msg
+import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.Integer
 import org.jetbrains.compose.resources.getString
 
@@ -39,10 +40,22 @@ internal object MinLengthValidator :
   AnswerExtensionConstraintValidator(
     url = MIN_LENGTH_EXTENSION_URL,
     predicate = { constraintValue, answer ->
+      val minLengthValue = getMinLengthValue(constraintValue)
       answer.value != null &&
-        (answer.value!!.asString()!!.value.value)!!.length < (constraintValue as Integer).value!!
+        minLengthValue != null &&
+        (answer.value!!.asString()?.value?.value ?: "").length < minLengthValue
     },
     messageGenerator = { constraintValue: Any ->
-      getString(Res.string.min_length_validation_error_msg, constraintValue.toString())
+      getString(
+        Res.string.min_length_validation_error_msg,
+        getMinLengthValue(constraintValue).toString()
+      )
     },
   )
+
+private fun getMinLengthValue(constraintValue: Any): Int? =
+  when (constraintValue) {
+    is Integer -> constraintValue.value
+    is Extension.Value.Integer -> constraintValue.asInteger()?.value?.value
+    else -> null
+  }

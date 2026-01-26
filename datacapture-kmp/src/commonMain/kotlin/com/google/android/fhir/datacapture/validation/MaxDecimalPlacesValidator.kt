@@ -25,6 +25,7 @@ package com.google.android.fhir.datacapture.validation
  */
 import android_fhir.datacapture_kmp.generated.resources.Res
 import android_fhir.datacapture_kmp.generated.resources.max_decimal_validation_error_msg
+import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.Integer
 import com.google.fhir.model.r4.QuestionnaireResponse
 import org.jetbrains.compose.resources.getString
@@ -34,15 +35,21 @@ private const val MAX_DECIMAL_URL = "http://hl7.org/fhir/StructureDefinition/max
 internal object MaxDecimalPlacesValidator :
   AnswerExtensionConstraintValidator(
     url = MAX_DECIMAL_URL,
-    predicate = { constraintValue: Any, answer: QuestionnaireResponse.Item.Answer,
-      ->
-      val maxDecimalPlaces = (constraintValue as? Integer)?.value
+    predicate = { constraintValue: Any, answer: QuestionnaireResponse.Item.Answer ->
+      val maxDecimalPlaces = getValue(constraintValue)
       answer.value != null &&
         maxDecimalPlaces != null &&
         answer.value!!.asDecimal()!!.value.value.toString().substringAfter(".").length >
           maxDecimalPlaces
     },
     messageGenerator = { constraintValue: Any ->
-      getString(Res.string.max_decimal_validation_error_msg, constraintValue.toString())
+      getString(Res.string.max_decimal_validation_error_msg, getValue(constraintValue).toString())
     },
   )
+
+private fun getValue(constraintValue: Any): Int? =
+  when (constraintValue) {
+    is Integer -> constraintValue.value
+    is Extension.Value.Integer -> constraintValue.asInteger()?.value?.value
+    else -> null
+  }
