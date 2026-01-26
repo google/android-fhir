@@ -52,6 +52,7 @@ import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineVie
 import com.google.android.fhir.datacapture.views.factories.QuantityViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewFactory
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewFactory
+import com.google.android.fhir.datacapture.views.factories.SliderViewFactory
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 import kotlin.uuid.ExperimentalUuidApi
@@ -342,6 +343,7 @@ fun getQuestionnaireItemViewFactory(
     QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewFactory
     QuestionnaireViewHolderType.QUANTITY -> QuantityViewFactory
     QuestionnaireViewHolderType.DISPLAY -> DisplayViewFactory
+    QuestionnaireViewHolderType.SLIDER -> SliderViewFactory
     QuestionnaireViewHolderType.BOOLEAN_TYPE_PICKER -> BooleanChoiceViewFactory
     QuestionnaireViewHolderType.RADIO_GROUP -> RadioGroupViewFactory
     QuestionnaireViewHolderType.CHECK_BOX_GROUP -> CheckBoxGroupViewFactory

@@ -26,7 +26,6 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runComposeUiTest
-import com.google.android.fhir.datacapture.extensions.BooleanAnswerValue
 import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4String
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
@@ -125,7 +124,10 @@ class BooleanChoiceViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = BooleanAnswerValue(value = FhirR4Boolean(value = true)),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Boolean(
+                    value = FhirR4Boolean(value = true),
+                  ),
               ),
             ),
         ),
@@ -150,7 +152,10 @@ class BooleanChoiceViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = BooleanAnswerValue(value = FhirR4Boolean(value = true)),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Boolean(
+                    value = FhirR4Boolean(value = true),
+                  ),
               ),
             ),
         ),
@@ -178,7 +183,10 @@ class BooleanChoiceViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = BooleanAnswerValue(value = FhirR4Boolean(value = false)),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Boolean(
+                    value = FhirR4Boolean(value = false),
+                  ),
               ),
             ),
         ),
@@ -204,7 +212,10 @@ class BooleanChoiceViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = BooleanAnswerValue(value = FhirR4Boolean(value = false)),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Boolean(
+                    value = FhirR4Boolean(value = false),
+                  ),
               ),
             ),
         ),
@@ -274,7 +285,10 @@ class BooleanChoiceViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = BooleanAnswerValue(value = FhirR4Boolean(value = true)),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Boolean(
+                    value = FhirR4Boolean(value = true),
+                  ),
               ),
             ),
         ),
@@ -302,7 +316,10 @@ class BooleanChoiceViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = BooleanAnswerValue(value = FhirR4Boolean(value = true)),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Boolean(
+                    value = FhirR4Boolean(value = true),
+                  ),
               ),
             ),
         ),
@@ -330,7 +347,10 @@ class BooleanChoiceViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = BooleanAnswerValue(value = FhirR4Boolean(value = false)),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Boolean(
+                    value = FhirR4Boolean(value = false),
+                  ),
               ),
             ),
         ),
@@ -358,7 +378,10 @@ class BooleanChoiceViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = BooleanAnswerValue(value = FhirR4Boolean(value = false)),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Boolean(
+                    value = FhirR4Boolean(value = false),
+                  ),
               ),
             ),
         ),
@@ -405,7 +428,10 @@ class BooleanChoiceViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = BooleanAnswerValue(value = FhirR4Boolean(value = true)),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Boolean(
+                    value = FhirR4Boolean(value = true),
+                  ),
               ),
             ),
         ),
@@ -433,7 +459,10 @@ class BooleanChoiceViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = BooleanAnswerValue(value = FhirR4Boolean(value = true)),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Boolean(
+                    value = FhirR4Boolean(value = true),
+                  ),
               ),
             ),
         ),

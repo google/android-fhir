@@ -34,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
-import com.google.android.fhir.datacapture.extensions.BooleanAnswerValue
 import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.choiceOrientation
@@ -72,7 +71,10 @@ internal object BooleanChoiceViewFactory : QuestionnaireItemViewFactory {
         selectedChoiceState = selected
         questionnaireViewItem.setAnswer(
           QuestionnaireResponse.Item.Answer(
-            value = BooleanAnswerValue(value = FhirR4Boolean(value = selected)),
+            value =
+              QuestionnaireResponse.Item.Answer.Value.Boolean(
+                value = FhirR4Boolean(value = selected),
+              ),
           ),
         )
       } else {
