@@ -17,8 +17,10 @@
 package com.google.android.fhir.datacapture.fhirpath
 
 import co.touchlab.kermit.Logger
-import com.google.fhir.fhirpath.evaluateFhirPath
+import com.google.fhir.fhirpath.FhirPathEngine
 import com.google.fhir.model.r4.Resource
+
+val r4FhirPathEngine = FhirPathEngine.forR4()
 
 fun convertToBoolean(result: List<Any>): Boolean {
   if (result.isEmpty()) return false
@@ -65,7 +67,7 @@ internal fun evaluateFhirPathToString(
     if (resource == null) {
       ""
     } else {
-      val results = evaluateFhirPath(expression, resource).toList()
+      val results = r4FhirPathEngine.evaluateExpression(expression, resource).toList()
       convertToString(results)
     }
   } catch (throwable: Throwable) {

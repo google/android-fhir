@@ -25,7 +25,6 @@ import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.isReferencedBy
 import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.extensions.variableExpressions
-import com.google.fhir.fhirpath.evaluateFhirPath
 import com.google.fhir.model.r4.Bundle
 import com.google.fhir.model.r4.Enumeration
 import com.google.fhir.model.r4.Expression
@@ -145,7 +144,10 @@ internal class ExpressionEvaluator(
    */
   fun evaluateExpression(expression: Expression?): List<Any> {
     if (expression == null) return emptyList()
-    return evaluateFhirPath(expression.expression?.value ?: "", questionnaireResponse) as List<Any>
+    return r4FhirPathEngine.evaluateExpression(
+      expression.expression?.value ?: "",
+      questionnaireResponse
+    ) as List<Any>
   }
 
   /**
@@ -485,7 +487,8 @@ internal class ExpressionEvaluator(
           }
           .build()
       } else if (expression.isFhirPath) {
-        evaluateFhirPath(
+        r4FhirPathEngine
+          .evaluateExpression(
             expression.expression?.value ?: "",
             questionnaireResponse,
           )
