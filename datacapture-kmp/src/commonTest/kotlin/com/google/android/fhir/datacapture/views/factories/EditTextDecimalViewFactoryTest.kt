@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.runComposeUiTest
+import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4String
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -39,7 +40,6 @@ import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TA
 import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
 import com.google.android.fhir.datacapture.views.compose.QUESTION_HEADER_TAG
 import com.google.android.fhir.datacapture.views.compose.UNIT_TEXT_TEST_TAG
-import com.google.fhir.model.r4.Boolean as FhirR4Boolean
 import com.google.fhir.model.r4.Code
 import com.google.fhir.model.r4.Coding
 import com.google.fhir.model.r4.Decimal
@@ -51,8 +51,6 @@ import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
-
-typealias DecimalAnswerValue = QuestionnaireResponse.Item.Answer.Value.Decimal
 
 @OptIn(ExperimentalTestApi::class)
 class EditTextDecimalViewFactoryTest {
@@ -97,7 +95,10 @@ class EditTextDecimalViewFactoryTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = DecimalAnswerValue(value = Decimal(value = "1.1".toBigDecimal())),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.Decimal(
+                        value = Decimal(value = "1.1".toBigDecimal()),
+                      ),
                   ),
                 ),
             ),
@@ -124,7 +125,10 @@ class EditTextDecimalViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = DecimalAnswerValue(value = Decimal(value = "1.1".toBigDecimal())),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Decimal(
+                      value = Decimal(value = "1.1".toBigDecimal()),
+                    ),
                 ),
               ),
           ),
@@ -174,7 +178,10 @@ class EditTextDecimalViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = DecimalAnswerValue(value = Decimal(value = "1.1".toBigDecimal())),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Decimal(
+                    value = Decimal(value = "1.1".toBigDecimal()),
+                  ),
               ),
             ),
         ),
@@ -215,7 +222,10 @@ class EditTextDecimalViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = DecimalAnswerValue(value = Decimal(value = "1.1".toBigDecimal())),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Decimal(
+                      value = Decimal(value = "1.1".toBigDecimal()),
+                    ),
                 ),
               ),
           ),
@@ -334,7 +344,10 @@ class EditTextDecimalViewFactoryTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = DecimalAnswerValue(value = Decimal(value = "3.3".toBigDecimal())),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.Decimal(
+                        value = Decimal(value = "3.3".toBigDecimal()),
+                      ),
                   ),
                 ),
             ),
@@ -373,7 +386,10 @@ class EditTextDecimalViewFactoryTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = DecimalAnswerValue(value = Decimal(value = "1.1".toBigDecimal())),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.Decimal(
+                        value = Decimal(value = "1.1".toBigDecimal()),
+                      ),
                   ),
                 ),
             ),
@@ -609,7 +625,10 @@ class EditTextDecimalViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = DecimalAnswerValue(value = Decimal(value = "124.5".toBigDecimal())),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Decimal(
+                      value = Decimal(value = "124.5".toBigDecimal()),
+                    ),
                 ),
               ),
           ),
@@ -629,7 +648,10 @@ class EditTextDecimalViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = DecimalAnswerValue(value = Decimal(value = "124.578".toBigDecimal())),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Decimal(
+                      value = Decimal(value = "124.578".toBigDecimal()),
+                    ),
                 ),
               ),
           ),
