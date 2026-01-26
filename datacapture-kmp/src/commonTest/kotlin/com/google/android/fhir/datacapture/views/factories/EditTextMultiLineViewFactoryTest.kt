@@ -193,7 +193,7 @@ class EditTextMultiLineViewFactoryTest {
   }
 
   @Test
-  fun displayValidationResult_noError_shouldShowNoErrorMessage() = runComposeUiTest {
+  fun displayValidationResultNoErrorShouldShowNoErrorMessage() = runComposeUiTest {
     setContent {
       QuestionnaireEditTextMultiLineView(
         questionnaireViewItem =
@@ -231,7 +231,7 @@ class EditTextMultiLineViewFactoryTest {
   }
 
   @Test
-  fun displayValidationResult_error_shouldShowErrorMessage() = runComposeUiTest {
+  fun displayValidationResultErrorShouldShowErrorMessage() = runComposeUiTest {
     setContent {
       QuestionnaireEditTextMultiLineView(
         questionnaireViewItem =

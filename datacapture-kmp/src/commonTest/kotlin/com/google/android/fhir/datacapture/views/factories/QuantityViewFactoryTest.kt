@@ -433,7 +433,7 @@ class QuantityViewFactoryTest {
   }
 
   @Test
-  fun draftWithUnit_shouldCompleteQuantity() {
+  fun draftWithUnitShouldCompleteQuantity() {
     var answerHolder: List<QuestionnaireResponse.Item.Answer>? = null
     var draftHolder: Any? = null
 
@@ -477,7 +477,7 @@ class QuantityViewFactoryTest {
   }
 
   @Test
-  fun draftWithDecimalValue_shouldCompleteQuantity() {
+  fun draftWithDecimalValueShouldCompleteQuantity() {
     var answerHolder: List<QuestionnaireResponse.Item.Answer>? = null
     var draftHolder: Any? = null
 
