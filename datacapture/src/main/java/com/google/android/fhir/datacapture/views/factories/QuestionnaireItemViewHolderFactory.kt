@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,11 @@ package com.google.android.fhir.datacapture.views.factories
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.annotation.LayoutRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.QuestionnaireAdapterItem
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.MediaView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -32,8 +33,9 @@ import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
  *
  * @param resId the layout resource for the view
  */
-abstract class QuestionnaireItemViewHolderFactory(@LayoutRes open val resId: Int) {
-  fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
+abstract class QuestionnaireItemAndroidViewHolderFactory(@LayoutRes open val resId: Int) :
+  QuestionnaireItemViewHolderFactory {
+  override fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
     return QuestionnaireItemViewHolder(
       LayoutInflater.from(parent.context).inflate(resId, parent, false),
       getQuestionnaireItemViewHolderDelegate(),
@@ -44,7 +46,21 @@ abstract class QuestionnaireItemViewHolderFactory(@LayoutRes open val resId: Int
    * Returns a [QuestionnaireItemViewHolderDelegate] that handles the initialization of views and
    * binding of items in [RecyclerView].
    */
-  abstract fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate
+  abstract fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemAndroidViewHolderDelegate
+}
+
+interface QuestionnaireItemComposeViewHolderFactory : QuestionnaireItemViewHolderFactory {
+  override fun create(parent: ViewGroup): QuestionnaireItemViewHolder =
+    QuestionnaireItemViewHolder(
+      ComposeView(parent.context),
+      getQuestionnaireItemViewHolderDelegate(),
+    )
+
+  fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemComposeViewHolderDelegate
+}
+
+sealed interface QuestionnaireItemViewHolderFactory {
+  fun create(parent: ViewGroup): QuestionnaireItemViewHolder
 }
 
 /**
@@ -57,37 +73,27 @@ class QuestionnaireItemViewHolder(
   private val delegate: QuestionnaireItemViewHolderDelegate,
 ) : RecyclerView.ViewHolder(itemView) {
 
-  private var itemMediaView: MediaView
-
   init {
-    delegate.init(itemView)
-    itemMediaView = itemView.findViewById(R.id.item_media)
+    if (delegate is QuestionnaireItemAndroidViewHolderDelegate) {
+      delegate.init(itemView)
+    }
   }
 
   fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-    delegate.questionnaireViewItem = questionnaireViewItem
-    delegate.bind(questionnaireViewItem)
-    itemMediaView.bind(questionnaireViewItem.questionnaireItem)
-    delegate.setReadOnly(questionnaireViewItem.questionnaireItem.readOnly)
-  }
-}
-
-/** The [RecyclerView.ViewHolder] for [QuestionnaireAdapterItem.RepeatedGroupHeader]. */
-internal class RepeatedGroupHeaderItemViewHolder(
-  itemView: View,
-) : RecyclerView.ViewHolder(itemView) {
-  private val header: TextView = itemView.findViewById(R.id.repeated_group_instance_header_title)
-  private val delete: View =
-    itemView.findViewById(R.id.repeated_group_instance_header_delete_button)
-
-  fun bind(repeatedGroupHeader: QuestionnaireAdapterItem.RepeatedGroupHeader) {
-    header.text =
-      header.context.getString(
-        R.string.repeated_group_title,
-        "${repeatedGroupHeader.index + 1}",
-        repeatedGroupHeader.title,
-      )
-    delete.setOnClickListener { repeatedGroupHeader.onDeleteClicked() }
+    when (delegate) {
+      is QuestionnaireItemAndroidViewHolderDelegate -> {
+        delegate.questionnaireViewItem = questionnaireViewItem
+        delegate.bind(questionnaireViewItem)
+        itemView
+          .findViewById<MediaView>(R.id.item_media)
+          .bind(questionnaireViewItem.questionnaireItem)
+        delegate.setReadOnly(questionnaireViewItem.questionnaireItem.readOnly)
+      }
+      is QuestionnaireItemComposeViewHolderDelegate -> {
+        require(itemView is ComposeView)
+        delegate.bind(itemView as ComposeView, questionnaireViewItem)
+      }
+    }
   }
 }
 
@@ -101,7 +107,7 @@ internal class RepeatedGroupHeaderItemViewHolder(
  * is a unique [QuestionnaireItemViewHolderDelegate] for each [QuestionnaireItemViewHolder]. This is
  * critical for the correctness of the recycler view.
  */
-interface QuestionnaireItemViewHolderDelegate {
+interface QuestionnaireItemAndroidViewHolderDelegate : QuestionnaireItemViewHolderDelegate {
 
   var questionnaireViewItem: QuestionnaireViewItem
 
@@ -120,3 +126,13 @@ interface QuestionnaireItemViewHolderDelegate {
   /** Sets view read only if [isReadOnly] is true. */
   fun setReadOnly(isReadOnly: Boolean)
 }
+
+interface QuestionnaireItemComposeViewHolderDelegate : QuestionnaireItemViewHolderDelegate {
+  fun bind(composeView: ComposeView, questionnaireViewItem: QuestionnaireViewItem) {
+    composeView.setContent { Mdc3Theme { Content(questionnaireViewItem) } }
+  }
+
+  @Composable fun Content(questionnaireViewItem: QuestionnaireViewItem)
+}
+
+sealed interface QuestionnaireItemViewHolderDelegate

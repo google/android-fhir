@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="label_gender">Gender</string>
+    <string name="label_date_of_birth">Date of Birth</string>
+    <string name="label_marital_status">Marital Status</string>
+    <string name="label_telecom">Telecom</string>
+    <string name="label_address">Address</string>
+
+    <string name="back">Back</string>
+</resources>

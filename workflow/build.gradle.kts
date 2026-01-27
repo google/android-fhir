@@ -3,11 +3,11 @@ import java.net.URL
 import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 
 plugins {
-  id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.mavenPublish)
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
+  `maven-publish`
   jacoco
-  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
+  alias(libs.plugins.dokka)
 }
 
 publishArtifact(Releases.Workflow)
@@ -19,7 +19,7 @@ android {
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.workflow"
   }
@@ -78,46 +78,46 @@ afterEvaluate { configureFirebaseTestLabForLibraries() }
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-
-  androidTestImplementation(Dependencies.jsonAssert)
-  androidTestImplementation(Dependencies.xmlUnit)
   androidTestImplementation(libs.androidx.test.core)
   androidTestImplementation(libs.androidx.test.ext.junit)
   androidTestImplementation(libs.androidx.test.ext.junit.ktx)
   androidTestImplementation(libs.androidx.test.runner)
   androidTestImplementation(libs.androidx.work.testing)
+  androidTestImplementation(libs.json.assert)
   androidTestImplementation(libs.junit)
   androidTestImplementation(libs.logback.android)
   androidTestImplementation(libs.truth)
+  androidTestImplementation(libs.xml.unit)
   androidTestImplementation(project(":workflow-testing"))
 
-  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
-  api(Dependencies.HapiFhir.guavaCaching)
+  api(libs.hapi.fhir.caching.guava)
+  api(libs.hapi.fhir.structures.r4) { exclude(module = "junit") }
 
-  implementation(Dependencies.HapiFhir.guavaCaching)
-  implementation(Dependencies.timber)
-  implementation(Dependencies.xerces)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
+
   implementation(libs.android.fhir.engine) { exclude(module = "truth") }
   implementation(libs.android.fhir.knowledge)
   implementation(libs.androidx.core)
+  implementation(libs.hapi.fhir.caching.guava)
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.opencds.cqf.fhir.cr)
   implementation(libs.opencds.cqf.fhir.jackson)
+  implementation(libs.timber)
+  implementation(libs.xerces)
 
-  testImplementation(Dependencies.jsonAssert)
-  testImplementation(Dependencies.robolectric)
-  testImplementation(Dependencies.xmlUnit)
   testImplementation(libs.androidx.room.room)
   testImplementation(libs.androidx.room.runtime)
   testImplementation(libs.androidx.test.core)
+  testImplementation(libs.json.assert)
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.robolectric)
   testImplementation(libs.truth)
-  testImplementation(project(":workflow-testing"))
+  testImplementation(libs.xml.unit)
   testImplementation(project(":knowledge"))
+  testImplementation(project(":workflow-testing"))
 
   configurations.all {
     if (name.contains("test", ignoreCase = true)) {

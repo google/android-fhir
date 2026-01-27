@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,8 @@ package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import android.text.Spanned
+import androidx.compose.ui.text.AnnotatedString
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.views.factories.localDate
-import com.google.android.fhir.datacapture.views.factories.localTime
 import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
@@ -119,6 +118,38 @@ internal fun StringType.toCodeType(): CodeType {
 /** Converts StringType to IdType. */
 internal fun StringType.toIdType(): IdType {
   return IdType(value)
+}
+
+/**
+ * Checks if two Coding objects match.
+ *
+ * The matching logic is progressive:
+ * 1. Always matches on the [code].
+ * 2. Matches on [system] if the both coding has a system.
+ * 3. Matches on [version] if the both coding has a version.
+ */
+internal fun Coding.matches(other: Coding): Boolean {
+  // Always match on code
+  if (this.code != other.code) {
+    return false
+  }
+
+  // If system exists in both, it must match
+  if (other.hasSystem() && this.hasSystem() && this.system != other.system) {
+    return false
+  }
+
+  // If version exists in both, it must match
+  if (other.hasVersion() && this.hasVersion() && this.version != other.version) {
+    return false
+  }
+
+  // All conditions met
+  return true
+}
+
+internal fun StringType.localizedTextAnnotatedString(): AnnotatedString? {
+  return this.getLocalizedText()?.toAnnotatedString()
 }
 
 /** Converts Coding to CodeType. */
