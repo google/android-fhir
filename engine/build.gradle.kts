@@ -2,12 +2,12 @@ import codegen.GenerateSearchParamsTask
 import java.net.URL
 
 plugins {
-  id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.kotlinKsp)
-  id(Plugins.BuildPlugins.mavenPublish)
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.ksp)
+  `maven-publish`
   jacoco
-  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
+  alias(libs.plugins.dokka)
 }
 
 publishArtifact(Releases.Engine)
@@ -38,7 +38,7 @@ android {
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
     consumerProguardFile("proguard-rules.pro")
@@ -97,29 +97,10 @@ dependencies {
   androidTestImplementation(libs.junit)
   androidTestImplementation(libs.truth)
 
-  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+  api(libs.hapi.fhir.structures.r4) { exclude(module = "junit") }
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-  // We have removed the dependency on Caffeine from HAPI due to conflicts with android
-  // Guava Caching must be individually loaded instead.
-  implementation(Dependencies.HapiFhir.guavaCaching)
-  // Validation to load system types into FhirPath's Context
-  // The loading happens via a ResourceStream in XML and thus
-  // XML parsers are also necessary.
-  implementation(Dependencies.HapiFhir.validationR4)
-  implementation(Dependencies.HapiFhir.validation) {
-    exclude(module = "commons-logging")
-    exclude(module = "httpclient")
-  }
-  implementation(Dependencies.Retrofit.coreRetrofit)
-  implementation(Dependencies.guava)
-  implementation(Dependencies.httpInterceptor)
-  implementation(Dependencies.jsonToolsPatch)
-  implementation(Dependencies.sqlcipher)
-  implementation(Dependencies.timber)
-  implementation(Dependencies.woodstox)
-  implementation(Dependencies.xerces)
   implementation(libs.android.fhir.common)
   implementation(libs.androidx.datastore.preferences)
   implementation(libs.androidx.lifecycle.livedata)
@@ -127,22 +108,40 @@ dependencies {
   implementation(libs.androidx.room.runtime)
   implementation(libs.androidx.sqlite)
   implementation(libs.androidx.work.runtime)
+  implementation(libs.guava)
+  // We have removed the dependency on Caffeine from HAPI due to conflicts with android
+  // Guava Caching must be individually loaded instead.
+  implementation(libs.hapi.fhir.caching.guava)
+  // Validation to load system types into FhirPath's Context. The loading happens via a
+  // ResourceStream in XML and thus XML parsers are also necessary.
+  implementation(libs.hapi.fhir.validation) {
+    exclude(module = "commons-logging")
+    exclude(module = "httpclient")
+  }
+  implementation(libs.hapi.fhir.validation.r4)
+  implementation(libs.okhttp3.interceptor)
+  implementation(libs.json.tools.patch)
   implementation(libs.kotlin.stdlib)
+  implementation(libs.retrofit)
+  implementation(libs.sqlcipher)
+  implementation(libs.timber)
   implementation(libs.truth)
+  implementation(libs.woodstox)
+  implementation(libs.xerces)
 
   ksp(libs.androidx.room.compiler)
 
-  testImplementation(Dependencies.jsonAssert)
-  testImplementation(Dependencies.mockitoInline)
-  testImplementation(Dependencies.mockitoKotlin)
-  testImplementation(Dependencies.mockWebServer)
-  testImplementation(Dependencies.robolectric)
   testImplementation(libs.androidx.arch.core.testing)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.androidx.work.testing)
+  testImplementation(libs.json.assert)
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)
   testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.okhttp3.mock.web.server)
+  testImplementation(libs.mockito.inline)
+  testImplementation(libs.mockito.kotlin)
+  testImplementation(libs.robolectric)
   testImplementation(libs.truth)
 
   constraints {

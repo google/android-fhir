@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,9 +37,10 @@ import org.hl7.fhir.r4.model.Questionnaire
  * This view is a container that contains the question and answer obtained from
  * questionnaireItemViewItem [QuestionnaireViewItem].
  */
-internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.layout.review_view) {
+internal object ReviewViewHolderFactory :
+  QuestionnaireItemAndroidViewHolderFactory(R.layout.review_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemAndroidViewHolderDelegate {
       private lateinit var header: ConstraintLayout
       private lateinit var flyOverTextView: TextView
       private lateinit var errorView: View

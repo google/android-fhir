@@ -1,7 +1,7 @@
 plugins {
-  id(Plugins.BuildPlugins.application)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.navSafeArgs)
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.androidx.navigation.safeargs)
 }
 
 configureRuler()
@@ -15,7 +15,7 @@ android {
     targetSdk = Sdk.TARGET_SDK
     versionCode = Releases.Catalog.versionCode
     versionName = Releases.Catalog.versionName
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
   buildFeatures { viewBinding = true }
@@ -44,7 +44,7 @@ dependencies {
   androidTestImplementation(libs.androidx.test.espresso.core)
   androidTestImplementation(libs.androidx.test.ext.junit)
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.constraintlayout)
@@ -54,11 +54,10 @@ dependencies {
   implementation(libs.androidx.navigation.ui)
   implementation(libs.kotlin.stdlib)
   implementation(libs.material)
-
-  implementation(project(path = ":datacapture"))
-  implementation(project(path = ":engine"))
   implementation(project(path = ":contrib:barcode"))
   implementation(project(path = ":contrib:locationwidget"))
+  implementation(project(path = ":datacapture"))
+  implementation(project(path = ":engine"))
 
   testImplementation(libs.junit)
 }

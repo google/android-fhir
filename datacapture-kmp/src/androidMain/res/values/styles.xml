@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ Copyright 2021 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources>
+    <!-- The default theme applied to the questionnaire rendered using QuestionnaireFragment. In
+         order to override the style attributes defined in this theme, extend this theme, override
+         the style attributes and set questionnaire_theme to the ID of the extended theme.
+
+         For example, to override the groupHeaderTextAppearance attribute, define a new theme called
+         Theme.MyQuestionnaire with the override attribute:
+
+            <style name="Theme.MyQuestionnaire" parent="Theme.Questionnaire">
+                <item name="groupHeaderTextAppearance">@style/TextAppearance.MaterialComponents.Subtitle1</item>
+            </style>
+
+         and apply the new theme to the questionnaire by setting the questionnaire_theme attribute
+         to the ID of the new theme:
+
+            <item name="questionnaire_theme">@style/Theme.MyQuestionnaire</item>
+
+         in the theme of your application, activity, fragment or view that contains the
+         QuestionnaireFragment. -->
+    <style
+        name="Theme.Questionnaire"
+        parent="Theme.Material3.DayNight.NoActionBar"
+    >
+        <item name="questionnaireGroupTypeHeaderStyle">
+            @style/Questionnaire.GroupTypeHeaderStyle
+        </item>
+        <item name="questionnaireGroupTypeQuestionTextStyle">
+            @style/TextAppearance.Material3.TitleMedium
+        </item>
+        <item name="questionnaireQuestionHeaderStyle">
+            @style/Questionnaire.QuestionHeaderStyle
+        </item>
+        <item
+            name="questionnaireQuestionTextStyle"
+        >@style/TextAppearance.Material3.TitleMedium</item>
+        <item
+            name="questionnaireReviewModeQuestionTextStyle"
+        >@style/TextAppearance.Material3.TitleMedium</item>
+        <item
+            name="questionnaireSubtitleTextStyle"
+        >@style/TextAppearance.Material3.BodyMedium
+        </item>
+        <item
+            name="questionnaireHelpHeaderStyle"
+        >@style/TextAppearance.Material3.TitleSmall</item>
+        <item
+            name="questionnaireHelpTextStyle"
+        >@style/TextAppearance.Material3.BodyMedium</item>
+        <item name="questionnaireHelpButtonStyle">
+            @style/Questionnaire.HelpIconStyle
+        </item>
+        <item name="questionnaireMediaImageStyle">
+            @style/Questionnaire.MediaImageStyle
+        </item>
+      <item
+            name="questionnaireBottomNavContainerStyle"
+        >@style/Questionnaire.BottomNavContainerStyle</item>
+      <item
+            name="questionnaireBottomNavContainerDividerStyle"
+        >@style/Questionnaire.BottomNavContainerDividerStyle</item>
+        <item
+            name="questionnaireReviewModeAnswerTextStyle"
+        >@style/Questionnaire.ReviewModeAnswerStyle</item>
+      <item
+            name="questionnaireReviewModeNotAnsweredTextStyle"
+        >@style/Questionnaire.ReviewModeNotAnsweredTextStyle</item>
+      <item
+            name="questionnaireReviewModeItemDividerStyle"
+        >@style/Questionnaire.ReviewModeMaterialDividerStyle</item>
+        <item
+            name="questionnaireCheckBoxStyle"
+        >@style/Questionnaire.CheckBoxStyle
+        </item>
+        <item
+            name="questionnaireRadioButtonStyle"
+        >@style/Questionnaire.RadioButtonStyle</item>
+        <item
+            name="questionnaireDropDownTextStyle"
+        >@style/TextAppearance.Material3.BodyLarge</item>
+        <item name="questionnaireDropDownSelectedTextStyle">
+            @style/TextAppearance.Material3.BodyLarge
+        </item>
+        <item
+            name="questionnaireTextInputEditTextStyle"
+        >@style/Questionnaire.TextInputEditTextStyle
+        </item>
+      <item
+            name="questionnaireMultiLineTextInputEditTextStyle"
+        >@style/Questionnaire.MultiLineTextInputEditTextStyle
+      </item>
+        <item
+            name="questionnaireChipStyle"
+        >@style/Widget.Material3.Chip.Input</item>
+        <item name="questionnaireButtonStyle">@style/Questionnaire.ButtonStyle
+        </item>
+        <item name="questionnaireErrorTextStyle">
+            @style/Questionnaire.ErrorStyle
+        </item>
+        <item
+            name="questionnaireTextInputLayoutStyle"
+        >@style/Questionnaire.TextInputLayoutStyle
+        </item>
+        <item
+            name="questionnaireDropdownLayoutStyle"
+        >@style/Questionnaire.DropdownLayoutStyle
+        </item>
+        <item name="chipStyle">@style/Questionnaire.ChipActionStyle</item>
+        <item
+            name="questionnaireSubmitButtonStyle"
+        >@style/Questionnaire.SubmitButtonStyle
+        </item>
+        <item
+            name="questionnaireCancelButtonStyle"
+        >@style/Questionnaire.CancelButtonStyle
+        </item>
+        <item
+            name="questionnaireEditButtonStyle"
+        >@style/Questionnaire.EditButtonStyle
+        </item>
+        <item
+            name="questionnaireAddRepeatedGroupButtonStyle"
+        >@style/Questionnaire.AddRepeatedGroupButtonStyle
+        </item>
+        <item
+            name="questionnaireDeleteRepeatedGroupButtonStyle"
+        >@style/Questionnaire.DeleteRepeatedGroupButtonStyle
+        </item>
+        <item name="questionnaireDialogButtonStyle">
+            @style/Widget.Material3.Button.TextButton.Dialog
+        </item>
+        <item name="questionnaireDialogTitleStyle">
+            @style/TextAppearance.Material3.TitleMedium
+        </item>
+        <item
+            name="questionnaireAddAnotherAnswerButtonStyle"
+        >@style/Widget.Material3.Button
+        </item>
+        <item name="questionnaireValidationDialogTitleStyle">
+            @style/TextAppearance.Material3.HeadlineSmall
+        </item>
+        <item name="questionnaireValidationDialogBodyStyle">
+            @style/TextAppearance.Material3.BodyMedium
+        </item>
+        <item name="questionnaireValidationDialogButtonStyle">
+            @style/Widget.Material3.Button.TextButton.Dialog
+        </item>
+        <item name="questionnaireLinearProgressIndicatorStyle">
+            @style/Widget.Material3.LinearProgressIndicator
+        </item>
+        <item name="questionnaireAttachmentTakePhotoButtonStyle">
+            @style/Questionnaire.AttachmentTakePhotoButtonStyle
+        </item>
+        <item name="questionnaireAttachmentDividerStyle">
+            @style/Questionnaire.AttachmentDividerStyle
+        </item>
+        <item name="questionnaireAttachmentUploadedLabelStyle">
+            @style/TextAppearance.Material3.TitleSmall
+        </item>
+        <item name="questionnaireAttachmentUploadButtonStyle">
+            @style/Questionnaire.AttachmentUploadButtonStyle
+        </item>
+        <item name="questionnaireAttachmentDeleteButtonStyle">
+            @style/Questionnaire.AttachmentDeleteButtonStyle
+        </item>
+        <item name="questionnaireShapeAppearanceAttachmentPreviewPhotoStyle">
+            @style/Questionnaire.ShapeAppearance.AttachmentPreviewPhoto
+        </item>
+        <item name="questionnaireAttachmentPreviewIconStyle">
+            @style/Questionnaire.AttachmentPreviewIconStyle
+        </item>
+        <item name="questionnaireAttachmentPreviewIconBackgroundStyle">
+            @style/Questionnaire.AttachmentPreviewIconBackgroundStyle
+        </item>
+        <item name="questionnaireAttachmentPreviewTitleStyle">
+            @style/Questionnaire.AttachmentPreviewTitleStyle
+        </item>
+        <item
+            name="questionnaireTitleStyle"
+        >@style/TextAppearance.Material3.TitleLarge
+        </item>
+    </style>
+
+    <style name="Questionnaire.GroupTypeHeaderStyle" parent="">
+        <item name="android:paddingBottom">@dimen/header_padding_bottom</item>
+    </style>
+
+    <style name="Questionnaire.QuestionHeaderStyle" parent="">
+        <item name="android:paddingBottom">@dimen/header_padding_bottom</item>
+    </style>
+
+    <style
+        name="Questionnaire.HelpStyle"
+        parent="TextAppearance.Material3.TitleSmall"
+    >
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style
+        name="Questionnaire.HelpDescriptionStyle"
+        parent="TextAppearance.Material3.BodyMedium"
+    >
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="Questionnaire.MediaImageStyle" parent="">
+        <item name="android:maxWidth">@dimen/item_media_image_max_width</item>
+        <item name="android:maxHeight">@dimen/item_media_image_max_width</item>
+        <item name="android:layout_gravity">center</item>
+        <item
+            name="android:layout_marginTop"
+        >@dimen/item_media_image_margin_vertical</item>
+        <item
+            name="android:layout_marginBottom"
+        >@dimen/item_media_image_margin_vertical</item>
+        <item
+            name="android:layout_marginStart"
+        >@dimen/item_media_image_margin_horizontal</item>
+        <item
+            name="android:layout_marginEnd"
+        >@dimen/item_media_image_margin_horizontal</item>
+
+    </style>
+
+    <style name="Questionnaire.BottomNavContainerStyle" parent="">
+      <item name="android:background">?attr/colorSurface</item>
+    </style>
+
+    <style
+        name="Questionnaire.BottomNavContainerDividerStyle"
+        parent="Widget.Material3.MaterialDivider"
+    >
+      <item name="android:visibility">visible</item>
+      <item name="dividerColor">@color/item_border_color</item>
+    </style>
+
+    <style
+        name="Questionnaire.ReviewModeAnswerStyle"
+        parent="TextAppearance.Material3.BodyMedium"
+    >
+      <item name="android:alpha">0.5</item>
+    </style>
+
+    <style
+        name="Questionnaire.ReviewModeNotAnsweredTextStyle"
+        parent="TextAppearance.Material3.BodyMedium"
+    >
+         <item name="android:textColor">?attr/colorError</item>
+    </style>
+
+    <style
+        name="Questionnaire.ReviewModeMaterialDividerStyle"
+        parent="Widget.Material3.MaterialDivider"
+    >
+      <item name="android:alpha">0.5</item>
+    </style>
+
+    <style
+        name="Questionnaire.ErrorStyle"
+        parent="TextAppearance.Material3.BodySmall"
+    >
+        <item name="android:textColor">?attr/colorError</item>
+    </style>
+
+    <style
+        name="Questionnaire.TextInputLayoutStyle"
+        parent="Widget.Material3.TextInputLayout.OutlinedBox"
+    >
+        <item name="materialThemeOverlay">
+            @style/Questionnaire.TextInputEditTextStyle
+        </item>
+        <!--        Override default theme box stroke color to improve contrast of disabled widget. -->
+        <item name="boxStrokeColor">@color/box_stroke_color</item>
+    </style>
+
+    <style
+        name="Questionnaire.DropdownLayoutStyle"
+        parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+    >
+        <item name="materialThemeOverlay">
+            @style/Questionnaire.AutoCompleteTextViewStyle
+        </item>
+        <!--        Override default theme box stroke color to improve contrast of disabled widget. -->
+        <item name="boxStrokeColor">@color/box_stroke_color</item>
+    </style>
+
+  <style
+        name="Questionnaire.MultiLineTextInputEditTextStyle"
+        parent="Questionnaire.TextInputEditTextStyle"
+    >
+    <item name="android:minLines">3</item>
+  </style>
+
+    <style
+        name="Questionnaire.TextInputEditTextStyle"
+        parent="ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
+    >
+        <item
+            name="editTextStyle"
+        >@style/Questionnaire.TextInputEditTextOutlinedBoxStyle</item>
+    </style>
+
+    <style
+        name="Questionnaire.AutoCompleteTextViewStyle"
+        parent="ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
+    >
+        <item name="autoCompleteTextViewStyle">
+            @style/Questionnaire.AutoCompleteTextViewOutlinedBoxStyle
+        </item>
+    </style>
+
+    <style
+        name="Questionnaire.TextInputEditTextOutlinedBoxStyle"
+        parent="Widget.Material3.TextInputEditText.OutlinedBox"
+    >
+        <!--        Override default theme text color to improve contrast of disabled text. -->
+        <item name="android:textColor">@color/text_color</item>
+    </style>
+
+    <style
+        name="Questionnaire.AutoCompleteTextViewOutlinedBoxStyle"
+        parent="Widget.Material3.AutoCompleteTextView.OutlinedBox"
+    >
+        <!--        Override default theme text color to improve contrast of disabled text. -->
+        <item name="android:textColor">@color/text_color</item>
+    </style>
+
+    <style
+        name="Questionnaire.ChipActionStyle"
+        parent="Widget.MaterialComponents.Chip.Action"
+    >
+        <!--        Override default theme text color to improve contrast of disabled text. -->
+        <item
+            name="android:textColor"
+        >@color/questionnaire_chip_text_color</item>
+    </style>
+
+    <style
+        name="Questionnaire.CheckBoxStyle"
+        parent="Widget.Material3.CompoundButton.CheckBox"
+    >
+        <item name="android:button">@drawable/checkbox_inset</item>
+        <item name="android:textColor">@color/checked_text_color</item>
+        <item name="android:buttonTint">@color/checked_text_color</item>
+        <item
+            name="android:background"
+        >@drawable/questionnaire_item_checkbox_background</item>
+        <item name="android:padding">@dimen/option_item_padding</item>
+    </style>
+
+    <style
+        name="Questionnaire.RadioButtonStyle"
+        parent="Widget.Material3.CompoundButton.RadioButton"
+    >
+        <item name="android:button">@drawable/radio_button_inset</item>
+        <item name="android:textColor">@color/checked_text_color</item>
+        <item name="android:buttonTint">@color/checked_text_color</item>
+        <item
+            name="android:background"
+        >@drawable/questionnaire_item_checkbox_background</item>
+        <item name="android:padding">@dimen/option_item_padding</item>
+        <item
+            name="android:paddingStart"
+        >@dimen/option_item_between_text_and_icon_padding</item>
+        <item
+            name="android:paddingEnd"
+        >@dimen/option_item_after_text_padding</item>
+    </style>
+
+  <style
+        name="Questionnaire.HelpIconStyle"
+        parent="Widget.MaterialComponents.Button.TextButton.Icon"
+    >
+    <item name="android:padding">@dimen/help_icon_padding</item>
+  </style>
+
+    <style
+        name="Questionnaire.EditButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton.Icon"
+    >
+        <item name="android:text">@string/edit_button_text</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+  <style
+        name="Questionnaire.AddRepeatedGroupButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+    <item name="android:textAllCaps">false</item>
+    <item name="cornerRadius">4dp</item>
+    <item name="icon">@drawable/add_24px</item>
+    <item
+            name="strokeColor"
+        >@color/m3_text_button_foreground_color_selector</item>
+    <item name="android:paddingLeft">@dimen/m3_btn_text_btn_padding_left</item>
+  </style>
+
+  <style
+        name="Questionnaire.DeleteRepeatedGroupButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+    <item name="android:textAllCaps">false</item>
+    <item name="android:textColor">@color/mtrl_error</item>
+    <item name="cornerRadius">4dp</item>
+    <item name="icon">@drawable/delete_24px</item>
+    <item name="strokeColor">@color/mtrl_error</item>
+    <item name="android:paddingLeft">@dimen/m3_btn_text_btn_padding_left</item>
+    <item name="iconTint">@color/mtrl_error</item>
+  </style>
+
+    <style
+        name="Questionnaire.SubmitButtonStyle"
+        parent="Widget.Material3.Button"
+    >
+        <item name="android:textAllCaps">false</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+    <style
+        name="Questionnaire.CancelButtonStyle"
+        parent="Widget.Material3.Button.TextButton"
+    >
+        <item name="android:textAllCaps">false</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Questionnaire.ButtonStyle" parent="Widget.Material3.Button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style
+        name="Questionnaire.AttachmentTakePhotoButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+        <item name="icon">@drawable/ic_camera</item>
+        <item name="iconTint">?attr/colorPrimary</item>
+        <item name="iconSize">@dimen/attachment_action_button_icon_size</item>
+        <item name="android:text">@string/take_photo</item>
+    </style>
+
+    <style
+        name="Questionnaire.AttachmentDividerStyle"
+        parent="Widget.Material3.MaterialDivider"
+    >
+        <item name="dividerColor">@color/item_border_color</item>
+    </style>
+
+    <style
+        name="Questionnaire.AttachmentUploadButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+        <item name="iconTint">?attr/colorPrimary</item>
+        <item name="iconSize">@dimen/attachment_action_button_icon_size</item>
+    </style>
+
+    <style
+        name="Questionnaire.ShapeAppearance.AttachmentPreviewPhoto"
+        parent="ShapeAppearance.MaterialComponents.SmallComponent"
+    >
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="Questionnaire.AttachmentPreviewIconStyle" parent="">
+        <item name="android:tint">?attr/colorPrimary</item>
+    </style>
+
+    <style name="Questionnaire.AttachmentPreviewIconBackgroundStyle" parent="">
+        <item
+            name="android:background"
+        >@drawable/rounded_corner_preview_icon_bg_filled</item>
+    </style>
+
+    <style
+        name="Questionnaire.AttachmentPreviewTitleStyle"
+        parent="TextAppearance.Material3.BodyLarge"
+    >
+        <item name="android:tint">?attr/colorPrimary</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style
+        name="Questionnaire.AttachmentDeleteButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+        <item name="android:drawableLeft">@drawable/ic_delete</item>
+        <item name="android:drawableTint">?attr/colorError</item>
+        <item name="android:textColor">?attr/colorError</item>
+        <item name="android:text">@string/delete</item>
+        <item name="android:visibility">visible</item>
+        <item
+            name="android:paddingRight"
+        >@dimen/attachment_action_button_padding_horizontal</item>
+        <item
+            name="android:paddingLeft"
+        >@dimen/attachment_action_button_padding_horizontal</item>
+    </style>
+</resources>

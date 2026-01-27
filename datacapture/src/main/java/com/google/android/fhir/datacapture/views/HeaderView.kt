@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.appendAsteriskToQuestionText
 import com.google.android.fhir.datacapture.extensions.applyCustomOrDefaultStyle
@@ -30,6 +31,10 @@ import com.google.android.fhir.datacapture.extensions.getLocalizedInstructionsSp
 import com.google.android.fhir.datacapture.extensions.initHelpViews
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import org.hl7.fhir.r4.model.Questionnaire
 
 /** View for the prefix, question, and hint of a questionnaire item. */
@@ -45,7 +50,11 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
   private val errorTextView = findViewById<TextView>(R.id.error_text_at_header)
   private val requiredOptionalTextView = findViewById<TextView>(R.id.required_optional_text)
 
-  fun bind(questionnaireViewItem: QuestionnaireViewItem) {
+  fun bind(
+    questionnaireViewItem: QuestionnaireViewItem,
+    displayValidationResult: Boolean = false,
+    showRequiredOrOptionalText: Boolean = false,
+  ) {
     initHelpViews(
       helpButton = findViewById(R.id.helpButton),
       helpCardView = findViewById(R.id.helpCardView),
@@ -76,22 +85,32 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
       questionTextView = question,
       instructionTextView = hint,
     )
+
+    if (showRequiredOrOptionalText) showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
+    if (displayValidationResult) showErrorText(questionnaireViewItem.validationResult)
   }
 
   /**
    * Shows an error in the header,and widgets could either use this or use another view (i.e.
    * TextInputLayout's error field) to display error.
    */
-  fun showErrorText(errorText: String? = null, isErrorTextVisible: Boolean = true) {
-    errorTextView.visibility =
-      when (isErrorTextVisible) {
-        true -> {
-          VISIBLE
-        }
-        false -> {
-          GONE
-        }
+  @VisibleForTesting
+  fun showErrorText(validationResult: ValidationResult) {
+    val isErrorTextVisible: Boolean
+    val errorText: String?
+    when (validationResult) {
+      is NotValidated,
+      Valid, -> {
+        isErrorTextVisible = false
+        errorText = null
       }
+      is Invalid -> {
+        isErrorTextVisible = true
+        errorText = validationResult.getSingleStringValidationMessage()
+      }
+    }
+
+    errorTextView.visibility = if (isErrorTextVisible) VISIBLE else GONE
     errorTextView.text = errorText
   }
 
@@ -99,7 +118,7 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
    * Shows [R.string.required] if [Questionnaire.QuestionnaireItemComponent.required] is true, or
    * else it shows [R.string.optional_helper_text]
    */
-  fun showRequiredOrOptionalTextInHeaderView(questionnaireViewItem: QuestionnaireViewItem) {
+  private fun showRequiredOrOptionalTextInHeaderView(questionnaireViewItem: QuestionnaireViewItem) {
     val requireOptionalText =
       when {
         (questionnaireViewItem.questionnaireItem.required &&

@@ -172,6 +172,23 @@
           "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
           "type": "choice",
           "text": "Gender",
+          "_text": {
+            "extension": [
+              {
+                "extension": [
+                  {
+                    "url": "lang",
+                    "valueCode": "sw"
+                  },
+                  {
+                    "url": "content",
+                    "valueString": "Jinsia"
+                  }
+                ],
+                "url": "http://hl7.org/fhir/StructureDefinition/translation"
+              }
+            ]
+          },
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
@@ -205,11 +222,23 @@
                 "system": "http://hl7.org/fhir/administrative-gender",
                 "code": "female",
                 "display": "Female",
-                "designation": [
-                  {
-                    "language": "sw",
-                    "value": "Mwanamke"
-                  }]
+                "_display": {
+                  "extension": [
+                    {
+                      "extension": [
+                        {
+                          "url": "lang",
+                          "valueCode": "sw"
+                        },
+                        {
+                          "url": "content",
+                          "valueString": "Mwanamke"
+                        }
+                      ],
+                      "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                    }
+                  ]
+                }
               }
             },
             {
@@ -217,11 +246,23 @@
                 "system": "http://hl7.org/fhir/administrative-gender",
                 "code": "male",
                 "display": "Male",
-                "designation": [
-                  {
-                    "language": "sw",
-                    "value": "Mwanaume"
-                  }]
+                "_display": {
+                  "extension": [
+                    {
+                      "extension": [
+                        {
+                          "url": "lang",
+                          "valueCode": "sw"
+                        },
+                        {
+                          "url": "content",
+                          "valueString": "Mwanaume"
+                        }
+                      ],
+                      "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                    }
+                  ]
+                }
               }
             },
             {
@@ -229,11 +270,23 @@
                 "system": "http://hl7.org/fhir/administrative-gender",
                 "code": "other",
                 "display": "Other",
-                "designation": [
-                  {
-                    "language": "sw",
-                    "value": "Nyingine"
-                  }]
+                "_display": {
+                  "extension": [
+                    {
+                      "extension": [
+                        {
+                          "url": "lang",
+                          "valueCode": "sw"
+                        },
+                        {
+                          "url": "content",
+                          "valueString": "Nyingine"
+                        }
+                      ],
+                      "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                    }
+                  ]
+                }
               }
             },
             {
@@ -241,11 +294,23 @@
                 "system": "http://hl7.org/fhir/administrative-gender",
                 "code": "unknown",
                 "display": "Unknown",
-                "designation": [
-                  {
-                    "language": "sw",
-                    "value": "Haijulikani"
-                  }]
+                "_display": {
+                  "extension": [
+                    {
+                      "extension": [
+                        {
+                          "url": "lang",
+                          "valueCode": "sw"
+                        },
+                        {
+                          "url": "content",
+                          "valueString": "Haijulikani"
+                        }
+                      ],
+                      "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                    }
+                  ]
+                }
               }
             }
           ]

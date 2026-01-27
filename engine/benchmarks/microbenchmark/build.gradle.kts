@@ -1,7 +1,7 @@
 plugins {
-  id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.benchmark)
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.androidx.benchmark)
 }
 
 android {
@@ -9,7 +9,7 @@ android {
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = Dependencies.androidBenchmarkRunner
+    testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
   }
 
   testBuildType = "release"
@@ -51,8 +51,8 @@ android {
 afterEvaluate { configureFirebaseTestLabForMicroBenchmark() }
 
 dependencies {
-  androidTestImplementation(Dependencies.Retrofit.coreRetrofit)
-  androidTestImplementation(Dependencies.mockWebServer)
+  androidTestImplementation(libs.retrofit)
+  androidTestImplementation(libs.okhttp3.mock.web.server)
   androidTestImplementation(libs.androidx.benchmark.junit4)
   androidTestImplementation(libs.androidx.test.ext.junit)
   androidTestImplementation(libs.androidx.test.runner)
@@ -66,5 +66,5 @@ dependencies {
   // for test json files only
   androidTestImplementation(project(":workflow-testing"))
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

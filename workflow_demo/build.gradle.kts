@@ -1,6 +1,6 @@
 plugins {
-  id("com.android.application")
-  id("org.jetbrains.kotlin.android")
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -13,7 +13,7 @@ android {
     targetSdk = Sdk.TARGET_SDK
     versionCode = Releases.WorkflowDemo.versionCode
     versionName = Releases.WorkflowDemo.versionName
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
   buildTypes {
@@ -51,7 +51,8 @@ dependencies {
   androidTestImplementation(libs.androidx.test.ext.junit)
 
   compileOnly(libs.opencds.cqf.fhir.cr)
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.constraintlayout)
