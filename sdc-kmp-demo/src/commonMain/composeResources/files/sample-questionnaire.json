@@ -14,7 +14,7 @@
       "linkId": "age",
       "type": "integer",
       "text": "Age",
-      "required": false
+      "required": true
     },
     {
       "linkId": "height",
@@ -48,6 +48,13 @@
             "code": "[in_i]",
             "display": "inch"
           }
+        }
+      ],
+      "enableWhen": [
+        {
+          "question": "age",
+          "operator": "<=",
+          "answerInteger": 18
         }
       ]
     },
