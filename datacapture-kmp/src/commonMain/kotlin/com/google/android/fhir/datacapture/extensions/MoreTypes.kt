@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.extensions
 
 import com.google.fhir.model.r4.Coding
 import com.google.fhir.model.r4.Quantity
-import com.google.fhir.model.r4.QuestionnaireResponse
 
 internal const val EXT_TRANSLATION = "http://hl7.org/fhir/StructureDefinition/translation"
 
@@ -47,14 +46,10 @@ internal fun Coding.hasCode() = !this.code?.value.isNullOrBlank()
 
 internal fun Coding.hasDisplay() = !this.display?.value.isNullOrBlank()
 
-typealias FhirR4String = com.google.fhir.model.r4.String
-
 typealias FhirR4Boolean = com.google.fhir.model.r4.Boolean
 
 typealias FhirR4Decimal = com.google.fhir.model.r4.Decimal
 
-typealias QuantityAnswerValue = QuestionnaireResponse.Item.Answer.Value.Quantity
+typealias FhirR4Integer = com.google.fhir.model.r4.Integer
 
-typealias StringAnswerValue = QuestionnaireResponse.Item.Answer.Value.String
-
-typealias IntegerAnswerValue = QuestionnaireResponse.Item.Answer.Value.Integer
+typealias FhirR4String = com.google.fhir.model.r4.String

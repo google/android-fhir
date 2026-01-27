@@ -1055,11 +1055,13 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
               enabledAnswerOptions = enabledQuestionnaireAnswerOptions,
               minAnswerValue =
                 questionnaireItem.minValueCqfCalculatedValueExpression?.let {
-                  expressionEvaluator.evaluateExpressionValue(it)
+                  expressionEvaluator.evaluateExpressionValue(it)?.singleOrNull()
+                    as Extension.Value?
                 },
               maxAnswerValue =
                 questionnaireItem.maxValueCqfCalculatedValueExpression?.let {
-                  expressionEvaluator.evaluateExpressionValue(it)
+                  expressionEvaluator.evaluateExpressionValue(it)?.singleOrNull()
+                    as Extension.Value?
                 },
               draftAnswer = draftAnswerMap[questionnaireResponseItem],
               enabledDisplayItems =
