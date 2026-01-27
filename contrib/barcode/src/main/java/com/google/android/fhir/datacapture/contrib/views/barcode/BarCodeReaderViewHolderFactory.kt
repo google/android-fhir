@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,16 @@ import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.LiveBa
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderDelegate
-import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemAndroidViewHolderDelegate
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemAndroidViewHolderFactory
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
 object BarCodeReaderViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_bar_code_reader_view) {
+  QuestionnaireItemAndroidViewHolderFactory(R.layout.questionnaire_item_bar_code_reader_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemAndroidViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var textQuestion: TextView
       private lateinit var barcodeTextView: TextView

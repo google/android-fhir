@@ -1,6 +1,6 @@
 plugins {
-  id(Plugins.BuildPlugins.androidTest)
-  id(Plugins.BuildPlugins.kotlinAndroid)
+  alias(libs.plugins.android.test)
+  alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -10,7 +10,7 @@ android {
   defaultConfig {
     minSdk = Sdk.MIN_SDK
     targetSdk = Sdk.TARGET_SDK
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
   buildTypes {

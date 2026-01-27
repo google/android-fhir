@@ -2,11 +2,12 @@ import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
 plugins {
-  id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.mavenPublish)
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.kotlin.compose)
+  `maven-publish`
   jacoco
-  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
+  alias(libs.plugins.dokka)
 }
 
 publishArtifact(Releases.DataCapture)
@@ -18,13 +19,16 @@ android {
   compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
     consumerProguardFile("proguard-rules.pro")
   }
 
-  buildFeatures { viewBinding = true }
+  buildFeatures {
+    viewBinding = true
+    compose = true
+  }
 
   buildTypes {
     release {
@@ -67,12 +71,13 @@ configurations {
 }
 
 dependencies {
-  androidTestImplementation(libs.androidx.test.espresso.core)
+  androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+  androidTestImplementation(libs.androidx.test.core)
   androidTestImplementation(libs.androidx.test.espresso.contrib) {
     // build fails with error "Duplicate class found" (org.checkerframework.checker.*)
     exclude(group = "org.checkerframework", module = "checker")
   }
-  androidTestImplementation(libs.androidx.test.core)
+  androidTestImplementation(libs.androidx.test.espresso.core)
   androidTestImplementation(libs.androidx.test.ext.junit)
   androidTestImplementation(libs.androidx.test.ext.junit.ktx)
   androidTestImplementation(libs.androidx.test.rules)
@@ -81,39 +86,51 @@ dependencies {
   androidTestImplementation(libs.kotlinx.coroutines.test)
   androidTestImplementation(libs.truth)
 
-  api(Dependencies.HapiFhir.structuresR4)
+  api(libs.hapi.fhir.structures.r4)
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-  implementation(Dependencies.HapiFhir.guavaCaching)
-  implementation(Dependencies.HapiFhir.validation) {
-    exclude(module = "commons-logging")
-    exclude(module = "httpclient")
-  }
-  implementation(Dependencies.timber)
+  implementation(libs.accompanist.themeadapter.material3)
   implementation(libs.android.fhir.common)
+  implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.appcompat)
+  implementation(libs.androidx.compose.material3)
+  implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.ui.graphics)
+  implementation(libs.androidx.compose.ui.tooling.preview)
   implementation(libs.androidx.constraintlayout)
   implementation(libs.androidx.core)
   implementation(libs.androidx.fragment)
   implementation(libs.androidx.lifecycle.viewmodel)
+  implementation(libs.androidx.navigation.compose)
+  implementation(libs.androidx.recyclerview)
   implementation(libs.glide)
+  implementation(libs.hapi.fhir.caching.guava)
+  implementation(libs.hapi.fhir.validation) {
+    exclude(module = "commons-logging")
+    exclude(module = "httpclient")
+  }
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.material)
+  implementation(platform(libs.androidx.compose.bom))
+  implementation(libs.timber)
 
-  testImplementation(Dependencies.mockitoInline)
-  testImplementation(Dependencies.mockitoKotlin)
-  testImplementation(Dependencies.robolectric)
-  testImplementation(project(":knowledge")) {
-    exclude(group = "com.google.android.fhir", module = "engine")
-  }
-  testImplementation(libs.androidx.test.core)
+  debugImplementation(libs.androidx.compose.ui.test.manifest)
+  debugImplementation(libs.androidx.compose.ui.tooling)
+
   testImplementation(libs.androidx.fragment.testing)
+  testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)
   testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.mockito.inline)
+  testImplementation(libs.mockito.kotlin)
+  testImplementation(libs.robolectric)
   testImplementation(libs.truth)
+  testImplementation(project(":knowledge")) {
+    exclude(group = "com.google.android.fhir", module = "engine")
+  }
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->

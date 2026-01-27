@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,52 +19,76 @@ package com.google.android.fhir.datacapture.test
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.filterToOne
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isDialog
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onChildren
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import androidx.fragment.app.commitNow
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.UiController
-import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions
-import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.RootMatchers
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.QuestionnaireFragment
-import com.google.android.fhir.datacapture.test.utilities.clickIcon
-import com.google.android.fhir.datacapture.test.utilities.clickOnText
+import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.localDate
+import com.google.android.fhir.datacapture.extensions.localDateTime
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.android.fhir.datacapture.validation.Valid
-import com.google.android.fhir.datacapture.views.factories.localDate
-import com.google.android.fhir.datacapture.views.factories.localDateTime
+import com.google.android.fhir.datacapture.views.compose.ADD_REPEATED_GROUP_BUTTON_TAG
+import com.google.android.fhir.datacapture.views.compose.DATE_TEXT_INPUT_FIELD
+import com.google.android.fhir.datacapture.views.compose.DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG
+import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
+import com.google.android.fhir.datacapture.views.compose.HANDLE_INPUT_DEBOUNCE_TIME
+import com.google.android.fhir.datacapture.views.compose.PAGE_NAVIGATION_BUTTON_TAG
+import com.google.android.fhir.datacapture.views.compose.REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG
+import com.google.android.fhir.datacapture.views.compose.TIME_PICKER_INPUT_FIELD
+import com.google.android.fhir.datacapture.views.factories.NO_CHOICE_RADIO_BUTTON_TAG
+import com.google.android.fhir.datacapture.views.factories.YES_CHOICE_RADIO_BUTTON_TAG
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
-import kotlinx.coroutines.test.runTest
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
+import org.hamcrest.Matchers.allOf
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -73,10 +97,11 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireUiEspressoTest {
 
-  @Rule
-  @JvmField
-  var activityScenarioRule: ActivityScenarioRule<TestActivity> =
+  @get:Rule
+  val activityScenarioRule: ActivityScenarioRule<TestActivity> =
     ActivityScenarioRule(TestActivity::class.java)
+
+  @get:Rule val composeTestRule = createEmptyComposeRule()
 
   private lateinit var parent: FrameLayout
   private val parser: IParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
@@ -90,61 +115,59 @@ class QuestionnaireUiEspressoTest {
   @Test
   fun shouldDisplayReviewButtonWhenNoMorePagesToDisplay() {
     buildFragmentFromQuestionnaire("/paginated_questionnaire_with_dependent_answer.json", true)
+    val reviewButtonText = context.getString(R.string.button_review)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
+      .assertIsDisplayed()
 
-    onView(withId(R.id.review_mode_button))
-      .check(
-        ViewAssertions.matches(
-          ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
-        ),
-      )
+    composeTestRule.onNodeWithText("Yes").performClick()
 
-    clickOnText("Yes")
-    onView(withId(R.id.review_mode_button))
-      .check(
-        ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
-      )
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
+      .assertIsNotDisplayed()
 
-    clickOnText("No")
-    onView(withId(R.id.review_mode_button))
-      .check(
-        ViewAssertions.matches(
-          ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
-        ),
-      )
+    composeTestRule.onNodeWithText("No").performClick()
+
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
+      .assertIsDisplayed()
   }
 
   @Test
   fun shouldHideNextButtonIfDisabled() {
     buildFragmentFromQuestionnaire("/layout_paginated.json", true)
 
-    clickOnText("Next")
+    val nextButtonText = context.getString(R.string.button_pagination_next)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
+      .performClick()
 
-    onView(withId(R.id.pagination_next_button))
-      .check(
-        ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
-      )
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
+      .assertIsNotDisplayed()
   }
 
   @Test
   fun shouldDisplayNextButtonIfEnabled() {
     buildFragmentFromQuestionnaire("/layout_paginated.json", true)
 
-    onView(withId(R.id.pagination_next_button))
-      .check(
-        ViewAssertions.matches(
-          ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
-        ),
-      )
+    val nextButtonText = context.getString(R.string.button_pagination_next)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
+      .assertIsDisplayed()
   }
 
   @Test
   fun integerTextEdit_inputOutOfRange_shouldShowError() {
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("12345678901"))
-    onView(withId(R.id.text_input_layout)).check { view, _ ->
-      val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo("Number must be between -2,147,483,648 and 2,147,483,647")
+    runBlocking {
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("12345678901")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
+      composeTestRule
+        .onNodeWithText("Number must be between -2,147,483,648 and 2,147,483,647")
+        .assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Error").assertIsDisplayed()
     }
   }
 
@@ -155,18 +178,18 @@ class QuestionnaireUiEspressoTest {
     // e.g whether 000001 or 1 is input, the answer saved will be 1.
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
 
-    runTest {
-      onView(withId(R.id.text_input_edit_text)).perform(typeText("0"))
+    runBlocking {
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("0")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
         .isEqualTo(0)
 
-      onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("01")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
         .isEqualTo(1)
 
-      onView(withId(R.id.text_input_edit_text)).check { view, _ ->
-        assertThat((view as TextInputEditText).text.toString()).isEqualTo("001")
-      }
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("001")
 
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
         .isEqualTo(1)
@@ -177,18 +200,18 @@ class QuestionnaireUiEspressoTest {
   fun decimalTextEdit_typingZeroBeforeAnyIntegerShouldKeepZeroDisplayed() {
     buildFragmentFromQuestionnaire("/text_questionnaire_decimal.json")
 
-    runTest {
-      onView(withId(R.id.text_input_edit_text)).perform(typeText("0."))
+    runBlocking {
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("0.")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
         .isEqualTo(BigDecimal.valueOf(0.0))
 
-      onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("01")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
         .isEqualTo(BigDecimal.valueOf(0.01))
 
-      onView(withId(R.id.text_input_edit_text)).check { view, _ ->
-        assertThat((view as TextInputEditText).text.toString()).isEqualTo("0.01")
-      }
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).assertTextEquals("0.01")
 
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
         .isEqualTo(BigDecimal.valueOf(0.01))
@@ -199,10 +222,12 @@ class QuestionnaireUiEspressoTest {
   fun decimalTextEdit_typingInvalidTextShouldShowError() {
     buildFragmentFromQuestionnaire("/text_questionnaire_decimal.json")
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("1.1.1.1"))
+    runBlocking {
+      composeTestRule.onNodeWithTag(EDIT_TEXT_FIELD_TEST_TAG).performTextInput("1.1.1.1")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
 
-    onView(withId(R.id.text_input_layout)).check { view, _ ->
-      assertThat((view as TextInputLayout).error).isEqualTo("Invalid number")
+      composeTestRule.onNodeWithText("Invalid number").assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Error").assertIsDisplayed()
     }
   }
 
@@ -210,36 +235,45 @@ class QuestionnaireUiEspressoTest {
   fun dateTimePicker_shouldShowErrorForWrongDate() {
     buildFragmentFromQuestionnaire("/component_date_time_picker.json")
 
-    // Add month and day. No need to add slashes as they are added automatically
-    onView(withId(R.id.date_input_edit_text))
-      .perform(ViewActions.click())
-      .perform(ViewActions.typeTextIntoFocusedView("0105"))
+    runBlocking {
+      // Add month and day. No need to add slashes as they are added automatically
+      composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("0105")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
 
-    onView(withId(R.id.date_input_layout)).check { view, _ ->
-      val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo("Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)")
+      composeTestRule
+        .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+        .assert(
+          SemanticsMatcher.expectValue(
+            SemanticsProperties.Error,
+            "Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)",
+          ),
+        )
+      composeTestRule.onNodeWithTag(TIME_PICKER_INPUT_FIELD).assertIsNotEnabled()
     }
-    onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isFalse() }
   }
 
   @Test
   fun dateTimePicker_shouldEnableTimePickerWithCorrectDate_butNotSaveInQuestionnaireResponse() {
     buildFragmentFromQuestionnaire("/component_date_time_picker.json")
 
-    onView(withId(R.id.date_input_edit_text))
-      .perform(ViewActions.click())
-      .perform(ViewActions.typeTextIntoFocusedView("01052005"))
+    runBlocking {
+      composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("01052005")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
 
-    onView(withId(R.id.date_input_layout)).check { view, _ ->
-      val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo(null)
-    }
+      composeTestRule
+        .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+        .assert(
+          SemanticsMatcher.keyNotDefined(
+            SemanticsProperties.Error,
+          ),
+        )
+      composeTestRule.onNodeWithTag(TIME_PICKER_INPUT_FIELD).assertIsEnabled()
 
-    onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isTrue() }
-
-    runTest {
-      assertThat(getQuestionnaireResponse().item.size).isEqualTo(1)
-      assertThat(getQuestionnaireResponse().item.first().answer.size).isEqualTo(0)
+      val questionnaireResponse = getQuestionnaireResponse()
+      assertThat(questionnaireResponse.item.size).isEqualTo(1)
+      assertThat(questionnaireResponse.item.first().answer.size).isEqualTo(1)
+      val answer = questionnaireResponse.item.first().answer.first().valueDateTimeType
+      assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 0, 0))
     }
   }
 
@@ -247,18 +281,32 @@ class QuestionnaireUiEspressoTest {
   fun dateTimePicker_shouldSetAnswerWhenDateAndTimeAreFilled() {
     buildFragmentFromQuestionnaire("/component_date_time_picker.json")
 
-    onView(withId(R.id.date_input_edit_text))
-      .perform(ViewActions.click())
-      .perform(ViewActions.typeTextIntoFocusedView("01052005"))
+    runBlocking {
+      composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("01052005")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
+      composeTestRule
+        .onNodeWithTag(TIME_PICKER_INPUT_FIELD)
+        .onChildren()
+        .filterToOne(
+          SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button),
+        )
+        .performClick()
 
-    onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
-    clickOnText("AM")
-    clickOnText("6")
-    clickOnText("10")
-    clickOnText("OK")
+      composeTestRule.onNodeWithText("AM").performClick()
+      composeTestRule.onNodeWithContentDescription("Select hour", substring = true).performClick()
+      composeTestRule.onNodeWithContentDescription("6 o'clock", substring = true).performClick()
 
-    runTest {
-      val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
+      composeTestRule
+        .onNodeWithContentDescription("Select minutes", substring = true)
+        .performClick()
+      composeTestRule.onNodeWithContentDescription("10 minutes", substring = true).performClick()
+
+      composeTestRule.onNodeWithText("OK").performClick()
+      // Synchronize
+      composeTestRule.waitForIdle()
+
+      val questionnaireResponse = getQuestionnaireResponse()
+      val answer = questionnaireResponse.item.first().answer.first().valueDateTimeType
       // check Locale
       assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
     }
@@ -268,14 +316,18 @@ class QuestionnaireUiEspressoTest {
   fun datePicker_shouldShowErrorForWrongDate() {
     buildFragmentFromQuestionnaire("/component_date_picker.json")
 
-    // Add month and day. No need to add slashes as they are added automatically
-    onView(withId(R.id.text_input_edit_text))
-      .perform(ViewActions.click())
-      .perform(ViewActions.typeTextIntoFocusedView("0105"))
-
-    onView(withId(R.id.text_input_layout)).check { view, _ ->
-      val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo("Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)")
+    runBlocking {
+      // Add month and day. No need to add slashes as they are added automatically
+      composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput("0105")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
+      composeTestRule
+        .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+        .assert(
+          SemanticsMatcher.expectValue(
+            SemanticsProperties.Error,
+            "Date format needs to be mm/dd/yyyy (e.g. 01/31/2023)",
+          ),
+        )
     }
   }
 
@@ -283,16 +335,13 @@ class QuestionnaireUiEspressoTest {
   fun datePicker_shouldSaveInQuestionnaireResponseWhenCorrectDateEntered() {
     buildFragmentFromQuestionnaire("/component_date_picker.json")
 
-    onView(withId(R.id.text_input_edit_text))
-      .perform(ViewActions.click())
-      .perform(ViewActions.typeTextIntoFocusedView("01052005"))
+    runBlocking {
+      composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput("01052005")
+      delay(HANDLE_INPUT_DEBOUNCE_TIME + 10L)
+      composeTestRule
+        .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+        .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Error))
 
-    onView(withId(R.id.text_input_layout)).check { view, _ ->
-      val actualError = (view as TextInputLayout).error
-      assertThat(actualError).isEqualTo(null)
-    }
-
-    runTest {
       val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType
       assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
     }
@@ -322,15 +371,18 @@ class QuestionnaireUiEspressoTest {
       }
 
     buildFragmentFromQuestionnaire(questionnaire)
-    onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
-    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
+    composeTestRule
+      .onNodeWithContentDescription(context.getString(R.string.select_date))
+      .performClick()
+    composeTestRule
+      .onNode(hasText("OK") and hasAnyAncestor(isDialog()))
+      .assertIsDisplayed()
+      .performClick()
+    composeTestRule.waitForIdle() // Synchronize
 
     val today = DateTimeType.today().valueAsString
 
-    runTest {
+    runBlocking {
       val answer =
         getQuestionnaireResponse().item.first().answer.first().valueDateType.valueAsString
       assertThat(answer).isEqualTo(today)
@@ -369,15 +421,18 @@ class QuestionnaireUiEspressoTest {
       }
 
     buildFragmentFromQuestionnaire(questionnaire)
-    onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
-    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
+    composeTestRule
+      .onNodeWithContentDescription(context.getString(R.string.select_date))
+      .performClick()
+    composeTestRule
+      .onNode(hasText("OK") and hasAnyAncestor(isDialog()))
+      .assertIsDisplayed()
+      .performClick()
+    composeTestRule.waitForIdle() // Synchronize
 
     val maxDateAllowed = maxDate.valueAsString
 
-    runTest {
+    runBlocking {
       val validationResult =
         QuestionnaireResponseValidator.validateQuestionnaireResponse(
           questionnaire,
@@ -416,15 +471,18 @@ class QuestionnaireUiEspressoTest {
       }
 
     buildFragmentFromQuestionnaire(questionnaire)
-    onView(withId(R.id.text_input_layout)).perform(clickIcon(true))
-    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
+    composeTestRule
+      .onNodeWithContentDescription(context.getString(R.string.select_date))
+      .performClick()
+    composeTestRule
+      .onNode(hasText("OK") and hasAnyAncestor(isDialog()))
+      .assertIsDisplayed()
+      .performClick()
+    composeTestRule.waitForIdle() // Synchronize
 
     val minDateAllowed = minDate.valueAsString
 
-    runTest {
+    runBlocking {
       val validationResult =
         QuestionnaireResponseValidator.validateQuestionnaireResponse(
           questionnaire,
@@ -440,7 +498,7 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
-  fun datePicker_shouldThrowException_whenMinValueRangeIsGreaterThanMaxValueRange() {
+  fun datePicker_shouldProhibitInputWithErrorMessage_whenMinValueRangeIsGreaterThanMaxValueRange() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -464,29 +522,32 @@ class QuestionnaireUiEspressoTest {
       }
 
     buildFragmentFromQuestionnaire(questionnaire)
-    val exception =
-      Assert.assertThrows(IllegalArgumentException::class.java) {
-        onView(withId(com.google.android.fhir.datacapture.R.id.text_input_layout))
-          .perform(clickIcon(true))
-        onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
-          .inRoot(RootMatchers.isDialog())
-          .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-          .perform(ViewActions.click())
-      }
-    assertThat(exception.message).isEqualTo("minValue cannot be greater than maxValue")
+    composeTestRule
+      .onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+      .assert(
+        SemanticsMatcher.expectValue(
+          SemanticsProperties.Error,
+          "minValue cannot be greater than maxValue",
+        ),
+      )
+    composeTestRule.onNodeWithTag(DATE_TEXT_INPUT_FIELD).assertIsNotEnabled()
+    composeTestRule
+      .onNodeWithContentDescription(context.getString(R.string.select_date))
+      .assertIsNotEnabled()
   }
 
   @Test
   fun displayItems_shouldGetEnabled_withAnswerChoice() {
     buildFragmentFromQuestionnaire("/questionnaire_with_enabled_display_items.json")
 
-    onView(withId(R.id.hint)).check { view, _ ->
-      val hintVisibility = (view as TextView).visibility
-      assertThat(hintVisibility).isEqualTo(View.GONE)
-    }
+    // Synchronize
+    composeTestRule.waitForIdle()
+    onView(withId(R.id.hint)).check(doesNotExist())
 
-    onView(withId(R.id.yes_radio_button)).perform(ViewActions.click())
+    composeTestRule.onNodeWithTag(YES_CHOICE_RADIO_BUTTON_TAG).performClick()
 
+    // Synchronize
+    composeTestRule.waitForIdle()
     onView(withId(R.id.hint)).check { view, _ ->
       val hintVisibility = (view as TextView).visibility
       val hintText = view.text.toString()
@@ -494,8 +555,10 @@ class QuestionnaireUiEspressoTest {
       assertThat(hintText).isEqualTo("Text when yes is selected")
     }
 
-    onView(withId(R.id.no_radio_button)).perform(ViewActions.click())
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).performClick()
 
+    // Synchronize
+    composeTestRule.waitForIdle()
     onView(withId(R.id.hint)).check { view, _ ->
       val hintVisibility = (view as TextView).visibility
       val hintText = view.text.toString()
@@ -503,12 +566,11 @@ class QuestionnaireUiEspressoTest {
       assertThat(hintText).isEqualTo("Text when no is selected")
     }
 
-    onView(withId(R.id.no_radio_button)).perform(ViewActions.click())
+    composeTestRule.onNodeWithTag(NO_CHOICE_RADIO_BUTTON_TAG).performClick()
 
-    onView(withId(R.id.hint)).check { view, _ ->
-      val hintVisibility = (view as TextView).visibility
-      assertThat(hintVisibility).isEqualTo(View.GONE)
-    }
+    // Synchronize
+    composeTestRule.waitForIdle()
+    onView(withId(R.id.hint)).check(doesNotExist())
   }
 
   @Test
@@ -523,7 +585,7 @@ class QuestionnaireUiEspressoTest {
       assertThat(view).isNull()
     }
 
-    onView(CoreMatchers.allOf(withText("First Option"))).perform(ViewActions.click())
+    composeTestRule.onNodeWithText("First Option").performClick()
 
     onView(CoreMatchers.allOf(withText("Option Date"))).check { view, _ ->
       assertThat(view).isNull()
@@ -535,18 +597,26 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
-  @SdkSuppress(minSdkVersion = 33)
   fun clearAllAnswers_shouldClearDraftAnswer() {
     val questionnaireFragment = buildFragmentFromQuestionnaire("/component_date_picker.json")
-    // Add month and day. No need to add slashes as they are added automatically
-    onView(withId(R.id.text_input_edit_text))
-      .perform(ViewActions.click())
-      .perform(ViewActions.typeTextIntoFocusedView("0105"))
 
-    questionnaireFragment.clearAllAnswers()
+    runBlocking {
+      // Add month and day. No need to add slashes as they are added automatically
+      composeTestRule
+        .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+        .performTextInput("0105")
+      composeTestRule
+        .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+        .assertTextEquals("01/05")
+      delay(1.seconds) // Add delay to give time for new questionnaire state
+      composeTestRule.awaitIdle()
 
-    onView(withId(R.id.text_input_edit_text)).check { view, _ ->
-      assertThat((view as TextInputEditText).text.toString()).isEmpty()
+      questionnaireFragment.clearAllAnswers()
+      composeTestRule.awaitIdle()
+
+      composeTestRule
+        .onNodeWithTag(DATE_TEXT_INPUT_FIELD, useUnmergedTree = true)
+        .assertTextEquals("")
     }
   }
 
@@ -576,7 +646,10 @@ class QuestionnaireUiEspressoTest {
   fun progressBar_shouldProgress_onPaginationNext() {
     buildFragmentFromQuestionnaire("/layout_paginated.json")
 
-    onView(withId(R.id.pagination_next_button)).perform(ViewActions.click())
+    val nextButtonText = context.getString(R.string.button_pagination_next)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
+      .performClick()
 
     onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
       val linearProgressIndicator = (view as LinearProgressIndicator)
@@ -588,7 +661,12 @@ class QuestionnaireUiEspressoTest {
   fun progressBar_shouldBeGone_whenNavigatedToReviewScreen() {
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json", isReviewMode = true)
 
-    onView(withId(R.id.review_mode_button)).perform(ViewActions.click())
+    val reviewButtonText = context.getString(R.string.button_review)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
+      .performClick()
+
+    composeTestRule.waitForIdle()
 
     onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
       val linearProgressIndicator = (view as LinearProgressIndicator)
@@ -600,7 +678,11 @@ class QuestionnaireUiEspressoTest {
   fun progressBar_shouldBeVisible_whenNavigatedToEditScreenFromReview() {
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json", isReviewMode = true)
 
-    onView(withId(R.id.review_mode_button)).perform(ViewActions.click())
+    val reviewButtonText = context.getString(R.string.button_review)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(reviewButtonText))
+      .performClick()
+    composeTestRule.waitForIdle()
 
     onView(withId(R.id.review_mode_edit_button)).perform(ViewActions.click())
 
@@ -611,31 +693,44 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
+  fun test_add_item_button_does_not_exist_for_non_repeated_groups() {
+    buildFragmentFromQuestionnaire("/component_non_repeated_group.json")
+    composeTestRule.onNodeWithTag(ADD_REPEATED_GROUP_BUTTON_TAG).assertDoesNotExist()
+  }
+
+  @Test
   fun test_repeated_group_is_added() {
     buildFragmentFromQuestionnaire("/component_repeated_group.json")
+    composeTestRule.onNodeWithTag(ADD_REPEATED_GROUP_BUTTON_TAG).performClick()
 
-    onView(withId(R.id.questionnaire_edit_recycler_view))
-      .perform(
-        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
-          0,
-          clickChildViewWithId(R.id.add_item),
-        ),
-      )
+    composeTestRule
+      .onNodeWithTag(QuestionnaireFragment.QUESTIONNAIRE_EDIT_LIST)
+      .assertExists()
+      .assertIsDisplayed()
 
-    onView(ViewMatchers.withId(R.id.questionnaire_edit_recycler_view)).check {
-      view,
-      noViewFoundException,
-      ->
-      if (noViewFoundException != null) {
-        throw noViewFoundException
-      }
-      assertThat(
-          (view as RecyclerView).countChildViewOccurrences(
-            R.id.repeated_group_instance_header_title,
-          ),
-        )
-        .isEqualTo(1)
-    }
+    composeTestRule.onNodeWithTag(REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG).assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag(DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG).assertIsDisplayed()
+  }
+
+  @Test
+  fun test_repeated_group_adds_multiple_items() {
+    buildFragmentFromQuestionnaire("/component_multiple_repeated_group.json")
+    composeTestRule
+      .onNode(hasTestTag(ADD_REPEATED_GROUP_BUTTON_TAG) and hasText("Add Repeated Group"))
+      .performClick()
+    composeTestRule.onNodeWithTag(DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG).assertIsDisplayed()
+
+    composeTestRule
+      .onNode(hasTestTag(ADD_REPEATED_GROUP_BUTTON_TAG) and hasText("Add Decimal Repeated Group"))
+      .performClick()
+    composeTestRule
+      .onAllNodes(hasTestTag(DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG))
+      .assertCountEquals(2)
+    composeTestRule
+      .onAllNodes(hasTestTag(REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG))
+      .assertCountEquals(2)
   }
 
   @Test
@@ -645,51 +740,259 @@ class QuestionnaireUiEspressoTest {
       responseFileName = "/repeated_group_response.json",
     )
 
-    onView(withId(R.id.questionnaire_edit_recycler_view))
-      .perform(
-        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
-          1,
-          clickChildViewWithId(R.id.repeated_group_instance_header_delete_button),
-        ),
-      )
+    composeTestRule
+      .onNodeWithTag(QuestionnaireFragment.QUESTIONNAIRE_EDIT_LIST)
+      .assertExists()
+      .assertIsDisplayed()
 
-    onView(ViewMatchers.withId(R.id.questionnaire_edit_recycler_view)).check {
-      view,
-      noViewFoundException,
-      ->
-      if (noViewFoundException != null) {
-        throw noViewFoundException
-      }
-      assertThat(
-          (view as RecyclerView).countChildViewOccurrences(
-            R.id.repeated_group_instance_header_title,
-          ),
+    composeTestRule.onNodeWithTag(REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG).performClick()
+    composeTestRule.onNodeWithTag(REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG).assertDoesNotExist()
+  }
+
+  @Test
+  fun shouldHideNextButtonOnLastPage() {
+    val questionnaireJson =
+      """{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "1.1",
+          "type": "display",
+          "text": "Item 1"
+        }
+      ]
+    },
+    {
+      "linkId": "2",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "2.1",
+          "type": "display",
+          "text": "Item 2"
+        }
+      ]
+    }
+  ]
+}
+"""
+    val questionnaire = parser.parseResource(questionnaireJson) as Questionnaire
+    buildFragmentFromQuestionnaire(questionnaire)
+    val nextButtonText = context.getString(R.string.button_pagination_next)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
+      .performClick()
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(nextButtonText))
+      .assertDoesNotExist()
+  }
+
+  @Test
+  fun reviewPageShouldShowBothEditAndSubmitButton() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
         )
-        .isEqualTo(0)
-    }
+      }
+    buildFragmentFromQuestionnaire(questionnaire, isReviewMode = true, showReviewPageFirst = true)
+    onView(withId(R.id.review_mode_edit_button))
+      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+    composeTestRule
+      .onNode(
+        hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and
+          hasText(
+            context.getString(R.string.submit_questionnaire),
+          ),
+      )
+      .assertIsDisplayed()
   }
 
-  private fun RecyclerView.countChildViewOccurrences(viewId: Int): Int {
-    var count = 0
-    for (i in 0 until this.adapter!!.itemCount) {
-      val holder = findViewHolderForAdapterPosition(i)
-      if (holder?.itemView?.findViewById<View>(viewId) != null) {
-        count++
+  @Test
+  fun questionnaireSubmitButtonTextShouldBeEditable() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
       }
-    }
-    return count
+    val customButtonText = "Apply"
+    buildFragmentFromQuestionnaire(questionnaire, submitText = customButtonText)
+    composeTestRule
+      .onNode(hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and hasText(customButtonText))
+      .assertIsDisplayed()
   }
 
-  private fun clickChildViewWithId(id: Int) =
-    object : ViewAction {
-      override fun getConstraints() = isAssignableFrom(View::class.java)
-
-      override fun getDescription() = "Click on a child view with specified id."
-
-      override fun perform(uiController: UiController?, view: View) {
-        view.findViewById<View>(id)?.performClick()
-      }
+  @Test
+  fun shouldHidePreviousButtonOnFirstPage() {
+    val questionnaireJson =
+      """{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "1.1",
+          "type": "display",
+          "text": "Item 1"
+        }
+      ]
+    },
+    {
+      "linkId": "2",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "2.1",
+          "type": "display",
+          "text": "Item 2"
+        }
+      ]
     }
+  ]
+}
+"""
+    val questionnaire = parser.parseResource(questionnaireJson) as Questionnaire
+    buildFragmentFromQuestionnaire(questionnaire)
+    composeTestRule
+      .onNode(
+        hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and
+          hasText(
+            context.getString(
+              R.string.button_pagination_previous,
+            ),
+          ),
+      )
+      .assertDoesNotExist()
+  }
+
+  fun showBottomNavigationContainerWhenSetShowNavigationInDefaultLongScrollIsSetToFalse() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+    buildFragmentFromQuestionnaire(questionnaire, showNavigationLongScroll = false)
+    onView(withId(R.id.bottom_nav_container_frame))
+      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+    composeTestRule
+      .onNode(
+        hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and
+          hasText(
+            context.getString(R.string.submit_questionnaire),
+          ),
+      )
+      .assertIsDisplayed()
+      .assertIsEnabled()
+  }
+
+  @Test
+  fun hideTheBottomNavigationContainerWhenSetShowNavigationInDefaultLongScrollIsSetToTrue() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+    buildFragmentFromQuestionnaire(questionnaire, showNavigationLongScroll = true)
+    onView(withId(R.id.bottom_nav_container_frame))
+      .check(
+        ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
+      )
+    composeTestRule
+      .onNode(
+        hasTestTag(PAGE_NAVIGATION_BUTTON_TAG) and
+          hasText(
+            context.getString(R.string.submit_questionnaire),
+          ),
+      )
+      .assertIsDisplayed()
+      .assertIsEnabled()
+  }
 
   private fun buildFragmentFromQuestionnaire(
     fileName: String,
@@ -709,7 +1012,7 @@ class QuestionnaireUiEspressoTest {
       activityScenarioRule.scenario.onActivity { activity ->
         activity.supportFragmentManager.commitNow {
           setReorderingAllowed(true)
-          add(R.id.container_holder, fragment)
+          add(com.google.android.fhir.datacapture.test.R.id.container_holder, fragment)
         }
       }
     }
@@ -718,16 +1021,22 @@ class QuestionnaireUiEspressoTest {
   private fun buildFragmentFromQuestionnaire(
     questionnaire: Questionnaire,
     isReviewMode: Boolean = false,
+    showReviewPageFirst: Boolean = false,
+    showNavigationLongScroll: Boolean = false,
+    submitText: String? = null,
   ) {
     val questionnaireFragment =
       QuestionnaireFragment.builder()
         .setQuestionnaire(parser.encodeResourceToString(questionnaire))
         .showReviewPageBeforeSubmit(isReviewMode)
+        .setShowNavigationInDefaultLongScroll(showNavigationLongScroll)
+        .showReviewPageFirst(showReviewPageFirst)
+        .apply { submitText?.let { setSubmitButtonText(it) } }
         .build()
     activityScenarioRule.scenario.onActivity { activity ->
       activity.supportFragmentManager.commitNow {
         setReorderingAllowed(true)
-        add(R.id.container_holder, questionnaireFragment)
+        add(com.google.android.fhir.datacapture.test.R.id.container_holder, questionnaireFragment)
       }
     }
   }
@@ -739,8 +1048,9 @@ class QuestionnaireUiEspressoTest {
     var testQuestionnaireFragment: QuestionnaireFragment? = null
     activityScenarioRule.scenario.onActivity { activity ->
       testQuestionnaireFragment =
-        activity.supportFragmentManager.findFragmentById(R.id.container_holder)
-          as QuestionnaireFragment
+        activity.supportFragmentManager.findFragmentById(
+          com.google.android.fhir.datacapture.test.R.id.container_holder,
+        ) as QuestionnaireFragment
     }
     return testQuestionnaireFragment!!.getQuestionnaireResponse()
   }

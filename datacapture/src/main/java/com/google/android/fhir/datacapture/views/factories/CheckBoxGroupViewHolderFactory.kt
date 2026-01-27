@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,170 +16,173 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.CheckBox
-import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.helper.widget.Flow
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.AnnotatedString
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.extensions.choiceOrientation
-import com.google.android.fhir.datacapture.extensions.displayStringSpanned
+import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
+import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.extensions.optionExclusive
-import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
-import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
-import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.ChoiceCheckbox
+import com.google.android.fhir.datacapture.views.compose.Header
+import com.google.android.fhir.datacapture.views.compose.MediaItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object CheckBoxGroupViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.checkbox_group_view) {
+internal object CheckBoxGroupViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
-      private var appContext: AppCompatActivity? = null
-      private lateinit var header: HeaderView
-      private lateinit var checkboxGroup: ConstraintLayout
-      private lateinit var flow: Flow
-      override lateinit var questionnaireViewItem: QuestionnaireViewItem
+    object : QuestionnaireItemComposeViewHolderDelegate {
 
-      override fun init(itemView: View) {
-        appContext = itemView.context.tryUnwrapContext()
-        header = itemView.findViewById(R.id.header)
-        checkboxGroup = itemView.findViewById(R.id.checkbox_group)
-        flow = itemView.findViewById(R.id.checkbox_flow)
-      }
-
-      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        header.bind(questionnaireViewItem)
-        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
-        val choiceOrientation =
-          questionnaireViewItem.questionnaireItem.choiceOrientation
-            ?: ChoiceOrientationTypes.VERTICAL
-
-        // Keep the Flow layout which is always the first child
-        checkboxGroup.removeViews(1, checkboxGroup.childCount - 1)
-        when (choiceOrientation) {
-          ChoiceOrientationTypes.HORIZONTAL -> {
-            flow.setOrientation(Flow.HORIZONTAL)
-            flow.setWrapMode(Flow.WRAP_CHAIN)
+      @Composable
+      override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
+        val context = LocalContext.current
+        val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
+        val readOnly =
+          remember(questionnaireViewItem) { questionnaireViewItem.questionnaireItem.readOnly }
+        val choiceOrientationType =
+          remember(questionnaireViewItem) {
+            questionnaireViewItem.questionnaireItem.choiceOrientation
+              ?: ChoiceOrientationTypes.VERTICAL
           }
-          ChoiceOrientationTypes.VERTICAL -> {
-            flow.setOrientation(Flow.VERTICAL)
-            flow.setWrapMode(Flow.WRAP_NONE)
-          }
-        }
-        questionnaireViewItem.enabledAnswerOptions
-          .map { answerOption -> View.generateViewId() to answerOption }
-          .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
-          .map { it.first }
-          .let { flow.referencedIds = it.toIntArray() }
-
-        displayValidationResult(questionnaireViewItem.validationResult)
-      }
-
-      override fun setReadOnly(isReadOnly: Boolean) {
-        // The Flow layout has index 0. The checkbox indices start from 1.
-        for (i in 1 until checkboxGroup.childCount) {
-          val view = checkboxGroup.getChildAt(i)
-          view.isEnabled = !isReadOnly
-        }
-      }
-
-      private fun populateViewWithAnswerOption(
-        viewId: Int,
-        answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
-        choiceOrientation: ChoiceOrientationTypes,
-      ) {
-        val checkboxLayout =
-          LayoutInflater.from(checkboxGroup.context).inflate(R.layout.check_box_view, null)
-        val checkbox =
-          checkboxLayout.findViewById<CheckBox>(R.id.check_box).apply {
-            id = viewId
-            text = answerOption.value.displayStringSpanned(header.context)
-            setCompoundDrawablesRelative(
-              answerOption.itemAnswerOptionImage(checkboxGroup.context),
-              null,
-              null,
-              null,
+        val enabledAnswerOptions =
+          remember(questionnaireViewItem) { questionnaireViewItem.enabledAnswerOptions }
+        var selectedAnswerOptions by
+          remember(questionnaireViewItem) {
+            mutableStateOf(
+              enabledAnswerOptions
+                .filter { questionnaireViewItem.isAnswerOptionSelected(it) }
+                .toSet(),
             )
-            isChecked = questionnaireViewItem.isAnswerOptionSelected(answerOption)
-            layoutParams =
-              ViewGroup.LayoutParams(
-                when (choiceOrientation) {
-                  ChoiceOrientationTypes.HORIZONTAL -> ViewGroup.LayoutParams.WRAP_CONTENT
-                  ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
-                },
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-              )
-            setOnClickListener {
-              appContext?.lifecycleScope?.launch {
-                when (isChecked) {
-                  true -> {
-                    val newAnswers = questionnaireViewItem.answers.toMutableList()
-                    newAnswers +=
-                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                        value = answerOption.value
-                      }
+          }
 
-                    if (answerOption.optionExclusive) {
-                      // if this answer option has optionExclusive extension, then deselect other
-                      // answer options.
-                      val optionExclusiveIndex = checkboxGroup.indexOfChild(it) - 1
-                      for (i in 0 until questionnaireViewItem.enabledAnswerOptions.size) {
-                        if (optionExclusiveIndex == i) {
-                          continue
-                        }
-                        (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
-                        newAnswers.removeIf {
-                          it.value.equalsDeep(questionnaireViewItem.enabledAnswerOptions[i].value)
-                        }
-                      }
-                    } else {
-                      // deselect optionExclusive answer option.
-                      for (i in 0 until questionnaireViewItem.enabledAnswerOptions.size) {
-                        if (!questionnaireViewItem.enabledAnswerOptions[i].optionExclusive) {
-                          continue
-                        }
-                        (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
-                        newAnswers.removeIf {
-                          it.value.equalsDeep(questionnaireViewItem.enabledAnswerOptions[i].value)
-                        }
-                      }
+        val onAnswerOptionCheckedChange:
+          suspend (Questionnaire.QuestionnaireItemAnswerOptionComponent, Boolean) -> Unit =
+          { answerOption, checked ->
+            when {
+              checked && answerOption.optionExclusive -> {
+                // If this answer option has optionExclusive extension, deselect other options
+                selectedAnswerOptions = setOf(answerOption)
+                questionnaireViewItem.setAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = answerOption.value
+                  },
+                )
+              }
+              checked -> {
+                // Deselect any optionExclusive answer options
+                val exclusiveOptions = enabledAnswerOptions.filter { it.optionExclusive }.toSet()
+                selectedAnswerOptions = (selectedAnswerOptions - exclusiveOptions) + answerOption
+
+                // Add the answer
+                val answers =
+                  questionnaireViewItem.answers +
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = answerOption.value
                     }
-                    questionnaireViewItem.setAnswer(*newAnswers.toTypedArray())
+                // Remove exclusive options from answers
+                val newAnswers =
+                  answers.filterNot { answer ->
+                    exclusiveOptions.any { it.value.equalsDeep(answer.value) }
                   }
-                  false -> {
-                    questionnaireViewItem.removeAnswer(
-                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                        value = answerOption.value
+                questionnaireViewItem.setAnswer(*newAnswers.toTypedArray())
+              }
+              else -> {
+                // Remove the answer
+                selectedAnswerOptions = selectedAnswerOptions - answerOption
+                questionnaireViewItem.removeAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = answerOption.value
+                  },
+                )
+              }
+            }
+          }
+
+        Column(
+          modifier =
+            Modifier.fillMaxWidth()
+              .padding(
+                horizontal = dimensionResource(R.dimen.item_margin_horizontal),
+                vertical = dimensionResource(R.dimen.item_margin_vertical),
+              ),
+        ) {
+          Header(
+            questionnaireViewItem,
+            showRequiredOrOptionalText = true,
+            displayValidationResult = true,
+          )
+          questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
+
+          when (choiceOrientationType) {
+            ChoiceOrientationTypes.HORIZONTAL -> {
+              FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement =
+                  Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_horizontal)),
+                verticalArrangement =
+                  Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_vertical)),
+              ) {
+                enabledAnswerOptions.forEach { answerOption ->
+                  ChoiceCheckbox(
+                    label =
+                      remember(answerOption) {
+                        AnnotatedString(answerOption.value.displayString(context))
                       },
-                    )
+                    checked = answerOption in selectedAnswerOptions,
+                    enabled = !readOnly,
+                    modifier = Modifier.weight(1f).testTag(CHECKBOX_OPTION_TAG),
+                    image = answerOption.itemAnswerOptionImage(context),
+                  ) {
+                    coroutineScope.launch { onAnswerOptionCheckedChange(answerOption, it) }
+                  }
+                }
+              }
+            }
+            ChoiceOrientationTypes.VERTICAL -> {
+              Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement =
+                  Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_vertical)),
+              ) {
+                enabledAnswerOptions.forEach { answerOption ->
+                  ChoiceCheckbox(
+                    label =
+                      remember(answerOption) {
+                        AnnotatedString(answerOption.value.displayString(context))
+                      },
+                    checked = answerOption in selectedAnswerOptions,
+                    enabled = !readOnly,
+                    modifier = Modifier.fillMaxWidth().testTag(CHECKBOX_OPTION_TAG),
+                    image = answerOption.itemAnswerOptionImage(context),
+                  ) {
+                    coroutineScope.launch { onAnswerOptionCheckedChange(answerOption, it) }
                   }
                 }
               }
             }
           }
-        checkboxGroup.addView(checkbox)
-        flow.addView(checkbox)
-      }
-
-      private fun displayValidationResult(validationResult: ValidationResult) {
-        when (validationResult) {
-          is NotValidated,
-          Valid, -> header.showErrorText(isErrorTextVisible = false)
-          is Invalid -> {
-            header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
-          }
         }
       }
     }
 }
+
+internal const val CHECKBOX_OPTION_TAG = "checkbox_group_option"

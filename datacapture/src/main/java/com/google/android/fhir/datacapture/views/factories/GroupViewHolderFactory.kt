@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,72 +16,43 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.view.View
-import android.widget.Button
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
-import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.views.GroupHeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import kotlinx.coroutines.launch
-import org.hl7.fhir.r4.model.QuestionnaireResponse
+import com.google.android.fhir.datacapture.views.compose.ErrorText
+import com.google.android.fhir.datacapture.views.compose.Header
+import com.google.android.fhir.datacapture.views.compose.MediaItem
 
-internal object GroupViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.group_header_view) {
+internal object GroupViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var context: AppCompatActivity
-      private lateinit var header: GroupHeaderView
-      private lateinit var error: TextView
-      private lateinit var addItemButton: Button
-      override lateinit var questionnaireViewItem: QuestionnaireViewItem
+    object : QuestionnaireItemComposeViewHolderDelegate {
 
-      override fun init(itemView: View) {
-        context = itemView.context.tryUnwrapContext()!!
-        header = itemView.findViewById(R.id.header)
-        error = itemView.findViewById(R.id.error)
-        addItemButton = itemView.findViewById(R.id.add_item)
-      }
-
-      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        header.bind(questionnaireViewItem)
-        addItemButton.text =
-          context.getString(
-            R.string.add_repeated_group_item,
-            questionnaireViewItem.questionText ?: "",
-          )
-        addItemButton.visibility =
-          if (questionnaireViewItem.questionnaireItem.repeats) View.VISIBLE else View.GONE
-        addItemButton.setOnClickListener {
-          context.lifecycleScope.launch {
-            questionnaireViewItem.addAnswer(
-              // Nested items will be added in answerChangedCallback in the QuestionnaireViewModel
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
-            )
+      @Composable
+      override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
+        val validationMessage =
+          remember(questionnaireViewItem.validationResult) {
+            (questionnaireViewItem.validationResult as? Invalid)?.getSingleStringValidationMessage()
+              ?: ""
           }
-        }
-        displayValidationResult(questionnaireViewItem.validationResult)
-      }
 
-      private fun displayValidationResult(validationResult: ValidationResult) {
-        when (validationResult) {
-          is NotValidated,
-          Valid, -> error.visibility = View.GONE
-          is Invalid -> {
-            error.text = validationResult.getSingleStringValidationMessage()
-            error.visibility = View.VISIBLE
+        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+          Header(questionnaireViewItem)
+          if (validationMessage.isNotBlank()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            ErrorText(validationMessage)
           }
+          Spacer(modifier = Modifier)
+          questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
         }
-      }
-
-      override fun setReadOnly(isReadOnly: Boolean) {
-        addItemButton.isEnabled = !isReadOnly
       }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,155 +16,142 @@
 
 package com.google.android.fhir.datacapture.views.factories
 
-import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.RadioButton
-import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.helper.widget.Flow
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.extensions.choiceOrientation
-import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
-import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
-import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.views.HeaderView
+import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.compose.ChoiceRadioButton
+import com.google.android.fhir.datacapture.views.compose.Header
+import com.google.android.fhir.datacapture.views.compose.MediaItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object BooleanChoiceViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.boolean_choice_view) {
+internal object BooleanChoiceViewHolderFactory : QuestionnaireItemComposeViewHolderFactory {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var context: AppCompatActivity
-      private lateinit var header: HeaderView
-      private lateinit var radioGroup: ConstraintLayout
-      private lateinit var yesRadioButton: RadioButton
-      private lateinit var noRadioButton: RadioButton
-      private lateinit var flow: Flow
+    object : QuestionnaireItemComposeViewHolderDelegate {
 
-      override lateinit var questionnaireViewItem: QuestionnaireViewItem
+      @Composable
+      override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
+        val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
+        val readOnly =
+          remember(questionnaireViewItem) { questionnaireViewItem.questionnaireItem.readOnly }
+        val choiceOrientationType =
+          remember(questionnaireViewItem) {
+            questionnaireViewItem.questionnaireItem.choiceOrientation
+              ?: ChoiceOrientationTypes.VERTICAL
+          }
+        val currentAnswer =
+          remember(questionnaireViewItem) {
+            questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.value
+          }
+        var selectedChoiceState by remember(currentAnswer) { mutableStateOf(currentAnswer) }
 
-      override fun init(itemView: View) {
-        context = itemView.context.tryUnwrapContext()!!
-        header = itemView.findViewById(R.id.header)
-        radioGroup = itemView.findViewById(R.id.radio_constraint_layout)
-        yesRadioButton = itemView.findViewById(R.id.yes_radio_button)
-        noRadioButton = itemView.findViewById(R.id.no_radio_button)
-        flow = itemView.findViewById(R.id.flow)
-      }
+        val onChoiceSelection: suspend (Boolean) -> Unit = { selected ->
+          if (selectedChoiceState != selected) {
+            selectedChoiceState = selected
+            questionnaireViewItem.setAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(selected)
+              },
+            )
+          } else {
+            // clear selection
+            selectedChoiceState = null
+            questionnaireViewItem.clearAnswer()
+          }
+        }
 
-      override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        this.questionnaireViewItem = questionnaireViewItem
-        header.bind(questionnaireViewItem)
-        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
-        val choiceOrientation =
-          questionnaireViewItem.questionnaireItem.choiceOrientation
-            ?: ChoiceOrientationTypes.VERTICAL
-        with(flow) {
-          when (choiceOrientation) {
+        Column(
+          modifier =
+            Modifier.fillMaxWidth()
+              .padding(
+                horizontal = dimensionResource(R.dimen.item_margin_horizontal),
+                vertical = dimensionResource(R.dimen.item_margin_vertical),
+              ),
+        ) {
+          Header(
+            questionnaireViewItem,
+            showRequiredOrOptionalText = true,
+            displayValidationResult = true,
+          )
+          questionnaireViewItem.questionnaireItem.itemMedia?.let { MediaItem(it) }
+
+          when (choiceOrientationType) {
             ChoiceOrientationTypes.HORIZONTAL -> {
-              setOrientation(Flow.HORIZONTAL)
-              setWrapMode(Flow.WRAP_CHAIN)
+              FlowRow(
+                modifier = Modifier.selectableGroup().fillMaxWidth(),
+                horizontalArrangement =
+                  Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_horizontal)),
+                verticalArrangement =
+                  Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_vertical)),
+              ) {
+                ChoiceRadioButton(
+                  label = AnnotatedString(stringResource(R.string.yes)),
+                  selected = selectedChoiceState == true,
+                  enabled = !readOnly,
+                  modifier = Modifier.weight(1f).testTag(YES_CHOICE_RADIO_BUTTON_TAG),
+                ) {
+                  coroutineScope.launch { onChoiceSelection(true) }
+                }
+
+                ChoiceRadioButton(
+                  label = AnnotatedString(stringResource(R.string.no)),
+                  selected = selectedChoiceState == false,
+                  enabled = !readOnly,
+                  modifier = Modifier.weight(1f).testTag(NO_CHOICE_RADIO_BUTTON_TAG),
+                  onClick = { coroutineScope.launch { onChoiceSelection(false) } },
+                )
+              }
             }
             ChoiceOrientationTypes.VERTICAL -> {
-              setOrientation(Flow.VERTICAL)
-              setWrapMode(Flow.WRAP_NONE)
+              Column(
+                modifier = Modifier.selectableGroup().fillMaxWidth(),
+                verticalArrangement =
+                  Arrangement.spacedBy(dimensionResource(R.dimen.option_item_margin_vertical)),
+              ) {
+                ChoiceRadioButton(
+                  label = AnnotatedString(stringResource(R.string.yes)),
+                  selected = selectedChoiceState == true,
+                  enabled = !readOnly,
+                  modifier = Modifier.fillMaxWidth().testTag(YES_CHOICE_RADIO_BUTTON_TAG),
+                ) {
+                  coroutineScope.launch { onChoiceSelection(true) }
+                }
+
+                ChoiceRadioButton(
+                  label = AnnotatedString(stringResource(R.string.no)),
+                  selected = selectedChoiceState == false,
+                  enabled = !readOnly,
+                  modifier = Modifier.fillMaxWidth().testTag(NO_CHOICE_RADIO_BUTTON_TAG),
+                  onClick = { coroutineScope.launch { onChoiceSelection(false) } },
+                )
+              }
             }
-          }
-        }
-
-        yesRadioButton.setLayoutParamsByOrientation(choiceOrientation)
-        noRadioButton.setLayoutParamsByOrientation(choiceOrientation)
-
-        when (questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.value) {
-          true -> {
-            yesRadioButton.isChecked = true
-            noRadioButton.isChecked = false
-          }
-          false -> {
-            noRadioButton.isChecked = true
-            yesRadioButton.isChecked = false
-          }
-          null -> {
-            yesRadioButton.isChecked = false
-            noRadioButton.isChecked = false
-          }
-        }
-
-        yesRadioButton.setOnClickListener {
-          context.lifecycleScope.launch {
-            if (
-              questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() == true
-            ) {
-              questionnaireViewItem.clearAnswer()
-              yesRadioButton.isChecked = false
-            } else {
-              questionnaireViewItem.setAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = BooleanType(true)
-                },
-              )
-            }
-          }
-        }
-
-        noRadioButton.setOnClickListener {
-          context.lifecycleScope.launch {
-            if (
-              questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() ==
-                false
-            ) {
-              questionnaireViewItem.clearAnswer()
-              noRadioButton.isChecked = false
-            } else {
-              questionnaireViewItem.setAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = BooleanType(false)
-                },
-              )
-            }
-          }
-        }
-
-        displayValidationResult(questionnaireViewItem.validationResult)
-      }
-
-      override fun setReadOnly(isReadOnly: Boolean) {
-        for (i in 0 until radioGroup.childCount) {
-          val view = radioGroup.getChildAt(i)
-          view.isEnabled = !isReadOnly
-        }
-      }
-
-      private fun RadioButton.setLayoutParamsByOrientation(
-        choiceOrientation: ChoiceOrientationTypes,
-      ) {
-        layoutParams =
-          LinearLayout.LayoutParams(
-            when (choiceOrientation) {
-              ChoiceOrientationTypes.HORIZONTAL -> 0
-              ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
-            },
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            1.0f,
-          )
-      }
-
-      private fun displayValidationResult(validationResult: ValidationResult) {
-        when (validationResult) {
-          is NotValidated,
-          Valid, -> header.showErrorText(isErrorTextVisible = false)
-          is Invalid -> {
-            header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
           }
         }
       }
     }
 }
+
+const val YES_CHOICE_RADIO_BUTTON_TAG = "yes_radio_button"
+const val NO_CHOICE_RADIO_BUTTON_TAG = "no_radio_button"
