@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import com.google.android.fhir.datacapture.extensions.toAnnotatedString
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 
@@ -75,8 +76,8 @@ data class QuestionnaireViewItem(
     ) -> Unit,
   val enabledAnswerOptions: List<Questionnaire.Item.AnswerOption> =
     questionnaireItem.answerOption.ifEmpty { emptyList() },
-  val minAnswerValue: Any? = questionnaireItem.minValue,
-  val maxAnswerValue: Any? = questionnaireItem.maxValue,
+  val minAnswerValue: Extension.Value? = questionnaireItem.minValue,
+  val maxAnswerValue: Extension.Value? = questionnaireItem.maxValue,
   val draftAnswer: Any? = null,
   val enabledDisplayItems: List<Questionnaire.Item> = emptyList(),
   val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),

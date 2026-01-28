@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.runComposeUiTest
 import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4String
-import com.google.android.fhir.datacapture.extensions.QuantityAnswerValue
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -117,7 +116,10 @@ class QuantityViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = QuantityAnswerValue(value = quantity(value = "5".toBigDecimal())),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Quantity(
+                      value = quantity(value = "5".toBigDecimal()),
+                    ),
                 ),
               ),
           ),
@@ -145,7 +147,10 @@ class QuantityViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = QuantityAnswerValue(value = quantity(value = "5".toBigDecimal())),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Quantity(
+                      value = quantity(value = "5".toBigDecimal()),
+                    ),
                 ),
               ),
           ),
@@ -186,7 +191,8 @@ class QuantityViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = QuantityAnswerValue(value = quantity(unit = "kg")),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Quantity(value = quantity(unit = "kg")),
                 ),
               ),
           ),
@@ -241,7 +247,8 @@ class QuantityViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = QuantityAnswerValue(value = quantity(unit = "kg")),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Quantity(value = quantity(unit = "kg")),
                 ),
               ),
           ),
@@ -302,7 +309,7 @@ class QuantityViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  QuantityAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.Quantity(
                     value =
                       quantity(
                         value = 22.5.toBigDecimal(),
@@ -426,7 +433,7 @@ class QuantityViewFactoryTest {
   }
 
   @Test
-  fun draftWithUnit_shouldCompleteQuantity() {
+  fun draftWithUnitShouldCompleteQuantity() {
     var answerHolder: List<QuestionnaireResponse.Item.Answer>? = null
     var draftHolder: Any? = null
 
@@ -470,7 +477,7 @@ class QuantityViewFactoryTest {
   }
 
   @Test
-  fun draftWithDecimalValue_shouldCompleteQuantity() {
+  fun draftWithDecimalValueShouldCompleteQuantity() {
     var answerHolder: List<QuestionnaireResponse.Item.Answer>? = null
     var draftHolder: Any? = null
 
@@ -635,7 +642,10 @@ class QuantityViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = QuantityAnswerValue(value = quantity(value = "5".toBigDecimal())),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Quantity(
+                      value = quantity(value = "5".toBigDecimal()),
+                    ),
                 ),
               ),
           ),
@@ -659,7 +669,10 @@ class QuantityViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = QuantityAnswerValue(value = quantity(value = "7".toBigDecimal())),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Quantity(
+                    value = quantity(value = "7".toBigDecimal()),
+                  ),
               ),
             ),
         ),
