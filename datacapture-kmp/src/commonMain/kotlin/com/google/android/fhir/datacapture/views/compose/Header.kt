@@ -171,7 +171,7 @@ internal fun Header(
     if (displayValidationResult && validationResult is Invalid) {
       Text(
         modifier = Modifier.testTag(ERROR_TEXT_AT_HEADER_TEST_TAG),
-        text = validationResult.getSingleStringValidationMessage(),
+        text = validationResult.singleStringValidationMessage,
         color = QuestionnaireTheme.colorScheme.error,
         style = QuestionnaireTheme.typography.bodySmall,
       )

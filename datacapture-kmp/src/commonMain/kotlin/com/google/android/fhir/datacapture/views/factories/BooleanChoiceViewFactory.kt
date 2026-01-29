@@ -48,6 +48,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
+internal const val YES_CHOICE_RADIO_BUTTON_TAG = "yes_radio_button"
+internal const val NO_CHOICE_RADIO_BUTTON_TAG = "no_radio_button"
+
 internal object BooleanChoiceViewFactory : QuestionnaireItemViewFactory {
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
@@ -154,6 +157,3 @@ internal object BooleanChoiceViewFactory : QuestionnaireItemViewFactory {
     }
   }
 }
-
-const val YES_CHOICE_RADIO_BUTTON_TAG = "yes_radio_button"
-const val NO_CHOICE_RADIO_BUTTON_TAG = "no_radio_button"

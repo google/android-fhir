@@ -40,6 +40,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 
+internal const val CHOICE_RADIO_BUTTON_IMAGE_TAG = "radio_button_option_icon"
+
 @Composable
 internal fun ChoiceRadioButton(
   label: AnnotatedString,
@@ -121,5 +123,3 @@ internal fun ChoiceRadioButton(
     Spacer(modifier = Modifier.width(QuestionnaireTheme.dimensions.optionItemAfterTextPadding))
   }
 }
-
-const val CHOICE_RADIO_BUTTON_IMAGE_TAG = "radio_button_option_icon"

@@ -299,7 +299,7 @@ private fun QuestionnaireReviewItem(
               tint = QuestionnaireTheme.colorScheme.error,
             )
             Text(
-              text = questionnaireViewItem.validationResult.getSingleStringValidationMessage(),
+              text = questionnaireViewItem.validationResult.singleStringValidationMessage,
               style = QuestionnaireTheme.typography.bodyMedium,
               color = QuestionnaireTheme.colorScheme.error,
             )

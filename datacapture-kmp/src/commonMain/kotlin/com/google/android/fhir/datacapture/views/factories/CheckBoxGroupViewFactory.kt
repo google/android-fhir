@@ -47,6 +47,8 @@ import com.google.fhir.model.r4.Questionnaire
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+internal const val CHECKBOX_OPTION_TAG = "checkbox_group_option"
+
 internal object CheckBoxGroupViewFactory : QuestionnaireItemViewFactory {
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
@@ -163,5 +165,3 @@ internal object CheckBoxGroupViewFactory : QuestionnaireItemViewFactory {
     }
   }
 }
-
-internal const val CHECKBOX_OPTION_TAG = "checkbox_group_option"

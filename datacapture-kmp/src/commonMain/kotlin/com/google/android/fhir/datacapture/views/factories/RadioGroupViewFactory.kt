@@ -47,6 +47,8 @@ import com.google.fhir.model.r4.Questionnaire
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+internal const val RADIO_OPTION_TAG = "radio_group_option"
+
 internal object RadioGroupViewFactory : QuestionnaireItemViewFactory {
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
@@ -141,5 +143,3 @@ internal object RadioGroupViewFactory : QuestionnaireItemViewFactory {
     }
   }
 }
-
-const val RADIO_OPTION_TAG = "radio_group_option"

@@ -69,6 +69,10 @@ import kotlin.concurrent.atomics.fetchAndIncrement
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
+internal const val OPTION_CHOICE_LIST_TAG = "dialog_select_option_choice_list"
+internal const val OPTION_CHOICE_TAG = "dialog_select_option_choice"
+internal const val OTHER_OPTION_TEXT_FIELD_TAG = "other_option_edit_text_field"
+
 @Composable
 internal fun OptionDialogSelect(
   title: AnnotatedString,
@@ -399,7 +403,3 @@ internal sealed class OptionSelectRow {
       OtherAddAnother -> "add_another"
     }
 }
-
-internal const val OPTION_CHOICE_LIST_TAG = "dialog_select_option_choice_list"
-internal const val OPTION_CHOICE_TAG = "dialog_select_option_choice"
-internal const val OTHER_OPTION_TEXT_FIELD_TAG = "other_option_edit_text_field"

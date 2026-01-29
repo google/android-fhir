@@ -59,6 +59,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
+internal const val MULTI_SELECT_TEXT_FIELD_TAG = "multi_select_summary_holder"
+
 internal object DialogSelectViewFactory : QuestionnaireItemViewFactory {
   @OptIn(ExperimentalMaterial3Api::class)
   @Composable
@@ -76,7 +78,7 @@ internal object DialogSelectViewFactory : QuestionnaireItemViewFactory {
 
     val validationResultMessage =
       remember(questionnaireViewItem.validationResult) {
-        questionnaireViewItem.validationResult.getSingleStringValidationMessage()?.let {
+        questionnaireViewItem.validationResult.singleStringValidationMessage?.let {
           if (
             questionnaireViewItem.questionnaireItem.required?.value == true &&
               questionnaireViewItem.questionViewTextConfiguration.showRequiredText
@@ -213,5 +215,3 @@ private fun QuestionnaireViewItem.extractInitialOptions(): SelectedOptions {
     otherOptions = otherOptions,
   )
 }
-
-internal const val MULTI_SELECT_TEXT_FIELD_TAG = "multi_select_summary_holder"
