@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,10 @@ class EditTextViewFactoryDelegateTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = DecimalAnswerValue(value = Decimal(value = 1.toBigDecimal())),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.Decimal(
+                        value = Decimal(value = 1.toBigDecimal()),
+                      ),
                   ),
                 ),
             ),
@@ -97,7 +100,10 @@ class EditTextViewFactoryDelegateTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = DecimalAnswerValue(value = Decimal(value = 1.1.toBigDecimal())),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Decimal(
+                      value = Decimal(value = 1.1.toBigDecimal()),
+                    ),
                 ),
               ),
           ),
