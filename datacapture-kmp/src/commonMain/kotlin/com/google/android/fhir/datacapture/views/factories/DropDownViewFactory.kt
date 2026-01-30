@@ -78,7 +78,9 @@ internal object DropDownViewFactory : QuestionnaireItemViewFactory {
           ?: ""
       }
     val showClearInput =
-      remember(questionnaireViewItem.answers) { questionnaireViewItem.answers.isNotEmpty() }
+      remember(questionnaireViewItem.answers.toString()) {
+        questionnaireViewItem.answers.isNotEmpty()
+      }
 
     val dropDownOptions =
       remember(questionnaireItemAnswerDropDownOptions) {
@@ -88,7 +90,7 @@ internal object DropDownViewFactory : QuestionnaireItemViewFactory {
         )
       }
     val selectedAnswerIdentifier =
-      remember(questionnaireViewItem.answers) {
+      remember(questionnaireViewItem.answers.toString()) {
         questionnaireViewItem.answers.singleOrNull()?.elementValue
       }
     val selectedOption =
