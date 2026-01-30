@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.extensions
 
 import com.google.fhir.model.r4.Coding
 import com.google.fhir.model.r4.Quantity
-import com.google.fhir.model.r4.QuestionnaireResponse
 
 internal fun com.google.fhir.model.r4.String.getLocalizedText(lang: String = "en"): String? {
   return getTranslation(lang) ?: getTranslation(lang.split("-").firstOrNull()) ?: value
@@ -49,14 +48,10 @@ internal fun Coding.hasSystem() = !this.system?.value.isNullOrBlank()
 
 internal fun Coding.hasVersion() = !this.version?.value.isNullOrBlank()
 
-typealias FhirR4String = com.google.fhir.model.r4.String
-
 typealias FhirR4Boolean = com.google.fhir.model.r4.Boolean
 
-typealias QuantityAnswerValue = QuestionnaireResponse.Item.Answer.Value.Quantity
+typealias FhirR4Integer = com.google.fhir.model.r4.Integer
 
-typealias StringAnswerValue = QuestionnaireResponse.Item.Answer.Value.String
-
-typealias IntegerAnswerValue = QuestionnaireResponse.Item.Answer.Value.Integer
+typealias FhirR4String = com.google.fhir.model.r4.String
 
 internal const val EXT_TRANSLATION = "http://hl7.org/fhir/StructureDefinition/translation"

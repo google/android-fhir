@@ -44,7 +44,6 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYS
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4String
-import com.google.android.fhir.datacapture.extensions.StringAnswerValue
 import com.google.android.fhir.datacapture.extensions.toAnnotatedString
 import com.google.android.fhir.datacapture.extensions.toQuestionnaireResponseItemAnswer
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
@@ -1029,7 +1028,10 @@ class DropDownViewFactoryTest {
         answer =
           listOf(
             QuestionnaireResponse.Item.Answer(
-              value = StringAnswerValue(value = FhirR4String(value = "Coding 1")),
+              value =
+                QuestionnaireResponse.Item.Answer.Value.String(
+                  value = FhirR4String(value = "Coding 1"),
+                ),
             ),
           ),
       )
@@ -1096,7 +1098,10 @@ class DropDownViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = StringAnswerValue(value = FhirR4String(value = "Coding 1")),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.String(
+                      value = FhirR4String(value = "Coding 1"),
+                    ),
                 ),
               ),
           ),
@@ -1554,7 +1559,10 @@ class DropDownViewFactoryTest {
       answer =
         responses.map { response ->
           QuestionnaireResponse.Item.Answer(
-            value = StringAnswerValue(value = FhirR4String(value = response)),
+            value =
+              QuestionnaireResponse.Item.Answer.Value.String(
+                value = FhirR4String(value = response),
+              ),
           )
         },
     )

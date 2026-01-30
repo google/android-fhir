@@ -335,8 +335,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     >()
 
   /**
-   * Map from [QuestionnaireResponse.Item] to draft answers, e.g "02/02" for date with missing year
-   * part.
+   * Map from [Questionnaire.Item] to draft answers, e.g "02/02" for date with missing year part.
    *
    * This is used to maintain draft answers on the screen especially when the widgets are being
    * recycled as a result of scrolling. Draft answers cannot be saved in [QuestionnaireResponse]
@@ -346,7 +345,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
    * When the draft answer becomes valid, its entry in the map is removed, e.g, "02/02/2023" is
    * valid answer and should not be in this map.
    */
-  private val draftAnswerMap = mutableMapOf<QuestionnaireResponse.Item, Any>()
+  private val draftAnswerMap = mutableMapOf<Questionnaire.Item, Any>()
 
   /**
    * Callback function to update the view model after the answer(s) to a question have been changed.
@@ -371,17 +370,10 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
       Any?,
     ) -> Unit =
     { questionnaireItem, questionnaireResponseItem, answers, draftAnswer ->
-      when {
-        (questionnaireResponseItem.answer.isNotEmpty()) -> {
-          draftAnswerMap.remove(questionnaireResponseItem)
-        }
-        else -> {
-          if (draftAnswer == null) {
-            draftAnswerMap.remove(questionnaireResponseItem)
-          } else {
-            draftAnswerMap[questionnaireResponseItem] = draftAnswer
-          }
-        }
+      if (draftAnswer != null) {
+        draftAnswerMap[questionnaireItem] = draftAnswer
+      } else {
+        draftAnswerMap.remove(key = questionnaireItem)
       }
 
       (questionnaireResponseItem.answer as? MutableList)?.let { answerList ->
@@ -1018,7 +1010,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
               //                    it,
               //                  )
               //                }
-              draftAnswer = draftAnswerMap[questionnaireResponseItem],
+              draftAnswer = draftAnswerMap[questionnaireItem],
               enabledDisplayItems =
                 questionnaireItem.item.filter {
                   it.isDisplayItem

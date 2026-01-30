@@ -29,7 +29,25 @@
       "required": false
     },
     {
-      "linkId": "1",
+      "linkId": "phone-number",
+      "text": "Phone Number",
+      "type": "string",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "phone-number"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "measurement",
       "text": "Enter length",
       "type": "quantity",
       "extension": [
@@ -48,6 +66,29 @@
             "code": "[in_i]",
             "display": "inch"
           }
+        }
+      ]
+    },
+    {
+      "linkId": "slider-children",
+      "text": "How many children does the client have?",
+      "type": "integer",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "slider",
+                "display": "Slider"
+              }
+            ]
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+          "valueInteger": 15
         }
       ]
     },
