@@ -54,6 +54,9 @@ import androidx.compose.ui.unit.dp
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import org.jetbrains.compose.resources.painterResource
 
+internal const val MULTI_AUTO_COMPLETE_TEXT_FIELD_TAG = "multi_auto_complete_text_field"
+internal const val MULTI_AUTO_COMPLETE_INPUT_CHIP_TAG = "multi_auto_complete_input_chip"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MultiAutoCompleteTextItem(
@@ -187,6 +190,3 @@ internal fun MultiAutoCompleteTextItem(
     }
   }
 }
-
-const val MULTI_AUTO_COMPLETE_TEXT_FIELD_TAG = "multi_auto_complete_text_field"
-const val MULTI_AUTO_COMPLETE_INPUT_CHIP_TAG = "multi_auto_complete_input_chip"

@@ -55,6 +55,11 @@ import com.google.fhir.model.r4.Element
 import com.google.fhir.model.r4.Questionnaire
 import org.jetbrains.compose.resources.painterResource
 
+internal const val CLEAR_TEXT_ICON_BUTTON_TAG = "clear_field_text"
+internal const val DROP_DOWN_TEXT_FIELD_TAG = "drop_down_text_field"
+internal const val DROP_DOWN_TEXT_FIELD_LEADING_ICON_TAG = "drop_down_text_field_leading_icon"
+internal const val DROP_DOWN_ANSWER_MENU_ITEM_TAG = "drop_down_answer_list_menu_item"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DropDownItem(
@@ -288,8 +293,3 @@ internal data class DropDownAnswerOption(
       )
   }
 }
-
-const val CLEAR_TEXT_ICON_BUTTON_TAG = "clear_field_text"
-const val DROP_DOWN_TEXT_FIELD_TAG = "drop_down_text_field"
-const val DROP_DOWN_TEXT_FIELD_LEADING_ICON_TAG = "drop_down_text_field_leading_icon"
-const val DROP_DOWN_ANSWER_MENU_ITEM_TAG = "drop_down_answer_list_menu_item"
