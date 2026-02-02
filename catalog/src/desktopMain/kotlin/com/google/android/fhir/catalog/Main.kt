@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.factories
+package com.google.android.fhir.catalog
 
-import androidx.compose.runtime.Composable
-import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPlacement
+import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.window.application
 
-interface QuestionnaireItemViewFactory {
-  @Composable fun Content(questionnaireViewItem: QuestionnaireViewItem)
-}
-
-internal object EmptyQuestionnaireViewFactory: QuestionnaireItemViewFactory {
-  @Composable
-  override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
-    // This is an empty place holder for view factories that are not implemented
+fun main() = application {
+  Window(
+    onCloseRequest = ::exitApplication,
+    title = "FHIR Catalog",
+    state = WindowState(placement = WindowPlacement.Maximized),
+  ) {
+    App()
   }
 }
