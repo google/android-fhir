@@ -89,7 +89,7 @@ fun Questionnaire.Item.AnswerOption.toQuestionnaireResponseItemAnswer():
     value =
       when (value) {
         is Questionnaire.Item.AnswerOption.Value.Integer ->
-          IntegerAnswerValue(
+          QuestionnaireResponse.Item.Answer.Value.Integer(
             value = (value as Questionnaire.Item.AnswerOption.Value.Integer).value,
           )
         is Questionnaire.Item.AnswerOption.Value.Coding ->

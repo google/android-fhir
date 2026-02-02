@@ -35,7 +35,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.google.android.fhir.datacapture.DataCapture
-import com.google.android.fhir.datacapture.extensions.DateTimeAnswerValue
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
 import com.google.android.fhir.datacapture.extensions.itemMedia
@@ -249,7 +248,7 @@ internal object DateTimeViewFactory : QuestionnaireItemViewFactory {
     questionnaireViewItem.setAnswer(
       QuestionnaireResponse.Item.Answer(
         value =
-          DateTimeAnswerValue(
+          QuestionnaireResponse.Item.Answer.Value.DateTime(
             value =
               DateTime(
                 value =

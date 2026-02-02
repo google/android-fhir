@@ -36,7 +36,6 @@ import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.runComposeUiTest
-import com.google.android.fhir.datacapture.extensions.DateAnswerValue
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_FORMAT_URL
 import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4DateType
@@ -125,7 +124,10 @@ class DateViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = DateAnswerValue(value = FhirR4DateType(value = null)),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Date(
+                      value = FhirR4DateType(value = null),
+                    ),
                 ),
               ),
           ),
@@ -154,7 +156,7 @@ class DateViewFactoryTest {
       //            listOf(
       //              QuestionnaireResponse.Item.Answer(
       //                value =
-      //                  DateAnswerValue(
+      //                  QuestionnaireResponse.Item.Answer.Value.Date(
       //                    value = FhirR4DateType(value = FhirDate.fromString("2020-10-19")),
       //                  ),
       //              ),
@@ -209,7 +211,8 @@ class DateViewFactoryTest {
       //          QuestionnaireResponse.Item(linkId = FhirR4String(value = "date-item"),
       //              answer = listOf(
       //                  QuestionnaireResponse.Item.Answer(
-      //                      value = DateAnswerValue(value = FhirR4DateType(value =
+      //                      value = QuestionnaireResponse.Item.Answer.Value.Date(value =
+      // FhirR4DateType(value =
       // FhirDate.Date(LocalDate(2020, 10, 19))))
       //                  )
       //              )),
@@ -237,7 +240,8 @@ class DateViewFactoryTest {
       //          QuestionnaireResponse.Item(linkId = FhirR4String(value = "date-item"),
       //                            answer = listOf(
       //                  QuestionnaireResponse.Item.Answer(
-      //                      value = DateAnswerValue(value = FhirR4DateType(value =
+      //                      value = QuestionnaireResponse.Item.Answer.Value.Date(value =
+      // FhirR4DateType(value =
       // FhirDate.Date(LocalDate(2020, 10, 19))))
       //                  )
       //              )),
@@ -273,7 +277,7 @@ class DateViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.Date(
                     value = FhirR4DateType(value = FhirDate.Date(LocalDate(2020, 11, 19))),
                   ),
               ),
@@ -397,7 +401,7 @@ class DateViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.Date(
                     value = FhirR4DateType(value = FhirDate.Date(LocalDate(2020, 11, 19))),
                   ),
               ),
@@ -439,7 +443,7 @@ class DateViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.Date(
                     value = FhirR4DateType(value = FhirDate.Date(LocalDate(2020, 11, 19))),
                   ),
               ),
@@ -481,7 +485,7 @@ class DateViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.Date(
                     value = FhirR4DateType(value = FhirDate.Date(LocalDate(2020, 10, 19))),
                   ),
               ),
@@ -502,7 +506,9 @@ class DateViewFactoryTest {
     val answer =
       QuestionnaireResponse.Item.Answer(
         value =
-          DateAnswerValue(value = FhirR4DateType(value = FhirDate.Date(LocalDate(2026, 1, 1)))),
+          QuestionnaireResponse.Item.Answer.Value.Date(
+            value = FhirR4DateType(value = FhirDate.Date(LocalDate(2026, 1, 1))),
+          ),
       )
     var partialValue: String? = "02/07"
     val questionnaireItem =
@@ -524,7 +530,7 @@ class DateViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.Date(
                     value = FhirR4DateType(value = FhirDate.Date(LocalDate(2020, 11, 19))),
                   ),
               ),
@@ -563,7 +569,7 @@ class DateViewFactoryTest {
               listOf(
                 QuestionnaireResponse.Item.Answer(
                   value =
-                    DateAnswerValue(
+                    QuestionnaireResponse.Item.Answer.Value.Date(
                       value = FhirR4DateType(value = FhirDate.Date(LocalDate(2020, 11, 19))),
                     ),
                 ),
@@ -644,7 +650,7 @@ class DateViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.Date(
                     value = FhirR4DateType(value = FhirDate.Date(LocalDate(2020, 11, 19))),
                   ),
               ),
@@ -689,7 +695,7 @@ class DateViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.Date(
                     value = FhirR4DateType(value = FhirDate.fromString("2026-01-01")),
                   ),
               ),
@@ -773,7 +779,7 @@ class DateViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.Date(
                     value = FhirR4DateType(value = FhirDate.fromString("2023-01-01")),
                   ),
               ),
@@ -851,7 +857,7 @@ class DateViewFactoryTest {
                 listOf(
                   QuestionnaireResponse.Item.Answer(
                     value =
-                      DateAnswerValue(
+                      QuestionnaireResponse.Item.Answer.Value.Date(
                         value = FhirR4DateType(value = FhirDate.Date(LocalDate(2020, 11, 19))),
                       ),
                   ),
@@ -885,7 +891,7 @@ class DateViewFactoryTest {
               listOf(
                 QuestionnaireResponse.Item.Answer(
                   value =
-                    DateAnswerValue(
+                    QuestionnaireResponse.Item.Answer.Value.Date(
                       value = FhirR4DateType(value = FhirDate.Date(LocalDate(2021, 11, 19))),
                     ),
                 ),

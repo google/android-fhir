@@ -41,7 +41,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.text.AnnotatedString
-import com.google.android.fhir.datacapture.extensions.DateTimeAnswerValue
 import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4String
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
@@ -164,7 +163,7 @@ class DateTimeViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateTimeAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.DateTime(
                     value =
                       DateTime(
                         value =
@@ -207,7 +206,7 @@ class DateTimeViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateTimeAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.DateTime(
                     value =
                       DateTime(
                         value =
@@ -252,7 +251,7 @@ class DateTimeViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateTimeAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.DateTime(
                     value =
                       DateTime(
                         value =
@@ -298,7 +297,7 @@ class DateTimeViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateTimeAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.DateTime(
                     value =
                       DateTime(
                         value =
@@ -342,7 +341,7 @@ class DateTimeViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateTimeAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.DateTime(
                     value =
                       DateTime(
                         value =
@@ -381,7 +380,7 @@ class DateTimeViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateTimeAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.DateTime(
                     value =
                       DateTime(
                         value =
@@ -409,7 +408,7 @@ class DateTimeViewFactoryTest {
     val answer =
       QuestionnaireResponse.Item.Answer(
         value =
-          DateTimeAnswerValue(
+          QuestionnaireResponse.Item.Answer.Value.DateTime(
             value =
               DateTime(
                 value =
@@ -433,7 +432,7 @@ class DateTimeViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateTimeAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.DateTime(
                     value =
                       DateTime(
                         value =
@@ -471,7 +470,7 @@ class DateTimeViewFactoryTest {
               listOf(
                 QuestionnaireResponse.Item.Answer(
                   value =
-                    DateTimeAnswerValue(
+                    QuestionnaireResponse.Item.Answer.Value.DateTime(
                       value =
                         DateTime(
                           value =
@@ -549,7 +548,7 @@ class DateTimeViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateTimeAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.DateTime(
                     value =
                       DateTime(
                         value =
@@ -740,7 +739,7 @@ class DateTimeViewFactoryTest {
             listOf(
               QuestionnaireResponse.Item.Answer(
                 value =
-                  DateTimeAnswerValue(
+                  QuestionnaireResponse.Item.Answer.Value.DateTime(
                     value =
                       DateTime(
                         value =
@@ -894,7 +893,7 @@ class DateTimeViewFactoryTest {
                 listOf(
                   QuestionnaireResponse.Item.Answer(
                     value =
-                      DateTimeAnswerValue(
+                      QuestionnaireResponse.Item.Answer.Value.DateTime(
                         value =
                           DateTime(
                             value =
@@ -936,7 +935,7 @@ class DateTimeViewFactoryTest {
               listOf(
                 QuestionnaireResponse.Item.Answer(
                   value =
-                    DateTimeAnswerValue(
+                    QuestionnaireResponse.Item.Answer.Value.DateTime(
                       value =
                         DateTime(
                           value =

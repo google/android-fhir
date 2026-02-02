@@ -32,7 +32,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.google.android.fhir.datacapture.DataCapture
-import com.google.android.fhir.datacapture.extensions.DateAnswerValue
 import com.google.android.fhir.datacapture.extensions.FhirR4DateType
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.extensions.entryFormat
@@ -248,7 +247,10 @@ internal object DateViewFactory : QuestionnaireItemViewFactory {
   ) =
     questionnaireViewItem.setAnswer(
       QuestionnaireResponse.Item.Answer(
-        value = DateAnswerValue(value = FhirR4DateType(value = FhirDate.Date(date = localDate))),
+        value =
+          QuestionnaireResponse.Item.Answer.Value.Date(
+            value = FhirR4DateType(value = FhirDate.Date(date = localDate)),
+          ),
       ),
     )
 }

@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.google.android.fhir.datacapture.DataCapture
-import com.google.android.fhir.datacapture.extensions.TimeAnswerValue
 import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -122,7 +121,7 @@ object TimeViewFactory : QuestionnaireItemViewFactory {
   ) =
     questionnaireViewItem.setAnswer(
       QuestionnaireResponse.Item.Answer(
-        value = TimeAnswerValue(value = Time(value = localDateTime)),
+        value = QuestionnaireResponse.Item.Answer.Value.Time(value = Time(value = localDateTime)),
       ),
     )
 }

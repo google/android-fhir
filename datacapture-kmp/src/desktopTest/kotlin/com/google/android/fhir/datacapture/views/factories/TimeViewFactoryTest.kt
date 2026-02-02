@@ -24,7 +24,6 @@ import androidx.compose.ui.test.hasTextExactly
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.runComposeUiTest
 import com.google.android.fhir.datacapture.extensions.FhirR4String
-import com.google.android.fhir.datacapture.extensions.TimeAnswerValue
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -99,7 +98,10 @@ class TimeViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = TimeAnswerValue(value = Time(value = LocalTime.parse("10:10:00"))),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Time(
+                    value = Time(value = LocalTime.parse("10:10:00")),
+                  ),
               ),
             ),
         ),
@@ -127,7 +129,10 @@ class TimeViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = TimeAnswerValue(value = Time(value = LocalTime.parse("10:10:00"))),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Time(
+                    value = Time(value = LocalTime.parse("10:10:00")),
+                  ),
               ),
             ),
         ),
@@ -158,7 +163,10 @@ class TimeViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = TimeAnswerValue(value = Time(value = LocalTime.parse("22:10:00"))),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Time(
+                    value = Time(value = LocalTime.parse("22:10:00")),
+                  ),
               ),
             ),
         ),
@@ -189,7 +197,10 @@ class TimeViewFactoryTest {
           answer =
             listOf(
               QuestionnaireResponse.Item.Answer(
-                value = TimeAnswerValue(value = Time(value = LocalTime.parse("22:10:00"))),
+                value =
+                  QuestionnaireResponse.Item.Answer.Value.Time(
+                    value = Time(value = LocalTime.parse("22:10:00")),
+                  ),
               ),
             ),
         ),
