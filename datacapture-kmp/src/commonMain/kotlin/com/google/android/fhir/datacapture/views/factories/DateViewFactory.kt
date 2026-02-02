@@ -31,13 +31,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.FhirR4DateType
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.extensions.entryFormat
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
 import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.extensions.toLocalDate
+import com.google.android.fhir.datacapture.getLocalDateTimeFormatter
 import com.google.android.fhir.datacapture.isValidDateEntryFormat
 import com.google.android.fhir.datacapture.parseLocalDateOrNull
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
@@ -65,7 +65,7 @@ internal object DateViewFactory : QuestionnaireItemViewFactory {
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
     val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
-    val localDateTimeFormatter = remember { DataCapture.getConfiguration().localDateTimeFormatter }
+    val localDateTimeFormatter = getLocalDateTimeFormatter()
     val isReadOnly =
       remember(questionnaireViewItem) {
         questionnaireViewItem.questionnaireItem.readOnly?.value ?: false

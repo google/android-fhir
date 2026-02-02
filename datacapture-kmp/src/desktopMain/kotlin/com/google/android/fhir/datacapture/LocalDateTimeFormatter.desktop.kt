@@ -16,32 +16,27 @@
 
 package com.google.android.fhir.datacapture
 
-import android.content.Context
-import android.icu.text.DateFormat
-import android.text.format.DateFormat as AndroidDateFormat
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import com.google.android.fhir.datacapture.extensions.length
 import java.text.ParseException
-import java.time.ZoneId
 import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
-import java.util.Date
+import java.util.Locale
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toJavaLocalTime
 import kotlinx.datetime.toKotlinLocalDate
 
-class AndroidLocalDateFormatter(private val context: Context) : LocalDateTimeFormatter {
-  private val currentLocale by lazy { context.resources.configuration.locales[0] }
-
+object JVMLocalDateTimeFormatter : LocalDateTimeFormatter {
   override fun parseStringToLocalDate(
     str: String,
     pattern: String,
   ): LocalDate {
-    val localDate =
-      java.time.LocalDate.parse(str, DateTimeFormatter.ofPattern(pattern, currentLocale))
+    val localDate = java.time.LocalDate.parse(str, DateTimeFormatter.ofPattern(pattern))
 
     // Throw ParseException if year is less than 4 digits.
     if (localDate.year.length() < 4) {
@@ -51,17 +46,14 @@ class AndroidLocalDateFormatter(private val context: Context) : LocalDateTimeFor
     if (localDate.year.length() > 4) {
       throw ParseException("Year has more than 4 digits.", str.indexOf('y'))
     }
-
     return localDate.toKotlinLocalDate()
   }
 
   override fun format(localDate: LocalDate, pattern: String?): String =
     if (pattern.isNullOrEmpty()) {
-      val date =
-        Date.from(localDate.toJavaLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant())
-      DateFormat.getDateInstance(DateFormat.SHORT, currentLocale).format(date)
+      DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).format(localDate.toJavaLocalDate())
     } else {
-      DateTimeFormatter.ofPattern(pattern, currentLocale).format(localDate.toJavaLocalDate())
+      DateTimeFormatter.ofPattern(pattern).format(localDate.toJavaLocalDate())
     }
 
   override val localDateShortFormatPattern: String
@@ -70,21 +62,15 @@ class AndroidLocalDateFormatter(private val context: Context) : LocalDateTimeFor
         FormatStyle.SHORT,
         null,
         IsoChronology.INSTANCE,
-        currentLocale,
+        Locale.getDefault(),
       )
 
-  // ICU on Android does not observe the user's 24h/12h time format setting (obtained from
-  // DateFormat.is24HourFormat()). In order to observe the setting, we are using DateFormat as
-  // suggested in the docs. See
-  // https://developer.android.com/guide/topics/resources/internationalization#24h-setting for
-  // details.
   override fun localizedTimeString(time: LocalTime): String {
-    val date =
-      Date.from(
-        java.time.LocalDateTime.of(java.time.LocalDate.now(), time.toJavaLocalTime())
-          .atZone(ZoneId.systemDefault())
-          .toInstant(),
-      )
-    return AndroidDateFormat.getTimeFormat(context).format(date)
+    return DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(time.toJavaLocalTime())
   }
+}
+
+@Composable
+actual fun getLocalDateTimeFormatter(): LocalDateTimeFormatter {
+  return remember { JVMLocalDateTimeFormatter }
 }

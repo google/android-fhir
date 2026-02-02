@@ -1,5 +1,5 @@
 /*
- * Copyright 2025-2026 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,10 @@ actual object DataCapture {
         if (context.applicationContext is DataCaptureConfig.Provider) {
           (context.applicationContext as DataCaptureConfig.Provider).getDataCaptureConfig()
         } else {
-          DataCaptureConfig(localDateTimeFormatter = AndroidLocalDateFormatter(context))
+          DataCaptureConfig()
         }
     }
+    return
   }
 
   actual fun getConfiguration(): DataCaptureConfig {

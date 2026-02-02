@@ -1,5 +1,5 @@
 /*
- * Copyright 2025-2026 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,6 @@ package com.google.android.fhir.datacapture
 actual object DataCapture {
   actual fun getConfiguration(): DataCaptureConfig {
     // TODO Replace default configuration with actual data capture configuration
-    return DataCaptureConfig(localDateTimeFormatter = IosLocalDateTimeFormatter)
+    return DataCaptureConfig()
   }
 }

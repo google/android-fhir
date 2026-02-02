@@ -26,8 +26,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.itemMedia
+import com.google.android.fhir.datacapture.getLocalDateTimeFormatter
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.Header
@@ -51,7 +51,7 @@ object TimeViewFactory : QuestionnaireItemViewFactory {
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
     val requiredTextNewLineStringResource = stringResource(Res.string.required_text_and_new_line)
-    val localDateTimeFormatter = remember { DataCapture.getConfiguration().localDateTimeFormatter }
+    val localDateTimeFormatter = getLocalDateTimeFormatter()
     val validationMessage =
       remember(questionnaireViewItem.validationResult) {
         val validationMessage =

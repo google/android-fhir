@@ -1,5 +1,5 @@
 /*
- * Copyright 2025-2026 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.example.sdckmpdemo
 
 import android.app.Application
-import com.google.android.fhir.datacapture.AndroidLocalDateFormatter
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.DataCaptureConfig
 
@@ -29,8 +28,6 @@ class DemoApplication : Application(), DataCaptureConfig.Provider {
   }
 
   override fun getDataCaptureConfig(): DataCaptureConfig {
-    return DataCaptureConfig(
-      localDateTimeFormatter = AndroidLocalDateFormatter(this@DemoApplication),
-    )
+    return DataCaptureConfig()
   }
 }

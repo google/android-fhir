@@ -16,9 +16,10 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.decodeToImageBitmap
-import com.google.android.fhir.datacapture.DataCapture
+import com.google.android.fhir.datacapture.getLocalDateTimeFormatter
 import com.google.fhir.model.r4.Element
 import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.FhirDate
@@ -130,14 +131,16 @@ val Questionnaire.Item.AnswerOption.Value.id: String?
  * Returns what to display on the UI depending on the [QuestionnaireItemAnswerOptionValue]. Used to
  * get the display representation for item answer options.
  */
+@Composable
 fun QuestionnaireItemAnswerOptionValue.displayString(): String = getDisplayString(this) ?: ""
 
-private fun getDisplayString(type: QuestionnaireItemAnswerOptionValue): String? =
+@Composable
+internal fun getDisplayString(type: QuestionnaireItemAnswerOptionValue): String? =
   when (type) {
     is Questionnaire.Item.AnswerOption.Value.Coding -> type.value.display?.getLocalizedText()
         ?: type.value.code?.value
     is Questionnaire.Item.AnswerOption.Value.Date -> {
-      val localDateFormatter = DataCapture.getConfiguration().localDateTimeFormatter
+      val localDateFormatter = getLocalDateTimeFormatter()
       val localDate = (type.value.value as? FhirDate.Date)?.date
       localDate?.let { localDateFormatter.format(it) }
     }
@@ -146,7 +149,7 @@ private fun getDisplayString(type: QuestionnaireItemAnswerOptionValue): String? 
         ?: type.value.reference?.value
     is Questionnaire.Item.AnswerOption.Value.String -> type.value.getLocalizedText()
     is Questionnaire.Item.AnswerOption.Value.Time -> {
-      val localDateFormatter = DataCapture.getConfiguration().localDateTimeFormatter
+      val localDateFormatter = getLocalDateTimeFormatter()
       val localTime = type.value.value
       localTime?.let { localDateFormatter.localizedTimeString(it) }
     }

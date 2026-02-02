@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.datacapture
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import kotlin.time.ExperimentalTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
@@ -84,4 +86,9 @@ object IosLocalDateTimeFormatter : LocalDateTimeFormatter {
 
     return calendar.dateFromComponents(components)
   }
+}
+
+@Composable
+actual fun getLocalDateTimeFormatter(): LocalDateTimeFormatter {
+  return remember { IosLocalDateTimeFormatter }
 }

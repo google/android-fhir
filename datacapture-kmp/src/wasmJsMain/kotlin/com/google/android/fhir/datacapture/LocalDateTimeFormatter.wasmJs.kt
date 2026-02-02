@@ -16,21 +16,24 @@
 
 package com.google.android.fhir.datacapture
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import com.google.android.fhir.datacapture.extensions.length
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-import kotlin.time.toJSDate
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atDate
+import kotlinx.datetime.format
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
 
 @OptIn(FormatStringsInDatetimeFormats::class)
-object JsLocalDateTimeFormatter : LocalDateTimeFormatter {
+object WasmJsLocalDateTimeFormatter : LocalDateTimeFormatter {
   override fun parseStringToLocalDate(
     str: String,
     pattern: String,
@@ -54,7 +57,7 @@ object JsLocalDateTimeFormatter : LocalDateTimeFormatter {
       if (!pattern.isNullOrEmpty()) {
         LocalDate.Format { byUnicodePattern(pattern) }
       } else {
-        LocalDate.Formats.ISO // Default to ISO format: yyyy-MM-dd
+        LocalDate.Formats.ISO
       }
 
     return format.format(localDate)
@@ -65,11 +68,18 @@ object JsLocalDateTimeFormatter : LocalDateTimeFormatter {
 
   @OptIn(ExperimentalTime::class)
   override fun localizedTimeString(time: LocalTime): String {
-    val jsDate =
+    val dateTime =
       time
         .atDate(Clock.System.todayIn(TimeZone.currentSystemDefault()))
         .toInstant(TimeZone.currentSystemDefault())
-        .toJSDate()
-    return jsDate.toLocaleTimeString()
+        .toLocalDateTime(
+          TimeZone.currentSystemDefault(),
+        )
+    return dateTime.time.format(LocalTime.Formats.ISO)
   }
+}
+
+@Composable
+actual fun getLocalDateTimeFormatter(): LocalDateTimeFormatter {
+  return remember { WasmJsLocalDateTimeFormatter }
 }

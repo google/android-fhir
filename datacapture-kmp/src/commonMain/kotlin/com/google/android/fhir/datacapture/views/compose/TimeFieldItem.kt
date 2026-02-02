@@ -45,7 +45,7 @@ import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import com.google.android.fhir.datacapture.DataCapture
+import com.google.android.fhir.datacapture.getLocalDateTimeFormatter
 import kotlinx.datetime.LocalTime
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -65,7 +65,7 @@ internal fun TimeFieldItem(
 ) {
   val focusManager = LocalFocusManager.current
   val keyboardController = LocalSoftwareKeyboardController.current
-  val localDateTimeFormatter = remember { DataCapture.getConfiguration().localDateTimeFormatter }
+  val localDateTimeFormatter = getLocalDateTimeFormatter()
 
   var selectedTimeTextDisplay by
     remember(timeSelectedDisplay) { mutableStateOf(timeSelectedDisplay ?: "") }

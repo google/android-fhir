@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture
 
+import androidx.compose.runtime.Composable
 import co.touchlab.kermit.Logger
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -79,3 +80,5 @@ internal fun LocalDateTimeFormatter.isValidDateEntryFormat(entryFormat: String?)
   }
     ?: false
 }
+
+@Composable expect fun getLocalDateTimeFormatter(): LocalDateTimeFormatter

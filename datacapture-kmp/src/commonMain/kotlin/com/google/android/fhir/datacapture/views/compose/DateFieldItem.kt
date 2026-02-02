@@ -51,8 +51,8 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.toLocalDate
+import com.google.android.fhir.datacapture.getLocalDateTimeFormatter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -79,7 +79,7 @@ internal fun DateFieldItem(
   val focusManager = LocalFocusManager.current
   val keyboardController = LocalSoftwareKeyboardController.current
   val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
-  val localDateTimeFormatter = remember { DataCapture.getConfiguration().localDateTimeFormatter }
+  val localDateTimeFormatter = getLocalDateTimeFormatter()
 
   var dateInputDisplay by
     remember(dateInput) {
