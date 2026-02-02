@@ -24,7 +24,7 @@ import androidx.compose.ui.window.application
 fun main() = application {
   Window(
     onCloseRequest = ::exitApplication,
-    title = "FHIR Catalog",
+    title = "Structured data capture catalog",
     state = WindowState(placement = WindowPlacement.Maximized),
   ) {
     App()
