@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 Google LLC
+ * Copyright 2022-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ interface QuestionnaireItemViewFactory {
   @Composable fun Content(questionnaireViewItem: QuestionnaireViewItem)
 }
 
-internal object EmptyQuestionnaireViewFactory: QuestionnaireItemViewFactory {
+internal object EmptyQuestionnaireViewFactory : QuestionnaireItemViewFactory {
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
     // This is an empty place holder for view factories that are not implemented

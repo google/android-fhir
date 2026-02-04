@@ -109,7 +109,11 @@ internal fun QuestionnaireEditList(
         is QuestionnaireAdapterItem.Question -> {
           val questionnaireViewHolderType = getItemViewTypeForQuestion(adapterItem.item)
           val questionnaireItemViewHolderDelegate =
-            getQuestionnaireItemViewFactory(questionnaireViewHolderType)
+            getQuestionnaireItemViewFactory(
+              adapterItem.item.questionnaireItem,
+              questionnaireViewHolderType,
+              questionnaireItemViewHolderMatchers,
+            )
           questionnaireItemViewHolderDelegate.Content(adapterItem.item)
         }
         is QuestionnaireAdapterItem.Navigation -> {
@@ -315,36 +319,25 @@ private fun QuestionnaireReviewItem(
   }
 }
 
-// TODO provide option to override factory
-/*private fun getQuestionnaireItemViewHolder(
-  parent: ViewGroup,
-  questionnaireViewItem: QuestionnaireViewItem,
-  questionnaireItemViewHolderMatchers:
-  List<QuestionnaireItemViewHolderFactoryMatcher>,
-): QuestionnaireItemViewHolder {
-  // Find a matching custom widget
-  val questionnaireViewHolderFactory =
-    questionnaireItemViewHolderMatchers
-      .find { it.matches(questionnaireViewItem.questionnaireItem) }
-      ?.factory
-      ?: getQuestionnaireItemViewHolderFactory(getItemViewTypeForQuestion(questionnaireViewItem))
-  return questionnaireViewHolderFactory.create(parent)
-}*/
-
 fun getQuestionnaireItemViewFactory(
+  questionnaireItem: Questionnaire.Item,
   questionnaireViewHolderType: QuestionnaireViewHolderType,
+  questionnaireItemViewHolderMatchers: List<QuestionnaireItemViewHolderFactoryMatcher>,
 ): QuestionnaireItemViewFactory {
-  return when (questionnaireViewHolderType) {
-    QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE -> EditTextSingleLineViewFactory
-    QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE -> EditTextMultiLineViewFactory
-    QuestionnaireViewHolderType.EDIT_TEXT_INTEGER -> EditTextIntegerViewFactory
-    QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewFactory
-    QuestionnaireViewHolderType.QUANTITY -> QuantityViewFactory
-    QuestionnaireViewHolderType.DISPLAY -> DisplayViewFactory
-    QuestionnaireViewHolderType.SLIDER -> SliderViewFactory
-    QuestionnaireViewHolderType.PHONE_NUMBER -> EditTextPhoneNumberViewFactory
-    else -> EmptyQuestionnaireViewFactory
-  }
+  val questionnaireViewHolderFactory =
+    questionnaireItemViewHolderMatchers.find { it.matches(questionnaireItem) }?.factory
+  return questionnaireViewHolderFactory
+    ?: when (questionnaireViewHolderType) {
+      QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE -> EditTextSingleLineViewFactory
+      QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE -> EditTextMultiLineViewFactory
+      QuestionnaireViewHolderType.EDIT_TEXT_INTEGER -> EditTextIntegerViewFactory
+      QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewFactory
+      QuestionnaireViewHolderType.QUANTITY -> QuantityViewFactory
+      QuestionnaireViewHolderType.DISPLAY -> DisplayViewFactory
+      QuestionnaireViewHolderType.SLIDER -> SliderViewFactory
+      QuestionnaireViewHolderType.PHONE_NUMBER -> EditTextPhoneNumberViewFactory
+      else -> EmptyQuestionnaireViewFactory
+    }
 }
 
 /**

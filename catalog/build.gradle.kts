@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
   id("org.jetbrains.kotlin.multiplatform")
@@ -53,11 +54,9 @@ kotlin {
       val rootProjectDir = rootProject.projectDir.path
       commonWebpackConfig {
         devServer =
-          (devServer
-              ?: org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.DevServer())
-            .copy(
-              static = (devServer?.static ?: mutableListOf()).apply { add(rootProjectDir) },
-            )
+          (devServer ?: KotlinWebpackConfig.DevServer()).copy(
+            static = (devServer?.static ?: mutableListOf()).apply { add(rootProjectDir) },
+          )
       }
     }
     binaries.executable()
