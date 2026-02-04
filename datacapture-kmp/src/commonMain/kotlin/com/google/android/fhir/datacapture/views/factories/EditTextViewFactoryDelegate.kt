@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 Google LLC
+ * Copyright 2022-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,8 +83,9 @@ class EditTextViewFactoryDelegate(
     Column(
       modifier =
         Modifier.padding(
-          horizontal = 16.dp,
-          vertical = 16.dp,
+          start = 16.dp,
+          end = 16.dp,
+          bottom = 8.dp,
         ),
     ) {
       Header(questionnaireViewItem)

@@ -96,6 +96,7 @@ kotlin {
       implementation(libs.androidx.lifecycle.viewmodel.compose)
       implementation(libs.androidx.lifecycle.runtime.compose)
       implementation(libs.material.icons.extended)
+      implementation(libs.kermit)
       implementation(libs.kotlin.fhir)
       implementation(libs.kotlinx.serialization.json)
       implementation(libs.kotlinx.coroutines.core)

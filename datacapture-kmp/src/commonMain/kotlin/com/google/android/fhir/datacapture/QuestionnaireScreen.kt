@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -274,11 +275,14 @@ fun QuestionnaireTitleBar(
     )
 
     if (showEditButton) {
-      OutlinedButton(onClick = onEditClick) {
+      OutlinedButton(
+        onClick = onEditClick,
+        colors =
+          ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+      ) {
         Icon(
           imageVector = Icons.Outlined.Edit,
           contentDescription = "Edit",
-          tint = MaterialTheme.colorScheme.primary,
         )
         Text(text = stringResource(Res.string.edit_button_text))
       }
