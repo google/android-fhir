@@ -45,6 +45,9 @@ import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverAnnotatedString
 import com.google.android.fhir.datacapture.extensions.toQuestionnaireResponseItemAnswer
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.Header
 import com.google.android.fhir.datacapture.views.compose.MediaItem
@@ -78,14 +81,18 @@ internal object DialogSelectViewFactory : QuestionnaireItemViewFactory {
 
     val validationResultMessage =
       remember(questionnaireViewItem.validationResult) {
-        questionnaireViewItem.validationResult.singleStringValidationMessage?.let {
-          if (
-            questionnaireViewItem.questionnaireItem.required?.value == true &&
-              questionnaireViewItem.questionViewTextConfiguration.showRequiredText
-          ) {
-            "$requiredTextAndNewLineString$it"
-          } else {
-            it
+        when (val validationResult = questionnaireViewItem.validationResult) {
+          is NotValidated,
+          Valid, -> null
+          is Invalid -> {
+            if (
+              questionnaireViewItem.questionnaireItem.required?.value == true &&
+                questionnaireViewItem.questionViewTextConfiguration.showRequiredText
+            ) {
+              "$requiredTextAndNewLineString$validationResult"
+            } else {
+              validationResult.singleStringValidationMessage
+            }
           }
         }
       }
@@ -105,7 +112,6 @@ internal object DialogSelectViewFactory : QuestionnaireItemViewFactory {
       remember(questionnaireViewItem) {
         mutableStateOf(questionnaireViewItem.extractInitialOptions())
       }
-    val selectedOptionsString = remember(selectedOptions) { selectedOptions.selectedSummary }
     val dialogTitle =
       remember(questionnaireViewItem) {
         questionnaireViewItem.questionText ?: hintLabelText ?: AnnotatedString("")
@@ -135,7 +141,7 @@ internal object DialogSelectViewFactory : QuestionnaireItemViewFactory {
       var expanded by remember { mutableStateOf(false) }
       ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
         OutlinedTextField(
-          value = selectedOptionsString,
+          value = selectedOptions.selectedSummary,
           onValueChange = {},
           readOnly = true,
           modifier =

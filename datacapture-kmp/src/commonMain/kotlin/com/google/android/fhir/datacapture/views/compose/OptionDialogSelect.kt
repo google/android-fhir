@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.elementValue
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.optionExclusive
 import com.google.android.fhir.datacapture.extensions.toAnnotatedString
@@ -355,8 +356,10 @@ data class SelectedOptions(
   val options: List<OptionSelectOption>,
   val otherOptions: List<String>,
 ) {
-  val selectedSummary: String =
-    (options.filter { it.selected }.map { it.displayString } + otherOptions).joinToString()
+
+  @get:Composable
+  val selectedSummary: String
+    get() = (options.filter { it.selected }.map { it.displayString } + otherOptions).joinToString()
 }
 
 /** Represents selectable options in the multi-select page. */
@@ -364,7 +367,9 @@ data class OptionSelectOption(
   val item: Questionnaire.Item.AnswerOption,
   val selected: Boolean,
 ) {
-  val displayString: String = item.value.displayString()
+  @get:Composable
+  val displayString: String
+    get() = item.displayString()
 }
 
 /** Sealed class representing different types of rows in the option select dialog. */
@@ -395,9 +400,9 @@ internal sealed class OptionSelectRow {
   /** "Add Another" other field button. Only used in multi-select when [OtherRow] is selected. */
   object OtherAddAnother : OptionSelectRow()
 
-  fun key(): Any =
+  fun key() =
     when (this) {
-      is Option -> "option_${option.displayString}"
+      is Option -> "option_${option.item.elementValue}"
       is OtherRow -> "other_row"
       is OtherEditText -> "other_edit_$id"
       OtherAddAnother -> "add_another"

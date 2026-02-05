@@ -108,8 +108,9 @@ internal object RadioGroupViewFactory : QuestionnaireItemViewFactory {
               Arrangement.spacedBy(QuestionnaireTheme.dimensions.optionItemMarginVertical),
           ) {
             enabledAnswerOptions.forEach {
+              val answerOptionDisplay = it.displayString()
               ChoiceRadioButton(
-                label = remember(it) { AnnotatedString(it.value.displayString()) },
+                label = remember(it) { AnnotatedString(answerOptionDisplay) },
                 selected = it == selectedAnswerOption,
                 enabled = !readOnly,
                 modifier = Modifier.weight(1f).testTag(RADIO_OPTION_TAG),
@@ -127,8 +128,9 @@ internal object RadioGroupViewFactory : QuestionnaireItemViewFactory {
               Arrangement.spacedBy(QuestionnaireTheme.dimensions.optionItemMarginVertical),
           ) {
             enabledAnswerOptions.forEach {
+              val answerOptionDisplay = it.displayString()
               ChoiceRadioButton(
-                label = remember(it) { AnnotatedString(it.value.displayString()) },
+                label = remember(it) { AnnotatedString(answerOptionDisplay) },
                 selected = it == selectedAnswerOption,
                 enabled = !readOnly,
                 modifier = Modifier.fillMaxWidth().testTag(RADIO_OPTION_TAG),

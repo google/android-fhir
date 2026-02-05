@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.decodeToImageBitmap
 import com.google.fhir.model.r4.Element
@@ -123,21 +124,8 @@ val Questionnaire.Item.AnswerOption.Value.id: String?
     }
 
 /**
- * Returns what to display on the UI depending on the [QuestionnaireItemAnswerOptionValue]. Used to
- * get the display representation for item answer options.
+ * Returns what to display on the UI depending on the [Questionnaire.Item.AnswerOption]. Used to get
+ * the display representation for item answer options.
  */
-fun QuestionnaireItemAnswerOptionValue.displayString(): String = getDisplayString(this) ?: ""
-
-private fun getDisplayString(type: QuestionnaireItemAnswerOptionValue): String? =
-  when (type) {
-    is Questionnaire.Item.AnswerOption.Value.Coding -> type.value.display?.getLocalizedText()
-        ?: type.value.code?.value
-    is Questionnaire.Item.AnswerOption.Value.Date -> TODO("Requires locale based formatting")
-    is Questionnaire.Item.AnswerOption.Value.Integer -> type.value.value?.toString()
-    is Questionnaire.Item.AnswerOption.Value.Reference -> type.value.display?.value
-        ?: type.value.reference?.value
-    is Questionnaire.Item.AnswerOption.Value.String -> type.value.getLocalizedText()
-    is Questionnaire.Item.AnswerOption.Value.Time -> TODO("Requires locale based formatting")
-  }
-
-typealias QuestionnaireItemAnswerOptionValue = Questionnaire.Item.AnswerOption.Value
+@Composable
+fun Questionnaire.Item.AnswerOption.displayString(): String = this.elementValue.displayString ?: ""

@@ -128,9 +128,9 @@ internal object CheckBoxGroupViewFactory : QuestionnaireItemViewFactory {
               Arrangement.spacedBy(QuestionnaireTheme.dimensions.optionItemMarginVertical),
           ) {
             enabledAnswerOptions.forEach { answerOption ->
+              val answerOptionDisplay = answerOption.displayString()
               ChoiceCheckbox(
-                label =
-                  remember(answerOption) { AnnotatedString(answerOption.value.displayString()) },
+                label = remember(answerOption) { AnnotatedString(answerOptionDisplay) },
                 checked = answerOption in selectedAnswerOptions,
                 enabled = !readOnly,
                 modifier = Modifier.weight(1f).testTag(CHECKBOX_OPTION_TAG),
@@ -148,9 +148,9 @@ internal object CheckBoxGroupViewFactory : QuestionnaireItemViewFactory {
               Arrangement.spacedBy(QuestionnaireTheme.dimensions.optionItemMarginVertical),
           ) {
             enabledAnswerOptions.forEach { answerOption ->
+              val answerOptionDisplay = answerOption.displayString()
               ChoiceCheckbox(
-                label =
-                  remember(answerOption) { AnnotatedString(answerOption.value.displayString()) },
+                label = remember(answerOption) { AnnotatedString(answerOptionDisplay) },
                 checked = answerOption in selectedAnswerOptions,
                 enabled = !readOnly,
                 modifier = Modifier.fillMaxWidth().testTag(CHECKBOX_OPTION_TAG),

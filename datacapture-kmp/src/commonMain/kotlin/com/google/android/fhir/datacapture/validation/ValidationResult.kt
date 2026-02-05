@@ -16,14 +16,13 @@
 
 package com.google.android.fhir.datacapture.validation
 
-sealed class ValidationResult(open val singleStringValidationMessage: String? = null)
+sealed class ValidationResult
 
 object NotValidated : ValidationResult()
 
 object Valid : ValidationResult()
 
-data class Invalid(
-  private val validationMessages: List<String>,
-  override val singleStringValidationMessage: String =
-    validationMessages.joinToString(separator = "\n"),
-) : ValidationResult()
+data class Invalid(private val validationMessages: List<String>) : ValidationResult() {
+  val singleStringValidationMessage: String
+    get() = this.validationMessages.joinToString(separator = "\n")
+}
