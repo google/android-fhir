@@ -89,7 +89,7 @@ internal object DialogSelectViewFactory : QuestionnaireItemViewFactory {
               questionnaireViewItem.questionnaireItem.required?.value == true &&
                 questionnaireViewItem.questionViewTextConfiguration.showRequiredText
             ) {
-              "$requiredTextAndNewLineString$validationResult"
+              "$requiredTextAndNewLineString${validationResult.singleStringValidationMessage}"
             } else {
               validationResult.singleStringValidationMessage
             }
