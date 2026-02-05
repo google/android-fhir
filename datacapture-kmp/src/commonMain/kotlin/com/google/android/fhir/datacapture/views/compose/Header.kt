@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,7 +157,7 @@ internal fun Header(
     if (displayValidationResult && validationResult is Invalid) {
       Text(
         modifier = Modifier.testTag(ERROR_TEXT_AT_HEADER_TEST_TAG),
-        text = validationResult.getSingleStringValidationMessage(),
+        text = validationResult.singleStringValidationMessage,
         color = QuestionnaireTheme.colorScheme.error,
         style = QuestionnaireTheme.typography.bodySmall,
       )

@@ -46,7 +46,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimePickerDialog(
+internal fun TimePickerDialog(
   type: TimeInputMode,
   initialSelectedHour: Int = 0,
   initialSelectedMinute: Int = 0,
@@ -122,7 +122,7 @@ fun TimePickerDialog(
   )
 }
 
-sealed interface TimeInputMode {
+internal sealed interface TimeInputMode {
   object KEYBOARD : TimeInputMode
 
   object CLOCK : TimeInputMode

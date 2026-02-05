@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverAnnotatedString
 import com.google.android.fhir.datacapture.extensions.unit
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.EditTextFieldItem
 import com.google.android.fhir.datacapture.views.compose.EditTextFieldState
@@ -107,7 +108,10 @@ class EditTextViewFactoryDelegate(
       if (questionnaireViewItem.draftAnswer != null) {
         stringResource(validationMessageStringRes, *validationMessageStringResArgs)
       } else {
-        questionnaireViewItem.validationResult.getSingleStringValidationMessage()
+        when (val validationResult = questionnaireViewItem.validationResult) {
+          is Invalid -> validationResult.singleStringValidationMessage
+          else -> null
+        }
       }
 
     return if (

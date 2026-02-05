@@ -41,6 +41,7 @@ import com.google.android.fhir.datacapture.getLocalDateTimeFormatter
 import com.google.android.fhir.datacapture.isValidDateEntryFormat
 import com.google.android.fhir.datacapture.parseLocalDateOrNull
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.DateFieldItem
 import com.google.android.fhir.datacapture.views.compose.DateInput
@@ -149,7 +150,10 @@ internal object DateViewFactory : QuestionnaireItemViewFactory {
             // so we display an error.
             invalidDraftDateErrorString
           } else {
-            questionnaireViewItem.validationResult.getSingleStringValidationMessage()
+            when (val validationResult = questionnaireViewItem.validationResult) {
+              is Invalid -> validationResult.singleStringValidationMessage
+              else -> null
+            }
           }
 
         if (

@@ -51,6 +51,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+internal const val TIME_PICKER_INPUT_FIELD = "time_picker_text_field"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TimeFieldItem(
@@ -145,7 +147,7 @@ internal fun TimeFieldItem(
 
 @Composable
 @Preview
-fun PreviewTimePickerItem() {
+internal fun PreviewTimePickerItem() {
   TimeFieldItem(
     Modifier,
     null,
@@ -156,5 +158,3 @@ fun PreviewTimePickerItem() {
     false,
   ) {}
 }
-
-const val TIME_PICKER_INPUT_FIELD = "time_picker_text_field"

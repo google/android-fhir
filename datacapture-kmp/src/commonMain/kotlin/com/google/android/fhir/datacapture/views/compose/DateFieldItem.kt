@@ -61,6 +61,8 @@ import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
+internal const val DATE_TEXT_INPUT_FIELD = "date_picker_text_field"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DateFieldItem(
@@ -244,11 +246,11 @@ internal fun DatePickerModal(
   }
 }
 
-typealias DateFormatPattern = String
+internal typealias DateFormatPattern = String
 
-data class DateInput(val display: String, val value: LocalDate?)
+internal data class DateInput(val display: String, val value: LocalDate?)
 
-data class DateInputFormat(val pattern: String, val delimiter: Char) {
+internal data class DateInputFormat(val pattern: String, val delimiter: Char) {
   val delimiterIndex = pattern.indices.filter { pattern[it] == delimiter }
   val delimiterExistsInPattern = delimiterIndex.isNotEmpty()
 
@@ -261,5 +263,3 @@ data class DateInputFormat(val pattern: String, val delimiter: Char) {
           .isNotEmpty())
       .or(text.isEmpty())
 }
-
-const val DATE_TEXT_INPUT_FIELD = "date_picker_text_field"

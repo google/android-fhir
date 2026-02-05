@@ -19,10 +19,8 @@ package com.google.android.fhir.datacapture.extensions
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.decodeToImageBitmap
-import com.google.android.fhir.datacapture.getLocalDateTimeFormatter
 import com.google.fhir.model.r4.Element
 import com.google.fhir.model.r4.Extension
-import com.google.fhir.model.r4.FhirDate
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 
@@ -69,50 +67,48 @@ fun Questionnaire.Item.AnswerOption.itemAnswerOptionImage(): ImageBitmap? {
 
 val Questionnaire.Item.AnswerOption.elementValue: Element
   get() =
-    when (this.value) {
-      is Questionnaire.Item.AnswerOption.Value.Reference ->
-        (value as Questionnaire.Item.AnswerOption.Value.Reference).value
-      is Questionnaire.Item.AnswerOption.Value.Coding ->
-        (value as Questionnaire.Item.AnswerOption.Value.Coding).value
-      is Questionnaire.Item.AnswerOption.Value.Date ->
-        (value as Questionnaire.Item.AnswerOption.Value.Date).value
-      is Questionnaire.Item.AnswerOption.Value.Integer ->
-        (value as Questionnaire.Item.AnswerOption.Value.Integer).value
-      is Questionnaire.Item.AnswerOption.Value.String ->
-        (value as Questionnaire.Item.AnswerOption.Value.String).value
-      is Questionnaire.Item.AnswerOption.Value.Time ->
-        (value as Questionnaire.Item.AnswerOption.Value.Time).value
+    this.value.let {
+      when (it) {
+        is Questionnaire.Item.AnswerOption.Value.Reference -> it.value
+        is Questionnaire.Item.AnswerOption.Value.Coding -> it.value
+        is Questionnaire.Item.AnswerOption.Value.Date -> it.value
+        is Questionnaire.Item.AnswerOption.Value.Integer -> it.value
+        is Questionnaire.Item.AnswerOption.Value.String -> it.value
+        is Questionnaire.Item.AnswerOption.Value.Time -> it.value
+      }
     }
 
 fun Questionnaire.Item.AnswerOption.toQuestionnaireResponseItemAnswer():
   QuestionnaireResponse.Item.Answer =
   QuestionnaireResponse.Item.Answer(
     value =
-      when (value) {
-        is Questionnaire.Item.AnswerOption.Value.Integer ->
-          QuestionnaireResponse.Item.Answer.Value.Integer(
-            value = (value as Questionnaire.Item.AnswerOption.Value.Integer).value,
-          )
-        is Questionnaire.Item.AnswerOption.Value.Coding ->
-          QuestionnaireResponse.Item.Answer.Value.Coding(
-            value = (value as Questionnaire.Item.AnswerOption.Value.Coding).value,
-          )
-        is Questionnaire.Item.AnswerOption.Value.Date ->
-          QuestionnaireResponse.Item.Answer.Value.Date(
-            value = (value as Questionnaire.Item.AnswerOption.Value.Date).value,
-          )
-        is Questionnaire.Item.AnswerOption.Value.Reference ->
-          QuestionnaireResponse.Item.Answer.Value.Reference(
-            value = (value as Questionnaire.Item.AnswerOption.Value.Reference).value,
-          )
-        is Questionnaire.Item.AnswerOption.Value.String ->
-          QuestionnaireResponse.Item.Answer.Value.String(
-            value = (value as Questionnaire.Item.AnswerOption.Value.String).value,
-          )
-        is Questionnaire.Item.AnswerOption.Value.Time ->
-          QuestionnaireResponse.Item.Answer.Value.Time(
-            value = (value as Questionnaire.Item.AnswerOption.Value.Time).value,
-          )
+      value.let {
+        when (it) {
+          is Questionnaire.Item.AnswerOption.Value.Integer ->
+            QuestionnaireResponse.Item.Answer.Value.Integer(
+              value = it.value,
+            )
+          is Questionnaire.Item.AnswerOption.Value.Coding ->
+            QuestionnaireResponse.Item.Answer.Value.Coding(
+              value = it.value,
+            )
+          is Questionnaire.Item.AnswerOption.Value.Date ->
+            QuestionnaireResponse.Item.Answer.Value.Date(
+              value = it.value,
+            )
+          is Questionnaire.Item.AnswerOption.Value.Reference ->
+            QuestionnaireResponse.Item.Answer.Value.Reference(
+              value = it.value,
+            )
+          is Questionnaire.Item.AnswerOption.Value.String ->
+            QuestionnaireResponse.Item.Answer.Value.String(
+              value = it.value,
+            )
+          is Questionnaire.Item.AnswerOption.Value.Time ->
+            QuestionnaireResponse.Item.Answer.Value.Time(
+              value = it.value,
+            )
+        }
       },
   )
 
@@ -128,31 +124,8 @@ val Questionnaire.Item.AnswerOption.Value.id: String?
     }
 
 /**
- * Returns what to display on the UI depending on the [QuestionnaireItemAnswerOptionValue]. Used to
- * get the display representation for item answer options.
+ * Returns what to display on the UI depending on the [Questionnaire.Item.AnswerOption]. Used to get
+ * the display representation for item answer options.
  */
 @Composable
-fun QuestionnaireItemAnswerOptionValue.displayString(): String = getDisplayString(this) ?: ""
-
-@Composable
-internal fun getDisplayString(type: QuestionnaireItemAnswerOptionValue): String? =
-  when (type) {
-    is Questionnaire.Item.AnswerOption.Value.Coding -> type.value.display?.getLocalizedText()
-        ?: type.value.code?.value
-    is Questionnaire.Item.AnswerOption.Value.Date -> {
-      val localDateFormatter = getLocalDateTimeFormatter()
-      val localDate = (type.value.value as? FhirDate.Date)?.date
-      localDate?.let { localDateFormatter.format(it) }
-    }
-    is Questionnaire.Item.AnswerOption.Value.Integer -> type.value.value?.toString()
-    is Questionnaire.Item.AnswerOption.Value.Reference -> type.value.display?.value
-        ?: type.value.reference?.value
-    is Questionnaire.Item.AnswerOption.Value.String -> type.value.getLocalizedText()
-    is Questionnaire.Item.AnswerOption.Value.Time -> {
-      val localDateFormatter = getLocalDateTimeFormatter()
-      val localTime = type.value.value
-      localTime?.let { localDateFormatter.localizedTimeString(it) }
-    }
-  }
-
-typealias QuestionnaireItemAnswerOptionValue = Questionnaire.Item.AnswerOption.Value
+fun Questionnaire.Item.AnswerOption.displayString(): String = this.elementValue.displayString ?: ""
