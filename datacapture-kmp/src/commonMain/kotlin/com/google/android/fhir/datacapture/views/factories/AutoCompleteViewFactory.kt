@@ -48,23 +48,20 @@ internal object AutoCompleteViewFactory : QuestionnaireItemViewFactory {
         questionnaireViewItem.questionnaireItem.repeats?.value ?: false
       }
     val enabledAnswerOptions =
-      remember(questionnaireViewItem.enabledAnswerOptions) {
-        questionnaireViewItem.enabledAnswerOptions.map { DropDownAnswerOption.of(it) }
-      }
+      questionnaireViewItem.enabledAnswerOptions.map { DropDownAnswerOption.of(it) }
     var selectedAnswerOptions by
       remember(questionnaireViewItem.answers, enabledAnswerOptions) {
         val answersElementSet = questionnaireViewItem.answers.map { it.elementValue }.toSet()
         mutableStateOf(
-          questionnaireViewItem.enabledAnswerOptions
-            .filter { it.elementValue in answersElementSet }
-            .map { DropDownAnswerOption.of(it) },
+          enabledAnswerOptions.filter { it.elementValue in answersElementSet },
         )
       }
     val errorTextMessage =
       remember(questionnaireViewItem.validationResult) {
-        (questionnaireViewItem.validationResult as? Invalid)
-          ?.getSingleStringValidationMessage()
-          ?.takeIf { it.isNotBlank() }
+        when (val validationResult = questionnaireViewItem.validationResult) {
+          is Invalid -> validationResult.singleStringValidationMessage.takeIf { it.isNotBlank() }
+          else -> null
+        }
       }
     val isReadOnly =
       remember(questionnaireViewItem.questionnaireItem) {

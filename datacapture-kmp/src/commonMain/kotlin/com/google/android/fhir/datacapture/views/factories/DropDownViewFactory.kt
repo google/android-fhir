@@ -32,6 +32,7 @@ import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverAnnotatedString
 import com.google.android.fhir.datacapture.extensions.toQuestionnaireResponseItemAnswer
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.AutoCompleteDropDownItem
 import com.google.android.fhir.datacapture.views.compose.DropDownAnswerOption
@@ -57,25 +58,25 @@ internal object DropDownViewFactory : QuestionnaireItemViewFactory {
       }
     val requiredOptionalText = getRequiredOrOptionalText(questionnaireViewItem)
     val questionnaireItemAnswerDropDownOptions =
-      remember(questionnaireViewItem.enabledAnswerOptions) {
-        questionnaireViewItem.enabledAnswerOptions.map { DropDownAnswerOption.of(it) }
-      }
+      questionnaireViewItem.enabledAnswerOptions.map { DropDownAnswerOption.of(it) }
 
     val requiredTextAndNewLineString = stringResource(Res.string.required_text_and_new_line)
 
     val validationErrorMessage =
       remember(questionnaireViewItem.validationResult) {
-        questionnaireViewItem.validationResult.getSingleStringValidationMessage()?.let {
-          if (
-            questionnaireViewItem.questionnaireItem.required?.value == true &&
-              questionnaireViewItem.questionViewTextConfiguration.showRequiredText
-          ) {
-            "$requiredTextAndNewLineString$it"
-          } else {
-            it
+        when (val validationResult = questionnaireViewItem.validationResult) {
+          is Invalid -> {
+            if (
+              questionnaireViewItem.questionnaireItem.required?.value == true &&
+                questionnaireViewItem.questionViewTextConfiguration.showRequiredText
+            ) {
+              "$requiredTextAndNewLineString${validationResult.singleStringValidationMessage}"
+            } else {
+              validationResult.singleStringValidationMessage
+            }
           }
+          else -> ""
         }
-          ?: ""
       }
     val showClearInput =
       remember(questionnaireViewItem.answers.toString()) {

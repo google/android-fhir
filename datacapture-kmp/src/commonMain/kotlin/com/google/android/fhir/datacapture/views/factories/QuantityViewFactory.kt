@@ -143,7 +143,7 @@ internal object QuantityViewFactory : QuestionnaireItemViewFactory {
     when (validationResult) {
       is NotValidated,
       Valid, -> null
-      is Invalid -> validationResult.getSingleStringValidationMessage()
+      is Invalid -> validationResult.singleStringValidationMessage
     }
 
   private suspend fun handleInput(

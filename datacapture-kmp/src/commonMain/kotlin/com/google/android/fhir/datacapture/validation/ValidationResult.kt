@@ -16,19 +16,13 @@
 
 package com.google.android.fhir.datacapture.validation
 
-sealed interface ValidationResult {
-  fun getSingleStringValidationMessage(): String?
-}
+sealed class ValidationResult
 
-object NotValidated : ValidationResult {
-  override fun getSingleStringValidationMessage() = null
-}
+object NotValidated : ValidationResult()
 
-object Valid : ValidationResult {
-  override fun getSingleStringValidationMessage() = null
-}
+object Valid : ValidationResult()
 
-data class Invalid(private val validationMessages: List<String>) : ValidationResult {
-  override fun getSingleStringValidationMessage() =
-    this.validationMessages.joinToString(separator = "\n")
+data class Invalid(private val validationMessages: List<String>) : ValidationResult() {
+  val singleStringValidationMessage: String
+    get() = this.validationMessages.joinToString(separator = "\n")
 }

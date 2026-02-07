@@ -285,11 +285,17 @@ internal data class DropDownAnswerOption(
   fun displayAnnotatedString() = displayString.toAnnotatedString()
 
   companion object {
-    fun of(answerOption: Questionnaire.Item.AnswerOption): DropDownAnswerOption =
-      DropDownAnswerOption(
-        answerOption.elementValue,
-        answerOption.value.displayString(),
-        answerOption.itemAnswerOptionImage(),
-      )
+    @Composable
+    fun of(answerOption: Questionnaire.Item.AnswerOption): DropDownAnswerOption {
+      val answerOptionDisplayString = answerOption.displayString()
+
+      return remember(answerOption) {
+        DropDownAnswerOption(
+          answerOption.elementValue,
+          answerOptionDisplayString,
+          answerOption.itemAnswerOptionImage(),
+        )
+      }
+    }
   }
 }
