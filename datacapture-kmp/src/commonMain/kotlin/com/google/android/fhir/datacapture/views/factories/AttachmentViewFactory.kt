@@ -76,7 +76,7 @@ import com.google.android.fhir.datacapture.extensions.hasMimeTypeOnly
 import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.extensions.maxSizeInBytes
 import com.google.android.fhir.datacapture.extensions.mimeTypes
-import com.google.android.fhir.datacapture.getMediaHandler
+import com.google.android.fhir.datacapture.rememberMediaHandler
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -113,12 +113,11 @@ internal object AttachmentViewFactory : QuestionnaireItemViewFactory {
       }
     val maxSupportedFileSizeBytes =
       remember(questionnaireItem) { questionnaireItem.maxSizeInBytes ?: DEFAULT_SIZE }
-    val attachmentMediaHandler = getMediaHandler(maxSupportedFileSizeBytes, fileMimeTypes)
+    val attachmentMediaHandler = rememberMediaHandler(maxSupportedFileSizeBytes, fileMimeTypes)
     val displayTakePhotoButton =
-      remember(questionnaireItem) {
-          questionnaireItem.hasMimeType(MimeType.IMAGE.value)
-      }
-    val isCameraAvailable = remember(attachmentMediaHandler) { attachmentMediaHandler.isCameraAvailable() }
+      remember(questionnaireItem) { questionnaireItem.hasMimeType(MimeType.IMAGE.value) }
+    val isCameraAvailable =
+      remember(attachmentMediaHandler) { attachmentMediaHandler.isCameraSupported() }
     val uploadButtonTextResId =
       remember(questionnaireItem) {
         when {

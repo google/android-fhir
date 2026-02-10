@@ -32,7 +32,16 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.init
+import io.github.vinceglb.filekit.dialogs.openCameraPicker
+import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.mimeType
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.readBytes
 import java.io.File
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.use
 import kotlinx.coroutines.suspendCancellableCoroutine
 
@@ -43,24 +52,52 @@ internal class AndroidMediaHandler(
   override val supportedMimeTypes: Array<String>,
 ) : MediaHandler {
 
+  init {
+    FileKit.init(activityResultRegistry)
+  }
+
   override suspend fun capturePhoto(): MediaCaptureResult {
     val isCameraPermissionGranted = requestCameraPermission()
     if (!isCameraPermissionGranted) {
       return MediaCaptureResult.Error("Error: Camera permission not granted")
     }
-    val (name, uri) = launchTakePicture()
-    return createAttachment(uri, fileTitleName = name)
+    val pickedFile = FileKit.openCameraPicker()
+    return pickedFile?.let {
+      captureResult(
+        it.readBytes(),
+        titleName = it.name,
+        mimeType = it.mimeType()?.toString() ?: "application/octet-stream",
+      )
+    }
+      ?: throw CancellationException()
   }
 
   override suspend fun selectFile(
     inputMimeTypes: Array<String>,
   ): MediaCaptureResult {
     val imageOnly = inputMimeTypes.all { it.startsWith("image/") }
-    val fileUri = if (imageOnly) pickPhoto() else pickFile(inputMimeTypes)
-    return createAttachment(fileUri, fileTitleName = context.getFileName(fileUri))
+
+    val fileKitType =
+      if (imageOnly) {
+        FileKitType.Image
+      } else {
+        FileKitType.File(
+          inputMimeTypes.toSet().takeIf { it.isNotEmpty() },
+        )
+      }
+    val pickedFile = FileKit.openFilePicker(type = fileKitType)
+
+    return pickedFile?.let {
+      captureResult(
+        it.readBytes(),
+        mimeType = it.mimeType()?.toString() ?: "application/octet-stream",
+        titleName = it.name,
+      )
+    }
+      ?: throw CancellationException()
   }
 
-  override fun isCameraAvailable(): Boolean =
+  override fun isCameraSupported(): Boolean =
     context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
 
   private suspend fun requestCameraPermission(): Boolean =
@@ -145,6 +182,7 @@ internal class AndroidMediaHandler(
             continuation.resumeWith(Result.success(uri))
           }
         }
+
       continuation.invokeOnCancellation { openFilePickerLauncher.unregister() }
       openFilePickerLauncher.launch(fileTypes)
     }
@@ -198,7 +236,7 @@ internal fun Context.getMimeTypeFromUri(uri: Uri): String {
 }
 
 @Composable
-internal actual fun getMediaHandler(
+internal actual fun rememberMediaHandler(
   maxSupportedFileSizeBytes: BigDecimal,
   supportedMimeTypes: Array<String>,
 ): MediaHandler {

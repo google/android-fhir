@@ -60,7 +60,7 @@ internal interface MediaHandler {
     inputMimeTypes: Array<String>,
   ): MediaCaptureResult
 
-  fun isCameraAvailable(): Boolean
+  fun isCameraSupported(): Boolean
 }
 
 internal fun MediaHandler.isMimeTypeSupported(mimeType: String) =
@@ -99,7 +99,7 @@ internal fun MediaHandler.captureResult(
 }
 
 @Composable
-internal expect fun getMediaHandler(
+internal expect fun rememberMediaHandler(
   maxSupportedFileSizeBytes: BigDecimal,
   supportedMimeTypes: Array<String>,
 ): MediaHandler

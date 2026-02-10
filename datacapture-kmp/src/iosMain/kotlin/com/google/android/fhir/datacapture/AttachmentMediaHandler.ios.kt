@@ -20,6 +20,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import co.touchlab.kermit.Logger
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.openCameraPicker
+import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.mimeType
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.readBytes
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 import kotlinx.cinterop.ByteVar
@@ -69,34 +77,40 @@ internal class IosMediaHandler(
     if (!isCameraPermissionGranted) {
       return MediaCaptureResult.Error("Error: Camera permission not granted")
     }
-    val (name, photoByteArray) = takeCameraPhoto()
-    return captureResult(photoByteArray, "image/jpeg", titleName = name)
+    val pickedFile = FileKit.openCameraPicker()
+    return pickedFile?.let {
+      captureResult(
+        it.readBytes(),
+        titleName = it.name,
+        mimeType = it.mimeType()?.toString() ?: "application/octet-stream",
+      )
+    }
+      ?: throw CancellationException()
   }
 
   override suspend fun selectFile(inputMimeTypes: Array<String>): MediaCaptureResult {
     val imageOnly = inputMimeTypes.all { it.startsWith("image/") }
-    return when {
-      imageOnly -> {
-        val isPhotoAccessGranted = requestPhotoLibraryAccess()
-        if (!isPhotoAccessGranted) {
-          MediaCaptureResult.Error("Error: PhotoLibrary permission not granted")
-        } else {
-          val (name, photoByteArray) = pickPhoto()
-          captureResult(photoByteArray, "image/jpeg", titleName = name)
-        }
-      }
-      else -> {
-        val (lastPathName, fileByteArray) = pickFile(inputMimeTypes)
-        captureResult(
-          fileByteArray,
-          "application/octet-stream",
-          titleName = lastPathName.substringBeforeLast("."),
+    val fileKitType =
+      if (imageOnly) {
+        FileKitType.Image
+      } else {
+        FileKitType.File(
+          inputMimeTypes.toSet().takeIf { it.isNotEmpty() },
         )
       }
+    val pickedFile = FileKit.openFilePicker(type = fileKitType)
+
+    return pickedFile?.let {
+      captureResult(
+        it.readBytes(),
+        mimeType = it.mimeType()?.toString() ?: "application/octet-stream",
+        titleName = it.name,
+      )
     }
+      ?: throw CancellationException()
   }
 
-  override fun isCameraAvailable(): Boolean =
+  override fun isCameraSupported(): Boolean =
     UIImagePickerController.isSourceTypeAvailable(
       UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypeCamera,
     )
@@ -315,7 +329,7 @@ internal fun NSData.toByteArray(): ByteArray {
 }
 
 @Composable
-internal actual fun getMediaHandler(
+internal actual fun rememberMediaHandler(
   maxSupportedFileSizeBytes: BigDecimal,
   supportedMimeTypes: Array<String>,
 ): MediaHandler {

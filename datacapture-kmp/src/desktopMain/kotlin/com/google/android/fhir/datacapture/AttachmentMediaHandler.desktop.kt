@@ -19,62 +19,43 @@ package com.google.android.fhir.datacapture
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import java.nio.file.Files
-import java.nio.file.Paths
-import javax.swing.JFileChooser
-import javax.swing.filechooser.FileNameExtensionFilter
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.name
+import kotlin.coroutines.cancellation.CancellationException
 
 internal class JvmMediaHandler(
   override val maxSupportedFileSizeBytes: BigDecimal,
   override val supportedMimeTypes: Array<String>,
 ) : MediaHandler {
+  override fun isCameraSupported(): Boolean = false
+
   override suspend fun capturePhoto(): MediaCaptureResult {
     // Camera capture is not available on desktop through standard APIs
     error("Error: Camera not available")
   }
 
   override suspend fun selectFile(inputMimeTypes: Array<String>): MediaCaptureResult {
-    return try {
-      val (fileName, byteArray) = pickFile(inputMimeTypes)
+    val pickedFile =
+      FileKit.openFilePicker(
+        type =
+          FileKitType.File(
+            inputMimeTypes
+              .flatMap { getExtensionsForMimeType(it) }
+              .toSet()
+              .takeIf { it.isNotEmpty() },
+          ),
+      )
+    return pickedFile?.let {
+      val fileName = it.name
       captureResult(
-        byteArray,
+        it.file.readBytes(),
         getMimeTypeFromExtension(fileName.substringAfterLast(".")),
         titleName = fileName,
       )
-    } catch (e: Exception) {
-      if (e is CancellationException) {
-        throw e // rethrow
-      }
-
-      MediaCaptureResult.Error("Error: selecting file failed ${e.message}")
     }
-  }
-
-  override fun isCameraAvailable(): Boolean = false
-
-  private suspend fun pickFile(mimeTypes: Array<String>): Pair<String, ByteArray> {
-    val fileChooser = JFileChooser()
-
-    mimeTypes.forEach {
-      val extensions = getExtensionsForMimeType(it)
-      if (extensions.isNotEmpty()) {
-        val filter = FileNameExtensionFilter("$it files", *extensions.toTypedArray())
-        fileChooser.addChoosableFileFilter(filter)
-      }
-    }
-
-    val result = fileChooser.showOpenDialog(null)
-    if (result == JFileChooser.APPROVE_OPTION) {
-      val selectedFile = fileChooser.selectedFile
-      val fileBytes =
-        withContext(Dispatchers.IO) { Files.readAllBytes(Paths.get(selectedFile.absolutePath)) }
-      return selectedFile.name to fileBytes
-    } else {
-      throw CancellationException()
-    }
+      ?: throw CancellationException()
   }
 
   private fun getExtensionsForMimeType(mimeType: String): List<String> {
@@ -128,7 +109,7 @@ internal class JvmMediaHandler(
 }
 
 @Composable
-internal actual fun getMediaHandler(
+internal actual fun rememberMediaHandler(
   maxSupportedFileSizeBytes: BigDecimal,
   supportedMimeTypes: Array<String>,
 ): MediaHandler {

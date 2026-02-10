@@ -19,26 +19,46 @@ package com.google.android.fhir.datacapture
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.mimeType
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.readBytes
+import kotlin.coroutines.cancellation.CancellationException
 
 internal class WasmMediaHandler(
   override val maxSupportedFileSizeBytes: BigDecimal,
   override val supportedMimeTypes: Array<String>,
 ) : MediaHandler {
   override suspend fun capturePhoto(): MediaCaptureResult {
-    TODO("Not yet implemented")
+    error("Error: Camera not supported")
   }
 
   override suspend fun selectFile(inputMimeTypes: Array<String>): MediaCaptureResult {
-    TODO("Not yet implemented")
+    val pickedFile =
+      FileKit.openFilePicker(
+        type =
+          FileKitType.File(
+            inputMimeTypes.toSet().takeIf { it.isNotEmpty() },
+          ),
+      )
+
+    return pickedFile?.let {
+      captureResult(
+        it.readBytes(),
+        mimeType = it.mimeType()?.toString() ?: "application/octet-stream",
+        titleName = it.name,
+      )
+    }
+      ?: throw CancellationException()
   }
 
-  override fun isCameraAvailable(): Boolean {
-    TODO("Not yet implemented")
-  }
+  override fun isCameraSupported(): Boolean = false
 }
 
 @Composable
-internal actual fun getMediaHandler(
+internal actual fun rememberMediaHandler(
   maxSupportedFileSizeBytes: BigDecimal,
   supportedMimeTypes: Array<String>,
 ): MediaHandler {
