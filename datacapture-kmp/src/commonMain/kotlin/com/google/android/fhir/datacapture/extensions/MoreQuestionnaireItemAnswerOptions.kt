@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.extensions
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.decodeToImageBitmap
 import com.google.fhir.model.r4.Element
@@ -128,4 +129,7 @@ val Questionnaire.Item.AnswerOption.Value.id: String?
  * the display representation for item answer options.
  */
 @Composable
-fun Questionnaire.Item.AnswerOption.displayString(): String = this.elementValue.displayString ?: ""
+fun Questionnaire.Item.AnswerOption.displayString(): String {
+  val localizedDisplayString = this.elementValue.displayString
+  return remember(this) { localizedDisplayString ?: "" }
+}
