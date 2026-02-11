@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import androidx.compose.ui.text.AnnotatedString
+import com.google.android.fhir.datacapture.extensions.elementValue
 import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.localizedTextAnnotatedString
 import com.google.android.fhir.datacapture.extensions.maxValue
@@ -195,17 +196,6 @@ data class QuestionnaireViewItem(
   //    return questionnaireResponseItem.answer.joinToString { it.value.displayString(context) }
   //  }
   //
-  //
-  //  val questionTextAnnotatedString: AnnotatedString? by lazy {
-  //    questionnaireResponseItem.text?.toAnnotatedString()
-  //      ?: questionnaireItem.text?.toElement().localizedTextAnnotatedString()
-  //  }
-
-  fun isAnswerOptionSelected(
-    answerOption: Questionnaire.Item.AnswerOption,
-  ): Boolean {
-    return answers.any { it.value == answerOption.value }
-  }
 
   /**
    * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem] have the
@@ -249,4 +239,10 @@ data class QuestionnaireViewItem(
     }
     return validationResult == other.validationResult
   }
+}
+
+internal fun QuestionnaireViewItem.isAnswerOptionSelected(
+  answerOption: Questionnaire.Item.AnswerOption,
+): Boolean {
+  return answers.any { it.elementValue == answerOption.elementValue }
 }
