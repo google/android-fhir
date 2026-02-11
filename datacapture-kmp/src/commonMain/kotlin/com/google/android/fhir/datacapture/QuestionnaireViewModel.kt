@@ -991,7 +991,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = answersChangedCallback,
-              enabledAnswerOptions = emptyList(),
+              //              enabledAnswerOptions = emptyList(),
               minAnswerValue = questionnaireItem.minValue,
               //                questionnaireItem.minValueCqfCalculatedValueExpression
               //                  ?.let {

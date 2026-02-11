@@ -104,23 +104,24 @@ class EditTextViewFactoryDelegate(
    */
   @Composable
   private fun getValidationErrorMessage(questionnaireViewItem: QuestionnaireViewItem): String? {
-    val validationMessage =
-      if (questionnaireViewItem.draftAnswer != null) {
-        stringResource(validationMessageStringRes, *validationMessageStringResArgs)
-      } else {
-        when (val validationResult = questionnaireViewItem.validationResult) {
-          is Invalid -> validationResult.singleStringValidationMessage
-          else -> null
-        }
-      }
-
-    return if (
-      questionnaireViewItem.questionnaireItem.required?.value == true &&
-        questionnaireViewItem.questionViewTextConfiguration.showRequiredText
-    ) {
-      stringResource(Res.string.required_text_and_new_line) + validationMessage
+    return if (questionnaireViewItem.draftAnswer != null) {
+      stringResource(validationMessageStringRes, *validationMessageStringResArgs)
     } else {
-      validationMessage
+      when (val validationResult = questionnaireViewItem.validationResult) {
+        is Invalid -> {
+          validationResult.singleStringValidationMessage.let {
+            if (
+              questionnaireViewItem.questionnaireItem.required?.value == true &&
+                questionnaireViewItem.questionViewTextConfiguration.showRequiredText
+            ) {
+              stringResource(Res.string.required_text_and_new_line) + it
+            } else {
+              it
+            }
+          }
+        }
+        else -> null
+      }
     }
   }
 }
