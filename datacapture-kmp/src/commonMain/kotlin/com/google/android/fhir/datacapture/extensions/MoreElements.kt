@@ -23,7 +23,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.google.fhir.model.r4.Attachment
 import com.google.fhir.model.r4.Coding
+import com.google.fhir.model.r4.Date
+import com.google.fhir.model.r4.DateTime
+import com.google.fhir.model.r4.Decimal
 import com.google.fhir.model.r4.Element
+import com.google.fhir.model.r4.Quantity
+import com.google.fhir.model.r4.Reference
+import com.google.fhir.model.r4.Time
 import org.jetbrains.compose.resources.stringResource
 
 @get:Composable
@@ -31,17 +37,17 @@ internal val Element.displayString: String?
   get() {
     return when (this) {
       is Coding -> remember(this) { display?.getLocalizedText() ?: code?.value }
-      is com.google.fhir.model.r4.DateTime -> {
+      is DateTime -> {
         TODO("Requires locale based formatting")
       }
-      is com.google.fhir.model.r4.Date -> {
+      is Date -> {
         TODO("Requires locale based formatting")
       }
-      is com.google.fhir.model.r4.Time -> {
+      is Time -> {
         TODO("Requires locale based formatting")
       }
       is FhirR4Integer -> remember(this) { value?.toString() }
-      is com.google.fhir.model.r4.Reference -> remember(this) { display?.value ?: reference?.value }
+      is Reference -> remember(this) { display?.value ?: reference?.value }
       is FhirR4String -> remember(this) { getLocalizedText() }
       is Attachment -> remember(this) { url?.value }
       is FhirR4Boolean -> {
@@ -50,8 +56,8 @@ internal val Element.displayString: String?
 
         remember(this) { value?.let { if (it) yesStringText else noStringText } }
       }
-      is com.google.fhir.model.r4.Quantity -> remember(this) { value?.value?.toStringExpanded() }
-      is com.google.fhir.model.r4.Decimal -> remember(this) { value?.toStringExpanded() }
+      is Quantity -> remember(this) { value?.value?.toStringExpanded() }
+      is Decimal -> remember(this) { value?.toStringExpanded() }
       else -> remember(this) { null }
     }
   }
