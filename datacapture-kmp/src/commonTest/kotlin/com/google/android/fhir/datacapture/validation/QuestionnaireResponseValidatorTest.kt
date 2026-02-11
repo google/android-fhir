@@ -111,7 +111,7 @@ class QuestionnaireResponseValidatorTest {
     assertTrue(result!![0] is Invalid)
     assertEquals(
       "Missing answer for required field.",
-      (result[0] as Invalid).getSingleStringValidationMessage(),
+      (result[0] as Invalid).singleStringValidationMessage,
     )
   }
 }

@@ -175,10 +175,10 @@ class QuestionnaireResponseItemValidatorTest {
 
     assertTrue(validationResult is Invalid)
     assertTrue(
-      validationResult.getSingleStringValidationMessage().contains("Minimum value allowed is:100"),
+      validationResult.singleStringValidationMessage.contains("Minimum value allowed is:100"),
     )
     assertTrue(
-      validationResult.getSingleStringValidationMessage().contains("Maximum value allowed is:200"),
+      validationResult.singleStringValidationMessage.contains("Maximum value allowed is:200"),
     )
   }
 
@@ -223,11 +223,10 @@ class QuestionnaireResponseItemValidatorTest {
         )
 
     assertTrue(validationResult is Invalid)
-    val invalidValidationResult = validationResult
     assertTrue(
-      invalidValidationResult
-        .getSingleStringValidationMessage()
-        .contains("Missing answer for required field."),
+      validationResult.singleStringValidationMessage.contains(
+        "Missing answer for required field."
+      ),
     )
   }
 }

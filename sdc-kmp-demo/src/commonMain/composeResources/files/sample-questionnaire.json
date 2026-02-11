@@ -29,6 +29,24 @@
       "required": false
     },
     {
+      "linkId": "phone-number",
+      "text": "Phone Number",
+      "type": "string",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "phone-number"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
       "linkId": "measurement",
       "text": "Enter length",
       "type": "quantity",
@@ -78,6 +96,342 @@
         {
           "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
           "valueInteger": 15
+        }
+      ]
+    },
+    {
+      "linkId": "boolean-choice",
+      "text": "Is this the first visit? (Boolean Choice)",
+      "type": "boolean",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1.3",
+          "text": "Select one",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "radio-button",
+                "display": "Radio Button"
+              }
+            ]
+          }
+        }
+      ],
+      "linkId": "radio-group",
+      "text": "Choose one from the options below (Radio Group)",
+      "type": "choice",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "option-1",
+            "display": "Option 1"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-2",
+            "display": "Option 2"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-3",
+            "display": "Option 3"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "mother",
+            "display": "Option 4"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "sibling",
+            "display": "Option 5"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "other",
+            "display": "Option 6"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1-select-one",
+          "text": "Select one",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "checkbox-group",
+      "text": "What’s the reason for today’s visit? (CheckBox Group)",
+      "type": "choice",
+      "repeats": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "check-box",
+                "display": "Checkbox"
+              }
+            ],
+            "text": "Checkbox"
+          }
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "code_1",
+            "display": "ANC",
+            "system": "http://snomed.info/sct"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "code_2",
+            "display": "Immunization",
+            "system": "http://snomed.info/sct"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "code_3",
+            "display": "Malaria Testing",
+            "system": "http://snomed.info/sct"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "code_4",
+            "display": "Feeling sick",
+            "system": "http://snomed.info/sct"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "code_5",
+            "display": "Family planning",
+            "system": "http://snomed.info/sct"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "code_6",
+            "display": "Lab Tests",
+            "system": "http://snomed.info/sct"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1-select-one",
+          "text": "Select all that apply",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "open-choice-dialog-select",
+      "type": "choice",
+      "repeats": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "open-choice",
+                "display": "Open choice"
+              }
+            ],
+            "text": "Open choice"
+          }
+        }
+      ],
+      "text": "Do you have any preexisting health conditions? (Open-choice DialogSelect)",
+      "item": [
+        {
+          "linkId": "1.1",
+          "text": "Health conditions",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "dm",
+            "display": "Diabetes Melitus (DM)"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "ht",
+            "display": "Hypertension (HT)"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "ihd",
+            "display": "Ischemic Heart Disease (IHD/CHD/CCF)"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "tb",
+            "display": "Tuberculosis (TB)"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "copd",
+            "display": "Asthma/COPD"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "kidney",
+            "display": "Chronic Kidney Disease"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "none",
+            "display": "None"
+          }
+        }
+      ]
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "check-box",
+                "display": "Check Box"
+              }
+            ],
+            "text": "Check box"
+          }
+        },
+        {
+          "url": "https://github.com/google/android-fhir/StructureDefinition/dialog"
+        }
+      ],
+      "linkId": "modal",
+      "type": "choice",
+      "repeats": true,
+      "text": "Specific health concern for today’s visit",
+      "item": [
+        {
+          "linkId": "1.2",
+          "text": "Health concern",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "contractions",
+            "display": "Contractions"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "cough",
+            "display": "Cough"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "diarrhoea",
+            "display": "Diarrhoea"
+          }
         }
       ]
     },
