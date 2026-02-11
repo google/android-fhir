@@ -225,7 +225,7 @@ class QuestionnaireResponseItemValidatorTest {
     assertTrue(validationResult is Invalid)
     assertTrue(
       validationResult.singleStringValidationMessage.contains(
-        "Missing answer for required field."
+        "Missing answer for required field.",
       ),
     )
   }
