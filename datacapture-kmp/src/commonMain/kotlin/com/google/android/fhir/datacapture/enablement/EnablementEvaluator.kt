@@ -66,6 +66,7 @@ import com.google.fhir.model.r4.Resource
  * @param questionnaireResponse the [QuestionnaireResponse] related to the [Questionnaire]
  * @param questionnaireItemParentMap the [Map] of items parent
  * @param questionnaireLaunchContextMap the [Map] of launchContext names to their resource values
+ * @param xFhirQueryResolver the [XFhirQueryResolver] used to resolve FHIR queries
  */
 internal class EnablementEvaluator(
   private val questionnaire: Questionnaire,

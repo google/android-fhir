@@ -39,8 +39,7 @@ internal object MaxLengthValidator : AnswerConstraintValidator {
     ) {
       return ConstraintValidator.Result(
         false,
-        "The maximum number of characters that are permitted in the answer is: " +
-          questionnaireItem.maxLength,
+        "The maximum number of characters that are permitted in the answer is: ${questionnaireItem.maxLength}",
       )
     }
     return ConstraintValidator.Result(true, null)

@@ -39,8 +39,13 @@ internal object MaxDecimalPlacesValidator :
       val maxDecimalPlaces = getValue(constraintValue)
       answer.value != null &&
         maxDecimalPlaces != null &&
-        answer.value!!.asDecimal()!!.value.value.toString().substringAfter(".").length >
-          maxDecimalPlaces
+        answer.value!!
+          .asDecimal()!!
+          .value
+          .value
+          ?.toStringExpanded()
+          ?.substringAfter(".")
+          ?.length!! > maxDecimalPlaces
     },
     messageGenerator = { constraintValue: Any ->
       getString(Res.string.max_decimal_validation_error_msg, getValue(constraintValue).toString())

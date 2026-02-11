@@ -39,6 +39,7 @@ import com.google.fhir.model.r4.Uri
 infix fun QuestionnaireResponse.Item.Answer.Value?.equalsFhirValue(
   other: Any?,
 ): Boolean {
+  if (this == other) return true
   if (this == null || other == null) return false
 
   val otherValue =
@@ -100,7 +101,7 @@ infix fun QuestionnaireResponse.Item.Answer.Value?.equalsFhirValue(
 infix fun QuestionnaireResponse.Item.Answer.Value?.compareFhirValue(
   other: Any?,
 ): Int {
-  if (this == null || other == null) return 0
+  if (this == other) return 0
 
   val otherValue =
     if (other is Extension.Value) {
@@ -179,11 +180,6 @@ infix fun QuestionnaireResponse.Item.Answer.Value?.compareFhirValue(
       val otherVal = otherValue.value!!.value!!
       thisVal.compareTo(otherVal)
     }
-    is QuestionnaireResponse.Item.Answer.Value.Attachment,
-    is QuestionnaireResponse.Item.Answer.Value.Boolean,
-    is QuestionnaireResponse.Item.Answer.Value.Coding,
-    is QuestionnaireResponse.Item.Answer.Value.Reference,
-    is QuestionnaireResponse.Item.Answer.Value.Uri, ->
-      throw IllegalStateException("Comparison not supported for type :$this")
+    else -> throw IllegalStateException("Comparison not supported for type :$this")
   }
 }
