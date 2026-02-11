@@ -20,6 +20,7 @@ import android_fhir.datacapture_kmp.generated.resources.Res
 import android_fhir.datacapture_kmp.generated.resources.optional_helper_text
 import android_fhir.datacapture_kmp.generated.resources.required
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import org.jetbrains.compose.resources.stringResource
 
@@ -30,17 +31,23 @@ import org.jetbrains.compose.resources.stringResource
  * [QuestionnaireViewItem.questionViewTextConfiguration.showOptionalText] is true.
  */
 @Composable
-fun getRequiredOrOptionalText(questionnaireViewItem: QuestionnaireViewItem) =
-  when {
-    (questionnaireViewItem.questionnaireItem.required?.value == true &&
-      questionnaireViewItem.questionViewTextConfiguration.showRequiredText) -> {
-      stringResource(Res.string.required)
-    }
-    (questionnaireViewItem.questionnaireItem.required?.value != true &&
-      questionnaireViewItem.questionViewTextConfiguration.showOptionalText) -> {
-      stringResource(Res.string.optional_helper_text)
-    }
-    else -> {
-      null
+fun getRequiredOrOptionalText(questionnaireViewItem: QuestionnaireViewItem): String? {
+  val requiredTextString = stringResource(Res.string.required)
+  val optionalHelperTextString = stringResource(Res.string.optional_helper_text)
+
+  return remember(questionnaireViewItem) {
+    when {
+      (questionnaireViewItem.questionnaireItem.required?.value == true &&
+        questionnaireViewItem.questionViewTextConfiguration.showRequiredText) -> {
+        requiredTextString
+      }
+      (questionnaireViewItem.questionnaireItem.required?.value != true &&
+        questionnaireViewItem.questionViewTextConfiguration.showOptionalText) -> {
+        optionalHelperTextString
+      }
+      else -> {
+        null
+      }
     }
   }
+}

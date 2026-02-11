@@ -31,7 +31,6 @@ import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.runComposeUiTest
 import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4String
-import com.google.android.fhir.datacapture.extensions.IntegerAnswerValue
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -92,7 +91,8 @@ class EditTextIntegerViewFactoryTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = IntegerAnswerValue(value = Integer(value = 5)),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.Integer(value = Integer(value = 5)),
                   ),
                 ),
             ),
@@ -119,7 +119,8 @@ class EditTextIntegerViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = IntegerAnswerValue(value = Integer(value = 5)),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Integer(value = Integer(value = 5)),
                 ),
               ),
           ),
@@ -232,7 +233,8 @@ class EditTextIntegerViewFactoryTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = IntegerAnswerValue(value = Integer(value = 3)),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.Integer(value = Integer(value = 3)),
                   ),
                 ),
             ),
@@ -271,7 +273,8 @@ class EditTextIntegerViewFactoryTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = IntegerAnswerValue(value = Integer(value = 1)),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.Integer(value = Integer(value = 1)),
                   ),
                 ),
             ),
@@ -507,7 +510,8 @@ class EditTextIntegerViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = IntegerAnswerValue(value = Integer(value = 12)),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Integer(value = Integer(value = 12)),
                 ),
               ),
           ),
@@ -527,7 +531,8 @@ class EditTextIntegerViewFactoryTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = IntegerAnswerValue(value = Integer(value = 120)),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Integer(value = Integer(value = 120)),
                 ),
               ),
           ),

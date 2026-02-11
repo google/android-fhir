@@ -143,7 +143,7 @@ internal object QuantityViewFactory : QuestionnaireItemViewFactory {
     when (validationResult) {
       is NotValidated,
       Valid, -> null
-      is Invalid -> validationResult.getSingleStringValidationMessage()
+      is Invalid -> validationResult.singleStringValidationMessage
     }
 
   private suspend fun handleInput(
@@ -226,13 +226,13 @@ internal object QuantityViewFactory : QuestionnaireItemViewFactory {
     takeIf { it.hasCode() || it.hasDisplay() }
       ?.let {
         DropDownAnswerOption(
-          answerId = it.code?.value ?: it.display?.value ?: "",
-          answerOptionString = it.display?.value ?: "",
+          elementValue = it,
+          displayString = it.display?.value ?: "",
         )
       }
 
   private fun DropDownAnswerOption.findCoding(options: List<Coding>) =
-    options.find { answerId == it.code?.value } ?: options.find { answerId == it.display?.value }
+    options.find { elementValue == it }
 }
 
 private data class UiQuantity(val value: String?, val unitDropDown: Coding?)

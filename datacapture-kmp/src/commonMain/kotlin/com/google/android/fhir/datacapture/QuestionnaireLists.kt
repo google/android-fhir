@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.datacapture
 
+import android_fhir.datacapture_kmp.generated.resources.Res
+import android_fhir.datacapture_kmp.generated.resources.not_answered
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.elementValue
 import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
@@ -44,16 +48,25 @@ import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.components.PageNavigationItem
 import com.google.android.fhir.datacapture.views.components.RepeatedGroupAddItem
 import com.google.android.fhir.datacapture.views.components.RepeatedGroupHeaderItem
+import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewFactory
+import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewFactory
+import com.google.android.fhir.datacapture.views.factories.CheckBoxGroupViewFactory
+import com.google.android.fhir.datacapture.views.factories.DialogSelectViewFactory
+import com.google.android.fhir.datacapture.views.factories.DisplayViewFactory
+import com.google.android.fhir.datacapture.views.factories.DropDownViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewFactory
+import com.google.android.fhir.datacapture.views.factories.EditTextPhoneNumberViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewFactory
 import com.google.android.fhir.datacapture.views.factories.GroupViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuantityViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewFactory
+import com.google.android.fhir.datacapture.views.factories.RadioGroupViewFactory
+import com.google.android.fhir.datacapture.views.factories.SliderViewFactory
 import com.google.fhir.model.r4.Questionnaire
-import com.google.fhir.model.r4.QuestionnaireResponse
 import kotlin.uuid.ExperimentalUuidApi
+import org.jetbrains.compose.resources.stringResource
 
 // Choice questions are rendered as dialogs if they have at least this many options
 const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG = 10
@@ -239,31 +252,12 @@ private fun QuestionnaireReviewItem(
         // No answer display for groups and display items
       }
       else -> {
+        val notAnsweredTextString = stringResource(Res.string.not_answered)
         val answerText =
           questionnaireViewItem.answers
-            .map { itemAnswer -> itemAnswer.value }
-            .joinToString(", ") { answer ->
-              when (answer) {
-                is QuestionnaireResponse.Item.Answer.Value.String -> answer.asString()?.value?.value
-                is QuestionnaireResponse.Item.Answer.Value.Integer ->
-                  answer.asInteger()?.value?.value.toString()
-                is QuestionnaireResponse.Item.Answer.Value.Decimal ->
-                  answer.asDecimal()?.value?.value?.toStringExpanded()
-                is QuestionnaireResponse.Item.Answer.Value.Date ->
-                  answer.asDate()?.value?.value?.toString()
-                is QuestionnaireResponse.Item.Answer.Value.Time ->
-                  answer.asTime()?.value?.value?.toString()
-                is QuestionnaireResponse.Item.Answer.Value.DateTime ->
-                  answer.asDateTime()?.value?.value?.toString()
-                is QuestionnaireResponse.Item.Answer.Value.Quantity ->
-                  answer.asQuantity()?.value?.value?.value?.toStringExpanded()
-                is QuestionnaireResponse.Item.Answer.Value.Coding ->
-                  answer.asCoding()?.value?.code?.value.toString()
-                else -> ""
-              }
-                as CharSequence?
-                ?: ""
-            }
+            .map { it.elementValue?.displayString ?: "" }
+            .joinToString()
+            .ifBlank { notAnsweredTextString }
 
         if (answerText.isNotEmpty()) {
           Text(
@@ -290,7 +284,7 @@ private fun QuestionnaireReviewItem(
               tint = QuestionnaireTheme.colorScheme.error,
             )
             Text(
-              text = questionnaireViewItem.validationResult.getSingleStringValidationMessage(),
+              text = questionnaireViewItem.validationResult.singleStringValidationMessage,
               style = QuestionnaireTheme.typography.bodyMedium,
               color = QuestionnaireTheme.colorScheme.error,
             )
@@ -333,6 +327,15 @@ fun getQuestionnaireItemViewFactory(
     QuestionnaireViewHolderType.EDIT_TEXT_INTEGER -> EditTextIntegerViewFactory
     QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewFactory
     QuestionnaireViewHolderType.QUANTITY -> QuantityViewFactory
+    QuestionnaireViewHolderType.DISPLAY -> DisplayViewFactory
+    QuestionnaireViewHolderType.SLIDER -> SliderViewFactory
+    QuestionnaireViewHolderType.PHONE_NUMBER -> EditTextPhoneNumberViewFactory
+    QuestionnaireViewHolderType.BOOLEAN_TYPE_PICKER -> BooleanChoiceViewFactory
+    QuestionnaireViewHolderType.RADIO_GROUP -> RadioGroupViewFactory
+    QuestionnaireViewHolderType.CHECK_BOX_GROUP -> CheckBoxGroupViewFactory
+    QuestionnaireViewHolderType.DIALOG_SELECT -> DialogSelectViewFactory
+    QuestionnaireViewHolderType.DROP_DOWN -> DropDownViewFactory
+    QuestionnaireViewHolderType.AUTO_COMPLETE -> AutoCompleteViewFactory
     QuestionnaireViewHolderType.GROUP -> GroupViewFactory
     else -> TODO()
   }

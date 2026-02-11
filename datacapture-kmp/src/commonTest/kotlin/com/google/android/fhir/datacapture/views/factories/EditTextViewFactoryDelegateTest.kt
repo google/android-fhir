@@ -75,7 +75,10 @@ class EditTextViewFactoryDelegateTest {
               answer =
                 listOf(
                   QuestionnaireResponse.Item.Answer(
-                    value = DecimalAnswerValue(value = Decimal(value = 1.toBigDecimal())),
+                    value =
+                      QuestionnaireResponse.Item.Answer.Value.Decimal(
+                        value = Decimal(value = 1.toBigDecimal()),
+                      ),
                   ),
                 ),
             ),
@@ -97,7 +100,10 @@ class EditTextViewFactoryDelegateTest {
             answer =
               listOf(
                 QuestionnaireResponse.Item.Answer(
-                  value = DecimalAnswerValue(value = Decimal(value = 1.1.toBigDecimal())),
+                  value =
+                    QuestionnaireResponse.Item.Answer.Value.Decimal(
+                      value = Decimal(value = 1.1.toBigDecimal()),
+                    ),
                 ),
               ),
           ),

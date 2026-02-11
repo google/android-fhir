@@ -113,8 +113,7 @@ class EditTextViewFactoryDelegate(
       is NotValidated,
       Valid, -> null
       is Invalid -> {
-        val validationMessage =
-          questionnaireViewItem.validationResult.getSingleStringValidationMessage()
+        val validationMessage = questionnaireViewItem.validationResult.singleStringValidationMessage
         if (
           questionnaireViewItem.questionnaireItem.required?.value == true &&
             questionnaireViewItem.questionViewTextConfiguration.showRequiredText

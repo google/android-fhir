@@ -57,6 +57,16 @@ import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import org.jetbrains.compose.resources.stringResource
 
+internal const val ERROR_TEXT_AT_HEADER_TEST_TAG = "error-text-at-header"
+internal const val REQUIRED_OPTIONAL_HEADER_TEXT_TAG = "required_optional_header_text"
+internal const val HELP_BUTTON_TAG = "help-button"
+internal const val HELP_CARD_TAG = "help-card-view"
+internal const val HELP_HEADER_TAG = "hint_text"
+internal const val HEADER_TAG = "header-View"
+internal const val HINT_HEADER_TAG = "hint_text"
+internal const val PREFIX_HEADER_TAG = "prefix_text"
+internal const val QUESTION_HEADER_TAG = "question_text"
+
 @Composable
 fun Header(
   questionnaireViewItem: QuestionnaireViewItem,
@@ -149,14 +159,18 @@ internal fun Header(
 
     // Required/Optional Text
     if (showRequiredOrOptionalText && !requiredOptionalText.isNullOrBlank()) {
-      Text(text = requiredOptionalText, style = QuestionnaireTheme.typography.bodyMedium)
+      Text(
+        text = requiredOptionalText,
+        style = QuestionnaireTheme.typography.bodyMedium,
+        modifier = Modifier.testTag(REQUIRED_OPTIONAL_HEADER_TEXT_TAG),
+      )
     }
 
     // Validation Error
     if (displayValidationResult && validationResult is Invalid) {
       Text(
         modifier = Modifier.testTag(ERROR_TEXT_AT_HEADER_TEST_TAG),
-        text = validationResult.getSingleStringValidationMessage(),
+        text = validationResult.singleStringValidationMessage,
         color = QuestionnaireTheme.colorScheme.error,
         style = QuestionnaireTheme.typography.bodySmall,
       )
@@ -348,12 +362,3 @@ internal fun Help(
     }
   }
 }
-
-const val ERROR_TEXT_AT_HEADER_TEST_TAG = "error-text-at-header"
-const val HELP_BUTTON_TAG = "help-button"
-const val HELP_CARD_TAG = "help-card-view"
-const val HELP_HEADER_TAG = "hint_text"
-const val HEADER_TAG = "header-View"
-const val HINT_HEADER_TAG = "hint_text"
-const val PREFIX_HEADER_TAG = "prefix_text"
-const val QUESTION_HEADER_TAG = "question_text"

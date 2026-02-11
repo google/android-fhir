@@ -16,6 +16,9 @@
 
 package com.google.android.fhir.datacapture.views.components
 
+import android_fhir.datacapture_kmp.generated.resources.Res
+import android_fhir.datacapture_kmp.generated.resources.ic_clear
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,7 +26,7 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,13 +36,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
+import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.elementValue
+import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.toAnnotatedString
+import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
+import com.google.fhir.model.r4.Element
+import com.google.fhir.model.r4.Questionnaire
+import org.jetbrains.compose.resources.painterResource
+
+internal const val CLEAR_TEXT_ICON_BUTTON_TAG = "clear_field_text"
+internal const val DROP_DOWN_TEXT_FIELD_TAG = "drop_down_text_field"
+internal const val DROP_DOWN_TEXT_FIELD_LEADING_ICON_TAG = "drop_down_text_field_leading_icon"
+internal const val DROP_DOWN_ANSWER_MENU_ITEM_TAG = "drop_down_answer_list_menu_item"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +77,7 @@ internal fun DropDownItem(
     remember(selectedOption, options) { mutableStateOf(selectedOption) }
   val selectedOptionDisplay by
     remember(selectedDropDownAnswerOption) {
-      derivedStateOf { selectedDropDownAnswerOption?.answerOptionString ?: "" }
+      derivedStateOf { selectedDropDownAnswerOption?.displayString ?: "" }
     }
 
   LaunchedEffect(selectedDropDownAnswerOption) {
@@ -85,10 +104,10 @@ internal fun DropDownItem(
       label = { labelText?.let { Text(it) } },
       supportingText = { supportingText?.let { Text(it) } },
       leadingIcon =
-        selectedDropDownAnswerOption?.answerOptionImage?.let {
+        selectedDropDownAnswerOption?.iconImage?.let {
           {
             Icon(
-              bitmap = it,
+              it,
               contentDescription = selectedOptionDisplay,
               modifier = Modifier.testTag(DROP_DOWN_TEXT_FIELD_LEADING_ICON_TAG),
             )
@@ -117,14 +136,17 @@ internal fun DropDownAnswerMenuItem(
   DropdownMenuItem(
     modifier = Modifier.testTag(DROP_DOWN_ANSWER_MENU_ITEM_TAG),
     text = {
-      Text(answerOption.answerOptionAnnotatedString(), style = MaterialTheme.typography.bodyLarge)
+      Text(
+        answerOption.displayAnnotatedString(),
+        style = QuestionnaireTheme.textStyles.dropDownText,
+      )
     },
     leadingIcon =
-      answerOption.answerOptionImage?.let {
+      answerOption.iconImage?.let {
         {
           Icon(
-            bitmap = it,
-            contentDescription = answerOption.answerOptionString,
+            it,
+            contentDescription = answerOption.displayString,
           )
         }
       },
@@ -134,16 +156,146 @@ internal fun DropDownAnswerMenuItem(
   )
 }
 
-internal data class DropDownAnswerOption(
-  val answerId: String,
-  val answerOptionString: String,
-  val answerOptionImage: ImageBitmap? = null,
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun AutoCompleteDropDownItem(
+  modifier: Modifier,
+  enabled: Boolean,
+  labelText: AnnotatedString? = null,
+  supportingText: String? = null,
+  isError: Boolean = false,
+  showClearIcon: Boolean = false,
+  readOnly: Boolean = showClearIcon,
+  selectedOption: DropDownAnswerOption? = null,
+  options: List<DropDownAnswerOption>,
+  onDropDownAnswerOptionSelected: (DropDownAnswerOption?) -> Unit,
 ) {
-  override fun toString(): String = this.answerOptionString
+  val focusManager = LocalFocusManager.current
+  var expanded by remember { mutableStateOf(false) }
+  var selectedDropDownAnswerOption by
+    remember(selectedOption, options) { mutableStateOf(selectedOption) }
 
-  fun answerOptionAnnotatedString() = answerOptionString.toAnnotatedString()
+  // A flag to track when the user is in the process of filtering the options.
+  var inFilterMode: Boolean by remember(options) { mutableStateOf(false) }
+
+  var selectedOptionDisplay by
+    remember(selectedDropDownAnswerOption) {
+      // When an option is selected, the filter is no longer active.
+      inFilterMode = false
+      val stringValue = selectedDropDownAnswerOption?.displayString ?: ""
+      mutableStateOf(TextFieldValue(stringValue, selection = TextRange(stringValue.length)))
+    }
+
+  // The options are filtered only when the user is in filter mode.
+  val filteredOptions =
+    remember(options, selectedOptionDisplay, inFilterMode) {
+      if (inFilterMode) {
+        options.filter { it.displayString.contains(selectedOptionDisplay.text, true) }
+      } else {
+        // When not in filter mode, all options are displayed.
+        options
+      }
+    }
+
+  LaunchedEffect(selectedDropDownAnswerOption) {
+    if (selectedDropDownAnswerOption != null) {
+      focusManager.clearFocus()
+    }
+
+    if (selectedDropDownAnswerOption != selectedOption) {
+      onDropDownAnswerOptionSelected(selectedDropDownAnswerOption)
+    }
+  }
+
+  ExposedDropdownMenuBox(
+    modifier = modifier,
+    expanded = expanded,
+    onExpandedChange = { expanded = it },
+  ) {
+    OutlinedTextField(
+      value = selectedOptionDisplay,
+      onValueChange = {
+        inFilterMode = true
+        selectedOptionDisplay = it
+        if (!expanded) expanded = true
+      },
+      modifier =
+        Modifier.fillMaxWidth()
+          .testTag(DROP_DOWN_TEXT_FIELD_TAG)
+          .semantics { if (isError) error(supportingText ?: "") }
+          .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, enabled),
+      readOnly = readOnly,
+      enabled = enabled,
+      minLines = 1,
+      isError = isError,
+      label = { labelText?.let { Text(it) } },
+      supportingText = { supportingText?.let { Text(it) } },
+      leadingIcon =
+        selectedDropDownAnswerOption?.iconImage?.let {
+          {
+            Icon(
+              it,
+              contentDescription = selectedDropDownAnswerOption!!.displayString,
+              modifier = Modifier.testTag(DROP_DOWN_TEXT_FIELD_LEADING_ICON_TAG),
+            )
+          }
+        },
+      trailingIcon = {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          if (showClearIcon) {
+            IconButton(
+              onClick = { selectedDropDownAnswerOption = null },
+              modifier = Modifier.testTag(CLEAR_TEXT_ICON_BUTTON_TAG),
+            ) {
+              Icon(painterResource(Res.drawable.ic_clear), contentDescription = "clear")
+            }
+          }
+          ExposedDropdownMenuDefaults.TrailingIcon(
+            expanded = expanded,
+            modifier =
+              Modifier.menuAnchor(
+                ExposedDropdownMenuAnchorType.SecondaryEditable,
+                enabled,
+              ),
+          )
+        }
+      },
+    )
+
+    if (filteredOptions.isNotEmpty()) {
+      ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        filteredOptions.forEach { option ->
+          DropDownAnswerMenuItem(enabled, option) {
+            selectedDropDownAnswerOption = option
+            expanded = false
+          }
+        }
+      }
+    }
+  }
 }
 
-const val DROP_DOWN_TEXT_FIELD_TAG = "drop_down_text_field"
-const val DROP_DOWN_TEXT_FIELD_LEADING_ICON_TAG = "drop_down_text_field_leading_icon"
-const val DROP_DOWN_ANSWER_MENU_ITEM_TAG = "drop_down_answer_list_menu_item"
+internal data class DropDownAnswerOption(
+  val elementValue: Element,
+  val displayString: String,
+  val iconImage: ImageBitmap? = null,
+) {
+  override fun toString(): String = this.displayString
+
+  fun displayAnnotatedString() = displayString.toAnnotatedString()
+
+  companion object {
+    @Composable
+    fun of(answerOption: Questionnaire.Item.AnswerOption): DropDownAnswerOption {
+      val answerOptionDisplayString = answerOption.displayString()
+
+      return remember(answerOption) {
+        DropDownAnswerOption(
+          answerOption.elementValue,
+          answerOptionDisplayString,
+          answerOption.itemAnswerOptionImage(),
+        )
+      }
+    }
+  }
+}
