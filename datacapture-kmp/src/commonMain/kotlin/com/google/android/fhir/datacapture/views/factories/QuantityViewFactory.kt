@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 Google LLC
+ * Copyright 2022-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,7 +143,7 @@ internal object QuantityViewFactory : QuestionnaireItemViewFactory {
     when (validationResult) {
       is NotValidated,
       Valid, -> null
-      is Invalid -> validationResult.getSingleStringValidationMessage()
+      is Invalid -> validationResult.singleStringValidationMessage
     }
 
   private suspend fun handleInput(
