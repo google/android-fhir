@@ -49,6 +49,10 @@ internal fun Coding.hasCode() = !this.code?.value.isNullOrBlank()
 
 internal fun Coding.hasDisplay() = !this.display?.value.isNullOrBlank()
 
+internal fun Coding.hasSystem() = !this.system?.value.isNullOrBlank()
+
+internal fun Coding.hasVersion() = !this.version?.value.isNullOrBlank()
+
 typealias FhirR4Boolean = com.google.fhir.model.r4.Boolean
 
 typealias FhirR4Decimal = com.google.fhir.model.r4.Decimal
