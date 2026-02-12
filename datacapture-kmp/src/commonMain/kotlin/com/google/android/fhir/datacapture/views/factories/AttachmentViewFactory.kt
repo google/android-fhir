@@ -101,7 +101,7 @@ internal object AttachmentViewFactory : QuestionnaireItemViewFactory {
       remember(questionnaireViewItem.validationResult) { questionnaireViewItem.validationResult }
     var errorMessage by
       remember(validationResult) {
-        mutableStateOf((validationResult as? Invalid)?.getSingleStringValidationMessage())
+        mutableStateOf((validationResult as? Invalid)?.singleStringValidationMessage)
       }
     val questionnaireItem =
       remember(questionnaireViewItem.questionnaireItem) { questionnaireViewItem.questionnaireItem }

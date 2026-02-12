@@ -121,7 +121,7 @@ internal object SliderViewFactory : QuestionnaireItemViewFactory {
     when (validationResult) {
       is NotValidated,
       Valid, -> null
-      is Invalid -> validationResult.getSingleStringValidationMessage()
+      is Invalid -> validationResult.singleStringValidationMessage
     }
 
   private fun getFloatValue(extensionValue: Extension.Value?, ifNull: Float) =
