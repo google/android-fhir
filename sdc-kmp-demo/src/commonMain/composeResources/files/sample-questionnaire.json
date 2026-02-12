@@ -429,6 +429,173 @@
       ]
     },
     {
+      "linkId": "dropdown",
+      "type": "choice",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "drop-down",
+                "display": "Drop down"
+              }
+            ],
+            "text": "Drop down"
+          }
+        }
+      ],
+      "text": "Choose one from the options below (DropDown)",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "option-1",
+            "display": "Option 1"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-2",
+            "display": "Option 2"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-3",
+            "display": "Option 3"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-4",
+            "display": "Option 4"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-5",
+            "display": "Option 5"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-6",
+            "display": "Option 6"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "1-relationship",
+          "text": "State",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "code": [],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "autocomplete",
+                "display": "Auto-complete"
+              }
+            ],
+            "text": "Auto-complete"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "instruction",
+          "text": "Try typing Asthma, Chronic Lung Disease, Depression, Diabetes, Hypertension, High Blood Pressure, or High Cholesterol",
+          "type": "display"
+        }
+      ],
+      "repeats": true,
+      "linkId": "autocomplete",
+      "text": "Do you have any existing conditions (AutoComplete)",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "asthma",
+            "display": "Asthma"
+          },
+          "initialSelected": true
+        },
+        {
+          "valueCoding": {
+            "code": "copd",
+            "display": "Chronic Lung Disease"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "depression",
+            "display": "Depression"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "t2dm",
+            "display": "Diabetes"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "hypertension",
+            "display": "Hypertension"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "hbp",
+            "display": "High Blood Pressure"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "hypercholesterolaemia",
+            "display": "High Cholesterol"
+          }
+        }
+      ]
+    },
+    {
       "linkId": "notes",
       "type": "text",
       "text": "Additional Notes",

@@ -45,10 +45,12 @@ import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewFactory
 import com.google.android.fhir.datacapture.views.factories.CheckBoxGroupViewFactory
 import com.google.android.fhir.datacapture.views.factories.DialogSelectViewFactory
 import com.google.android.fhir.datacapture.views.factories.DisplayViewFactory
+import com.google.android.fhir.datacapture.views.factories.DropDownViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewFactory
@@ -329,6 +331,8 @@ fun getQuestionnaireItemViewFactory(
       QuestionnaireViewHolderType.RADIO_GROUP -> RadioGroupViewFactory
       QuestionnaireViewHolderType.CHECK_BOX_GROUP -> CheckBoxGroupViewFactory
       QuestionnaireViewHolderType.DIALOG_SELECT -> DialogSelectViewFactory
+      QuestionnaireViewHolderType.DROP_DOWN -> DropDownViewFactory
+      QuestionnaireViewHolderType.AUTO_COMPLETE -> AutoCompleteViewFactory
       else -> EmptyQuestionnaireViewFactory
     }
 }
