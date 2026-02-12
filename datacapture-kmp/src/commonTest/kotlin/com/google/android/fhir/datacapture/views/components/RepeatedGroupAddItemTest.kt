@@ -50,7 +50,7 @@ class RepeatedGroupAddItemTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    setContent { RepeatedGroupAddItem(viewItem) }
+    setContent { RepeatedGroupAddButtonItem(viewItem) }
     onNodeWithTag(ADD_REPEATED_GROUP_BUTTON_TAG).assertIsNotEnabled()
   }
 
@@ -67,7 +67,7 @@ class RepeatedGroupAddItemTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    setContent { RepeatedGroupAddItem(viewItem) }
+    setContent { RepeatedGroupAddButtonItem(viewItem) }
     onNodeWithTag(ADD_REPEATED_GROUP_BUTTON_TAG).assertIsDisplayed()
   }
 
@@ -86,7 +86,7 @@ class RepeatedGroupAddItemTest {
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
       )
-    setContent { RepeatedGroupAddItem(viewItem) }
+    setContent { RepeatedGroupAddButtonItem(viewItem) }
     onNodeWithTag(ADD_REPEATED_GROUP_BUTTON_TAG).assertIsEnabled()
   }
 }

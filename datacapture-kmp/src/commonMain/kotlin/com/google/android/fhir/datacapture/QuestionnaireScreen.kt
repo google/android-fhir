@@ -44,7 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
-import com.google.android.fhir.datacapture.views.components.PageNavigationItem
+import com.google.android.fhir.datacapture.views.components.QuestionnaireBottomNavigation
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -192,7 +192,7 @@ private fun EditModeContent(
     },
     bottomBar = {
       if (bottomNavItem != null) {
-        PageNavigationItem(bottomNavItem.questionnaireNavigationUIState)
+        QuestionnaireBottomNavigation(bottomNavItem.questionnaireNavigationUIState)
       }
     },
   ) { innerPadding ->
@@ -226,14 +226,14 @@ private fun ReviewModeContent(
     },
     bottomBar = {
       if (bottomNavItem != null) {
-        PageNavigationItem(
+        QuestionnaireBottomNavigation(
           bottomNavItem.questionnaireNavigationUIState,
         )
       }
     },
   ) { innerPadding ->
     Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-      QuestionnaireReviewList(items = state.items.filterIsInstance<ReviewAdapterItem>())
+      QuestionnaireReviewList(items = state.items.filterIsInstance<QuestionnaireReviewItem>())
     }
   }
 }

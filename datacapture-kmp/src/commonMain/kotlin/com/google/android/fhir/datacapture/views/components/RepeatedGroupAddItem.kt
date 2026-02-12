@@ -45,8 +45,10 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
+internal const val ADD_REPEATED_GROUP_BUTTON_TAG = "addRepeatedGroupButton"
+
 @Composable
-internal fun RepeatedGroupAddItem(questionnaireViewItem: QuestionnaireViewItem) {
+internal fun RepeatedGroupAddButtonItem(questionnaireViewItem: QuestionnaireViewItem) {
   val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
   val questionText =
     remember(questionnaireViewItem) { questionnaireViewItem.questionText?.toString() ?: "" }
@@ -102,5 +104,3 @@ internal fun RepeatedGroupAddItem(questionnaireViewItem: QuestionnaireViewItem) 
     }
   }
 }
-
-internal const val ADD_REPEATED_GROUP_BUTTON_TAG = "addRepeatedGroupButton"

@@ -45,6 +45,9 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
+internal const val DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG = "delete_repeated_group_item_button"
+internal const val REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG = "repeated_group_instance_header_title"
+
 @Composable
 internal fun RepeatedGroupHeaderItem(
   repeatedGroupHeader: QuestionnaireAdapterItem.RepeatedGroupHeader,
@@ -86,6 +89,3 @@ internal fun RepeatedGroupHeaderItem(
     }
   }
 }
-
-internal const val DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG = "delete_repeated_group_item_button"
-internal const val REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG = "repeated_group_instance_header_title"

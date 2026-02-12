@@ -52,6 +52,10 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+internal const val EDIT_TEXT_FIELD_TEST_TAG = "text_input_edit_text"
+internal const val UNIT_TEXT_TEST_TAG = "unit_text_view"
+internal const val HANDLE_INPUT_DEBOUNCE_TIME = 500L
+
 @Composable
 internal fun EditTextFieldItem(modifier: Modifier, textFieldState: EditTextFieldState) {
   OutlinedEditTextFieldItem(
@@ -191,7 +195,3 @@ internal data class EditTextFieldState(
     inputText = text
   }
 }
-
-const val EDIT_TEXT_FIELD_TEST_TAG = "text_input_edit_text"
-const val UNIT_TEXT_TEST_TAG = "unit_text_view"
-const val HANDLE_INPUT_DEBOUNCE_TIME = 500L

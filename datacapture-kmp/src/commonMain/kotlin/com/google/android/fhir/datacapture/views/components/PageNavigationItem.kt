@@ -44,8 +44,10 @@ import com.google.android.fhir.datacapture.QuestionnaireNavigationViewUIState
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import org.jetbrains.compose.resources.stringResource
 
+internal const val PAGE_NAVIGATION_BUTTON_TAG = "page_navigation_button"
+
 @Composable
-internal fun PageNavigationItem(
+internal fun QuestionnaireBottomNavigation(
   pageNavigationUIState: QuestionnaireNavigationUIState,
   modifier: Modifier = Modifier,
 ) {
@@ -129,5 +131,3 @@ private fun PageNavigationButton(
     }
   }
 }
-
-internal const val PAGE_NAVIGATION_BUTTON_TAG = "page_navigation_button"

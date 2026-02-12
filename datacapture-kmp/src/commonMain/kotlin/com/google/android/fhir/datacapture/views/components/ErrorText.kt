@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 
+internal const val ERROR_TEXT_TAG = "error_text"
+
 @Composable
 internal fun ErrorText(validationMessage: String) {
   Text(
@@ -35,5 +37,3 @@ internal fun ErrorText(validationMessage: String) {
         .testTag(ERROR_TEXT_TAG),
   )
 }
-
-const val ERROR_TEXT_TAG = "error_text"

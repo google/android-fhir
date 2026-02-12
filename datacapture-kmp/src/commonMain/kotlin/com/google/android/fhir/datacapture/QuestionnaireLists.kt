@@ -45,8 +45,8 @@ import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.components.PageNavigationItem
-import com.google.android.fhir.datacapture.views.components.RepeatedGroupAddItem
+import com.google.android.fhir.datacapture.views.components.QuestionnaireBottomNavigation
+import com.google.android.fhir.datacapture.views.components.RepeatedGroupAddButtonItem
 import com.google.android.fhir.datacapture.views.components.RepeatedGroupHeaderItem
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewFactory
@@ -127,13 +127,13 @@ internal fun QuestionnaireEditList(
           questionnaireItemViewHolderDelegate.Content(adapterItem.item)
         }
         is QuestionnaireAdapterItem.Navigation -> {
-          PageNavigationItem(adapterItem.questionnaireNavigationUIState)
+          QuestionnaireBottomNavigation(adapterItem.questionnaireNavigationUIState)
         }
         is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
           RepeatedGroupHeaderItem(adapterItem)
         }
         is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
-          RepeatedGroupAddItem(adapterItem.item)
+          RepeatedGroupAddButtonItem(adapterItem.item)
         }
       }
     }
@@ -141,7 +141,7 @@ internal fun QuestionnaireEditList(
 }
 
 @Composable
-internal fun QuestionnaireReviewList(items: List<ReviewAdapterItem>) {
+internal fun QuestionnaireReviewList(items: List<QuestionnaireReviewItem>) {
   LazyColumn {
     items(
       items = items,
@@ -153,7 +153,7 @@ internal fun QuestionnaireReviewList(items: List<ReviewAdapterItem>) {
         }
       },
       contentType = { it::class.simpleName },
-    ) { item: ReviewAdapterItem ->
+    ) { item: QuestionnaireReviewItem ->
       when (item) {
         is QuestionnaireAdapterItem.Question -> {
           QuestionnaireReviewItem(
@@ -162,7 +162,7 @@ internal fun QuestionnaireReviewList(items: List<ReviewAdapterItem>) {
           )
         }
         is QuestionnaireAdapterItem.Navigation -> {
-          PageNavigationItem(
+          QuestionnaireBottomNavigation(
             item.questionnaireNavigationUIState,
             modifier = Modifier.fillMaxWidth(),
           )
