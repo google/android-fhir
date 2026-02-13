@@ -27,10 +27,14 @@ import com.google.fhir.model.r4.Date
 import com.google.fhir.model.r4.DateTime
 import com.google.fhir.model.r4.Decimal
 import com.google.fhir.model.r4.Element
+import com.google.fhir.model.r4.Expression
 import com.google.fhir.model.r4.Quantity
 import com.google.fhir.model.r4.Reference
 import com.google.fhir.model.r4.Time
 import org.jetbrains.compose.resources.stringResource
+
+internal const val EXTENSION_CQF_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/StructureDefinition/cqf-expression"
 
 @get:Composable
 internal val Element.displayString: String?
@@ -61,3 +65,7 @@ internal val Element.displayString: String?
       else -> remember(this) { null }
     }
   }
+
+internal val Element.cqfExpression: Expression?
+  get() =
+    this.extension.find { it.url == EXTENSION_CQF_EXPRESSION_URL }?.value?.asExpression()?.value
