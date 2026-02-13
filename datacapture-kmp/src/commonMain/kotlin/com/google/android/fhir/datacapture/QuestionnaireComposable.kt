@@ -107,7 +107,8 @@ fun Questionnaire(
       }
     }
 
-  val viewModel: QuestionnaireViewModel = viewModel { QuestionnaireViewModel(stateMap) }
+  val viewModel: QuestionnaireViewModel =
+    viewModel(key = questionnaireJson) { QuestionnaireViewModel(stateMap) }
 
   LaunchedEffect(viewModel, onSubmit, onCancel) {
     viewModel.setOnSubmitButtonClickListener { onSubmit { viewModel.getQuestionnaireResponse() } }

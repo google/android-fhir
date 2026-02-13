@@ -18,7 +18,6 @@ package com.google.android.fhir.catalog.ui.shared
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,15 +46,10 @@ fun CatalogItemCard(
 ) {
   Surface(
     onClick = onClick,
-    modifier =
-      Modifier.padding(4.dp)
-        .fillMaxWidth()
-        .height(180.dp)
-        .border(
-          1.dp,
-          Color.LightGray,
-          RoundedCornerShape(MaterialTheme.shapes.large.topEnd),
-        ),
+    modifier = Modifier.padding(4.dp).fillMaxWidth().height(180.dp),
+    shape = RoundedCornerShape(8.dp),
+    tonalElevation = 1.dp,
+    shadowElevation = 2.dp,
   ) {
     Column {
       Box(

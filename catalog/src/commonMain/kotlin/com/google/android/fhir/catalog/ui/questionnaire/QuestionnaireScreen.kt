@@ -21,24 +21,27 @@ import android_fhir.catalog.generated.resources.behavior_name_calculated_express
 import android_fhir.catalog.generated.resources.behavior_name_calculated_expression_info
 import android_fhir.catalog.generated.resources.behavior_name_skip_logic
 import android_fhir.catalog.generated.resources.behavior_name_skip_logic_info
-import android_fhir.catalog.generated.resources.show_error_state
+import android_fhir.catalog.generated.resources.ic_info_24
+import android_fhir.catalog.generated.resources.loading
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -48,17 +51,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.google.android.fhir.catalog.ui.questionnaire.components.ErrorStateToggleAction
+import com.google.android.fhir.catalog.ui.questionnaire.components.ValidationErrorDialog
 import com.google.android.fhir.datacapture.Questionnaire
+import com.google.fhir.model.r4.QuestionnaireResponse
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuestionnaireScreen(
-  viewModel: CatalogQuestionnaireViewModel,
+  viewModel: QuestionnaireViewModel,
   title: String,
   fileName: String,
   validationFileName: String? = null,
@@ -71,7 +80,6 @@ fun QuestionnaireScreen(
   var isErrorState by remember { mutableStateOf(false) }
   var questionnaireJson by remember { mutableStateOf<String?>(null) }
   val scope = rememberCoroutineScope()
-  var showMenu by remember { mutableStateOf(false) }
 
   val skipLogicTitle = stringResource(Res.string.behavior_name_skip_logic)
   val calculatedExpressionTitle = stringResource(Res.string.behavior_name_calculated_expression)
@@ -90,67 +98,94 @@ fun QuestionnaireScreen(
 
   Scaffold(
     topBar = {
-      TopAppBar(
-        title = { Text(title) },
-        navigationIcon = {
-          IconButton(onClick = onBackClick) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-          }
-        },
-        actions = {
-          if (validationFileName != null) {
-            IconButton(onClick = { showMenu = !showMenu }) {
-              Icon(Icons.Default.MoreVert, contentDescription = "Options")
+      Column {
+        TopAppBar(
+          title = { Text(title) },
+          navigationIcon = {
+            IconButton(onClick = onBackClick) {
+              Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
-            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-              DropdownMenuItem(
-                text = { Text(stringResource(Res.string.show_error_state)) },
-                onClick = {
-                  isErrorState = !isErrorState
-                  showMenu = false
-                },
+          },
+          actions = {
+            if (validationFileName != null) {
+              ErrorStateToggleAction(
+                isErrorState = isErrorState,
+                onToggle = { isErrorState = it },
               )
             }
-          }
-        },
-      )
-    },
-  ) { paddingValues ->
-    Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-      // Info Card for specific behaviors
-      if (title == skipLogicTitle || title == calculatedExpressionTitle) {
-        InfoCard(
-          title = title,
-          info =
-            if (title == skipLogicTitle) {
-              stringResource(Res.string.behavior_name_skip_logic_info)
-            } else {
-              stringResource(Res.string.behavior_name_calculated_expression_info)
-            },
+          },
         )
       }
-
-      Box(modifier = Modifier.weight(1f)) {
-        questionnaireJson?.let { json ->
-          Questionnaire(
-            questionnaireJson = json,
-            questionnaireLaunchContextMap = launchContextMap,
-            showSubmitButton = true,
-            showReviewPage = showReviewPage,
-            showReviewPageFirst = showReviewPageFirst,
-            isReadOnly = isReadOnly,
-            showCancelButton = false,
-            onSubmit = { getResponse ->
-              scope.launch {
-                val response = getResponse()
-                val responseJson = viewModel.getQuestionnaireResponseJson(response)
-                navigateToResponse(responseJson)
-              }
-            },
-            onCancel = {},
+    },
+  ) { paddingValues ->
+    Surface(
+      modifier = Modifier.fillMaxSize().padding(paddingValues),
+      color = Color(0xFFF5F5F5),
+    ) {
+      Column(modifier = Modifier.fillMaxSize()) {
+        if (title == skipLogicTitle || title == calculatedExpressionTitle) {
+          InfoCard(
+            title = title,
+            info =
+              if (title == skipLogicTitle) {
+                stringResource(Res.string.behavior_name_skip_logic_info)
+              } else {
+                stringResource(Res.string.behavior_name_calculated_expression_info)
+              },
           )
         }
-          ?: run { Text("Loading...", modifier = Modifier.padding(16.dp)) }
+
+        Box(modifier = Modifier.weight(1f)) {
+          var showValidationDialog by remember { mutableStateOf(false) }
+          var invalidFields by remember { mutableStateOf<List<String>>(emptyList()) }
+          var pendingResponse by remember { mutableStateOf<QuestionnaireResponse?>(null) }
+
+          if (showValidationDialog) {
+            ValidationErrorDialog(
+              invalidFields = invalidFields,
+              onDismiss = { showValidationDialog = false },
+              onFixQuestions = { showValidationDialog = false },
+              onSubmitAnyway = {
+                showValidationDialog = false
+                pendingResponse?.let {
+                  val responseJson = viewModel.getQuestionnaireResponseJson(it)
+                  navigateToResponse(responseJson)
+                }
+              },
+            )
+          }
+
+          questionnaireJson?.let { json ->
+            Questionnaire(
+              questionnaireJson = json,
+              questionnaireLaunchContextMap = launchContextMap,
+              showSubmitButton = true,
+              showReviewPage = showReviewPage,
+              showReviewPageFirst = showReviewPageFirst,
+              isReadOnly = isReadOnly,
+              showCancelButton = false,
+              showRequiredText = isErrorState,
+              showOptionalText = isErrorState,
+              onSubmit = { getResponse ->
+                scope.launch {
+                  val response = getResponse()
+                  val errors = viewModel.validateAndGetErrors(json, response)
+
+                  if (errors.isNotEmpty()) {
+                    invalidFields = errors
+                    pendingResponse = response
+                    showValidationDialog = true
+                  } else {
+                    val responseJson = viewModel.getQuestionnaireResponseJson(response)
+                    navigateToResponse(responseJson)
+                  }
+                }
+              },
+              onCancel = {},
+            )
+          }
+            ?: run { Text(stringResource(Res.string.loading), modifier = Modifier.padding(16.dp)) }
+        }
       }
     }
   }
@@ -166,15 +201,24 @@ fun InfoCard(title: String, info: String) {
       ),
   ) {
     Column(modifier = Modifier.padding(16.dp)) {
-      Text(
-        text = title,
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.onSecondaryContainer,
-      )
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+          painter = painterResource(Res.drawable.ic_info_24),
+          contentDescription = null,
+          modifier = Modifier.size(20.dp),
+          tint = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+          text = title,
+          style = MaterialTheme.typography.bodyMedium,
+          fontWeight = FontWeight.Bold,
+          color = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
+      }
       Text(
         text = info,
-        style = MaterialTheme.typography.bodyMedium,
+        style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.padding(top = 8.dp),
         color = MaterialTheme.colorScheme.onSecondaryContainer,
       )

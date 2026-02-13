@@ -50,9 +50,9 @@ import com.google.android.fhir.catalog.ui.components.ComponentListScreen
 import com.google.android.fhir.catalog.ui.components.ComponentListViewModel
 import com.google.android.fhir.catalog.ui.layouts.LayoutListScreen
 import com.google.android.fhir.catalog.ui.layouts.LayoutListViewModel
-import com.google.android.fhir.catalog.ui.questionnaire.CatalogQuestionnaireViewModel
 import com.google.android.fhir.catalog.ui.questionnaire.QuestionnaireResponseScreen
 import com.google.android.fhir.catalog.ui.questionnaire.QuestionnaireScreen
+import com.google.android.fhir.catalog.ui.questionnaire.QuestionnaireViewModel
 import com.google.android.fhir.catalog.ui.theme.AppTheme
 import org.jetbrains.compose.resources.painterResource
 
@@ -190,7 +190,7 @@ fun App() {
               }
 
             QuestionnaireScreen(
-              viewModel = viewModel { CatalogQuestionnaireViewModel() },
+              viewModel = viewModel { QuestionnaireViewModel() },
               title = title,
               fileName = fileName,
               validationFileName = validationFile,
@@ -213,7 +213,6 @@ fun App() {
               arguments?.read { if (contains("title")) getString("title") else null } ?: ""
             QuestionnaireResponseScreen(
               responseJson = submittedResponseJson ?: "",
-              title = title,
               onBackClick = { navController.popBackStack() },
             )
           }

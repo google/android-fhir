@@ -17,17 +17,23 @@
 package com.google.android.fhir.catalog.ui.questionnaire
 
 import android_fhir.catalog.generated.resources.Res
+import android_fhir.catalog.generated.resources.close
 import android_fhir.catalog.generated.resources.questionnaire_response_subtitle
+import android_fhir.catalog.generated.resources.questionnaire_response_title
 import android_fhir.catalog.generated.resources.questionnaire_submitted
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -46,7 +52,6 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun QuestionnaireResponseScreen(
   responseJson: String,
-  title: String,
   onBackClick: () -> Unit,
 ) {
   Scaffold(
@@ -54,7 +59,7 @@ fun QuestionnaireResponseScreen(
       TopAppBar(
         title = {
           Text(
-            text = title,
+            text = stringResource(Res.string.questionnaire_response_title),
             modifier = Modifier.fillMaxWidth(),
           )
         },
@@ -70,7 +75,7 @@ fun QuestionnaireResponseScreen(
       modifier =
         Modifier.fillMaxSize()
           .padding(padding)
-          .padding(horizontal = 16.dp)
+          .padding(horizontal = 24.dp)
           .verticalScroll(rememberScrollState()),
       horizontalAlignment = Alignment.Start,
       verticalArrangement = Arrangement.Top,
@@ -91,6 +96,14 @@ fun QuestionnaireResponseScreen(
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurface,
       )
+      Spacer(modifier = Modifier.height(24.dp))
+      Button(
+        onClick = onBackClick,
+        modifier = Modifier.width(132.dp).align(Alignment.CenterHorizontally),
+      ) {
+        Text(stringResource(Res.string.close))
+      }
+      Spacer(modifier = Modifier.height(24.dp))
     }
   }
 }

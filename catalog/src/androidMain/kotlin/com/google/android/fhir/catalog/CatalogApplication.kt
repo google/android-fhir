@@ -17,11 +17,12 @@
 package com.google.android.fhir.catalog
 
 import android.app.Application
+import com.google.android.fhir.datacapture.DataCapture
 
 class CatalogApplication : Application() {
 
   override fun onCreate() {
     super.onCreate()
-    // TODO Restore QueryResolver for DataCaptureConfigu once FHIR Engine is migrated to KMP
+    DataCapture.initialize(this)
   }
 }

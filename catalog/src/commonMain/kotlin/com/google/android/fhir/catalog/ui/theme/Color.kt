@@ -81,5 +81,3 @@ val SurfaceVariantNeutralVariant30 = Color(0xFF444746)
 val OnSurfaceVariantNeutralVariant80 = Color(0xFFC4C7C5)
 
 val OutlineNeutralVariant60 = Color(0xFF8E918F)
-
-val IcCardFileBoxBackground = Color(0xFF3B5CFF)
