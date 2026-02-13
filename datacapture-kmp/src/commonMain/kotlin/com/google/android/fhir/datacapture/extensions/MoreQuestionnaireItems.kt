@@ -20,14 +20,19 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import co.touchlab.kermit.Logger
 import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
+import com.google.android.fhir.datacapture.fhirpath.evaluateToDisplay
 import com.google.fhir.model.r4.Attachment
 import com.google.fhir.model.r4.Coding
+import com.google.fhir.model.r4.Date
 import com.google.fhir.model.r4.Expression
 import com.google.fhir.model.r4.Extension
+import com.google.fhir.model.r4.Integer
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
+import com.google.fhir.model.r4.Reference
 import com.google.fhir.model.r4.Resource
 import com.google.fhir.model.r4.String as FhirString
+import com.google.fhir.model.r4.Time
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlin.time.Clock
@@ -330,15 +335,14 @@ val Questionnaire.Item.sliderStepValue: Int?
 internal val Questionnaire.Item.minValue
   get() = this.extension.find { it.url == MIN_VALUE_EXTENSION_URL }?.value
 
-// internal val Questionnaire.Item.minValueCqfCalculatedValueExpression
-//  get() = this.extension.find { it.url == MIN_VALUE_EXTENSION_URL }
-// ?.value?.cqfCalculatedValueExpression
+internal val Questionnaire.Item.minValueCqfCalculatedValueExpression: Expression?
+  get() = this.extension.find { it.url == MIN_VALUE_EXTENSION_URL }?.cqfCalculatedValueExpression
 
 internal val Questionnaire.Item.maxValue
   get() = this.extension.find { it.url == MAX_VALUE_EXTENSION_URL }?.value
 
-// internal val Questionnaire.Item.maxValueCqfCalculatedValueExpression
-//  get() = getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value?.cqfCalculatedValueExpression
+internal val Questionnaire.Item.maxValueCqfCalculatedValueExpression: Expression?
+  get() = this.extension.find { it.url == MAX_VALUE_EXTENSION_URL }?.cqfCalculatedValueExpression
 
 // ********************************************************************************************** //
 //                                                                                                //
@@ -647,36 +651,35 @@ internal val Questionnaire.Item.unitOption: List<Coding>
 //                                                                                                //
 // ********************************************************************************************** //
 
-// internal val Questionnaire.Item.answerOptionsToggleExpressions
-//  get() =
-//    this.extension
-//      .filter { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL }
-//      .map { rootExtension ->
-//        val options =
-//          rootExtension.extension
-//            .filter { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION }
-//            .map { it.value }
-//        if (options.isEmpty()) {
-//          throw IllegalArgumentException(
-//            "Questionnaire item $linkId with extension '$EXTENSION_ANSWER_EXPRESSION_URL' requires
-// at least one option. See
-// http://hl7.org/fhir/uv/sdc/STU3/StructureDefinition-sdc-questionnaire-answerOptionsToggleExpression.html.",
-//          )
-//        }
-//        val expression =
-//          rootExtension.extension
-//            .single { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION }
-//            .let { it.castToExpression(it.value) }
-//        expression to options
-//      }
+internal val Questionnaire.Item.answerOptionsToggleExpressions
+  get() =
+    this.extension
+      .filter { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL }
+      .map { rootExtension ->
+        val options =
+          rootExtension.extension
+            .filter { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION }
+            .map { it.value }
+        if (options.isEmpty()) {
+          throw IllegalArgumentException(
+            "Questionnaire item $linkId with extension '$EXTENSION_ANSWER_EXPRESSION_URL' requires at least one option. See http://hl7.org/fhir/uv/sdc/STU3/StructureDefinition-sdc-questionnaire-answerOptionsToggleExpression.html.",
+          )
+        }
+        val expression =
+          rootExtension.extension
+            .single { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION }
+            .value
+            ?.asExpression()
+        expression to options
+      }
 
 // Return expression if Questionnaire.Item has ENABLE WHEN EXPRESSION URL
-// val Questionnaire.Item.enableWhenExpression: Expression?
-//  get() {
-//    return this.extension
-//      .firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }
-//      ?.let { it.value as Expression }
-//  }
+val Questionnaire.Item.enableWhenExpression: Expression?
+  get() {
+    return this.extension
+      .firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }
+      ?.let { it.value?.asExpression()?.value }
+  }
 
 internal val Questionnaire.Item.variableExpressions: List<Expression>
   get() =
@@ -695,73 +698,78 @@ internal fun Questionnaire.Item.findVariableExpression(
 ): Expression? {
   return variableExpressions.find { variableName == it.name?.value }
 }
-//
-// /** Returns Calculated expression, or null */
-// internal val Questionnaire.Item.calculatedExpression: Expression?
-//  get() =
-//    this.getExtensionByUrl(EXTENSION_CALCULATED_EXPRESSION_URL)?.let {
-//      it.castToExpression(it.value)
-//    }
 
-// /** Returns list of extensions whose value is of type [Expression] */
-// internal val Questionnaire.Item.expressionBasedExtensions
-//  get() = this.extension.filter { it.value is Expression }
-//
-// /**
-// * Whether [item] has any expression directly referencing the current questionnaire item by link
-// ID
-// * (e.g. if [item] has an expression `%resource.item.where(linkId='this-question')` where
-// * `this-question` is the link ID of the current questionnaire item).
-// */
-// internal fun Questionnaire.Item.isReferencedBy(
-//  item: Questionnaire.Item,
-// ) =
-//  item.expressionBasedExtensions.any {
-//    it
-//      .castToExpression(it.value)
-//      .expression
-//      .replace(" ", "")
-//      .contains(Regex(".*linkId='${this.linkId}'.*"))
-//  }
-//
-// internal val Questionnaire.Item.answerExpression: Expression?
-//  get() =
-//    ToolingExtensions.getExtension(this, EXTENSION_ANSWER_EXPRESSION_URL)?.value?.let {
-//      it.castToExpression(it)
-//    }
-//
-// internal val Questionnaire.Item.candidateExpression: Expression?
-//  get() =
-//    ToolingExtensions.getExtension(this, EXTENSION_CANDIDATE_EXPRESSION_URL)?.value?.let {
-//      it.castToExpression(it)
-//    }
+/** Returns Calculated expression, or null */
+internal val Questionnaire.Item.calculatedExpression: Expression?
+  get() {
+    return this.extension
+      .firstOrNull { it.url == EXTENSION_CALCULATED_EXPRESSION_URL }
+      ?.let { it.value?.asExpression()?.value }
+  }
+
+/** Returns list of extensions whose value is of type [Expression] */
+internal val Questionnaire.Item.expressionBasedExtensions
+  get() = this.extension.filter { it.value is Extension.Value.Expression }
+
+/**
+ * Whether [item] has any expression directly referencing the current questionnaire item by link ID
+ * (e.g. if [item] has an expression `%resource.item.where(linkId='this-question')` where
+ * `this-question` is the link ID of the current questionnaire item).
+ */
+internal fun Questionnaire.Item.isReferencedBy(
+  item: Questionnaire.Item,
+) =
+  item.expressionBasedExtensions.any {
+    it.value
+      ?.asExpression()
+      ?.value
+      ?.expression
+      ?.value
+      ?.replace(" ", "")
+      ?.contains(Regex(".*linkId='${this.linkId}'.*")) == true
+  }
+
+internal val Questionnaire.Item.answerExpression: Expression?
+  get() =
+    this.extension.find { it.url == EXTENSION_ANSWER_EXPRESSION_URL }?.value?.asExpression()?.value
+
+internal val Questionnaire.Item.candidateExpression: Expression?
+  get() =
+    this.extension
+      .find { it.url == EXTENSION_CANDIDATE_EXPRESSION_URL }
+      ?.value
+      ?.asExpression()
+      ?.value
 
 // TODO implement full functionality of choice column
 // https://github.com/google/android-fhir/issues/1495
-// /**
-// * Choice column extension https://build.fhir.org/ig/HL7/sdc/examples.html#choiceColumn
-// *
-// * The extension choice-column defines its internal elements as nested extension with table
-// * properties
-// * - path -> the field in answerOption
-// * - width -> the width of given column if widget generates a table; TBD in #1495
-// * - label -> the label of given column of table or answerOption
-// * - forDisplay -> if the column should be shown on UI
-// */
-// internal val Questionnaire.Item.choiceColumn: List<ChoiceColumn>?
-//  get() =
-//    ToolingExtensions.getExtensions(this, EXTENSION_CHOICE_COLUMN_URL)?.map { extension ->
-//      extension.extension.let { nestedExtensions ->
-//        ChoiceColumn(
-//          path = nestedExtensions.find { it.url == "path" }!!.value.asStringValue(),
-//          label = nestedExtensions.find { it.url == "label" }?.value?.asStringValue(),
-//          forDisplay =
-//            nestedExtensions.any {
-//              it.url == "forDisplay" && it.castToBoolean(it.value).booleanValue()
-//            },
-//        )
-//      }
-//    }
+/**
+ * Choice column extension https://build.fhir.org/ig/HL7/sdc/examples.html#choiceColumn
+ *
+ * The extension choice-column defines its internal elements as nested extension with table
+ * properties
+ * - path -> the field in answerOption
+ * - width -> the width of given column if widget generates a table; TBD in #1495
+ * - label -> the label of given column of table or answerOption
+ * - forDisplay -> if the column should be shown on UI
+ */
+internal val Questionnaire.Item.choiceColumn: List<ChoiceColumn>
+  get() =
+    this.extension
+      .filter { it.url == EXTENSION_CHOICE_COLUMN_URL }
+      .map { extension ->
+        extension.extension.let { nestedExtensions ->
+          ChoiceColumn(
+            path = nestedExtensions.find { it.url == "path" }!!.value?.asString()?.value?.value
+                ?: "",
+            label = nestedExtensions.find { it.url == "label" }?.value?.asString()?.value?.value,
+            forDisplay =
+              nestedExtensions.any {
+                it.url == "forDisplay" && it.value?.asBoolean()?.value?.value == true
+              },
+          )
+        }
+      }
 
 /**
  * A choice column extracted from choice column extension contains following properties
@@ -782,41 +790,51 @@ internal data class ChoiceColumn(val path: String, val label: String?, val forDi
  * - With other types it adds the options as is
  *
  * @param dataList the source data to extract the answer option values. The data could be list of
- *   resources [Resource], identifiers [Identifier] or codes [Coding]
- * @return list of answer options [Questionnaire.QuestionnaireItemAnswerOptionComponent]
+ *   resources [Resource], identifiers [com.google.fhir.model.r4.Identifier] or codes [Coding]
+ * @return list of answer options [Questionnaire.Item.AnswerOption]
  */
-// internal fun Questionnaire.Item.extractAnswerOptions(
-//  dataList: List<Base>,
-// ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-//  return when (this.type) {
-//    Questionnaire.QuestionnaireItemType.REFERENCE -> {
-//      require(dataList.all { it.isResource }) {
-//        "'${this.type.toCode()}' cannot be used to populate $EXTENSION_CHOICE_COLUMN_URL. Only
-// Resources can be used to populate the choice columns."
-//      }
-//
-//      dataList.map { data ->
-//        data as Resource
-//        Reference().apply {
-//          reference = "${data.resourceType}/${data.logicalId}"
-//          this@extractAnswerOptions.choiceColumn
-//            ?.filter { it.forDisplay }
-//            ?.map { it.path }
-//            ?.let { evaluateToDisplay(it, data) }
-//            ?.also { display = it }
-//        }
-//      }
-//    }
-//    else -> {
-//      require(dataList.all { !it.isResource }) {
-//        "$EXTENSION_CHOICE_COLUMN_URL not applicable for '${this.type.toCode()}'. Only type
-// reference is allowed with resource."
-//      }
-//
-//      dataList.map { it.castToType(it) }
-//    }
-//  }.map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
-// }
+internal fun Questionnaire.Item.extractAnswerOptions(
+  dataList: List<Any>,
+): List<Questionnaire.Item.AnswerOption> {
+  return when (this.type.value) {
+    Questionnaire.QuestionnaireItemType.Reference -> {
+      require(dataList.all { it is Resource }) {
+        "'${this.type.value?.getCode()}' cannot be used to populate $EXTENSION_CHOICE_COLUMN_URL. Only Resources can be used to populate the choice columns."
+      }
+
+      dataList.map { data ->
+        data as Resource
+        Reference.Builder()
+          .apply {
+            reference =
+              FhirString.Builder().apply { value = "${data::class.simpleName}/${data.logicalId}" }
+            this@extractAnswerOptions.choiceColumn
+              .filter { it.forDisplay }
+              .map { it.path }
+              .let { evaluateToDisplay(it, data) }
+              .also { display = FhirString.Builder().apply { value = it } }
+          }
+          .build()
+      }
+    }
+    else -> {
+      require(dataList.all { it !is Resource }) {
+        "$EXTENSION_CHOICE_COLUMN_URL not applicable for '${this.type.value?.getCode()}'. Only type reference is allowed with resource."
+      }
+      dataList
+    }
+  }.mapNotNull {
+    when (it) {
+      is Integer -> Questionnaire.Item.AnswerOption.Value.Integer(it)
+      is FhirString -> Questionnaire.Item.AnswerOption.Value.String(it)
+      is Coding -> Questionnaire.Item.AnswerOption.Value.Coding(it)
+      is Reference -> Questionnaire.Item.AnswerOption.Value.Reference(it)
+      is Date -> Questionnaire.Item.AnswerOption.Value.Date(it)
+      is Time -> Questionnaire.Item.AnswerOption.Value.Time(it)
+      else -> null
+    }?.let { value -> Questionnaire.Item.AnswerOption(value = value) }
+  }
+}
 
 /** See http://hl7.org/fhir/constraint-severity */
 enum class ConstraintSeverityTypes(
