@@ -406,7 +406,18 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
       }
 
       if (questionnaireItem.shouldHaveNestedItemsUnderAnswers) {
-        questionnaireResponseItem.toBuilder().copyNestedItemsToChildlessAnswers(questionnaireItem)
+        val questionnaireResponseItemCopy =
+          questionnaireResponseItem
+            .toBuilder()
+            .apply { copyNestedItemsToChildlessAnswers(questionnaireItem) }
+            .build()
+
+        // Update current questionnaireResponseItem answers with updated nested answers list from
+        // copy
+        (questionnaireResponseItem.answer as? MutableList)?.let {
+          it.clear()
+          it.addAll(questionnaireResponseItemCopy.answer)
+        }
 
         // If nested items are added to the answer, the enablement evaluator needs to be
         // reinitialized in order for it to rebuild the pre-order map and parent map of

@@ -609,6 +609,29 @@
       "repeats": true,
       "item": [
         {
+          "linkId": "1-1",
+          "text": "Quantity",
+          "type": "quantity",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "system": "http://unitsofmeasure.org",
+                "code": "cm",
+                "display": "centimeter"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "system": "http://unitsofmeasure.org",
+                "code": "[in_i]",
+                "display": "inch"
+              }
+            }
+          ]
+        },
+        {
           "linkId": "1-2",
           "type": "choice",
           "extension": [
