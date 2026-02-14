@@ -28,8 +28,6 @@ import io.github.vinceglb.filekit.mimeType
 import io.github.vinceglb.filekit.name
 import io.github.vinceglb.filekit.readBytes
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -44,28 +42,10 @@ import platform.AVFoundation.AVMediaTypeVideo
 import platform.AVFoundation.authorizationStatusForMediaType
 import platform.AVFoundation.requestAccessForMediaType
 import platform.Foundation.NSData
-import platform.Foundation.NSURL
-import platform.Foundation.dataWithContentsOfURL
-import platform.Photos.PHAuthorizationStatus
-import platform.Photos.PHAuthorizationStatusAuthorized
-import platform.Photos.PHAuthorizationStatusDenied
-import platform.Photos.PHAuthorizationStatusNotDetermined
-import platform.Photos.PHPhotoLibrary
-import platform.UIKit.UIApplication
-import platform.UIKit.UIDocumentPickerDelegateProtocol
-import platform.UIKit.UIDocumentPickerMode
-import platform.UIKit.UIDocumentPickerViewController
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
 import platform.UIKit.UIImagePickerController
-import platform.UIKit.UIImagePickerControllerCameraCaptureMode
-import platform.UIKit.UIImagePickerControllerDelegateProtocol
-import platform.UIKit.UIImagePickerControllerEditedImage
-import platform.UIKit.UIImagePickerControllerImageURL
-import platform.UIKit.UIImagePickerControllerOriginalImage
 import platform.UIKit.UIImagePickerControllerSourceType
-import platform.UIKit.UINavigationControllerDelegateProtocol
-import platform.darwin.NSObject
 
 internal class IosMediaHandler(
   override val maxSupportedFileSizeBytes: BigDecimal,
@@ -73,19 +53,36 @@ internal class IosMediaHandler(
 ) : MediaHandler {
 
   override suspend fun capturePhoto(): MediaCaptureResult {
-    val isCameraPermissionGranted = requestCameraPermission()
-    if (!isCameraPermissionGranted) {
-      return MediaCaptureResult.Error("Error: Camera permission not granted")
+    val currentAuthorizedStatus = AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
+    return when (currentAuthorizedStatus) {
+      AVAuthorizationStatusAuthorized -> {
+        val pickedFile = FileKit.openCameraPicker()
+        pickedFile?.let {
+          captureResult(
+            it.readBytes(),
+            titleName = it.name,
+            mimeType = it.mimeType()?.toString() ?: "application/octet-stream",
+          )
+        }
+          ?: throw CancellationException()
+      }
+      AVAuthorizationStatusNotDetermined -> {
+        suspendCancellableCoroutine { continuation ->
+          AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo) { isGranted ->
+            Logger.e("ERROR: IOS Camera permission: $isGranted")
+            continuation.resumeWith(Result.success(Unit))
+          }
+        }
+        throw CancellationException() // cancel camera picker request to reset and allow user to
+        // pick again
+      }
+      AVAuthorizationStatusDenied ->
+        MediaCaptureResult.Error("Error: Camera permission not granted")
+      else -> {
+        Logger.e("unknown camera permission status $currentAuthorizedStatus")
+        MediaCaptureResult.Error("Error: Camera permission not granted")
+      }
     }
-    val pickedFile = FileKit.openCameraPicker()
-    return pickedFile?.let {
-      captureResult(
-        it.readBytes(),
-        titleName = it.name,
-        mimeType = it.mimeType()?.toString() ?: "application/octet-stream",
-      )
-    }
-      ?: throw CancellationException()
   }
 
   override suspend fun selectFile(inputMimeTypes: Array<String>): MediaCaptureResult {
@@ -114,197 +111,6 @@ internal class IosMediaHandler(
     UIImagePickerController.isSourceTypeAvailable(
       UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypeCamera,
     )
-
-  private suspend fun requestCameraPermission(): Boolean =
-    suspendCancellableCoroutine { continuation ->
-      val currentAuthorizedStatus =
-        AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
-      when (currentAuthorizedStatus) {
-        AVAuthorizationStatusAuthorized -> continuation.resumeWith(Result.success(true)) // granted
-        AVAuthorizationStatusNotDetermined -> {
-          AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo) { isGranted ->
-            continuation.resumeWith(Result.success(isGranted))
-          }
-        }
-        AVAuthorizationStatusDenied -> continuation.resumeWith(Result.success(false))
-        else -> {
-          Logger.e("unknown camera permission status $currentAuthorizedStatus")
-          continuation.resumeWith(Result.success(false))
-        }
-      }
-    }
-
-  private suspend fun requestPhotoLibraryAccess(): Boolean =
-    suspendCancellableCoroutine { continuation ->
-      fun checkAccessStatus(authorizationStatus: PHAuthorizationStatus) {
-        when (authorizationStatus) {
-          PHAuthorizationStatusAuthorized -> continuation.resumeWith(Result.success(true))
-          PHAuthorizationStatusNotDetermined -> {
-            PHPhotoLibrary.requestAuthorization { newStatus -> checkAccessStatus(newStatus) }
-          }
-          PHAuthorizationStatusDenied -> continuation.resumeWith(Result.success(false))
-          else -> {
-            Logger.e("unknown photo library permission status $authorizationStatus")
-            continuation.resumeWith(Result.success(false))
-          }
-        }
-      }
-
-      val currentAccessStatus = PHPhotoLibrary.authorizationStatus()
-      checkAccessStatus(currentAccessStatus)
-    }
-
-  private suspend fun requestFilePickerAccess(): Boolean =
-    suspendCancellableCoroutine { continuation ->
-    }
-
-  @OptIn(ExperimentalUuidApi::class)
-  private suspend fun takeCameraPhoto(): Pair<String, ByteArray> =
-    suspendCancellableCoroutine { continuation ->
-      val cameraDelegate =
-        object :
-          NSObject(),
-          UIImagePickerControllerDelegateProtocol,
-          UINavigationControllerDelegateProtocol {
-          override fun imagePickerController(
-            picker: UIImagePickerController,
-            didFinishPickingMediaWithInfo: Map<Any?, *>,
-          ) {
-            val image =
-              didFinishPickingMediaWithInfo.getValue(UIImagePickerControllerEditedImage) as? UIImage
-                ?: didFinishPickingMediaWithInfo.getValue(
-                  UIImagePickerControllerOriginalImage,
-                ) as? UIImage
-
-            picker.dismissViewControllerAnimated(true, null)
-
-            image?.toJPEGByteArray()?.let {
-              val name = "IMG_${Uuid.random().toHexString()}.jpeg"
-              continuation.resumeWith(Result.success(name to it))
-            }
-              ?: continuation.cancel()
-          }
-
-          override fun imagePickerControllerDidCancel(picker: UIImagePickerController) {
-            picker.dismissViewControllerAnimated(true, null)
-            continuation.cancel()
-          }
-        }
-
-      val imagePicker = UIImagePickerController()
-      imagePicker.setSourceType(
-        UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypeCamera,
-      )
-      imagePicker.setAllowsEditing(true)
-      imagePicker.setCameraCaptureMode(
-        UIImagePickerControllerCameraCaptureMode.UIImagePickerControllerCameraCaptureModePhoto,
-      )
-      imagePicker.setDelegate(cameraDelegate)
-      UIApplication.sharedApplication.keyWindow
-        ?.rootViewController
-        ?.presentViewController(
-          imagePicker,
-          true,
-          null,
-        )
-    }
-
-  @OptIn(ExperimentalUuidApi::class)
-  private suspend fun pickPhoto(): Pair<String, ByteArray> =
-    suspendCancellableCoroutine { continuation ->
-      val galleryDelegate =
-        object :
-          NSObject(),
-          UIImagePickerControllerDelegateProtocol,
-          UINavigationControllerDelegateProtocol {
-          override fun imagePickerController(
-            picker: UIImagePickerController,
-            didFinishPickingMediaWithInfo: Map<Any?, *>,
-          ) {
-            val image =
-              didFinishPickingMediaWithInfo.getValue(
-                UIImagePickerControllerEditedImage,
-              ) as? UIImage
-                ?: didFinishPickingMediaWithInfo.getValue(
-                  UIImagePickerControllerOriginalImage,
-                ) as? UIImage
-            val imageURL =
-              didFinishPickingMediaWithInfo.getValue(
-                UIImagePickerControllerImageURL,
-              ) as? NSURL
-            val fileName =
-              imageURL?.lastPathComponent?.substringBeforeLast(".")
-                ?: "IMG_${Uuid.random().toHexString()}"
-
-            picker.dismissViewControllerAnimated(true, null)
-            image?.toJPEGByteArray()?.let {
-              continuation.resumeWith(Result.success("$fileName.jpeg" to it))
-            }
-              ?: continuation.cancel()
-          }
-
-          override fun imagePickerControllerDidCancel(picker: UIImagePickerController) {
-            picker.dismissViewControllerAnimated(true, null)
-            continuation.cancel()
-          }
-        }
-
-      val imagePicker = UIImagePickerController()
-      imagePicker.setSourceType(
-        UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypePhotoLibrary,
-      )
-      imagePicker.setAllowsEditing(true)
-      imagePicker.setDelegate(galleryDelegate)
-      UIApplication.sharedApplication.keyWindow
-        ?.rootViewController
-        ?.presentViewController(
-          imagePicker,
-          true,
-          null,
-        )
-    }
-
-  @OptIn(ExperimentalUuidApi::class)
-  private suspend fun pickFile(mimeTypes: Array<String>): Pair<String, ByteArray> =
-    suspendCancellableCoroutine { continuation ->
-      val fileDocumentDelegate =
-        object : NSObject(), UIDocumentPickerDelegateProtocol {
-          override fun documentPicker(
-            controller: UIDocumentPickerViewController,
-            didPickDocumentAtURL: NSURL,
-          ) {
-            didPickDocumentAtURL.startAccessingSecurityScopedResource()
-            val data = NSData.dataWithContentsOfURL(didPickDocumentAtURL)
-            val fileName = didPickDocumentAtURL.lastPathComponent ?: "selected_file"
-            didPickDocumentAtURL.stopAccessingSecurityScopedResource()
-
-            controller.dismissViewControllerAnimated(true, null)
-            data?.toByteArray()?.let { continuation.resumeWith(Result.success(fileName to it)) }
-              ?: continuation.cancel()
-          }
-
-          override fun documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
-            controller.dismissViewControllerAnimated(true, null)
-            continuation.cancel()
-          }
-        }
-
-      val documentPicker =
-        UIDocumentPickerViewController(
-          documentTypes = listOf("public.item"),
-          inMode = UIDocumentPickerMode.UIDocumentPickerModeOpen,
-        )
-
-      //        val picker = UIDocumentPickerViewController(
-      //            forOpeningContentTypes = listOf(UTTypePDF), // Example: PDF
-      //            asCopy = true
-      //        )
-
-      documentPicker.setDelegate(fileDocumentDelegate)
-      UIApplication.sharedApplication.keyWindow
-        ?.rootViewController
-        ?.presentViewController(documentPicker, true, null)
-    }
 }
 
 @OptIn(ExperimentalForeignApi::class)
