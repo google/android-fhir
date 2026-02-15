@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import co.touchlab.kermit.Logger
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.compressImage
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.openCameraPicker
 import io.github.vinceglb.filekit.dialogs.openFilePicker
@@ -28,11 +29,6 @@ import io.github.vinceglb.filekit.mimeType
 import io.github.vinceglb.filekit.name
 import io.github.vinceglb.filekit.readBytes
 import kotlin.coroutines.cancellation.CancellationException
-import kotlinx.cinterop.ByteVar
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.get
-import kotlinx.cinterop.reinterpret
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.AVFoundation.AVAuthorizationStatusAuthorized
 import platform.AVFoundation.AVAuthorizationStatusDenied
@@ -41,11 +37,9 @@ import platform.AVFoundation.AVCaptureDevice
 import platform.AVFoundation.AVMediaTypeVideo
 import platform.AVFoundation.authorizationStatusForMediaType
 import platform.AVFoundation.requestAccessForMediaType
-import platform.Foundation.NSData
-import platform.UIKit.UIImage
-import platform.UIKit.UIImageJPEGRepresentation
 import platform.UIKit.UIImagePickerController
 import platform.UIKit.UIImagePickerControllerSourceType
+import platform.UniformTypeIdentifiers.UTType
 
 internal class IosMediaHandler(
   override val maxSupportedFileSizeBytes: BigDecimal,
@@ -59,7 +53,7 @@ internal class IosMediaHandler(
         val pickedFile = FileKit.openCameraPicker()
         pickedFile?.let {
           captureResult(
-            it.readBytes(),
+            FileKit.compressImage(it),
             titleName = it.name,
             mimeType = it.mimeType()?.toString() ?: "application/octet-stream",
           )
@@ -69,7 +63,6 @@ internal class IosMediaHandler(
       AVAuthorizationStatusNotDetermined -> {
         suspendCancellableCoroutine { continuation ->
           AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo) { isGranted ->
-            Logger.e("ERROR: IOS Camera permission: $isGranted")
             continuation.resumeWith(Result.success(Unit))
           }
         }
@@ -91,15 +84,18 @@ internal class IosMediaHandler(
       if (imageOnly) {
         FileKitType.Image
       } else {
+        val extensions =
+          inputMimeTypes.mapNotNull { getExtensionFromMimeType(it) } +
+            inputMimeTypes.flatMap { getExtensionsForWildcardMimeType(it) }
         FileKitType.File(
-          inputMimeTypes.toSet().takeIf { it.isNotEmpty() },
+          extensions.toSet().takeIf { it.isNotEmpty() },
         )
       }
     val pickedFile = FileKit.openFilePicker(type = fileKitType)
 
     return pickedFile?.let {
       captureResult(
-        it.readBytes(),
+        if (fileKitType == FileKitType.Image) FileKit.compressImage(it) else it.readBytes(),
         mimeType = it.mimeType()?.toString() ?: "application/octet-stream",
         titleName = it.name,
       )
@@ -111,27 +107,21 @@ internal class IosMediaHandler(
     UIImagePickerController.isSourceTypeAvailable(
       UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypeCamera,
     )
-}
 
-@OptIn(ExperimentalForeignApi::class)
-internal fun UIImage.toJPEGByteArray(): ByteArray {
-  val compressionQuality = 0.99
-  val imageData =
-    UIImageJPEGRepresentation(this, compressionQuality)
-      ?: throw IllegalArgumentException("image data is null")
-  val bytes = imageData.bytes ?: throw IllegalArgumentException("image bytes is null")
-  val length = imageData.length
+  private fun getExtensionsForWildcardMimeType(mimeType: String): List<String> {
+    return when (mimeType.lowercase()) {
+      "image/*" -> listOf("jpg", "jpeg", "png", "gif", "bmp")
+      "text/*" -> listOf("txt", "md")
+      "video/*" -> listOf("mp4", "avi", "mov", "wmv")
+      "audio/*" -> listOf("mp3", "wav", "flac", "aac", "m4a")
+      else -> emptyList()
+    }
+  }
 
-  val data: CPointer<ByteVar> = bytes.reinterpret()
-
-  return ByteArray(length.toInt()) { index -> data[index] }
-}
-
-@OptIn(ExperimentalForeignApi::class)
-internal fun NSData.toByteArray(): ByteArray {
-  val bytes = bytes?.reinterpret<ByteVar>()
-  val length = length.toInt()
-  return ByteArray(length) { index -> bytes!![index] }
+  private fun getExtensionFromMimeType(mimeType: String): String? {
+    val type = UTType.typeWithMIMEType(mimeType)
+    return type?.preferredFilenameExtension
+  }
 }
 
 @Composable
