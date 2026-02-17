@@ -603,6 +603,81 @@
       ]
     },
     {
+      "linkId": "date-item",
+      "text": "Enter a date",
+      "type": "date",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1-most-recent",
+          "text": "Use keyboard entry or date picker",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "time-item",
+      "text": "Enter a time",
+      "type": "time",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1-most-recent",
+          "text": "Use keyboard entry or time picker",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "date-time-item",
+      "text": "Schedule an appointment",
+      "type": "dateTime",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1-most-recent",
+          "text": "Select a date 4 weeks from now",
+          "type": "display"
+        }
+      ]
+    },
+    {
       "linkId": "notes",
       "type": "text",
       "text": "Additional Notes",

@@ -16,6 +16,9 @@
 
 package com.google.android.fhir.datacapture.views.compose
 
+import android_fhir.datacapture_kmp.generated.resources.Res
+import android_fhir.datacapture_kmp.generated.resources.gm_calendar_today_24
+import android_fhir.datacapture_kmp.generated.resources.select_date
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DatePicker
@@ -42,28 +45,27 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.toLocalDate
-import java.time.LocalDate
+import com.google.android.fhir.datacapture.getLocalDateTimeFormatter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 internal const val DATE_TEXT_INPUT_FIELD = "date_picker_text_field"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun DatePickerItem(
+internal fun DateFieldItem(
   modifier: Modifier = Modifier,
   initialSelectedDateMillis: Long?,
   dateInput: DateInput,
@@ -79,6 +81,7 @@ internal fun DatePickerItem(
   val focusManager = LocalFocusManager.current
   val keyboardController = LocalSoftwareKeyboardController.current
   val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
+  val localDateTimeFormatter = getLocalDateTimeFormatter()
 
   var dateInputDisplay by
     remember(dateInput) {
@@ -160,8 +163,8 @@ internal fun DatePickerItem(
     trailingIcon = {
       IconButton(onClick = { showDatePickerModal = true }, enabled = enabled) {
         Icon(
-          painterResource(R.drawable.gm_calendar_today_24),
-          contentDescription = stringResource(R.string.select_date),
+          painterResource(Res.drawable.gm_calendar_today_24),
+          contentDescription = stringResource(Res.string.select_date),
         )
       }
     },
@@ -184,7 +187,7 @@ internal fun DatePickerItem(
       selectableDates,
       onDateSelected = { dateMillis ->
         dateMillis?.toLocalDate()?.let {
-          val dateDisplay = it.format(dateInputFormat.pattern)
+          val dateDisplay = localDateTimeFormatter.format(it, dateInputFormat.pattern)
           dateInputDisplay =
             dateInputDisplay.copy(
               text = dateDisplay,
@@ -243,11 +246,11 @@ internal fun DatePickerModal(
   }
 }
 
-typealias DateFormatPattern = String
+internal typealias DateFormatPattern = String
 
-data class DateInput(val display: String, val value: LocalDate?)
+internal data class DateInput(val display: String, val value: LocalDate?)
 
-data class DateInputFormat(val pattern: String, val delimiter: Char) {
+internal data class DateInputFormat(val pattern: String, val delimiter: Char) {
   val delimiterIndex = pattern.indices.filter { pattern[it] == delimiter }
   val delimiterExistsInPattern = delimiterIndex.isNotEmpty()
 
