@@ -55,6 +55,8 @@ internal fun Coding.hasVersion() = !this.version?.value.isNullOrBlank()
 
 typealias FhirR4Boolean = com.google.fhir.model.r4.Boolean
 
+typealias FhirR4DateType = com.google.fhir.model.r4.Date
+
 typealias FhirR4Decimal = com.google.fhir.model.r4.Decimal
 
 typealias FhirR4Integer = com.google.fhir.model.r4.Integer
