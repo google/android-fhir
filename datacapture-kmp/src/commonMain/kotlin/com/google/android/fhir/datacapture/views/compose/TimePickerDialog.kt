@@ -17,9 +17,13 @@
 package com.google.android.fhir.datacapture.views.compose
 
 import android_fhir.datacapture_kmp.generated.resources.Res
+import android_fhir.datacapture_kmp.generated.resources.cancel
 import android_fhir.datacapture_kmp.generated.resources.ic_access_time
 import android_fhir.datacapture_kmp.generated.resources.ic_keyboard
+import android_fhir.datacapture_kmp.generated.resources.ok
 import android_fhir.datacapture_kmp.generated.resources.select_time
+import android_fhir.datacapture_kmp.generated.resources.switch_to_clock_input
+import android_fhir.datacapture_kmp.generated.resources.switch_to_text_input
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -69,10 +73,10 @@ internal fun TimePickerDialog(
           onDismiss()
         },
       ) {
-        Text("OK")
+        Text(stringResource(Res.string.ok))
       }
     },
-    dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+    dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.cancel)) } },
     text = {
       Column(
         verticalArrangement = Arrangement.Center,
@@ -109,9 +113,9 @@ internal fun TimePickerDialog(
               painterResource(iconRes),
               contentDescription =
                 if (inputType == TimeInputMode.CLOCK) {
-                  "Switch to text input"
+                  stringResource(Res.string.switch_to_text_input)
                 } else {
-                  "Switch to clock input"
+                  stringResource(Res.string.switch_to_clock_input)
                 },
             )
           }

@@ -59,6 +59,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+internal const val DATE_TEXT_INPUT_FIELD = "date_picker_text_field"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DatePickerItem(
@@ -258,5 +260,3 @@ data class DateInputFormat(val pattern: String, val delimiter: Char) {
           .isNotEmpty())
       .or(text.isEmpty())
 }
-
-const val DATE_TEXT_INPUT_FIELD = "date_picker_text_field"

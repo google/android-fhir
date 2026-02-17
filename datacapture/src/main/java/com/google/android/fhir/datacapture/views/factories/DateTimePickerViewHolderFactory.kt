@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 Google LLC
+ * Copyright 2022-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,11 +84,7 @@ internal object DateTimePickerViewHolderFactory : QuestionnaireItemComposeViewHo
         val canonicalizedDatePattern =
           remember(localDatePattern) { canonicalizeDatePattern(localDatePattern) }
         val uiDatePatternText =
-          remember(canonicalizedDatePattern) {
-            // Use 'mm' for month instead of 'MM' to avoid confusion.
-            // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
-            canonicalizedDatePattern.lowercase()
-          }
+          remember(canonicalizedDatePattern) { canonicalizedDatePattern.lowercase() }
         val dateInputFormat =
           remember(canonicalizedDatePattern, datePatternSeparator) {
             DateInputFormat(

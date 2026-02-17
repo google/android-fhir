@@ -87,11 +87,7 @@ internal object DateViewFactory : QuestionnaireItemViewFactory {
     val canonicalizedDatePattern =
       remember(dateEntryFormat) { canonicalizeDatePattern(dateEntryFormat) }
     val uiDatePatternText =
-      remember(canonicalizedDatePattern) {
-        // Use 'mm' for month instead of 'MM' to avoid confusion.
-        // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
-        canonicalizedDatePattern.lowercase()
-      }
+      remember(canonicalizedDatePattern) { canonicalizedDatePattern.lowercase() }
     val dateInputFormat =
       remember(canonicalizedDatePattern, datePatternSeparator) {
         DateInputFormat(
@@ -136,8 +132,6 @@ internal object DateViewFactory : QuestionnaireItemViewFactory {
     val invalidDraftDateErrorString =
       stringResource(
         Res.string.date_format_validation_error_msg,
-        // Use 'mm' for month instead of 'MM' to avoid confusion.
-        // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
         canonicalizedDatePattern.lowercase(),
         canonicalizedDatePattern.replace("dd", "31").replace("MM", "01").replace("yyyy", "2023"),
       )
