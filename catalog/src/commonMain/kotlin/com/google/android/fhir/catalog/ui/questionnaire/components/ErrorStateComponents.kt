@@ -19,6 +19,7 @@ package com.google.android.fhir.catalog.ui.questionnaire.components
 import android_fhir.catalog.generated.resources.Res
 import android_fhir.catalog.generated.resources.options
 import android_fhir.catalog.generated.resources.show_error_state
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 
@@ -87,10 +89,23 @@ private fun ErrorStateBottomSheet(
         modifier = Modifier.padding(bottom = 24.dp),
       )
       Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier =
+          Modifier.fillMaxWidth()
+            .then(
+              if (!isErrorState) {
+                Modifier.border(1.dp, Color.LightGray, MaterialTheme.shapes.small)
+              } else {
+                Modifier
+              },
+            ),
         colors =
           CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+            containerColor =
+              if (isErrorState) {
+                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+              } else {
+                Color.Transparent
+              },
           ),
       ) {
         Row(
@@ -105,7 +120,7 @@ private fun ErrorStateBottomSheet(
           Text(
             text = stringResource(Res.string.show_error_state),
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.primary,
+            color = if (isErrorState) MaterialTheme.colorScheme.primary else Color.Unspecified,
           )
         }
       }
