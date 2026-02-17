@@ -80,8 +80,9 @@ class EditTextViewFactoryDelegate(
     Column(
       modifier =
         Modifier.padding(
-          horizontal = 16.dp,
-          vertical = 16.dp,
+          start = 16.dp,
+          end = 16.dp,
+          bottom = 8.dp,
         ),
     ) {
       Header(questionnaireViewItem)

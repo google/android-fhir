@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,9 +62,11 @@ import com.google.fhir.model.r4.QuestionnaireResponse
 fun Questionnaire(
   questionnaireJson: String,
   questionnaireResponseJson: String? = null,
+  questionnaireLaunchContextMap: Map<String, String>? = null,
   showSubmitButton: Boolean = true,
   showCancelButton: Boolean = true,
   showReviewPage: Boolean = false,
+  showReviewPageFirst: Boolean = false,
   isReadOnly: Boolean = false,
   showAsterisk: Boolean = true,
   showRequiredText: Boolean = false,
@@ -78,9 +80,11 @@ fun Questionnaire(
     remember(
       questionnaireJson,
       questionnaireResponseJson,
+      questionnaireLaunchContextMap,
       showSubmitButton,
       showCancelButton,
       showReviewPage,
+      showReviewPageFirst,
       isReadOnly,
       showAsterisk,
       showRequiredText,
@@ -90,9 +94,11 @@ fun Questionnaire(
       buildMap<String, Any> {
         put(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireJson)
         questionnaireResponseJson?.let { put(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, it) }
+        questionnaireLaunchContextMap?.let { put(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP, it) }
         put(EXTRA_SHOW_SUBMIT_BUTTON, showSubmitButton)
         put(EXTRA_SHOW_CANCEL_BUTTON, showCancelButton)
         put(EXTRA_ENABLE_REVIEW_PAGE, showReviewPage)
+        put(EXTRA_SHOW_REVIEW_PAGE_FIRST, showReviewPageFirst)
         put(EXTRA_READ_ONLY, isReadOnly)
         put(EXTRA_SHOW_ASTERISK_TEXT, showAsterisk)
         put(EXTRA_SHOW_REQUIRED_TEXT, showRequiredText)
@@ -101,7 +107,8 @@ fun Questionnaire(
       }
     }
 
-  val viewModel: QuestionnaireViewModel = viewModel { QuestionnaireViewModel(stateMap) }
+  val viewModel: QuestionnaireViewModel =
+    viewModel(key = questionnaireJson) { QuestionnaireViewModel(stateMap) }
 
   LaunchedEffect(viewModel, onSubmit, onCancel) {
     viewModel.setOnSubmitButtonClickListener { onSubmit { viewModel.getQuestionnaireResponse() } }

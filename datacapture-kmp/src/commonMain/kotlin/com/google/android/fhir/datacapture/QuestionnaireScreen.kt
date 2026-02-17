@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -273,7 +275,11 @@ fun QuestionnaireTitleBar(
     )
 
     if (showEditButton) {
-      OutlinedButton(onClick = onEditClick) {
+      OutlinedButton(
+        onClick = onEditClick,
+        colors =
+          ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+      ) {
         Icon(
           imageVector = Icons.Outlined.Edit,
           contentDescription = "Edit",
@@ -326,7 +332,7 @@ fun QuestionnaireBottomNavigation(
           // Previous button
           when (val previousState = navigationState.navPrevious) {
             is QuestionnaireNavigationViewUIState.Enabled -> {
-              OutlinedButton(
+              Button(
                 onClick = previousState.onClickAction,
               ) {
                 Text(

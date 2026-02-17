@@ -60,10 +60,10 @@ object QuestionnaireResponseValidator {
     xFhirQueryResolver: XFhirQueryResolver? = null,
   ): Map<String, List<ValidationResult>> {
     require(
-      questionnaireResponse.questionnaire == null ||
-        questionnaire.url == questionnaireResponse.questionnaire,
+      questionnaireResponse.questionnaire?.value == null ||
+        questionnaire.url?.value == questionnaireResponse.questionnaire?.value,
     ) {
-      "Mismatching Questionnaire ${questionnaire.url} and QuestionnaireResponse (for Questionnaire ${questionnaireResponse.questionnaire})"
+      "Mismatching Questionnaire ${questionnaire.url?.value} and QuestionnaireResponse (for Questionnaire ${questionnaireResponse.questionnaire?.value})"
     }
 
     val enablementEvaluator =
@@ -219,10 +219,10 @@ object QuestionnaireResponseValidator {
     questionnaireResponse: QuestionnaireResponse,
   ) {
     require(
-      questionnaireResponse.questionnaire == null ||
-        questionnaire.url == questionnaireResponse.questionnaire,
+      questionnaireResponse.questionnaire?.value == null ||
+        questionnaire.url?.value == questionnaireResponse.questionnaire?.value,
     ) {
-      "Mismatching Questionnaire ${questionnaire.url} and QuestionnaireResponse (for Questionnaire ${questionnaireResponse.questionnaire})"
+      "Mismatching Questionnaire ${questionnaire.url?.value} and QuestionnaireResponse (for Questionnaire ${questionnaireResponse.questionnaire?.value})"
     }
     checkQuestionnaireResponseItems(
       questionnaire.item,

@@ -58,6 +58,7 @@ import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewFa
 import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextPhoneNumberViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewFactory
+import com.google.android.fhir.datacapture.views.factories.EmptyQuestionnaireViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuantityViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewFactory
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewFactory
@@ -121,7 +122,11 @@ internal fun QuestionnaireEditList(
         is QuestionnaireAdapterItem.Question -> {
           val questionnaireViewHolderType = getItemViewTypeForQuestion(adapterItem.item)
           val questionnaireItemViewHolderDelegate =
-            getQuestionnaireItemViewFactory(questionnaireViewHolderType)
+            getQuestionnaireItemViewFactory(
+              adapterItem.item.questionnaireItem,
+              questionnaireViewHolderType,
+              questionnaireItemViewHolderMatchers,
+            )
           questionnaireItemViewHolderDelegate.Content(adapterItem.item)
         }
         is QuestionnaireAdapterItem.Navigation -> {
@@ -308,45 +313,34 @@ private fun QuestionnaireReviewItem(
   }
 }
 
-// TODO provide option to override factory
-/*private fun getQuestionnaireItemViewHolder(
-  parent: ViewGroup,
-  questionnaireViewItem: QuestionnaireViewItem,
-  questionnaireItemViewHolderMatchers:
-  List<QuestionnaireItemViewHolderFactoryMatcher>,
-): QuestionnaireItemViewHolder {
-  // Find a matching custom widget
-  val questionnaireViewHolderFactory =
-    questionnaireItemViewHolderMatchers
-      .find { it.matches(questionnaireViewItem.questionnaireItem) }
-      ?.factory
-      ?: getQuestionnaireItemViewHolderFactory(getItemViewTypeForQuestion(questionnaireViewItem))
-  return questionnaireViewHolderFactory.create(parent)
-}*/
-
 fun getQuestionnaireItemViewFactory(
+  questionnaireItem: Questionnaire.Item,
   questionnaireViewHolderType: QuestionnaireViewHolderType,
+  questionnaireItemViewHolderMatchers: List<QuestionnaireItemViewHolderFactoryMatcher>,
 ): QuestionnaireItemViewFactory {
-  return when (questionnaireViewHolderType) {
-    QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE -> EditTextSingleLineViewFactory
-    QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE -> EditTextMultiLineViewFactory
-    QuestionnaireViewHolderType.EDIT_TEXT_INTEGER -> EditTextIntegerViewFactory
-    QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewFactory
-    QuestionnaireViewHolderType.QUANTITY -> QuantityViewFactory
-    QuestionnaireViewHolderType.DISPLAY -> DisplayViewFactory
-    QuestionnaireViewHolderType.SLIDER -> SliderViewFactory
-    QuestionnaireViewHolderType.PHONE_NUMBER -> EditTextPhoneNumberViewFactory
-    QuestionnaireViewHolderType.BOOLEAN_TYPE_PICKER -> BooleanChoiceViewFactory
-    QuestionnaireViewHolderType.RADIO_GROUP -> RadioGroupViewFactory
-    QuestionnaireViewHolderType.CHECK_BOX_GROUP -> CheckBoxGroupViewFactory
-    QuestionnaireViewHolderType.DIALOG_SELECT -> DialogSelectViewFactory
-    QuestionnaireViewHolderType.DROP_DOWN -> DropDownViewFactory
-    QuestionnaireViewHolderType.AUTO_COMPLETE -> AutoCompleteViewFactory
-    QuestionnaireViewHolderType.DATE_PICKER -> DateViewFactory
-    QuestionnaireViewHolderType.TIME_PICKER -> TimeViewFactory
-    QuestionnaireViewHolderType.DATE_TIME_PICKER -> DateTimeViewFactory
-    else -> TODO()
-  }
+  val questionnaireViewHolderFactory =
+    questionnaireItemViewHolderMatchers.find { it.matches(questionnaireItem) }?.factory
+  return questionnaireViewHolderFactory
+    ?: when (questionnaireViewHolderType) {
+      QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE -> EditTextSingleLineViewFactory
+      QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE -> EditTextMultiLineViewFactory
+      QuestionnaireViewHolderType.EDIT_TEXT_INTEGER -> EditTextIntegerViewFactory
+      QuestionnaireViewHolderType.EDIT_TEXT_DECIMAL -> EditTextDecimalViewFactory
+      QuestionnaireViewHolderType.QUANTITY -> QuantityViewFactory
+      QuestionnaireViewHolderType.DISPLAY -> DisplayViewFactory
+      QuestionnaireViewHolderType.SLIDER -> SliderViewFactory
+      QuestionnaireViewHolderType.PHONE_NUMBER -> EditTextPhoneNumberViewFactory
+      QuestionnaireViewHolderType.BOOLEAN_TYPE_PICKER -> BooleanChoiceViewFactory
+      QuestionnaireViewHolderType.RADIO_GROUP -> RadioGroupViewFactory
+      QuestionnaireViewHolderType.CHECK_BOX_GROUP -> CheckBoxGroupViewFactory
+      QuestionnaireViewHolderType.DIALOG_SELECT -> DialogSelectViewFactory
+      QuestionnaireViewHolderType.DROP_DOWN -> DropDownViewFactory
+      QuestionnaireViewHolderType.AUTO_COMPLETE -> AutoCompleteViewFactory
+      QuestionnaireViewHolderType.DATE_PICKER -> DateViewFactory
+      QuestionnaireViewHolderType.TIME_PICKER -> TimeViewFactory
+      QuestionnaireViewHolderType.DATE_TIME_PICKER -> DateTimeViewFactory
+      else -> EmptyQuestionnaireViewFactory
+    }
 }
 
 /**
