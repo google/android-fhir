@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.extensions
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
-import co.touchlab.kermit.Logger
 import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.fhirpath.evaluateToDisplay
 import com.google.fhir.model.r4.Attachment
@@ -33,10 +32,6 @@ import com.google.fhir.model.r4.Reference
 import com.google.fhir.model.r4.Resource
 import com.google.fhir.model.r4.String as FhirString
 import com.google.fhir.model.r4.Time
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 internal const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
 
@@ -281,42 +276,8 @@ internal val Questionnaire.Item.isHidden: Boolean
 val Questionnaire.Item.entryFormat: String?
   get() {
     val extension = extension.singleOrNull { it.url == EXTENSION_ENTRY_FORMAT_URL } ?: return null
-    val value = extension.value
-    if (value is Extension.Value.String) {
-      return value.asString()?.value?.value
-    }
-    return null
+    return extension.value?.asString()?.value?.value
   }
-
-/**
- * The date entry format for the questionnaire item component if one is specified, otherwise, the
- * system default date entry format.
- */
-val Questionnaire.Item.dateEntryFormatOrSystemDefault: String
-  get() {
-    return if (isValidDateEntryFormat(entryFormat)) {
-      entryFormat!!
-    } else {
-      getLocalizedDatePattern()
-    }
-  }
-
-@OptIn(ExperimentalTime::class)
-private fun isValidDateEntryFormat(entryFormat: String?): Boolean {
-  return entryFormat?.let {
-    try {
-      parseDate(
-        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString(),
-        entryFormat,
-      )
-      true
-    } catch (e: Exception) {
-      Logger.w(messageString = e.message ?: "Error parsing date", throwable = e)
-      false
-    }
-  }
-    ?: false
-}
 
 /** Slider step extension value. */
 val Questionnaire.Item.sliderStepValue: Int?

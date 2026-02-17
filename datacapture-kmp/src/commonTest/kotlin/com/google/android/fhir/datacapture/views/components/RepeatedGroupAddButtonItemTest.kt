@@ -32,7 +32,7 @@ import com.google.fhir.model.r4.QuestionnaireResponse
 import kotlin.test.Test
 
 @OptIn(ExperimentalTestApi::class)
-class RepeatedGroupAddItemTest {
+class RepeatedGroupAddButtonItemTest {
 
   @Test
   fun testRepeatedGroupIsReadOnlyDisablesAddButton() = runComposeUiTest {
