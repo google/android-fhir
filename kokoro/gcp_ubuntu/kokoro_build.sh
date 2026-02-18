@@ -53,7 +53,7 @@ function zip_artifacts() {
     -exec cp {} test-results/ \;
 
   echo "URLs for screen capture videos:"
-  gsutil ls gs://$GCS_BUCKET/$KOKORO_BUILD_ARTIFACTS_SUBDIR/**/*.mp4 \
+  gcloud storage ls gs://$GCS_BUCKET/$KOKORO_BUILD_ARTIFACTS_SUBDIR/**/*.mp4 \
     | sed 's|gs://|https://storage.googleapis.com/|'
 }
 
