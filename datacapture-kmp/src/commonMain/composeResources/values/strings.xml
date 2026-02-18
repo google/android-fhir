@@ -40,6 +40,7 @@
     <!-- 2.1 All Widgets -->
     <string name="not_answered">"Not Answered"</string>
     <string name="help">Help</string>
+    <string name="ok">Ok</string>
 
     <!-- 2.2 Boolean -->
     <string name="no">No</string>
@@ -61,6 +62,8 @@
     <string name="time">Time</string>
     <string name="select_date">Select date</string>
     <string name="select_time">Select time</string>
+    <string name="switch_to_text_input">Switch to text input</string>
+    <string name="switch_to_clock_input">Switch to clock input</string>
 
     <!-- 2.6 Attachment widget -->
     <string name="take_photo">Take Photo</string>

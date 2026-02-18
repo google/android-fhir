@@ -49,6 +49,8 @@ import com.google.android.fhir.datacapture.views.factories.AttachmentViewFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewFactory
 import com.google.android.fhir.datacapture.views.factories.CheckBoxGroupViewFactory
+import com.google.android.fhir.datacapture.views.factories.DateTimeViewFactory
+import com.google.android.fhir.datacapture.views.factories.DateViewFactory
 import com.google.android.fhir.datacapture.views.factories.DialogSelectViewFactory
 import com.google.android.fhir.datacapture.views.factories.DisplayViewFactory
 import com.google.android.fhir.datacapture.views.factories.DropDownViewFactory
@@ -61,6 +63,7 @@ import com.google.android.fhir.datacapture.views.factories.QuantityViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewFactory
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewFactory
 import com.google.android.fhir.datacapture.views.factories.SliderViewFactory
+import com.google.android.fhir.datacapture.views.factories.TimeViewFactory
 import com.google.fhir.model.r4.Questionnaire
 import kotlin.uuid.ExperimentalUuidApi
 import org.jetbrains.compose.resources.stringResource
@@ -340,6 +343,9 @@ fun getQuestionnaireItemViewFactory(
     QuestionnaireViewHolderType.DIALOG_SELECT -> DialogSelectViewFactory
     QuestionnaireViewHolderType.DROP_DOWN -> DropDownViewFactory
     QuestionnaireViewHolderType.AUTO_COMPLETE -> AutoCompleteViewFactory
+    QuestionnaireViewHolderType.DATE_PICKER -> DateViewFactory
+    QuestionnaireViewHolderType.TIME_PICKER -> TimeViewFactory
+    QuestionnaireViewHolderType.DATE_TIME_PICKER -> DateTimeViewFactory
     QuestionnaireViewHolderType.ATTACHMENT -> AttachmentViewFactory
     else -> TODO()
   }
