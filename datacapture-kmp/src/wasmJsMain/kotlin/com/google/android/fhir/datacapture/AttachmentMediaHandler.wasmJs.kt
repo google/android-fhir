@@ -32,7 +32,7 @@ internal class WasmMediaHandler(
   override val supportedMimeTypes: Array<String>,
 ) : MediaHandler {
   override suspend fun capturePhoto(): MediaCaptureResult {
-    error("Error: Camera not supported")
+    return MediaCaptureResult.Error("Error: Camera not supported")
   }
 
   override suspend fun selectFile(inputMimeTypes: Array<String>): MediaCaptureResult {

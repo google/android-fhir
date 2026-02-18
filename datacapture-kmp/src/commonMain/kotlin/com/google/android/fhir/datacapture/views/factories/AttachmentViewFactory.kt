@@ -92,6 +92,12 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
+private const val BUTTON_ICON_SPACING = 4
+
+internal const val TAKE_PHOTO_BUTTON_TAG = "TakePhotoButton"
+internal const val UPLOAD_FILE_BUTTON_TAG = "UploadFileButton"
+internal const val ATTACHMENT_MEDIA_PREVIEW_TAG = "photo_preview"
+
 internal object AttachmentViewFactory : QuestionnaireItemViewFactory {
 
   @Composable
@@ -415,10 +421,3 @@ private fun AttachmentPreview(
     }
   }
 }
-
-private const val BYTES_IN_MB = 1048576L
-private const val BUTTON_ICON_SPACING = 4
-
-const val TAKE_PHOTO_BUTTON_TAG = "TakePhotoButton"
-const val UPLOAD_FILE_BUTTON_TAG = "UploadFileButton"
-const val ATTACHMENT_MEDIA_PREVIEW_TAG = "photo_preview"

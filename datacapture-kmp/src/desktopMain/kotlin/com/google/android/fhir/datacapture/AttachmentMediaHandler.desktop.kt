@@ -33,7 +33,7 @@ internal class JvmMediaHandler(
 
   override suspend fun capturePhoto(): MediaCaptureResult {
     // Camera capture is not available on desktop through standard APIs
-    error("Error: Camera not available")
+    return MediaCaptureResult.Error("Error: Camera not available")
   }
 
   override suspend fun selectFile(inputMimeTypes: Array<String>): MediaCaptureResult {
