@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.views.factories
 
 import android_fhir.datacapture_kmp.generated.resources.Res
-import android_fhir.datacapture_kmp.generated.resources.required
 import android_fhir.datacapture_kmp.generated.resources.required_text_and_new_line
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,8 +33,6 @@ import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverAnnotatedString
 import com.google.android.fhir.datacapture.extensions.unit
 import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.EditTextFieldItem
 import com.google.android.fhir.datacapture.views.compose.EditTextFieldState
@@ -107,22 +104,23 @@ class EditTextViewFactoryDelegate(
    */
   @Composable
   private fun getValidationErrorMessage(questionnaireViewItem: QuestionnaireViewItem): String? {
-    if (questionnaireViewItem.draftAnswer != null) {
-      return stringResource(validationMessageStringRes, *validationMessageStringResArgs)
-    }
-    return when (questionnaireViewItem.validationResult) {
-      is NotValidated,
-      Valid, -> null
-      is Invalid -> {
-        val validationMessage = questionnaireViewItem.validationResult.singleStringValidationMessage
-        if (
-          questionnaireViewItem.questionnaireItem.required?.value == true &&
-            questionnaireViewItem.questionViewTextConfiguration.showRequiredText
-        ) {
-          stringResource(Res.string.required_text_and_new_line) + validationMessage
-        } else {
-          validationMessage
+    return if (questionnaireViewItem.draftAnswer != null) {
+      stringResource(validationMessageStringRes, *validationMessageStringResArgs)
+    } else {
+      when (val validationResult = questionnaireViewItem.validationResult) {
+        is Invalid -> {
+          validationResult.singleStringValidationMessage.let {
+            if (
+              questionnaireViewItem.questionnaireItem.required?.value == true &&
+                questionnaireViewItem.questionViewTextConfiguration.showRequiredText
+            ) {
+              stringResource(Res.string.required_text_and_new_line) + it
+            } else {
+              it
+            }
+          }
         }
+        else -> null
       }
     }
   }

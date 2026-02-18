@@ -21,6 +21,7 @@ import android_fhir.datacapture_kmp.generated.resources.no
 import android_fhir.datacapture_kmp.generated.resources.yes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import com.google.android.fhir.datacapture.getLocalDateTimeFormatter
 import com.google.fhir.model.r4.Attachment
 import com.google.fhir.model.r4.Coding
 import com.google.fhir.model.r4.Date
@@ -28,6 +29,8 @@ import com.google.fhir.model.r4.DateTime
 import com.google.fhir.model.r4.Decimal
 import com.google.fhir.model.r4.Element
 import com.google.fhir.model.r4.Expression
+import com.google.fhir.model.r4.FhirDate
+import com.google.fhir.model.r4.FhirDateTime
 import com.google.fhir.model.r4.Quantity
 import com.google.fhir.model.r4.Reference
 import com.google.fhir.model.r4.Time
@@ -42,13 +45,28 @@ internal val Element.displayString: String?
     return when (this) {
       is Coding -> remember(this) { display?.getLocalizedText() ?: code?.value }
       is DateTime -> {
-        TODO("Requires locale based formatting")
+        val localDateFormatter = getLocalDateTimeFormatter()
+        remember(this) {
+          val localDateTime = (value as? FhirDateTime.DateTime)?.dateTime
+          "${localDateTime?.date?.let { localDateFormatter.format(it) }} ${
+                        localDateTime?.time?.let {
+                            localDateFormatter.localizedTimeString(
+                                it,
+                            )
+                        }
+                    }"
+        }
       }
       is Date -> {
-        TODO("Requires locale based formatting")
+        val localDateFormatter = getLocalDateTimeFormatter()
+        remember(this) {
+          val localDate = (value as? FhirDate.Date)?.date
+          localDate?.let { localDateFormatter.format(it) }
+        }
       }
       is Time -> {
-        TODO("Requires locale based formatting")
+        val localDateFormatter = getLocalDateTimeFormatter()
+        remember(this) { value?.let { localDateFormatter.localizedTimeString(it) } }
       }
       is FhirR4Integer -> remember(this) { value?.toString() }
       is Reference -> remember(this) { display?.value ?: reference?.value }
