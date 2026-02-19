@@ -1,0 +1,36 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "status": "completed",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "Repeated Group",
+      "item": [
+        {
+          "linkId": "1-1",
+          "text": "Sample date question",
+          "answer": [
+            {
+              "valueDate": "2024-06-03"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "1",
+      "text": "Repeated Group",
+      "item": [
+        {
+          "linkId": "1-1",
+          "text": "Sample date question",
+          "answer": [
+            {
+              "valueDate": "2026-02-11"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

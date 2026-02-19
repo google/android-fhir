@@ -32,10 +32,10 @@ import com.google.android.fhir.datacapture.extensions.toQuestionnaireResponseIte
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.DropDownAnswerOption
-import com.google.android.fhir.datacapture.views.compose.Header
-import com.google.android.fhir.datacapture.views.compose.MediaItem
-import com.google.android.fhir.datacapture.views.compose.MultiAutoCompleteTextItem
+import com.google.android.fhir.datacapture.views.components.DropDownAnswerOption
+import com.google.android.fhir.datacapture.views.components.Header
+import com.google.android.fhir.datacapture.views.components.MediaItem
+import com.google.android.fhir.datacapture.views.components.MultiAutoCompleteTextItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

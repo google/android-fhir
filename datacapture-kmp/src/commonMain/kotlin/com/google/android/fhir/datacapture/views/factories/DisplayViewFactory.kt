@@ -24,8 +24,8 @@ import androidx.compose.ui.Modifier
 import com.google.android.fhir.datacapture.extensions.itemMedia
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.Header
-import com.google.android.fhir.datacapture.views.compose.MediaItem
+import com.google.android.fhir.datacapture.views.components.Header
+import com.google.android.fhir.datacapture.views.components.MediaItem
 
 internal object DisplayViewFactory : QuestionnaireItemViewFactory {
 

@@ -46,11 +46,11 @@ import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.ERROR_TEXT_AT_HEADER_TEST_TAG
-import com.google.android.fhir.datacapture.views.compose.OPTION_CHOICE_LIST_TAG
-import com.google.android.fhir.datacapture.views.compose.OPTION_CHOICE_TAG
-import com.google.android.fhir.datacapture.views.compose.OTHER_OPTION_TEXT_FIELD_TAG
-import com.google.android.fhir.datacapture.views.compose.QUESTION_HEADER_TAG
+import com.google.android.fhir.datacapture.views.components.ERROR_TEXT_AT_HEADER_TEST_TAG
+import com.google.android.fhir.datacapture.views.components.OPTION_CHOICE_LIST_TAG
+import com.google.android.fhir.datacapture.views.components.OPTION_CHOICE_TAG
+import com.google.android.fhir.datacapture.views.components.OTHER_OPTION_TEXT_FIELD_TAG
+import com.google.android.fhir.datacapture.views.components.QUESTION_HEADER_TAG
 import com.google.fhir.model.r4.Code
 import com.google.fhir.model.r4.CodeableConcept
 import com.google.fhir.model.r4.Coding

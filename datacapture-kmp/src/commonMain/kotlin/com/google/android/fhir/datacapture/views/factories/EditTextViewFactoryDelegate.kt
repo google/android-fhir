@@ -34,12 +34,12 @@ import com.google.android.fhir.datacapture.extensions.localizedFlyoverAnnotatedS
 import com.google.android.fhir.datacapture.extensions.unit
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.EditTextFieldItem
-import com.google.android.fhir.datacapture.views.compose.EditTextFieldState
-import com.google.android.fhir.datacapture.views.compose.Header
-import com.google.android.fhir.datacapture.views.compose.MediaItem
-import com.google.android.fhir.datacapture.views.compose.UnitText
-import com.google.android.fhir.datacapture.views.compose.getRequiredOrOptionalText
+import com.google.android.fhir.datacapture.views.components.EditTextFieldItem
+import com.google.android.fhir.datacapture.views.components.EditTextFieldState
+import com.google.android.fhir.datacapture.views.components.Header
+import com.google.android.fhir.datacapture.views.components.MediaItem
+import com.google.android.fhir.datacapture.views.components.UnitText
+import com.google.android.fhir.datacapture.views.components.getRequiredOrOptionalText
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 

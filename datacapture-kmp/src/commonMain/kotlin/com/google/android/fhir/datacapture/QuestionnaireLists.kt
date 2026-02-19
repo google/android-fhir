@@ -45,6 +45,9 @@ import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.components.QuestionnaireBottomNavigation
+import com.google.android.fhir.datacapture.views.components.RepeatedGroupAddButtonItem
+import com.google.android.fhir.datacapture.views.components.RepeatedGroupHeaderItem
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewFactory
 import com.google.android.fhir.datacapture.views.factories.CheckBoxGroupViewFactory
@@ -58,6 +61,7 @@ import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewFa
 import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextPhoneNumberViewFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewFactory
+import com.google.android.fhir.datacapture.views.factories.GroupViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuantityViewFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewFactory
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewFactory
@@ -116,6 +120,7 @@ internal fun QuestionnaireEditList(
               ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
         }
       },
+      contentType = { it::class.simpleName },
     ) { adapterItem: QuestionnaireAdapterItem ->
       when (adapterItem) {
         is QuestionnaireAdapterItem.Question -> {
@@ -131,7 +136,7 @@ internal fun QuestionnaireEditList(
           RepeatedGroupHeaderItem(adapterItem)
         }
         is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
-          RepeatedGroupAddButtonItem(adapterItem)
+          RepeatedGroupAddButtonItem(adapterItem.item)
         }
       }
     }
@@ -139,7 +144,7 @@ internal fun QuestionnaireEditList(
 }
 
 @Composable
-internal fun QuestionnaireReviewList(items: List<QuestionnaireAdapterItem>) {
+internal fun QuestionnaireReviewList(items: List<QuestionnaireReviewItem>) {
   LazyColumn {
     items(
       items = items,
@@ -147,13 +152,11 @@ internal fun QuestionnaireReviewList(items: List<QuestionnaireAdapterItem>) {
         when (item) {
           is QuestionnaireAdapterItem.Question -> item.id
               ?: throw IllegalStateException("Missing id for the Question: $item")
-          is QuestionnaireAdapterItem.RepeatedGroupHeader -> item.id
           is QuestionnaireAdapterItem.Navigation -> "navigation"
-          is QuestionnaireAdapterItem.RepeatedGroupAddButton -> item.id
-              ?: throw IllegalStateException("Missing id for the RepeatedGroupAddButton: $item")
         }
       },
-    ) { item: QuestionnaireAdapterItem ->
+      contentType = { it::class.simpleName },
+    ) { item: QuestionnaireReviewItem ->
       when (item) {
         is QuestionnaireAdapterItem.Question -> {
           QuestionnaireReviewItem(
@@ -163,15 +166,9 @@ internal fun QuestionnaireReviewList(items: List<QuestionnaireAdapterItem>) {
         }
         is QuestionnaireAdapterItem.Navigation -> {
           QuestionnaireBottomNavigation(
-            navigationState = item.questionnaireNavigationUIState,
+            item.questionnaireNavigationUIState,
             modifier = Modifier.fillMaxWidth(),
           )
-        }
-        is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-          // TODO not implemented
-        }
-        is QuestionnaireAdapterItem.RepeatedGroupAddButton -> {
-          //  TODO not implemented
         }
       }
     }
@@ -345,6 +342,7 @@ fun getQuestionnaireItemViewFactory(
     QuestionnaireViewHolderType.DATE_PICKER -> DateViewFactory
     QuestionnaireViewHolderType.TIME_PICKER -> TimeViewFactory
     QuestionnaireViewHolderType.DATE_TIME_PICKER -> DateTimeViewFactory
+    QuestionnaireViewHolderType.GROUP -> GroupViewFactory
     else -> TODO()
   }
 }

@@ -1,0 +1,71 @@
+{
+  "resourceType": "Questionnaire",
+  "title": "Review Questionnaire",
+  "status": "active",
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page 1"
+              }
+            ],
+            "text": "Page 1"
+          }
+        }
+      ],
+      "linkId": "1",
+      "type": "group",
+      "item": [
+        {
+          "linkId": "1.1",
+          "text": "Are you Omar?",
+          "type": "boolean",
+          "initial": [
+            {
+              "valueBoolean": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page 2"
+              }
+            ],
+            "text": "Page 2"
+          }
+        }
+      ],
+      "linkId": "2",
+      "type": "group",
+      "enableWhen": [
+        {
+          "question": "1.1",
+          "operator": "=",
+          "answerBoolean": true
+        }
+      ],
+      "item": [
+        {
+          "text": "What is your favourite animal?",
+          "linkId": "2.1",
+          "type": "string"
+        }
+      ]
+    }
+  ]
+}

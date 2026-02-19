@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,10 +65,12 @@ fun Questionnaire(
   showSubmitButton: Boolean = true,
   showCancelButton: Boolean = true,
   showReviewPage: Boolean = false,
+  showReviewPageFirst: Boolean = false,
   isReadOnly: Boolean = false,
-  showAsterisk: Boolean = true,
-  showRequiredText: Boolean = false,
+  showAsterisk: Boolean = false,
+  showRequiredText: Boolean = true,
   showOptionalText: Boolean = false,
+  showNavigationLongScroll: Boolean = false,
   submitButtonText: String? = null,
   matchersProvider: QuestionnaireItemViewHolderFactoryMatchersProvider? = null,
   onSubmit: (suspend () -> QuestionnaireResponse) -> Unit,
@@ -81,10 +83,12 @@ fun Questionnaire(
       showSubmitButton,
       showCancelButton,
       showReviewPage,
+      showReviewPageFirst,
       isReadOnly,
       showAsterisk,
       showRequiredText,
       showOptionalText,
+      showNavigationLongScroll,
       submitButtonText,
     ) {
       buildMap<String, Any> {
@@ -97,6 +101,8 @@ fun Questionnaire(
         put(EXTRA_SHOW_ASTERISK_TEXT, showAsterisk)
         put(EXTRA_SHOW_REQUIRED_TEXT, showRequiredText)
         put(EXTRA_SHOW_OPTIONAL_TEXT, showOptionalText)
+        put(EXTRA_SHOW_REVIEW_PAGE_FIRST, showReviewPageFirst)
+        put(EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL, showNavigationLongScroll)
         submitButtonText?.let { put(EXTRA_SUBMIT_BUTTON_TEXT, it) }
       }
     }

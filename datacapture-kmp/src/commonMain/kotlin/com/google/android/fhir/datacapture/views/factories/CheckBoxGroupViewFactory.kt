@@ -39,9 +39,9 @@ import com.google.android.fhir.datacapture.extensions.optionExclusive
 import com.google.android.fhir.datacapture.extensions.toQuestionnaireResponseItemAnswer
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.ChoiceCheckbox
-import com.google.android.fhir.datacapture.views.compose.Header
-import com.google.android.fhir.datacapture.views.compose.MediaItem
+import com.google.android.fhir.datacapture.views.components.ChoiceCheckbox
+import com.google.android.fhir.datacapture.views.components.Header
+import com.google.android.fhir.datacapture.views.components.MediaItem
 import com.google.android.fhir.datacapture.views.isAnswerOptionSelected
 import com.google.fhir.model.r4.Questionnaire
 import kotlinx.coroutines.Dispatchers

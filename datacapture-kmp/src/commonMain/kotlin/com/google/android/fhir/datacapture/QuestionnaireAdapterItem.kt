@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 Google LLC
+ * Copyright 2022-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import com.google.fhir.model.r4.QuestionnaireResponse
 internal sealed interface QuestionnaireAdapterItem {
   /** A row for a question in a Questionnaire RecyclerView. */
   data class Question(val item: QuestionnaireViewItem) :
-    QuestionnaireAdapterItem, ReviewAdapterItem {
+    QuestionnaireAdapterItem, QuestionnaireReviewItem {
     var id: String? = item.questionnaireItem.linkId.value
   }
 
@@ -45,7 +45,7 @@ internal sealed interface QuestionnaireAdapterItem {
   ) : QuestionnaireAdapterItem
 
   data class Navigation(val questionnaireNavigationUIState: QuestionnaireNavigationUIState) :
-    QuestionnaireAdapterItem, ReviewAdapterItem
+    QuestionnaireAdapterItem, QuestionnaireReviewItem
 }
 
-internal sealed interface ReviewAdapterItem
+internal sealed interface QuestionnaireReviewItem
