@@ -521,33 +521,31 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
    * questions.
    */
   suspend fun getQuestionnaireResponse(): QuestionnaireResponse {
-    questionnaireResponse.value =
-      questionnaireResponse.value
-        .toBuilder()
-        .apply {
-          // Use the view model's questionnaire and questionnaire response for calculating enabled
-          // items
-          // because the calculation relies on references to the questionnaire response items.
-          item =
-            getEnabledResponseItems(
-                this@QuestionnaireViewModel.questionnaire.item,
-                questionnaireResponse.value.item,
-              )
-              .toMutableList()
-
-          unpackRepeatedGroups(this@QuestionnaireViewModel.questionnaire)
-          // Use authored as a submission time stamp
-          authored =
-            DateTime.Builder().apply {
-              value =
-                FhirDateTime.DateTime(
-                  dateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
-                  utcOffset = UtcOffset.ZERO,
-                )
-            }
-        }
-        .build()
     return questionnaireResponse.value
+      .toBuilder()
+      .apply {
+        // Use the view model's questionnaire and questionnaire response for calculating enabled
+        // items
+        // because the calculation relies on references to the questionnaire response items.
+        item =
+          getEnabledResponseItems(
+              this@QuestionnaireViewModel.questionnaire.item,
+              questionnaireResponse.value.item,
+            )
+            .toMutableList()
+
+        unpackRepeatedGroups(this@QuestionnaireViewModel.questionnaire)
+        // Use authored as a submission time stamp
+        authored =
+          DateTime.Builder().apply {
+            value =
+              FhirDateTime.DateTime(
+                dateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+                utcOffset = UtcOffset.ZERO,
+              )
+          }
+      }
+      .build()
   }
 
   /** Clears all the answers from the questionnaire response by iterating through each item. */
@@ -1021,21 +1019,27 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
       }
 
     // Set question text dynamically from CQL expression
-    questionnaireItem.text?.cqfExpression?.let { expression ->
-      val result = expressionEvaluator.evaluateExpressionValue(expression) ?: emptyList()
-
-      questionnaireResponseItem.text?.toBuilder()?.apply { this.value = convertToString(result) }
-    }
+    val cqfDynamicQuestionnaireText =
+      questionnaireItem.text
+        ?.cqfExpression
+        ?.let { expressionEvaluator.evaluateExpressionValue(it) }
+        ?.takeIf { it.isNotEmpty() }
+        ?.let { convertToString(it) }
+    val evaluatedQuestionnaireResponseItem =
+      cqfDynamicQuestionnaireText?.let {
+        questionnaireResponseItem.copy(text = FhirR4String(value = it))
+      }
+        ?: questionnaireResponseItem
 
     val (enabledQuestionnaireAnswerOptions, disabledQuestionnaireResponseAnswers) =
       answerOptionsEvaluator.evaluate(
         questionnaireItem,
-        questionnaireResponseItem,
+        evaluatedQuestionnaireResponseItem,
       )
     if (disabledQuestionnaireResponseAnswers.isNotEmpty()) {
       removeDisabledAnswers(
         questionnaireItem,
-        questionnaireResponseItem,
+        evaluatedQuestionnaireResponseItem,
         disabledQuestionnaireResponseAnswers,
       )
     }
@@ -1043,14 +1047,14 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     val items = buildList {
       val itemHelpCard = questionnaireItem.item.firstOrNull { it.isHelpCode }
       val isHelpCard = itemHelpCard != null
-      val isHelpCardOpen = openedHelpCardSet.contains(questionnaireResponseItem)
+      val isHelpCardOpen = openedHelpCardSet.contains(evaluatedQuestionnaireResponseItem)
       // Add an item for the question itself
 
       val question =
         QuestionnaireAdapterItem.Question(
             QuestionnaireViewItem(
               questionnaireItem,
-              questionnaireResponseItem,
+              evaluatedQuestionnaireResponseItem,
               validationResult = validationResult,
               answersChangedCallback = answersChangedCallback,
               enabledAnswerOptions = enabledQuestionnaireAnswerOptions,
@@ -1070,7 +1074,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
                   it.isDisplayItem &&
                     enablementEvaluator.evaluate(
                       it,
-                      questionnaireResponseItem,
+                      evaluatedQuestionnaireResponseItem,
                     )
                 },
               questionViewTextConfiguration =
@@ -1105,11 +1109,13 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
       // For background, see https://build.fhir.org/questionnaireresponse.html#link.
 
       // Case 1: Non-repeated group - process nested items directly with current prefix
-      if (!questionnaireItem.isRepeatedGroup && questionnaireResponseItem.item.isNotEmpty()) {
+      if (
+        !questionnaireItem.isRepeatedGroup && evaluatedQuestionnaireResponseItem.item.isNotEmpty()
+      ) {
         addAll(
           getQuestionnaireAdapterItems(
             questionnaireItemList = questionnaireItem.item.filterNot { it.isDisplayItem },
-            questionnaireResponseItemList = questionnaireResponseItem.item,
+            questionnaireResponseItemList = evaluatedQuestionnaireResponseItem.item,
             parentIdPrefix = parentIdPrefix,
           ),
         )
@@ -1117,7 +1123,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
 
       // Case 2 and 3: Questions nested under answers (for questions with nested items or repeated
       // groups)
-      questionnaireResponseItem.answer
+      evaluatedQuestionnaireResponseItem.answer
         .map { it.item }
         .forEachIndexed { index, nestedResponseItemList ->
           val currentIdPrefix =

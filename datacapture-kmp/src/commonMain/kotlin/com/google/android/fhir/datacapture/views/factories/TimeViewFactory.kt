@@ -61,13 +61,15 @@ object TimeViewFactory : QuestionnaireItemViewFactory {
             else -> null
           }
 
-        if (
-          questionnaireViewItem.questionnaireItem.required?.value == true &&
-            questionnaireViewItem.questionViewTextConfiguration.showRequiredText
-        ) {
-          requiredTextNewLineStringResource + validationMessage
-        } else {
-          validationMessage
+        validationMessage?.let {
+          if (
+            questionnaireViewItem.questionnaireItem.required?.value == true &&
+              questionnaireViewItem.questionViewTextConfiguration.showRequiredText
+          ) {
+            requiredTextNewLineStringResource + validationMessage
+          } else {
+            validationMessage
+          }
         }
       }
     val readOnly =

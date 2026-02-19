@@ -139,24 +139,26 @@ internal object DateViewFactory : QuestionnaireItemViewFactory {
     val itemValidationMessage =
       remember(draftAnswer, questionnaireViewItem.validationResult) {
         val validationMessage =
-          if (!draftAnswer.isNullOrBlank()) {
-            // If the draft answer is set, this means the user has yet to type a parseable answer,
-            // so we display an error.
-            invalidDraftDateErrorString
-          } else {
-            when (val validationResult = questionnaireViewItem.validationResult) {
-              is Invalid -> validationResult.singleStringValidationMessage
-              else -> null
+          when {
+            !draftAnswer.isNullOrBlank() -> {
+              // If the draft answer is set, this means the user has yet to type a parseable answer,
+              // so we display an error.
+              invalidDraftDateErrorString
             }
+            questionnaireViewItem.validationResult is Invalid ->
+              questionnaireViewItem.validationResult.singleStringValidationMessage
+            else -> null
           }
 
-        if (
-          questionnaireViewItem.questionnaireItem.required?.value == true &&
-            questionnaireViewItem.questionViewTextConfiguration.showRequiredText
-        ) {
-          requiredTextNewLineStringResource + validationMessage
-        } else {
-          validationMessage
+        validationMessage?.let {
+          if (
+            questionnaireViewItem.questionnaireItem.required?.value == true &&
+              questionnaireViewItem.questionViewTextConfiguration.showRequiredText
+          ) {
+            requiredTextNewLineStringResource + validationMessage
+          } else {
+            validationMessage
+          }
         }
       }
 

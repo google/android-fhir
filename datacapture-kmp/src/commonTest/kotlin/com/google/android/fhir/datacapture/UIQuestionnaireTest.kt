@@ -37,7 +37,9 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.printToLog
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelStore
@@ -125,6 +127,7 @@ class UIQuestionnaireTest {
   fun cqfExpression_shouldSetText_withEvaluatedAnswer() = runComposeUiTest {
     setQuestionnaireContent("files/questionnaire_with_dynamic_question_text.json")
 
+    onRoot().printToLog("Anyting!!!")
     onNode(hasTestTag(QUESTION_HEADER_TAG) and hasText("Option Date")).assertIsDisplayed()
     onNode(hasTestTag(QUESTION_HEADER_TAG) and hasText("Provide \"First Option\" Date"))
       .assertDoesNotExist()
@@ -233,6 +236,17 @@ class UIQuestionnaireTest {
     onNodeWithTag(REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG).assertIsDisplayed()
     onNodeWithTag(DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG).performClick()
     onNodeWithTag(REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG).assertDoesNotExist()
+  }
+
+  @Test
+  fun test_repeated_group_populates_multiple_answers() = runComposeUiTest {
+    setQuestionnaireContent(
+      "files/component_repeated_group.json",
+      responseFileName = "files/repeated_group_multiple_response.json",
+    )
+
+    onAllNodes(hasTestTag(REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG)).assertCountEquals(2)
+    onAllNodes(hasTestTag(DELETE_REPEATED_GROUP_ITEM_BUTTON_TAG)).assertCountEquals(2)
   }
 
   @Test
@@ -494,8 +508,6 @@ class UIQuestionnaireTest {
         .assertIsDisplayed()
         .assertIsEnabled()
     }
-
-  // todo: Add test for repeated group with multiple answers
 
   private suspend fun ComposeUiTest.setQuestionnaireContent(
     fileName: String,
