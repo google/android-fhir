@@ -44,7 +44,9 @@ import com.google.android.fhir.datacapture.QuestionnaireNavigationViewUIState
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import org.jetbrains.compose.resources.stringResource
 
-internal const val PAGE_NAVIGATION_BUTTON_TAG = "page_navigation_button"
+internal const val QUESTIONNAIRE_PAGE_NAVIGATION_BUTTON_TEST_TAG = "page_navigation_button"
+internal const val QUESTIONNAIRE_BOTTOM_NAVIGATION_TEST_TAG =
+  "questionnaire_bottom_navigation_test_tag"
 
 @Composable
 internal fun QuestionnaireBottomNavigation(
@@ -53,7 +55,7 @@ internal fun QuestionnaireBottomNavigation(
 ) {
   val navigationUIState = remember(pageNavigationUIState) { pageNavigationUIState }
 
-  Column(modifier = modifier.fillMaxWidth()) {
+  Column(modifier = modifier.testTag(QUESTIONNAIRE_BOTTOM_NAVIGATION_TEST_TAG).fillMaxWidth()) {
     HorizontalDivider(color = QuestionnaireTheme.colorScheme.onSurface.copy(alpha = 0.15f))
 
     Surface(
@@ -123,7 +125,7 @@ private fun PageNavigationButton(
     val buttonText = navigationViewState.labelText?.takeIf { it.isNotBlank() } ?: defaultText
     Button(
       onClick = navigationViewState.onClickAction,
-      modifier = modifier.testTag(PAGE_NAVIGATION_BUTTON_TAG),
+      modifier = modifier.testTag(QUESTIONNAIRE_PAGE_NAVIGATION_BUTTON_TEST_TAG),
     ) {
       Text(
         text = buttonText,

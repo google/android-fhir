@@ -41,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
@@ -133,6 +134,9 @@ internal const val EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL =
  */
 internal const val EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON = "show-submit-anyway-button"
 
+internal const val QUESTIONNAIRE_PROGRESS_INDICATOR_TEST_TAG =
+  "questionnaire_progress_indicator_test_tag"
+
 @Composable
 internal fun QuestionnaireScreen(
   viewModel: QuestionnaireViewModel,
@@ -187,7 +191,8 @@ private fun EditModeContent(
     topBar = {
       LinearProgressIndicator(
         progress = { progress / 100f },
-        modifier = Modifier.height(4.dp).fillMaxWidth(),
+        modifier =
+          Modifier.testTag(QUESTIONNAIRE_PROGRESS_INDICATOR_TEST_TAG).height(4.dp).fillMaxWidth(),
       )
     },
     bottomBar = {

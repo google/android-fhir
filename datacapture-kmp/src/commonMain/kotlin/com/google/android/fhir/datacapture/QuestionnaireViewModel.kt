@@ -148,6 +148,8 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     )
 
   init {
+    val tempQuestionnaireResponse: QuestionnaireResponse
+
     when {
       state.contains(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI) -> {
         if (state.contains(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING)) {
@@ -157,73 +159,69 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
           )
         }
 
-        questionnaireResponse.value =
+        tempQuestionnaireResponse =
           jsonR4.decodeFromString(
             readFileContent(state[EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI]!! as String),
           ) as QuestionnaireResponse
 
         addMissingResponseItems(
           questionnaire.item,
-          questionnaireResponse.value.item.toMutableList(),
+          tempQuestionnaireResponse.item.toMutableList(),
         )
-        checkQuestionnaireResponse(questionnaire, questionnaireResponse.value)
+        checkQuestionnaireResponse(questionnaire, tempQuestionnaireResponse)
       }
       state.contains(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING) -> {
         val questionnaireResponseJson: String =
           state[EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] as String
-        questionnaireResponse.value =
+        tempQuestionnaireResponse =
           jsonR4.decodeFromString(questionnaireResponseJson) as QuestionnaireResponse
         addMissingResponseItems(
           questionnaire.item,
-          questionnaireResponse.value.item.toMutableList(),
+          tempQuestionnaireResponse.item.toMutableList(),
         )
-        checkQuestionnaireResponse(questionnaire, questionnaireResponse.value)
+        checkQuestionnaireResponse(questionnaire, tempQuestionnaireResponse)
       }
       else -> {
-        questionnaireResponse.value =
-          QuestionnaireResponse.Builder(
-              status =
-                Enumeration(value = QuestionnaireResponse.QuestionnaireResponseStatus.In_Progress),
-            )
-            .apply {
-              questionnaire =
-                Canonical.Builder().apply {
-                  value = this@QuestionnaireViewModel.questionnaire.url?.value
-                }
-
-              val dateTime =
-                DateTime(
-                  value =
-                    FhirDateTime.DateTime(
-                      dateTime =
-                        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
-                      utcOffset = UtcOffset.ZERO,
-                    ),
-                )
-              // Add extension for questionnaire launch time stamp
-              val timeStampExtension =
-                extension.firstOrNull { it.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP }
-              timeStampExtension?.apply { value?.let { Extension.Value.DateTime(dateTime) } }
-                ?: extension.add(
-                  Extension.Builder(EXTENSION_LAST_LAUNCHED_TIMESTAMP).apply {
-                    value = Extension.Value.DateTime(dateTime)
-                  },
-                )
-            }
-            .also { builder ->
-              // Retain the hierarchy and order of items within the questionnaire as specified in
-              // the standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
-              builder.item.addAll(
-                questionnaire.item
-                  .filterNot { it.isRepeatedGroup }
-                  .map { it.createQuestionnaireResponseItem() },
-              )
-
-              builder.packRepeatedGroups(questionnaire)
-            }
-            .build()
+        tempQuestionnaireResponse =
+          QuestionnaireResponse(
+            status =
+              Enumeration(value = QuestionnaireResponse.QuestionnaireResponseStatus.In_Progress),
+            questionnaire = Canonical(value = this@QuestionnaireViewModel.questionnaire.url?.value),
+            // Retain the hierarchy and order of items within the questionnaire as specified in
+            // the standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
+            item =
+              this@QuestionnaireViewModel.questionnaire.item
+                .filterNot { it.isRepeatedGroup }
+                .map { it.createQuestionnaireResponseItem().build() },
+          )
       }
     }
+
+    questionnaireResponse.value =
+      tempQuestionnaireResponse
+        .toBuilder()
+        .apply {
+          val dateTime =
+            DateTime(
+              value =
+                FhirDateTime.DateTime(
+                  dateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+                  utcOffset = UtcOffset.ZERO,
+                ),
+            )
+          // Add extension for questionnaire launch time stamp
+          val timeStampExtension =
+            extension.firstOrNull { it.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP }
+          timeStampExtension?.apply { value = Extension.Value.DateTime(dateTime) }
+            ?: extension.add(
+              Extension.Builder(EXTENSION_LAST_LAUNCHED_TIMESTAMP).apply {
+                value = Extension.Value.DateTime(dateTime)
+              },
+            )
+
+          packRepeatedGroups(this@QuestionnaireViewModel.questionnaire)
+        }
+        .build()
   }
 
   /**
