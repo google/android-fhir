@@ -69,6 +69,7 @@ import androidx.compose.ui.unit.dp
 import com.google.android.fhir.datacapture.MediaCaptureResult
 import com.google.android.fhir.datacapture.MediaHandler
 import com.google.android.fhir.datacapture.extensions.DEFAULT_SIZE
+import com.google.android.fhir.datacapture.extensions.MAX_ALLOWED_ATTACHMENT_SIZE
 import com.google.android.fhir.datacapture.extensions.MimeType
 import com.google.android.fhir.datacapture.extensions.data
 import com.google.android.fhir.datacapture.extensions.hasMimeType
@@ -118,7 +119,9 @@ internal object AttachmentViewFactory : QuestionnaireItemViewFactory {
         mutableStateOf(questionnaireViewItem.answers.singleOrNull()?.value?.asAttachment()?.value)
       }
     val maxSupportedFileSizeBytes =
-      remember(questionnaireItem) { questionnaireItem.maxSizeInBytes ?: DEFAULT_SIZE }
+      remember(questionnaireItem) {
+        minOf(questionnaireItem.maxSizeInBytes ?: DEFAULT_SIZE, MAX_ALLOWED_ATTACHMENT_SIZE)
+      }
     val attachmentMediaHandler = rememberMediaHandler(maxSupportedFileSizeBytes, fileMimeTypes)
     val displayTakePhotoButton =
       remember(questionnaireItem) { questionnaireItem.hasMimeType(MimeType.IMAGE.value) }
