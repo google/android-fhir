@@ -45,6 +45,7 @@ import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.factories.AttachmentViewFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewFactory
 import com.google.android.fhir.datacapture.views.factories.CheckBoxGroupViewFactory
@@ -345,6 +346,7 @@ fun getQuestionnaireItemViewFactory(
     QuestionnaireViewHolderType.DATE_PICKER -> DateViewFactory
     QuestionnaireViewHolderType.TIME_PICKER -> TimeViewFactory
     QuestionnaireViewHolderType.DATE_TIME_PICKER -> DateTimeViewFactory
+    QuestionnaireViewHolderType.ATTACHMENT -> AttachmentViewFactory
     else -> TODO()
   }
 }

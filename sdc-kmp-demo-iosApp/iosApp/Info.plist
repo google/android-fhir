@@ -4,5 +4,20 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+
+	<key>NSCameraUsageDescription</key>
+	<string>Camera access needed to take photos</string>
+
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo library access needed to select images</string>
+
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>Document access needed to select files for attachment</string>
+
+    <key>NSDownloadsFolderUsageDescription</key>
+    <string>Download access needed to select files for attachment</string>
+
+    <key>NSDesktopFolderUsageDescription</key>
+    <string>Desktop access needed to select files for attachment</string>
 </dict>
 </plist>
