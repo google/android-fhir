@@ -17,14 +17,15 @@ kotlin {
 
   androidLibrary {
     namespace = "com.google.android.fhir.datacapture"
-    compileSdk = 36
-    minSdk = 24
+    compileSdk = Sdk.COMPILE_SDK
+    minSdk = Sdk.MIN_SDK
     withJava()
     withHostTestBuilder {}
     withDeviceTestBuilder { sourceSetTreeName = "test" }
       .configure { instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
 
     experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
+
     compilations.configureEach {
       compilerOptions.configure {
         jvmTarget.set(
@@ -89,6 +90,7 @@ kotlin {
         implementation(compose.ui)
         implementation(compose.components.resources)
         implementation(compose.components.uiToolingPreview)
+        implementation(libs.fhir.path)
         implementation(libs.navigation.compose)
         implementation(libs.androidx.lifecycle.viewmodel.compose)
         implementation(libs.androidx.lifecycle.runtime.compose)

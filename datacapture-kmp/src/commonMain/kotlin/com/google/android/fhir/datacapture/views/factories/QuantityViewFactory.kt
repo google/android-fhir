@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 Google LLC
+ * Copyright 2022-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,9 +43,6 @@ import com.google.android.fhir.datacapture.extensions.toCoding
 import com.google.android.fhir.datacapture.extensions.unitOption
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
-import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.compose.DropDownAnswerOption
 import com.google.android.fhir.datacapture.views.compose.DropDownItem
@@ -79,7 +76,7 @@ internal object QuantityViewFactory : QuestionnaireItemViewFactory {
     val selectedOption =
       remember(questionnaireViewItem) {
         unitTextCoding(questionnaireViewItem)?.toDropDownAnswerOption()
-          ?: dropDownOptions.singleOrNull() // Select if has only one option
+          ?: dropDownOptions.singleOrNull() // Select if it has only one option
       }
 
     var quantity by
@@ -87,7 +84,13 @@ internal object QuantityViewFactory : QuestionnaireItemViewFactory {
         mutableStateOf(UiQuantity(text, selectedOption?.findCoding(unitOptions)))
       }
 
-    val validationUiMessage = uiValidationMessage(questionnaireViewItem.validationResult)
+    val validationUiMessage =
+      remember(questionnaireViewItem.validationResult) {
+        when (val validationResult = questionnaireViewItem.validationResult) {
+          is Invalid -> validationResult.singleStringValidationMessage
+          else -> null
+        }
+      }
 
     LaunchedEffect(quantity) {
       coroutineScope.launch { handleInput(questionnaireViewItem, quantity) }
@@ -138,13 +141,6 @@ internal object QuantityViewFactory : QuestionnaireItemViewFactory {
       }
     }
   }
-
-  private fun uiValidationMessage(validationResult: ValidationResult): String? =
-    when (validationResult) {
-      is NotValidated,
-      Valid, -> null
-      is Invalid -> validationResult.getSingleStringValidationMessage()
-    }
 
   private suspend fun handleInput(
     questionnaireViewItem: QuestionnaireViewItem,
@@ -226,13 +222,13 @@ internal object QuantityViewFactory : QuestionnaireItemViewFactory {
     takeIf { it.hasCode() || it.hasDisplay() }
       ?.let {
         DropDownAnswerOption(
-          answerId = it.code?.value ?: it.display?.value ?: "",
-          answerOptionString = it.display?.value ?: "",
+          elementValue = it,
+          displayString = it.display?.value ?: "",
         )
       }
 
   private fun DropDownAnswerOption.findCoding(options: List<Coding>) =
-    options.find { answerId == it.code?.value } ?: options.find { answerId == it.display?.value }
+    options.find { elementValue == it }
 }
 
 private data class UiQuantity(val value: String?, val unitDropDown: Coding?)
