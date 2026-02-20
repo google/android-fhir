@@ -87,6 +87,7 @@ data class QuestionnaireDimensions(
   // Auto Complete
   val autoCompleteChipMargin: Dp = 10.dp,
   val autoCompleteChipMarginBottom: Dp = 50.dp,
+  val autoCompleteTextFieldContentPadding: Dp = 16.dp,
 
   // Barcode
   val barcodeQuestionMarginEnd: Dp = 8.dp,

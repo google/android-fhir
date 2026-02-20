@@ -16,10 +16,15 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import androidx.compose.ui.text.intl.Locale
 import com.google.fhir.model.r4.Coding
 import com.google.fhir.model.r4.Quantity
 
-internal fun com.google.fhir.model.r4.String.getLocalizedText(lang: String = "en"): String? {
+internal const val EXT_TRANSLATION = "http://hl7.org/fhir/StructureDefinition/translation"
+
+internal fun com.google.fhir.model.r4.String.getLocalizedText(
+  lang: String = Locale.current.toLanguageTag(),
+): String? {
   return getTranslation(lang) ?: getTranslation(lang.split("-").firstOrNull()) ?: value
 }
 
@@ -44,10 +49,16 @@ internal fun Coding.hasCode() = !this.code?.value.isNullOrBlank()
 
 internal fun Coding.hasDisplay() = !this.display?.value.isNullOrBlank()
 
+internal fun Coding.hasSystem() = !this.system?.value.isNullOrBlank()
+
+internal fun Coding.hasVersion() = !this.version?.value.isNullOrBlank()
+
 typealias FhirR4Boolean = com.google.fhir.model.r4.Boolean
+
+typealias FhirR4DateType = com.google.fhir.model.r4.Date
+
+typealias FhirR4Decimal = com.google.fhir.model.r4.Decimal
 
 typealias FhirR4Integer = com.google.fhir.model.r4.Integer
 
 typealias FhirR4String = com.google.fhir.model.r4.String
-
-internal const val EXT_TRANSLATION = "http://hl7.org/fhir/StructureDefinition/translation"

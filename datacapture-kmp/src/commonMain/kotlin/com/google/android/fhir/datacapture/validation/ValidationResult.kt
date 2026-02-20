@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 Google LLC
+ * Copyright 2022-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,5 +23,6 @@ object NotValidated : ValidationResult()
 object Valid : ValidationResult()
 
 data class Invalid(private val validationMessages: List<String>) : ValidationResult() {
-  fun getSingleStringValidationMessage() = this.validationMessages.joinToString(separator = "\n")
+  val singleStringValidationMessage: String
+    get() = this.validationMessages.joinToString(separator = "\n")
 }
