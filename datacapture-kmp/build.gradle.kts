@@ -104,6 +104,7 @@ kotlin {
 
     commonTest {
       dependencies {
+        implementation(libs.androidx.lifecycle.runtime.testing)
         implementation(libs.kotlin.test)
         implementation(libs.kotest.assertions.core)
 
