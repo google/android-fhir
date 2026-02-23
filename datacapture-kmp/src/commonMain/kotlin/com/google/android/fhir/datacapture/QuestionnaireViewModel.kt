@@ -148,7 +148,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     )
 
   init {
-    val tempQuestionnaireResponse: QuestionnaireResponse
+    val questionnaireResponseDraft: QuestionnaireResponse
 
     when {
       state.contains(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI) -> {
@@ -159,30 +159,30 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
           )
         }
 
-        tempQuestionnaireResponse =
+        questionnaireResponseDraft =
           jsonR4.decodeFromString(
             readFileContent(state[EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI]!! as String),
           ) as QuestionnaireResponse
 
         addMissingResponseItems(
           questionnaire.item,
-          tempQuestionnaireResponse.item.toMutableList(),
+          questionnaireResponseDraft.item.toMutableList(),
         )
-        checkQuestionnaireResponse(questionnaire, tempQuestionnaireResponse)
+        checkQuestionnaireResponse(questionnaire, questionnaireResponseDraft)
       }
       state.contains(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING) -> {
         val questionnaireResponseJson: String =
           state[EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] as String
-        tempQuestionnaireResponse =
+        questionnaireResponseDraft =
           jsonR4.decodeFromString(questionnaireResponseJson) as QuestionnaireResponse
         addMissingResponseItems(
           questionnaire.item,
-          tempQuestionnaireResponse.item.toMutableList(),
+          questionnaireResponseDraft.item.toMutableList(),
         )
-        checkQuestionnaireResponse(questionnaire, tempQuestionnaireResponse)
+        checkQuestionnaireResponse(questionnaire, questionnaireResponseDraft)
       }
       else -> {
-        tempQuestionnaireResponse =
+        questionnaireResponseDraft =
           QuestionnaireResponse(
             status =
               Enumeration(value = QuestionnaireResponse.QuestionnaireResponseStatus.In_Progress),
@@ -198,7 +198,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     }
 
     questionnaireResponse.value =
-      tempQuestionnaireResponse
+      questionnaireResponseDraft
         .toBuilder()
         .apply {
           val dateTime =
@@ -420,7 +420,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
         // If nested items are added to the answer, the enablement evaluator needs to be
         // reinitialized in order for it to rebuild the pre-order map and parent map of
         // questionnaire response items to reflect the new structure of the questionnaire response
-        // to correctly calculate calculate enable when statements.
+        // to correctly calculate enable when statements.
         enablementEvaluator =
           EnablementEvaluator(
             questionnaire,
