@@ -525,7 +525,7 @@ internal val Questionnaire.Item.maxSizeInMiBs: BigDecimal?
 internal val DEFAULT_SIZE = 1048576.toBigDecimal()
 
 /** Maximum allowed attachment size */
-internal val MAX_ALLOWED_ATTACHMENT_SIZE = 5_242_880.toBigDecimal()
+internal val MAX_ALLOWED_ATTACHMENT_SIZE = 15_728_640.toBigDecimal()
 
 /** Returns true if given size is above maximum size allowed. */
 internal fun Questionnaire.Item.isGivenSizeOverLimit(
