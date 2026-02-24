@@ -345,7 +345,6 @@ fun getQuestionnaireItemViewFactory(
     QuestionnaireViewHolderType.DATE_TIME_PICKER -> DateTimeViewFactory
     QuestionnaireViewHolderType.GROUP -> GroupViewFactory
     QuestionnaireViewHolderType.ATTACHMENT -> AttachmentViewFactory
-    else -> TODO()
   }
 }
 

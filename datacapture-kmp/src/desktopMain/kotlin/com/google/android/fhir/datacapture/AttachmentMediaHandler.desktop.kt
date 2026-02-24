@@ -65,7 +65,6 @@ internal class JvmMediaHandler(
       "text/*" -> listOf("txt", "md")
       "video/*" -> listOf("mp4", "avi", "mov", "wmv")
       "audio/*" -> listOf("mp3", "wav", "flac", "aac")
-      "image/jpeg" -> listOf("jpg", "jpeg")
       else -> listOf(mimeType.substringAfter("/"))
     }
   }
