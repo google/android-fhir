@@ -94,6 +94,7 @@ kotlin {
         implementation(libs.navigation.compose)
         implementation(libs.androidx.lifecycle.viewmodel.compose)
         implementation(libs.androidx.lifecycle.runtime.compose)
+        implementation(libs.filekit.dialogs.compose)
         implementation(libs.kermit)
         implementation(libs.kotlinx.coroutines.core)
         implementation(libs.kotlin.fhir)
@@ -104,6 +105,7 @@ kotlin {
 
     commonTest {
       dependencies {
+        implementation(libs.androidx.lifecycle.runtime.testing)
         implementation(libs.kotlin.test)
         implementation(libs.kotest.assertions.core)
 

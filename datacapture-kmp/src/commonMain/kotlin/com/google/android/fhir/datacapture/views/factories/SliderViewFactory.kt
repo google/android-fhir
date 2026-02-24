@@ -34,10 +34,10 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.ErrorText
-import com.google.android.fhir.datacapture.views.compose.Header
-import com.google.android.fhir.datacapture.views.compose.MediaItem
-import com.google.android.fhir.datacapture.views.compose.SliderItem
+import com.google.android.fhir.datacapture.views.components.ErrorText
+import com.google.android.fhir.datacapture.views.components.Header
+import com.google.android.fhir.datacapture.views.components.MediaItem
+import com.google.android.fhir.datacapture.views.components.SliderItem
 import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.QuestionnaireResponse
 import kotlinx.coroutines.Dispatchers

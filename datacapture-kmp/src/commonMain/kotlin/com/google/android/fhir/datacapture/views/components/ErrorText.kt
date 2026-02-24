@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.compose
+package com.google.android.fhir.datacapture.views.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
+
+internal const val ERROR_TEXT_TAG = "error_text"
 
 @Composable
 internal fun ErrorText(validationMessage: String) {
@@ -35,5 +37,3 @@ internal fun ErrorText(validationMessage: String) {
         .testTag(ERROR_TEXT_TAG),
   )
 }
-
-const val ERROR_TEXT_TAG = "error_text"

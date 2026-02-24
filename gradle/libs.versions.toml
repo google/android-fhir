@@ -40,6 +40,7 @@ desugar-jdk-libs = "2.0.3"
 dokka = "1.9.20"
 fhir-path = "1.0.0-beta01"
 fhir-ucum = "1.0.3"
+filekit = "0.12.0"
 fladle-version = "0.17.4"
 glide = "4.16.0"
 gradle = "8.13.0"
@@ -85,6 +86,7 @@ woodstox = "6.5.1"
 xerces = "2.12.2"
 xml-unit = "2.9.1"
 zxing = "3.4.1"
+lifecycle-runtime-testing = "2.10.0"
 
 [libraries]
 accompanist-themeadapter-material3 = { module = "com.google.accompanist:accompanist-themeadapter-material3", version.ref = "accompanist-themeadapter-material3"}
@@ -115,6 +117,7 @@ androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecyc
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle-viewmodel" }
 androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle-viewmodel" }
+androidx-lifecycle-runtime-testing = { module = "androidx.lifecycle:lifecycle-runtime-testing", version.ref = "androidx-lifecycle-viewmodel" }
 androidx-lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "androidx-lifecycle" }
 androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx-navigation" }
 androidx-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidx-navigation" }
@@ -143,6 +146,7 @@ fladle = { module = "com.osacky.flank.gradle:fladle", version.ref = "fladle-vers
 apache-commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "apache-commons-compress" }
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar-jdk-libs" }
 fhir-ucum = { module = "org.fhir:ucum", version.ref = "fhir-ucum" }
+filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }

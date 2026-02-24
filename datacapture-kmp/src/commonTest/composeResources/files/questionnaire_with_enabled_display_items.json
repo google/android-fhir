@@ -1,0 +1,66 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "questionnaire.enabled.display",
+  "name": "Questionnaire Enabled Display",
+  "title": "Questionnaire Enabled Display",
+  "status": "active",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "Questionnaire Text",
+      "type": "boolean",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+              "valueExpression": {
+                "language": "text/fhirpath",
+                "expression": "%resource.repeat(item).where(linkId='1' and answer.empty().not()).select(answer.value) = false"
+              }
+            }
+          ],
+          "linkId": "1.1",
+          "text": "Text when no is selected",
+          "type": "display"
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+              "valueExpression": {
+                "language": "text/fhirpath",
+                "expression": "%resource.repeat(item).where(linkId='1' and answer.empty().not()).select(answer.value) = true"
+              }
+            }
+          ],
+          "linkId": "1.2",
+          "text": "Text when yes is selected",
+          "type": "display"
+        }
+      ]
+    }
+  ]
+}
