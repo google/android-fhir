@@ -68,9 +68,10 @@ fun Questionnaire(
   showReviewPage: Boolean = false,
   showReviewPageFirst: Boolean = false,
   isReadOnly: Boolean = false,
-  showAsterisk: Boolean = true,
-  showRequiredText: Boolean = false,
+  showAsterisk: Boolean = false,
+  showRequiredText: Boolean = true,
   showOptionalText: Boolean = false,
+  showNavigationLongScroll: Boolean = false,
   submitButtonText: String? = null,
   matchersProvider: QuestionnaireItemViewHolderFactoryMatchersProvider? = null,
   onSubmit: (suspend () -> QuestionnaireResponse) -> Unit,
@@ -89,6 +90,7 @@ fun Questionnaire(
       showAsterisk,
       showRequiredText,
       showOptionalText,
+      showNavigationLongScroll,
       submitButtonText,
     ) {
       buildMap<String, Any> {
@@ -103,6 +105,8 @@ fun Questionnaire(
         put(EXTRA_SHOW_ASTERISK_TEXT, showAsterisk)
         put(EXTRA_SHOW_REQUIRED_TEXT, showRequiredText)
         put(EXTRA_SHOW_OPTIONAL_TEXT, showOptionalText)
+        put(EXTRA_SHOW_REVIEW_PAGE_FIRST, showReviewPageFirst)
+        put(EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL, showNavigationLongScroll)
         submitButtonText?.let { put(EXTRA_SUBMIT_BUTTON_TEXT, it) }
       }
     }
