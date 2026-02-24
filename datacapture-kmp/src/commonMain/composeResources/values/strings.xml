@@ -97,6 +97,7 @@
     <string name="file_deleted">File deleted</string>
     <string name="video_deleted">Video deleted</string>
     <string name="audio_deleted">Audio deleted</string>
+    <string name="loading">Loading\u2026</string>
 
     <!-- 2.7 Group -->
     <string name="group_header_add_item_button">Add item</string>

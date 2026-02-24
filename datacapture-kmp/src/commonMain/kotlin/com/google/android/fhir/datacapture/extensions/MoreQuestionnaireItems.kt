@@ -509,30 +509,13 @@ fun Questionnaire.Item.hasMimeTypeOnly(type: String): Boolean {
 internal val Questionnaire.Item.maxSizeInBytes: BigDecimal?
   get() = extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.value?.asDecimal()?.value?.value
 
-private val BYTES_PER_KIB = 1024.toBigDecimal()
+internal val Questionnaire.Item.maxAllowedAttachmentSize: BigDecimal
+  get() =
+    maxSizeInBytes?.let { minOf(it, MAX_ALLOWABLE_ATTACHMENT_SIZE) }
+      ?: MAX_ALLOWABLE_ATTACHMENT_SIZE
 
-/** The maximum size of an attachment in Kibibytes. */
-internal val Questionnaire.Item.maxSizeInKiBs: BigDecimal?
-  get() = maxSizeInBytes?.div(BYTES_PER_KIB)
-
-private val BYTES_PER_MIB = 1048576.toBigDecimal()
-
-/** The maximum size of an attachment in Mebibytes. */
-internal val Questionnaire.Item.maxSizeInMiBs: BigDecimal?
-  get() = maxSizeInBytes?.div(BYTES_PER_MIB)
-
-/** The default maximum size of an attachment is 1 Mebibytes. */
-internal val DEFAULT_SIZE = 1048576.toBigDecimal()
-
-/** Maximum allowed attachment size */
-internal val MAX_ALLOWED_ATTACHMENT_SIZE = 15_728_640.toBigDecimal()
-
-/** Returns true if given size is above maximum size allowed. */
-internal fun Questionnaire.Item.isGivenSizeOverLimit(
-  size: BigDecimal,
-): Boolean {
-  return size > (maxSizeInBytes ?: DEFAULT_SIZE)
-}
+/** Maximum allowable attachment size */
+internal val MAX_ALLOWABLE_ATTACHMENT_SIZE = 15_728_640.toBigDecimal()
 
 /** A media that is attached to a [Questionnaire.Item]. */
 internal val Questionnaire.Item.itemMedia: Attachment?

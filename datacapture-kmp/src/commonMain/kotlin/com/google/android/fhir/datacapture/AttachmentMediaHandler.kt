@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import androidx.compose.runtime.Composable
 import com.google.android.fhir.datacapture.extensions.FhirR4String
+import com.google.android.fhir.datacapture.extensions.inMBs
 import com.google.fhir.model.r4.Attachment
 import com.google.fhir.model.r4.Base64Binary
 import com.google.fhir.model.r4.Code
@@ -74,7 +75,7 @@ internal fun MediaHandler.captureResult(
 ): MediaCaptureResult {
   if (byteArray.size.toBigDecimal() > maxSupportedFileSizeBytes) {
     return MediaCaptureResult.Error(
-      "Error: File size is larger than the allowed ${maxSupportedFileSizeBytes.div(1048576L)} MB",
+      "Error: File size is larger than the allowed ${maxSupportedFileSizeBytes.inMBs} MB",
     )
   }
 

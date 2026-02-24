@@ -119,12 +119,6 @@ internal class AndroidMediaHandler(
   companion object {
     private const val CAMERA_REQUEST_PERMISSION_RESULT_CONTRACT_KEY =
       "com.google.android.fhir.datacapture.AndroidMediaHandler.CameraPermission"
-    private const val SELECT_FILE_RESULT_CONTRACT_KEY =
-      "com.google.android.fhir.datacapture.AndroidMediaHandler.SelectFile"
-    private const val SELECT_PHOTO_RESULT_CONTRACT_KEY =
-      "com.google.android.fhir.datacapture.AndroidMediaHandler.SelectPhoto"
-    private const val TAKE_PICTURE_RESULT_CONTRACT_KEY =
-      "com.google.android.fhir.datacapture.AndroidMediaHandler.TakePicture"
   }
 }
 

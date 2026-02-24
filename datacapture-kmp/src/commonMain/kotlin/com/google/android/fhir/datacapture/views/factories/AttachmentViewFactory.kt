@@ -27,6 +27,7 @@ import android_fhir.datacapture_kmp.generated.resources.ic_document_file
 import android_fhir.datacapture_kmp.generated.resources.ic_file
 import android_fhir.datacapture_kmp.generated.resources.ic_image_file
 import android_fhir.datacapture_kmp.generated.resources.ic_video_file
+import android_fhir.datacapture_kmp.generated.resources.loading
 import android_fhir.datacapture_kmp.generated.resources.take_photo
 import android_fhir.datacapture_kmp.generated.resources.upload_audio
 import android_fhir.datacapture_kmp.generated.resources.upload_document
@@ -68,22 +69,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.android.fhir.datacapture.MediaCaptureResult
 import com.google.android.fhir.datacapture.MediaHandler
-import com.google.android.fhir.datacapture.extensions.DEFAULT_SIZE
-import com.google.android.fhir.datacapture.extensions.MAX_ALLOWED_ATTACHMENT_SIZE
 import com.google.android.fhir.datacapture.extensions.MimeType
 import com.google.android.fhir.datacapture.extensions.data
 import com.google.android.fhir.datacapture.extensions.hasMimeType
 import com.google.android.fhir.datacapture.extensions.hasMimeTypeOnly
 import com.google.android.fhir.datacapture.extensions.itemMedia
-import com.google.android.fhir.datacapture.extensions.maxSizeInBytes
+import com.google.android.fhir.datacapture.extensions.maxAllowedAttachmentSize
 import com.google.android.fhir.datacapture.extensions.mimeTypes
 import com.google.android.fhir.datacapture.rememberMediaHandler
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.ErrorText
-import com.google.android.fhir.datacapture.views.compose.Header
-import com.google.android.fhir.datacapture.views.compose.MediaItem
+import com.google.android.fhir.datacapture.views.components.ErrorText
+import com.google.android.fhir.datacapture.views.components.Header
+import com.google.android.fhir.datacapture.views.components.MediaItem
 import com.google.fhir.model.r4.Attachment
 import com.google.fhir.model.r4.QuestionnaireResponse
 import kotlinx.coroutines.Dispatchers
@@ -119,9 +118,7 @@ internal object AttachmentViewFactory : QuestionnaireItemViewFactory {
         mutableStateOf(questionnaireViewItem.answers.singleOrNull()?.value?.asAttachment()?.value)
       }
     val maxSupportedFileSizeBytes =
-      remember(questionnaireItem) {
-        minOf(questionnaireItem.maxSizeInBytes ?: DEFAULT_SIZE, MAX_ALLOWED_ATTACHMENT_SIZE)
-      }
+      remember(questionnaireItem) { questionnaireItem.maxAllowedAttachmentSize }
     val attachmentMediaHandler = rememberMediaHandler(maxSupportedFileSizeBytes, fileMimeTypes)
     val displayTakePhotoButton =
       remember(questionnaireItem) { questionnaireItem.hasMimeType(MimeType.IMAGE.value) }
@@ -284,7 +281,7 @@ private fun TakePhotoButton(
       modifier = Modifier.size(QuestionnaireTheme.dimensions.attachmentActionButtonIconSize),
     )
     Spacer(modifier = Modifier.width(BUTTON_ICON_SPACING.dp))
-    Text(if (isLoading) "Loading..." else takePhotoText)
+    Text(if (isLoading) stringResource(Res.string.loading) else takePhotoText)
   }
 }
 
@@ -328,7 +325,9 @@ private fun UploadFileButton(
       modifier = Modifier.size(QuestionnaireTheme.dimensions.attachmentActionButtonIconSize),
     )
     Spacer(modifier = Modifier.width(BUTTON_ICON_SPACING.dp))
-    Text(if (isLoading) "Loading..." else stringResource(uploadButtonTextResId))
+    Text(
+      if (isLoading) stringResource(Res.string.loading) else stringResource(uploadButtonTextResId),
+    )
   }
 }
 
