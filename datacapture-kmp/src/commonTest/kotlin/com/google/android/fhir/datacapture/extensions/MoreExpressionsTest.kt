@@ -25,7 +25,7 @@ import kotlin.test.assertTrue
 class MoreExpressionsTest {
 
   @Test
-  fun `isXFhirQuery should return true`() {
+  fun is_xfhir_query_should_return_true() {
     val expression =
       Expression(
         language = Enumeration(value = Expression.ExpressionLanguage.Application_X_Fhir_Query),
@@ -35,7 +35,7 @@ class MoreExpressionsTest {
   }
 
   @Test
-  fun `isXFhirQuery should return false`() {
+  fun is_xfhir_query_should_return_false() {
     val expression =
       Expression(language = Enumeration(value = Expression.ExpressionLanguage.Text_Cql))
 
@@ -43,7 +43,7 @@ class MoreExpressionsTest {
   }
 
   @Test
-  fun `isFhirPath should return true`() {
+  fun is_fhir_path_should_return_true() {
     val expression =
       Expression(language = Enumeration(value = Expression.ExpressionLanguage.Text_Fhirpath))
 
@@ -51,7 +51,7 @@ class MoreExpressionsTest {
   }
 
   @Test
-  fun `isFhirPath should return false`() {
+  fun is_fhir_path_should_return_false() {
     val expression =
       Expression(
         language = Enumeration(value = Expression.ExpressionLanguage.Application_X_Fhir_Query),

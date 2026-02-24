@@ -22,6 +22,9 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.fhir.model.r4.QuestionnaireResponse
 
+internal const val QUESTIONNAIRE_VIEW_MODEL_PROVIDER_KEY =
+  "com.google.android.fhir.datacapture:QuestionnaireViewModel"
+
 /**
  * Public composable function for displaying a FHIR Questionnaire in KMP applications.
  *
@@ -107,7 +110,8 @@ fun Questionnaire(
       }
     }
 
-  val viewModel: QuestionnaireViewModel = viewModel { QuestionnaireViewModel(stateMap) }
+  val viewModel: QuestionnaireViewModel =
+    viewModel(key = QUESTIONNAIRE_VIEW_MODEL_PROVIDER_KEY) { QuestionnaireViewModel(stateMap) }
 
   LaunchedEffect(viewModel, onSubmit, onCancel) {
     viewModel.setOnSubmitButtonClickListener { onSubmit { viewModel.getQuestionnaireResponse() } }
