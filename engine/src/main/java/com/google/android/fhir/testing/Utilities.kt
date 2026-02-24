@@ -140,9 +140,9 @@ internal open class TestDownloadManagerImpl(
     return listOf(patient)
   }
 }
-
+ 
 internal object TestFhirEngineImpl : FhirEngine {
-  override suspend fun create(vararg resource: Resource) = emptyList<String>()
+  override suspend fun create(vararg resource: Resource, isLocalOnly: Boolean) = emptyList<String>()
 
   override suspend fun update(vararg resource: Resource) {}
 
