@@ -48,6 +48,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.components.QuestionnaireBottomNavigation
 import com.google.android.fhir.datacapture.views.components.RepeatedGroupAddButtonItem
 import com.google.android.fhir.datacapture.views.components.RepeatedGroupHeaderItem
+import com.google.android.fhir.datacapture.views.factories.AttachmentViewFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewFactory
 import com.google.android.fhir.datacapture.views.factories.CheckBoxGroupViewFactory
@@ -343,7 +344,7 @@ fun getQuestionnaireItemViewFactory(
     QuestionnaireViewHolderType.TIME_PICKER -> TimeViewFactory
     QuestionnaireViewHolderType.DATE_TIME_PICKER -> DateTimeViewFactory
     QuestionnaireViewHolderType.GROUP -> GroupViewFactory
-    else -> TODO()
+    QuestionnaireViewHolderType.ATTACHMENT -> AttachmentViewFactory
   }
 }
 

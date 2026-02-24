@@ -85,6 +85,9 @@
     <string
         name="mime_type_wrong_media_format_validation_error_msg"
     >Error: Wrong media format</string>
+    <string
+        name="media_not_saved_validation_error_msg"
+    >Error: Media not saved</string>
     <string name="uploaded">Uploaded</string>
     <string name="image_uploaded">Image uploaded</string>
     <string name="file_uploaded">File uploaded</string>
@@ -94,6 +97,7 @@
     <string name="file_deleted">File deleted</string>
     <string name="video_deleted">Video deleted</string>
     <string name="audio_deleted">Audio deleted</string>
+    <string name="loading">Loading\u2026</string>
 
     <!-- 2.7 Group -->
     <string name="group_header_add_item_button">Add item</string>
