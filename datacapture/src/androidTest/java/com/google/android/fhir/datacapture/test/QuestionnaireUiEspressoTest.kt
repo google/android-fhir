@@ -941,6 +941,7 @@ class QuestionnaireUiEspressoTest {
       .assertDoesNotExist()
   }
 
+  @Test
   fun showBottomNavigationContainerWhenSetShowNavigationInDefaultLongScrollIsSetToFalse() {
     val questionnaire =
       Questionnaire().apply {

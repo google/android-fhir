@@ -40,6 +40,7 @@ import com.google.android.fhir.datacapture.views.components.Header
 import com.google.android.fhir.datacapture.views.components.MediaItem
 import com.google.android.fhir.datacapture.views.components.UnitText
 import com.google.android.fhir.datacapture.views.components.getRequiredOrOptionalText
+import kotlinx.coroutines.Dispatchers
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -55,7 +56,7 @@ class EditTextViewFactoryDelegate(
   @Composable
   override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
     val text = uiInputText(questionnaireViewItem) ?: ""
-    val coroutineScope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
     val requiredOptionalText = getRequiredOrOptionalText(questionnaireViewItem)
     val validationMessage = getValidationErrorMessage(questionnaireViewItem)
     val composeViewQuestionnaireState =

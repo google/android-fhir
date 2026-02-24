@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2026 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.factories
+package com.google.android.fhir.datacapture
 
-internal val EditTextMultiLineViewFactory = createEditTextStringViewHolderDelegate(multiLine = true)
+import android.app.Application
+
+/** Application class when you want to test the DataCaptureConfig.Provider */
+internal class DataCaptureTestApplication : Application(), DataCaptureConfig.Provider {
+
+  override fun onCreate() {
+    super.onCreate()
+    DataCapture.initialize(this)
+  }
+
+  override fun getDataCaptureConfig(): DataCaptureConfig {
+    return DataCaptureConfig()
+  }
+}

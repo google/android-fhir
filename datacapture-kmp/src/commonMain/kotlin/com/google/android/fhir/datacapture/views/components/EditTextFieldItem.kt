@@ -49,6 +49,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -187,7 +188,9 @@ internal data class EditTextFieldState(
       snapshotFlow { inputText }
         .drop(1) // Drops the initial value emitted by snapshotFlow
         .debounce(HANDLE_INPUT_DEBOUNCE_TIME)
-        .collectLatest { handleTextInputChange(it) }
+        .collectLatest {
+          handleTextInputChange(it)
+        }
     }
   }
 

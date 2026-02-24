@@ -129,7 +129,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun `evaluate() should evaluate enableWhenExpression`() = runTest {
+  fun evaluate_should_evaluate_enable_when_expression() = runTest {
     val questionnaireJson =
       """
         {
@@ -208,7 +208,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun `evaluate() should evaluate false enableWhenExpression`() = runTest {
+  fun evaluate_should_evaluate_false_enable_when_expression() = runTest {
     val questionnaireJson =
       """
         {
@@ -284,7 +284,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun `evaluate() should evaluate enableWhenExpression with %context fhirpath supplement literal`() =
+  fun evaluate_should_evaluate_enable_when_expression_with_context_fhirpath_supplement_literal() =
     runTest {
       val questionnaireJson =
         """
@@ -362,7 +362,7 @@ class EnablementEvaluatorTest {
     }
 
   @Test
-  fun `evaluate() should evaluate enableWhenExpression with %questionnaire fhirpath supplement`() =
+  fun evaluate_should_evaluate_enable_when_expression_with_questionnaire_fhirpath_supplement_literal() =
     runTest {
       val questionnaireJson =
         """
@@ -428,7 +428,7 @@ class EnablementEvaluatorTest {
     }
 
   @Test
-  fun `evaluate() should evaluate enableWhenExpression with %qItem fhirpath supplement`() =
+  fun evaluate_should_evaluate_enable_when_expression_with_q_item_fhirpath_supplement_literal() =
     runTest {
       val questionnaireJson =
         """
