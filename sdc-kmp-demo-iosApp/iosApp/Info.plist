@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+
+	<key>NSCameraUsageDescription</key>
+	<string>Camera access needed to take photos</string>
+
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo library access needed to select images</string>
+
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>Document access needed to select files for attachment</string>
+
+    <key>NSDownloadsFolderUsageDescription</key>
+    <string>Download access needed to select files for attachment</string>
+
+    <key>NSDesktopFolderUsageDescription</key>
+    <string>Desktop access needed to select files for attachment</string>
+</dict>
+</plist>

@@ -17,21 +17,9 @@
 object Plugins {
 
   object BuildPlugins {
-    const val androidLib = "com.android.library"
-    const val application = "com.android.application"
-    const val benchmark = "androidx.benchmark"
-    const val dokka = "org.jetbrains.dokka"
-    const val kotlin = "kotlin"
-    const val kotlinAndroid = "kotlin-android"
-    const val kotlinCompose = "org.jetbrains.kotlin.plugin.compose"
-    const val kotlinKsp = "com.google.devtools.ksp"
-    const val kotlinSerialization = "org.jetbrains.kotlin.plugin.serialization"
-    const val mavenPublish = "maven-publish"
     const val fladle = "com.osacky.fladle"
-    const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
     const val ruler = "com.spotify.ruler"
     const val spotless = "com.diffplug.spotless"
-    const val androidTest = "com.android.test"
   }
 
   // classpath plugins
@@ -52,8 +40,7 @@ object Plugins {
   object Versions {
     const val androidGradlePlugin = "8.9.2"
     const val benchmarkPlugin = "1.4.0-rc01"
-    const val dokka = "1.9.20"
-    const val kspPlugin = "2.1.20-2.0.1"
-    const val kotlin = "2.1.20"
+    const val kspPlugin = "2.2.20-2.0.4"
+    const val kotlin = "2.2.20"
   }
 }
