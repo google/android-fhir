@@ -105,3 +105,6 @@ synthea
  ### Kotlin/JS
  kotlin-js-store/
  node_modules/
+
+sdc-kmp-demo-iosApp/Configuration/LocalConfig.xcconfig
+**/xcuserdata/

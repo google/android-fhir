@@ -71,7 +71,7 @@ internal val Element.displayString: String?
       is FhirR4Integer -> remember(this) { value?.toString() }
       is Reference -> remember(this) { display?.value ?: reference?.value }
       is FhirR4String -> remember(this) { getLocalizedText() }
-      is Attachment -> remember(this) { url?.value }
+      is Attachment -> remember(this) { url?.value ?: title?.value }
       is FhirR4Boolean -> {
         val yesStringText = stringResource(Res.string.yes)
         val noStringText = stringResource(Res.string.no)
