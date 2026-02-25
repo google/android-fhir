@@ -90,6 +90,19 @@ jobs:
           # Use SNAPSHOT Prefix to follow Maven convention
           ARTIFACT_VERSION_SUFFIX: SNAPSHOT
 
+      - name: Package (build) APKs for Device UI Tests
+        run: ./gradlew packageDebugAndroidTest --scan --stacktrace && ./gradlew packageReleaseAndroidTest --scan --stacktrace
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        # NB: actions/checkout must be before google-github-actions/auth
+        with:
+            credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
+      - name: Run Device UI Tests on Firebase Test Lab with Flank
+        run: ./.github/workflows/runFlank.sh
+
       - name: Release artifacts to local repo
         run: ./gradlew publishReleasePublicationToCIRepository --scan
         env:
