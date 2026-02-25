@@ -142,11 +142,13 @@ internal class ExpressionEvaluator(
    *
    * %resource = [QuestionnaireResponse] %context = [QuestionnaireResponse.Item]
    */
-  fun evaluateExpression(
+  suspend fun evaluateExpression(
+    questionnaireItem: Questionnaire.Item,
+    questionnaireResponseItem: QuestionnaireResponse.Item?,
     expression: Expression?,
-    variables: Map<String, Any?> = emptyMap(),
   ): List<Any> {
     if (expression == null) return emptyList()
+    val variables = getVariables(expression, questionnaireItem, questionnaireResponseItem)
     return r4FhirPathEngine.evaluateExpression(
       expression.expression?.value ?: "",
       questionnaireResponse,
@@ -158,12 +160,16 @@ internal class ExpressionEvaluator(
    * Returns a list of [Any] evaluation value result of an expression, including cqf-expression and
    * cqf-calculatedValue expressions
    */
-  fun evaluateExpressionValue(expression: Expression): List<Any>? {
+  suspend fun evaluateExpressionValue(
+    questionnaireItem: Questionnaire.Item,
+    questionnaireResponseItem: QuestionnaireResponse.Item?,
+    expression: Expression,
+  ): List<Any>? {
     if (!expression.isFhirPath) {
       throw UnsupportedOperationException("${expression.language} not supported yet")
     }
     return try {
-      evaluateExpression(expression)
+      evaluateExpression(questionnaireItem, questionnaireResponseItem, expression)
     } catch (e: Exception) {
       Logger.w("Could not evaluate expression ${expression.expression} with FHIRPathEngine", e)
       null
@@ -174,8 +180,9 @@ internal class ExpressionEvaluator(
    * Returns a list of pair of item and the calculated and evaluated value for all items with
    * calculated expression extension, which is dependent on value of updated response
    */
-  fun evaluateAllAffectedCalculatedExpressions(
+  suspend fun evaluateAllAffectedCalculatedExpressions(
     questionnaireItem: Questionnaire.Item,
+    questionnaireResponseItem: QuestionnaireResponse.Item?,
   ): List<ItemToAnswersPair> {
     return questionnaire.item
       .flattened()
@@ -190,7 +197,12 @@ internal class ExpressionEvaluator(
         // TODO: Pass the questionnaire response item corresponding to the
         //  questionnaire item with the calculated expression for the FHIRPath supplement
         //  `%context`.
-        val updatedAnswer = evaluateExpression(item.calculatedExpression!!)
+        val updatedAnswer =
+          evaluateExpression(
+            questionnaireItem,
+            questionnaireResponseItem,
+            item.calculatedExpression!!,
+          )
         item to updatedAnswer
       }
   }
@@ -199,18 +211,27 @@ internal class ExpressionEvaluator(
    * Returns the evaluated value of [calculatedExpression] from the given [questionnaireItem]. A
    * [NullPointerException] will be thrown if [calculatedExpression] is not present.
    */
-  fun evaluateCalculatedExpression(
+  suspend fun evaluateCalculatedExpression(
     questionnaireItem: Questionnaire.Item,
     questionnaireResponseItem: QuestionnaireResponse.Item? = null,
   ): List<Any> {
+    val expression = questionnaireItem.calculatedExpression ?: return emptyList<Any>()
+    return evaluateExpression(questionnaireItem, questionnaireResponseItem, expression)
+  }
+
+  private suspend fun getVariables(
+    expression: Expression,
+    questionnaireItem: Questionnaire.Item,
+    questionnaireResponseItem: QuestionnaireResponse.Item?,
+  ): MutableMap<String, Any?> {
     val variables =
-      mutableMapOf<String, Any?>().apply {
+      extractItemDependentVariables(expression, questionnaireItem).apply {
         put("questionnaire", questionnaire)
         put("qItem", questionnaireItem)
         questionnaireResponseItem?.let { put("context", it) }
         questionnaireLaunchContextMap?.let { putAll(it) }
       }
-    return evaluateExpression(questionnaireItem.calculatedExpression!!, variables)
+    return variables
   }
 
   /**
@@ -474,7 +495,7 @@ internal class ExpressionEvaluator(
    */
   private suspend fun evaluateVariable(
     expression: Expression,
-    dependentVariables: Map<String, Any?> = emptyMap(),
+    dependentVariables: Map<String, Any?>,
   ) =
     try {
       require(expression.name?.value?.isNotBlank() == true) {
@@ -488,6 +509,10 @@ internal class ExpressionEvaluator(
 
         val xFhirExpressionString =
           createXFhirQueryFromExpression(expression, dependentVariables) ?: ""
+
+        if (dependentVariables.contains(expression.name!!.value)) {
+          dependentVariables[expression.name!!.value]!!
+        }
 
         Bundle.Builder(type = Enumeration(value = Bundle.BundleType.Searchset))
           .apply {
@@ -503,6 +528,7 @@ internal class ExpressionEvaluator(
           .evaluateExpression(
             expression.expression?.value ?: "",
             questionnaireResponse,
+            variables = dependentVariables,
           )
           .firstOrNull()
       } else {

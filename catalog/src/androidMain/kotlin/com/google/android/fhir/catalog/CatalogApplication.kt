@@ -18,11 +18,16 @@ package com.google.android.fhir.catalog
 
 import android.app.Application
 import com.google.android.fhir.datacapture.DataCapture
+import com.google.android.fhir.datacapture.DataCaptureConfig
 
-class CatalogApplication : Application() {
+class CatalogApplication : Application(), DataCaptureConfig.Provider {
 
   override fun onCreate() {
     super.onCreate()
     DataCapture.initialize(this)
+  }
+
+  override fun getDataCaptureConfig(): DataCaptureConfig {
+    return DataCaptureConfig(xFhirQueryResolver = { emptyList() })
   }
 }
