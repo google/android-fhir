@@ -252,7 +252,8 @@ data class QuestionnaireViewItem(
         }
         .all { it } &&
       draftAnswer == other.draftAnswer &&
-      questionText == other.questionText
+      questionText == other.questionText &&
+            minAnswerValue == other.minAnswerValue
 
   /**
    * Returns whether this [QuestionnaireViewItem] and the `other` [QuestionnaireViewItem] have the
