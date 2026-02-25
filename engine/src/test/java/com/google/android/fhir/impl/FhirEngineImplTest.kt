@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,13 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.get
+import com.google.android.fhir.getResources
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
@@ -68,6 +70,8 @@ import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.`when`
+import org.mockito.kotlin.mock
 import org.robolectric.RobolectricTestRunner
 
 /** Unit tests for [FhirEngineImpl]. */
@@ -92,6 +96,31 @@ class FhirEngineImplTest {
     assertThat(ids).containsExactly("test_patient_1", "test_patient_2")
     assertResourceEquals(TEST_PATIENT_1, fhirEngine.get<Patient>(TEST_PATIENT_1_ID))
     assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
+  }
+
+  @Test
+  fun create_isLocalOnlyTrue_shouldCreateResourceWithoutFlaggingLocalChange() = runBlocking {
+    val totalLocalChangesPatient2 =
+      fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_2_ID).size
+    fhirEngine.create(TEST_PATIENT_2, isLocalOnly = true)
+    assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
+    assertThat(fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_2_ID).size)
+      .isEqualTo(totalLocalChangesPatient2)
+  }
+
+  @Test
+  fun createAll_isLocalOnlyTrue_shouldCreateResourceWithoutFlaggingLocalChange() = runBlocking {
+    val totalLocalChangesPatient1 =
+      fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_1_ID).size
+    val totalLocalChangesPatient2 =
+      fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_2_ID).size
+    fhirEngine.create(TEST_PATIENT_1, TEST_PATIENT_2, isLocalOnly = true)
+    assertResourceEquals(TEST_PATIENT_1, fhirEngine.get<Patient>(TEST_PATIENT_1_ID))
+    assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
+    assertThat(fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_1_ID).size)
+      .isEqualTo(totalLocalChangesPatient1)
+    assertThat(fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_2_ID).size)
+      .isEqualTo(totalLocalChangesPatient2)
   }
 
   @Test
@@ -896,6 +925,49 @@ class FhirEngineImplTest {
       runBlocking { fhirEngine.get<Encounter>("enc-01") }
     }
   }
+
+  @Test
+  fun `get returns a single resource`() = runTest {
+    val fhirEngine = mock<FhirEngine>()
+    val expectedPatient = Patient().apply { id = TEST_PATIENT_1_ID }
+
+    `when`(fhirEngine.get(ResourceType.Patient, TEST_PATIENT_1_ID)).thenReturn(expectedPatient)
+
+    assertThat(fhirEngine.get<Patient>(TEST_PATIENT_1_ID)).isEqualTo(expectedPatient)
+  }
+
+  @Test
+  fun `get throws ResourceNotFoundException when resource is not found`() = runTest {
+    val resourceNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { fhirEngine.get<Patient>("id1") }
+      }
+    assertThat(resourceNotFoundException.message)
+      .isEqualTo("Resource not found with type Patient and id id1!")
+  }
+
+  @Test
+  fun `getResources returns a list of resources`() = runTest {
+    val patientIds = arrayOf(TEST_PATIENT_1_ID, TEST_PATIENT_2_ID)
+    val expectedPatients = listOf(Patient(), Patient())
+    val fhirEngine = mock<FhirEngine>()
+
+    `when`(fhirEngine.getResources(ResourceType.Patient, *patientIds)).thenReturn(expectedPatients)
+
+    val resources = fhirEngine.getResources<Patient>(*patientIds)
+    assertThat(resources).isEqualTo(expectedPatients)
+  }
+
+  @Test
+  fun `getResources throws ResourceNotFoundException when no resources with ids are found`() =
+    runTest {
+      val resourceNotFoundException =
+        assertThrows(ResourceNotFoundException::class.java) {
+          runBlocking { fhirEngine.getResources<Patient>("id1", "id2") }
+        }
+      assertThat(resourceNotFoundException.message)
+        .isEqualTo("Resources not found with type Patient and ids id1,id2!")
+    }
 
   companion object {
     private const val TEST_PATIENT_1_ID = "test_patient_1"
