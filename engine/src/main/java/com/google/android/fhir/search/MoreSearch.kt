@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -364,17 +364,13 @@ internal fun Search.getQuery(
   val sortArgs = join.args
 
   val filterQuery = getFilterQueries()
-  val filterQueryStatement =
-    filterQuery.joinToString(separator = "${operation.logicalOperator} ") {
-      //  spotless:off
-    """
-      a.resourceUuid IN (
-      ${it.query}
-      )
-      
-      """.trimIndent()
-    //  spotless:on
+  val filterQueryJoinOperator =
+    when (operation) {
+      Operation.OR -> "\nUNION\n"
+      Operation.AND -> "\nINTERSECT\n"
     }
+  val filterQueryStatement =
+    filterQuery.joinToString(separator = filterQueryJoinOperator) { it.query.trimIndent() }
   val filterQueryArgs = filterQuery.flatMap { it.args }
 
   var limitStatement = ""
@@ -392,14 +388,35 @@ internal fun Search.getQuery(
   val nestedQueryFilterStatement = nestedFilterQuery?.query ?: ""
   val nestedQueryFilterArgs = nestedFilterQuery?.args ?: emptyList()
 
-  // Combines filter statements derived from filter queries and nested queries, that use the
-  // resourceUuid field,
-  // and defaults to filter statement with the resourceType field when blank
+  val combinedFilterQueryStatement =
+    when {
+      filterQueryStatement.isNotBlank() && nestedQueryFilterStatement.isNotBlank() ->
+        """
+        SELECT * 
+        FROM ($filterQueryStatement
+        )
+        INTERSECT
+        SELECT *
+        FROM ($nestedQueryFilterStatement
+        )
+            """
+          .trimIndent()
+      filterQueryStatement.isNotBlank() -> filterQueryStatement
+      nestedQueryFilterStatement.isNotBlank() -> nestedQueryFilterStatement
+      else -> null
+    }
+
+  // Sets filterStatement to use resourceUuid field when combinedFilterQueryStatement is not null
+  //  defaults to filter statement with the resourceType field otherwise
   val filterStatement =
-    listOf(filterQueryStatement, nestedQueryFilterStatement)
-      .filter { it.isNotBlank() }
-      .joinToString(separator = " AND ")
-      .ifBlank { "a.resourceType = ?" }
+    combinedFilterQueryStatement?.let {
+      """a.resourceUuid IN (
+          $it
+          )
+          """
+    }
+      ?: "a.resourceType = ?"
+
   val filterArgs = (filterQueryArgs + nestedQueryFilterArgs).ifEmpty { listOf(type.name) }
 
   val whereArgs = mutableListOf<Any>()

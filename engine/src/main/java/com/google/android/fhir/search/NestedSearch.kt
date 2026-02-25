@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -214,15 +214,20 @@ internal fun List<NestedSearch>.nestedQuery(
   return if (isEmpty()) {
     null
   } else {
+    val filterJoinOperator =
+      when (operation) {
+        Operation.OR -> "\nUNION\n"
+        Operation.AND -> "\nINTERSECT\n"
+      }
+
     map { it.nestedQuery(type) }
       .let { searchQueries ->
         SearchQuery(
           query =
             searchQueries.joinToString(
-              prefix = "a.resourceUuid IN ",
-              separator = " ${operation.logicalOperator} a.resourceUuid IN",
+              separator = " $filterJoinOperator",
             ) { searchQuery ->
-              "(\n${searchQuery.query}\n) "
+              "\n${searchQuery.query}\n"
             },
           args = searchQueries.flatMap { it.args },
         )
