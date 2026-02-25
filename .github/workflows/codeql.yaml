@@ -45,28 +45,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ["java"]
+        include:
+          - language: java-kotlin
+            build-mode: autobuild
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Switch to Java 17 from Eclipse Temurin distro
-        uses: actions/setup-java@v4
         with:
-          java-version: 17
-          distribution: temurin
+#          maybe not needed but got error with spotless. To be tested...
+          fetch-depth: 0
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-
-      # TODO: use Autobuild instead of ./gradlew after https://github.com/github/codeql-action/issues/1417 is fixed
-      # - name: Autobuild
-      #   uses: github/codeql-action/autobuild@v2
-      - name: Build with Gradle
-        run: ./gradlew --scan --full-stacktrace -Dorg.gradle.dependency.verification=off compileDebugAndroidTestSources
+          build-mode: autobuild
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
