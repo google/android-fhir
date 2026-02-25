@@ -130,11 +130,11 @@ internal object PatchOrdering {
       Patch.Type.INSERT,
       Patch.Type.UPDATE, -> {
         localChanges.forEach { localChange ->
-          localChange.token.ids.forEach { id ->
-            localChangeIdToReferenceMap[id]?.let {
-              references.addAll(it.map { it.resourceReferenceValue })
+          references.addAll(
+            localChange.token.ids.flatMap { id ->
+              localChangeIdToReferenceMap[id]?.map { it.resourceReferenceValue } ?: emptyList()
             }
-          }
+          )
         }
       }
       Patch.Type.DELETE -> {
