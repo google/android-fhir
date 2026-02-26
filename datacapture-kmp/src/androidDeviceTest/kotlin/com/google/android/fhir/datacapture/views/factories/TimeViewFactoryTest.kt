@@ -29,8 +29,8 @@ import com.google.android.fhir.datacapture.extensions.FhirR4String
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.QUESTION_HEADER_TAG
-import com.google.android.fhir.datacapture.views.compose.TIME_PICKER_INPUT_FIELD
+import com.google.android.fhir.datacapture.views.components.QUESTION_HEADER_TAG
+import com.google.android.fhir.datacapture.views.components.TIME_PICKER_INPUT_FIELD
 import com.google.fhir.model.r4.Enumeration
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse

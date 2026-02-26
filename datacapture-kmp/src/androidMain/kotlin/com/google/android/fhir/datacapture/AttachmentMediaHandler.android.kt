@@ -1,0 +1,148 @@
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.google.android.fhir.datacapture
+
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.activity.compose.LocalActivityResultRegistryOwner
+import androidx.activity.result.ActivityResultRegistry
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.init
+import io.github.vinceglb.filekit.dialogs.openCameraPicker
+import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.mimeType
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.readBytes
+import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.suspendCancellableCoroutine
+
+internal class AndroidMediaHandler(
+  private val activityResultRegistry: ActivityResultRegistry,
+  private val context: Context,
+  override val maxSupportedFileSizeBytes: BigDecimal,
+  override val supportedMimeTypes: Array<String>,
+) : MediaHandler {
+
+  init {
+    FileKit.init(activityResultRegistry)
+  }
+
+  override suspend fun capturePhoto(): MediaCaptureResult {
+    val isCameraPermissionGranted = requestCameraPermission()
+    if (!isCameraPermissionGranted) {
+      return MediaCaptureResult.Error("Error: Camera permission not granted")
+    }
+    val pickedFile = FileKit.openCameraPicker()
+    return pickedFile?.let {
+      captureResult(
+        it.readBytes(),
+        titleName = it.name,
+        mimeType = it.mimeType()?.toString() ?: "application/octet-stream",
+      )
+    }
+      ?: throw CancellationException()
+  }
+
+  override suspend fun selectFile(
+    inputMimeTypes: Array<String>,
+  ): MediaCaptureResult {
+    val imageOnly = inputMimeTypes.all { it.startsWith("image/") }
+
+    val fileKitType =
+      if (imageOnly) {
+        FileKitType.Image
+      } else {
+        FileKitType.File(
+          inputMimeTypes.toSet().takeIf { it.isNotEmpty() },
+        )
+      }
+    val pickedFile = FileKit.openFilePicker(type = fileKitType)
+
+    return pickedFile?.let {
+      captureResult(
+        it.readBytes(),
+        mimeType = it.mimeType()?.toString() ?: "application/octet-stream",
+        titleName = it.name,
+      )
+    }
+      ?: throw CancellationException()
+  }
+
+  override fun isCameraSupported(): Boolean =
+    context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+
+  private suspend fun requestCameraPermission(): Boolean =
+    suspendCancellableCoroutine { continuation ->
+      val requestPermissionLauncher =
+        activityResultRegistry.register(
+          CAMERA_REQUEST_PERMISSION_RESULT_CONTRACT_KEY,
+          ActivityResultContracts.RequestPermission(),
+        ) {
+          continuation.resumeWith(Result.success(it))
+        }
+
+      continuation.invokeOnCancellation { requestPermissionLauncher.unregister() }
+
+      if (
+        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+          PackageManager.PERMISSION_GRANTED
+      ) {
+        continuation.resumeWith(Result.success(true))
+      } else {
+        requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+      }
+    }
+
+  companion object {
+    private const val CAMERA_REQUEST_PERMISSION_RESULT_CONTRACT_KEY =
+      "com.google.android.fhir.datacapture.AndroidMediaHandler.CameraPermission"
+  }
+}
+
+@Composable
+internal actual fun rememberMediaHandler(
+  maxSupportedFileSizeBytes: BigDecimal,
+  supportedMimeTypes: Array<String>,
+): MediaHandler {
+  val context = LocalContext.current
+  val activityResultRegistry = LocalActivityResultRegistryOwner.current!!.activityResultRegistry
+  val lifecycleOwner = LocalLifecycleOwner.current
+
+  return remember(
+    context,
+    activityResultRegistry,
+    lifecycleOwner,
+    maxSupportedFileSizeBytes,
+    supportedMimeTypes,
+  ) {
+    AndroidMediaHandler(
+      activityResultRegistry,
+      context,
+      maxSupportedFileSizeBytes,
+      supportedMimeTypes,
+    )
+  }
+}

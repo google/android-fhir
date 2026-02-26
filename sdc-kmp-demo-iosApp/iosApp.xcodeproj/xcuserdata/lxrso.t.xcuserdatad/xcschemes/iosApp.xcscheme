@@ -14,7 +14,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B9DA97B02DC1472C00A4DA20"
-               BuildableName = "KotlinProject.app"
+               BuildableName = "SdcKmpDemo.app"
                BlueprintName = "iosApp"
                ReferencedContainer = "container:iosApp.xcodeproj">
             </BuildableReference>
@@ -43,7 +43,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B9DA97B02DC1472C00A4DA20"
-            BuildableName = "KotlinProject.app"
+            BuildableName = "SdcKmpDemo.app"
             BlueprintName = "iosApp"
             ReferencedContainer = "container:iosApp.xcodeproj">
          </BuildableReference>

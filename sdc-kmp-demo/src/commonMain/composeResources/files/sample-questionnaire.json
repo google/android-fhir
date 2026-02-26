@@ -77,6 +77,53 @@
       ]
     },
     {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/mimeType",
+          "valueCode": "image/*"
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/mimeType",
+          "valueCode": "audio/*"
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/mimeType",
+          "valueCode": "video/*"
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/mimeType",
+          "valueCode": "application/pdf"
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/maxSize",
+          "valueDecimal": 5242880
+        }
+      ],
+      "linkId": "attachment",
+      "text": "Select an image or file to upload",
+      "type": "attachment",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1-media-types-supported",
+          "text": "Media types supported: .jpg, .png, .mp3, .mp4, .pdf",
+          "type": "display"
+        }
+      ]
+    },
+    {
       "linkId": "slider-children",
       "text": "How many children does the client have?",
       "type": "integer",
@@ -674,6 +721,105 @@
           "linkId": "1-most-recent",
           "text": "Select a date 4 weeks from now",
           "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "repeated-group",
+      "type": "group",
+      "text": "Repeated Group",
+      "repeats": true,
+      "item": [
+        {
+          "linkId": "1-1",
+          "text": "Quantity",
+          "type": "quantity",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "system": "http://unitsofmeasure.org",
+                "code": "cm",
+                "display": "centimeter"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+              "valueCoding": {
+                "system": "http://unitsofmeasure.org",
+                "code": "[in_i]",
+                "display": "inch"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "1-2",
+          "type": "choice",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "text": "Sample dropdown question",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "answer-a",
+                "display": "A"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "answer-b",
+                "display": "B"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "answer-c",
+                "display": "C"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "answer-other",
+                "display": "Other"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "1-3-1",
+              "text": "Dropdown question helper text",
+              "type": "display",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "flyover",
+                        "display": "Fly-over"
+                      }
+                    ],
+                    "text": "Flyover"
+                  }
+                }
+              ]
+            }
+          ]
         }
       ]
     },

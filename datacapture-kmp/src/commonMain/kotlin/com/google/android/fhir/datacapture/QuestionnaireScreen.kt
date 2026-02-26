@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,10 @@
 package com.google.android.fhir.datacapture
 
 import android_fhir.datacapture_kmp.generated.resources.Res
-import android_fhir.datacapture_kmp.generated.resources.add_repeated_group_item
-import android_fhir.datacapture_kmp.generated.resources.button_pagination_next
-import android_fhir.datacapture_kmp.generated.resources.button_pagination_previous
-import android_fhir.datacapture_kmp.generated.resources.button_review
-import android_fhir.datacapture_kmp.generated.resources.cancel_questionnaire
-import android_fhir.datacapture_kmp.generated.resources.delete
 import android_fhir.datacapture_kmp.generated.resources.edit_button_text
 import android_fhir.datacapture_kmp.generated.resources.questionnaire_review_mode_title
-import android_fhir.datacapture_kmp.generated.resources.repeated_group_title
-import android_fhir.datacapture_kmp.generated.resources.submit_questionnaire
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,29 +28,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
-import com.google.fhir.model.r4.QuestionnaireResponse
-import kotlinx.coroutines.launch
+import com.google.android.fhir.datacapture.views.components.QuestionnaireBottomNavigation
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -148,6 +134,9 @@ internal const val EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL =
  */
 internal const val EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON = "show-submit-anyway-button"
 
+internal const val QUESTIONNAIRE_PROGRESS_INDICATOR_TEST_TAG =
+  "questionnaire_progress_indicator_test_tag"
+
 @Composable
 internal fun QuestionnaireScreen(
   viewModel: QuestionnaireViewModel,
@@ -202,14 +191,13 @@ private fun EditModeContent(
     topBar = {
       LinearProgressIndicator(
         progress = { progress / 100f },
-        modifier = Modifier.height(4.dp).fillMaxWidth(),
+        modifier =
+          Modifier.testTag(QUESTIONNAIRE_PROGRESS_INDICATOR_TEST_TAG).height(4.dp).fillMaxWidth(),
       )
     },
     bottomBar = {
       if (bottomNavItem != null) {
-        QuestionnaireBottomNavigation(
-          navigationState = bottomNavItem.questionnaireNavigationUIState,
-        )
+        QuestionnaireBottomNavigation(bottomNavItem.questionnaireNavigationUIState)
       }
     },
   ) { innerPadding ->
@@ -244,13 +232,13 @@ private fun ReviewModeContent(
     bottomBar = {
       if (bottomNavItem != null) {
         QuestionnaireBottomNavigation(
-          navigationState = bottomNavItem.questionnaireNavigationUIState,
+          bottomNavItem.questionnaireNavigationUIState,
         )
       }
     },
   ) { innerPadding ->
     Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-      QuestionnaireReviewList(items = state.items)
+      QuestionnaireReviewList(items = state.items.filterIsInstance<QuestionnaireReviewItem>())
     }
   }
 }
@@ -279,177 +267,6 @@ fun QuestionnaireTitleBar(
           contentDescription = "Edit",
         )
         Text(text = stringResource(Res.string.edit_button_text))
-      }
-    }
-  }
-}
-
-@Composable
-fun QuestionnaireBottomNavigation(
-  navigationState: QuestionnaireNavigationUIState,
-  modifier: Modifier = Modifier,
-) {
-  Column(modifier = modifier) {
-    HorizontalDivider()
-
-    Surface(
-      modifier = Modifier.fillMaxWidth(),
-      color = QuestionnaireTheme.colorScheme.surface,
-    ) {
-      Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-      ) {
-        // Cancel button (start)
-        when (val cancelState = navigationState.navCancel) {
-          is QuestionnaireNavigationViewUIState.Enabled -> {
-            OutlinedButton(
-              onClick = cancelState.onClickAction,
-            ) {
-              Text(
-                text = cancelState.labelText ?: stringResource(Res.string.cancel_questionnaire),
-              )
-            }
-          }
-          QuestionnaireNavigationViewUIState.Hidden -> {
-            /* Hidden */
-          }
-        }
-
-        // Spacer to push navigation buttons to the end
-        Row(
-          modifier = Modifier.weight(1f),
-          horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End),
-          verticalAlignment = Alignment.CenterVertically,
-        ) {
-          // Previous button
-          when (val previousState = navigationState.navPrevious) {
-            is QuestionnaireNavigationViewUIState.Enabled -> {
-              OutlinedButton(
-                onClick = previousState.onClickAction,
-              ) {
-                Text(
-                  text = previousState.labelText
-                      ?: stringResource(Res.string.button_pagination_previous),
-                )
-              }
-            }
-            QuestionnaireNavigationViewUIState.Hidden -> {
-              /* Hidden */
-            }
-          }
-
-          // Next button
-          when (val nextState = navigationState.navNext) {
-            is QuestionnaireNavigationViewUIState.Enabled -> {
-              Button(
-                onClick = nextState.onClickAction,
-              ) {
-                Text(
-                  text = nextState.labelText ?: stringResource(Res.string.button_pagination_next),
-                )
-              }
-            }
-            QuestionnaireNavigationViewUIState.Hidden -> {
-              /* Hidden */
-            }
-          }
-
-          // Review button
-          when (val reviewState = navigationState.navReview) {
-            is QuestionnaireNavigationViewUIState.Enabled -> {
-              Button(
-                onClick = reviewState.onClickAction,
-              ) {
-                Text(
-                  text = reviewState.labelText ?: stringResource(Res.string.button_review),
-                )
-              }
-            }
-            QuestionnaireNavigationViewUIState.Hidden -> {
-              /* Hidden */
-            }
-          }
-
-          // Submit button
-          when (val submitState = navigationState.navSubmit) {
-            is QuestionnaireNavigationViewUIState.Enabled -> {
-              Button(
-                onClick = submitState.onClickAction,
-              ) {
-                Text(
-                  text = submitState.labelText ?: stringResource(Res.string.submit_questionnaire),
-                )
-              }
-            }
-            QuestionnaireNavigationViewUIState.Hidden -> {
-              /* Hidden */
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-@Composable
-internal fun RepeatedGroupHeaderItem(
-  repeatedGroupHeader: QuestionnaireAdapterItem.RepeatedGroupHeader,
-) {
-  Row(
-    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-    horizontalArrangement = Arrangement.SpaceBetween,
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Text(
-      text =
-        stringResource(
-          Res.string.repeated_group_title,
-          "${repeatedGroupHeader.index + 1}",
-          repeatedGroupHeader.title,
-        ),
-      style = QuestionnaireTheme.typography.titleMedium,
-      fontWeight = FontWeight.SemiBold,
-      modifier = Modifier.weight(1f),
-    )
-
-    OutlinedButton(
-      onClick = repeatedGroupHeader.onDeleteClicked,
-    ) {
-      Text(text = stringResource(Res.string.delete))
-    }
-  }
-}
-
-@Composable
-internal fun RepeatedGroupAddButtonItem(
-  addButtonItem: QuestionnaireAdapterItem.RepeatedGroupAddButton,
-) {
-  val scope = rememberCoroutineScope()
-
-  if (addButtonItem.item.questionnaireItem.repeats?.value == true) {
-    Box(
-      modifier = Modifier.padding(vertical = 8.dp),
-      contentAlignment = Alignment.Center,
-    ) {
-      Button(
-        onClick = {
-          scope.launch {
-            addButtonItem.item.addAnswer(
-              QuestionnaireResponse.Item.Answer(),
-            )
-          }
-        },
-        enabled = addButtonItem.item.questionnaireItem.readOnly?.value != true,
-      ) {
-        Text(
-          text =
-            stringResource(
-              Res.string.add_repeated_group_item,
-              // TODO addButtonItem.item.questionText ?: "",
-            ),
-        )
       }
     }
   }
