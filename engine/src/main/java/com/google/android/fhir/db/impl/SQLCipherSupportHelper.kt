@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,58 +27,32 @@ import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABA
 import java.time.Duration
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SQLiteDatabaseHook
-import net.sqlcipher.database.SQLiteOpenHelper
+import net.zetetic.database.sqlcipher.SQLiteDatabaseHook
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import timber.log.Timber
 
-/** A [SupportSQLiteOpenHelper] which initializes a [SQLiteDatabase] with a passphrase. */
+/** A [SupportSQLiteOpenHelper] which initializes SQLCipher with a passphrase. */
 internal class SQLCipherSupportHelper(
   private val configuration: SupportSQLiteOpenHelper.Configuration,
-  hook: SQLiteDatabaseHook? = null,
+  private val hook: SQLiteDatabaseHook? = null,
   private val databaseErrorStrategy: DatabaseErrorStrategy,
   private val passphraseFetcher: () -> ByteArray,
 ) : SupportSQLiteOpenHelper {
 
   init {
-    SQLiteDatabase.loadLibs(configuration.context)
+    System.loadLibrary("sqlcipher")
   }
 
-  private val standardHelper =
-    object :
-      SQLiteOpenHelper(
-        configuration.context,
-        configuration.name,
-        /* factory= */ null,
-        configuration.callback.version,
-        hook,
-      ) {
-      override fun onCreate(db: SQLiteDatabase) {
-        configuration.callback.onCreate(db)
-      }
+  @Volatile private var delegate: SupportSQLiteOpenHelper? = null
 
-      override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        configuration.callback.onUpgrade(db, oldVersion, newVersion)
-      }
+  @Volatile private var walEnabled: Boolean = false
 
-      override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        configuration.callback.onDowngrade(db, oldVersion, newVersion)
-      }
-
-      override fun onOpen(db: SQLiteDatabase) {
-        configuration.callback.onOpen(db)
-      }
-
-      override fun onConfigure(db: SQLiteDatabase) {
-        configuration.callback.onConfigure(db)
-      }
-    }
-
-  override val databaseName
-    get() = standardHelper.databaseName
+  override val databaseName: String?
+    get() = configuration.name
 
   override fun setWriteAheadLoggingEnabled(enabled: Boolean) {
-    standardHelper.setWriteAheadLoggingEnabled(enabled)
+    walEnabled = enabled
+    delegate?.setWriteAheadLoggingEnabled(enabled)
   }
 
   override val writableDatabase: SupportSQLiteDatabase
@@ -87,19 +61,51 @@ internal class SQLCipherSupportHelper(
         "Unexpected unencrypted database, $UNENCRYPTED_DATABASE_NAME, already exists. " +
           "Check if you have accidentally disabled database encryption across releases."
       }
-      val key = runBlocking { getPassphraseWithRetry() }
+
+      val helper = delegate ?: createDelegate().also { delegate = it }
+
       return try {
-        standardHelper.getWritableDatabase(key)
+        helper.writableDatabase
       } catch (ex: SQLiteException) {
         if (databaseErrorStrategy == DatabaseErrorStrategy.RECREATE_AT_OPEN) {
           Timber.w("Fail to open database. Recreating database.")
           configuration.context.getDatabasePath(databaseName).delete()
-          standardHelper.getWritableDatabase(key)
+
+          // Reset and retry with a fresh helper instance
+          delegate?.close()
+          delegate = null
+          createDelegate().also { delegate = it }.writableDatabase
         } else {
           throw ex
         }
       }
     }
+
+  override val readableDatabase: SupportSQLiteDatabase
+    get() = writableDatabase
+
+  override fun close() {
+    delegate?.close()
+    delegate = null
+  }
+
+  /** Creates a SQLCipher-aware SupportSQLiteOpenHelper using SupportOpenHelperFactory. */
+  private fun createDelegate(): SupportSQLiteOpenHelper {
+    val passphrase = runBlocking { getPassphraseWithRetry() }
+
+    val factory =
+      if (hook == null) {
+        SupportOpenHelperFactory(passphrase)
+      } else {
+        SupportOpenHelperFactory(
+          passphrase,
+          hook,
+          /* enableWriteAheadLogging = */ walEnabled,
+        )
+      }
+
+    return factory.create(configuration)
+  }
 
   private suspend fun getPassphraseWithRetry(): ByteArray {
     var lastException: DatabaseEncryptionException? = null
@@ -118,13 +124,6 @@ internal class SQLCipherSupportHelper(
     }
     Timber.w("Can't access the database encryption key after $MAX_RETRY_ATTEMPTS attempts.")
     throw lastException ?: DatabaseEncryptionException(Exception(), UNKNOWN)
-  }
-
-  override val readableDatabase
-    get() = writableDatabase
-
-  override fun close() {
-    standardHelper.close()
   }
 
   private companion object {
