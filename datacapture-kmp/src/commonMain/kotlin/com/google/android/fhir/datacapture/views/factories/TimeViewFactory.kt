@@ -31,10 +31,10 @@ import com.google.android.fhir.datacapture.getLocalDateTimeFormatter
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.Header
-import com.google.android.fhir.datacapture.views.compose.MediaItem
-import com.google.android.fhir.datacapture.views.compose.TimeFieldItem
-import com.google.android.fhir.datacapture.views.compose.getRequiredOrOptionalText
+import com.google.android.fhir.datacapture.views.components.Header
+import com.google.android.fhir.datacapture.views.components.MediaItem
+import com.google.android.fhir.datacapture.views.components.TimeFieldItem
+import com.google.android.fhir.datacapture.views.components.getRequiredOrOptionalText
 import com.google.fhir.model.r4.QuestionnaireResponse
 import com.google.fhir.model.r4.Time
 import kotlin.time.Clock
@@ -61,13 +61,15 @@ object TimeViewFactory : QuestionnaireItemViewFactory {
             else -> null
           }
 
-        if (
-          questionnaireViewItem.questionnaireItem.required?.value == true &&
-            questionnaireViewItem.questionViewTextConfiguration.showRequiredText
-        ) {
-          requiredTextNewLineStringResource + validationMessage
-        } else {
-          validationMessage
+        validationMessage?.let {
+          if (
+            questionnaireViewItem.questionnaireItem.required?.value == true &&
+              questionnaireViewItem.questionViewTextConfiguration.showRequiredText
+          ) {
+            requiredTextNewLineStringResource + validationMessage
+          } else {
+            validationMessage
+          }
         }
       }
     val readOnly =

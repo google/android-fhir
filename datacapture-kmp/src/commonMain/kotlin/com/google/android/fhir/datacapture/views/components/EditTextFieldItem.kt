@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.compose
+package com.google.android.fhir.datacapture.views.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -51,6 +51,10 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
+
+internal const val EDIT_TEXT_FIELD_TEST_TAG = "text_input_edit_text"
+internal const val UNIT_TEXT_TEST_TAG = "unit_text_view"
+internal const val HANDLE_INPUT_DEBOUNCE_TIME = 500L
 
 @Composable
 internal fun EditTextFieldItem(modifier: Modifier, textFieldState: EditTextFieldState) {
@@ -191,7 +195,3 @@ internal data class EditTextFieldState(
     inputText = text
   }
 }
-
-const val EDIT_TEXT_FIELD_TEST_TAG = "text_input_edit_text"
-const val UNIT_TEXT_TEST_TAG = "unit_text_view"
-const val HANDLE_INPUT_DEBOUNCE_TIME = 500L

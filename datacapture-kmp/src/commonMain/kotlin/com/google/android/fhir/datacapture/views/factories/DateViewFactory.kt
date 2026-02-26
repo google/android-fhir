@@ -43,12 +43,12 @@ import com.google.android.fhir.datacapture.parseLocalDateOrNull
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.DateFieldItem
-import com.google.android.fhir.datacapture.views.compose.DateInput
-import com.google.android.fhir.datacapture.views.compose.DateInputFormat
-import com.google.android.fhir.datacapture.views.compose.Header
-import com.google.android.fhir.datacapture.views.compose.MediaItem
-import com.google.android.fhir.datacapture.views.compose.getRequiredOrOptionalText
+import com.google.android.fhir.datacapture.views.components.DateFieldItem
+import com.google.android.fhir.datacapture.views.components.DateInput
+import com.google.android.fhir.datacapture.views.components.DateInputFormat
+import com.google.android.fhir.datacapture.views.components.Header
+import com.google.android.fhir.datacapture.views.components.MediaItem
+import com.google.android.fhir.datacapture.views.components.getRequiredOrOptionalText
 import com.google.fhir.model.r4.FhirDate
 import com.google.fhir.model.r4.QuestionnaireResponse
 import kotlin.time.Clock
@@ -139,24 +139,26 @@ internal object DateViewFactory : QuestionnaireItemViewFactory {
     val itemValidationMessage =
       remember(draftAnswer, questionnaireViewItem.validationResult) {
         val validationMessage =
-          if (!draftAnswer.isNullOrBlank()) {
-            // If the draft answer is set, this means the user has yet to type a parseable answer,
-            // so we display an error.
-            invalidDraftDateErrorString
-          } else {
-            when (val validationResult = questionnaireViewItem.validationResult) {
-              is Invalid -> validationResult.singleStringValidationMessage
-              else -> null
+          when {
+            !draftAnswer.isNullOrBlank() -> {
+              // If the draft answer is set, this means the user has yet to type a parseable answer,
+              // so we display an error.
+              invalidDraftDateErrorString
             }
+            questionnaireViewItem.validationResult is Invalid ->
+              questionnaireViewItem.validationResult.singleStringValidationMessage
+            else -> null
           }
 
-        if (
-          questionnaireViewItem.questionnaireItem.required?.value == true &&
-            questionnaireViewItem.questionViewTextConfiguration.showRequiredText
-        ) {
-          requiredTextNewLineStringResource + validationMessage
-        } else {
-          validationMessage
+        validationMessage?.let {
+          if (
+            questionnaireViewItem.questionnaireItem.required?.value == true &&
+              questionnaireViewItem.questionViewTextConfiguration.showRequiredText
+          ) {
+            requiredTextNewLineStringResource + validationMessage
+          } else {
+            validationMessage
+          }
         }
       }
 

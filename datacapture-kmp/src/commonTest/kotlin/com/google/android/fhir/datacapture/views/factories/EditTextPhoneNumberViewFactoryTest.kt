@@ -38,8 +38,8 @@ import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
-import com.google.android.fhir.datacapture.views.compose.EDIT_TEXT_FIELD_TEST_TAG
-import com.google.android.fhir.datacapture.views.compose.QUESTION_HEADER_TAG
+import com.google.android.fhir.datacapture.views.components.EDIT_TEXT_FIELD_TEST_TAG
+import com.google.android.fhir.datacapture.views.components.QUESTION_HEADER_TAG
 import com.google.fhir.model.r4.Code
 import com.google.fhir.model.r4.CodeableConcept
 import com.google.fhir.model.r4.Coding
