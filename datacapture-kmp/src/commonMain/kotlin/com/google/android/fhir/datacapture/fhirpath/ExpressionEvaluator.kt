@@ -94,7 +94,7 @@ internal class ExpressionEvaluator(
    * If we apply regex to the expression "X + Y", it returns nothing as there are no matching groups
    * in this expression
    */
-  private val variableRegex = Regex("%([A-Za-z0-9\\-]{1,64})")
+  private val variableRegex = Regex("%([A-Za-z0-9\\-']{1,64})")
 
   /**
    * Finds all the matching occurrences of FHIRPaths in x-fhir-query. See:
@@ -110,7 +110,7 @@ internal class ExpressionEvaluator(
   private val questionnaireFhirPathSupplement = "questionnaire"
 
   /**
-   * Variable %qitem refer to Questionnaire.item that corresponds to context
+   * Variable %qitem refer to [Questionnaire.Item] that corresponds to context
    * QuestionnaireResponse.item. It is only valid for FHIRPath expressions defined within a
    * Questionnaire item. https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements
    */
@@ -148,7 +148,8 @@ internal class ExpressionEvaluator(
     expression: Expression?,
   ): List<Any> {
     if (expression == null) return emptyList()
-    val variables = getVariables(expression, questionnaireItem, questionnaireResponseItem)
+    val variables =
+      extractItemDependentVariables(expression, questionnaireItem, questionnaireResponseItem)
     return r4FhirPathEngine.evaluateExpression(
       expression.expression?.value ?: "",
       questionnaireResponse,
@@ -219,21 +220,6 @@ internal class ExpressionEvaluator(
     return evaluateExpression(questionnaireItem, questionnaireResponseItem, expression)
   }
 
-  private suspend fun getVariables(
-    expression: Expression,
-    questionnaireItem: Questionnaire.Item,
-    questionnaireResponseItem: QuestionnaireResponse.Item?,
-  ): MutableMap<String, Any?> {
-    val variables =
-      extractItemDependentVariables(expression, questionnaireItem).apply {
-        put("questionnaire", questionnaire)
-        put("qItem", questionnaireItem)
-        questionnaireResponseItem?.let { put("context", it) }
-        questionnaireLaunchContextMap?.let { putAll(it) }
-      }
-    return variables
-  }
-
   /**
    * Evaluates variable expression defined at questionnaire item level and returns the evaluated
    * result.
@@ -249,13 +235,11 @@ internal class ExpressionEvaluator(
    * @param expression the [Expression] Variable expression Questionnaire.Questionnaire.Item>] of
    *   child to parent
    * @param questionnaireItem the [Questionnaire.Item] where this expression is defined,
-   * @param variablesMap the [Map<String, Any>] of variables, the default value is empty map
    * @return [Any] the result of expression
    */
   internal suspend fun evaluateQuestionnaireItemVariableExpression(
     expression: Expression,
     questionnaireItem: Questionnaire.Item,
-    variablesMap: MutableMap<String, Any?> = mutableMapOf(),
   ): Any? {
     require(
       questionnaireItem.variableExpressions.any {
@@ -264,16 +248,13 @@ internal class ExpressionEvaluator(
     ) {
       "The expression should come from the same questionnaire item"
     }
-    extractItemDependentVariables(
-      expression,
-      questionnaireItem,
-      variablesMap,
-    )
-
-    return evaluateVariable(
-      expression,
-      variablesMap,
-    )
+    val variablesMap =
+      extractItemDependentVariables(
+        expression,
+        questionnaireItem,
+        null,
+      )
+    return evaluateVariable(expression, variablesMap)
   }
 
   /**
@@ -282,30 +263,31 @@ internal class ExpressionEvaluator(
    *
    * @param expression the [Expression] expression to find variables applicable
    * @param questionnaireItem the [Questionnaire.Item] where this expression
-   * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map is
-   *   defined
    */
   internal suspend fun extractItemDependentVariables(
     expression: Expression,
     questionnaireItem: Questionnaire.Item,
-    variablesMap: MutableMap<String, Any?> = mutableMapOf(),
+    questionnaireResponseItem: QuestionnaireResponse.Item?,
   ): MutableMap<String, Any?> {
-    questionnaireLaunchContextMap?.let { variablesMap.putAll(it) }
-    findDependentVariables(expression)
-      .filterNot { variable -> reservedItemVariables.contains(variable) }
-      .forEach { variableName ->
-        if (variablesMap[variableName] == null) {
-          findAndEvaluateVariable(
-            variableName,
-            questionnaireItem,
-            variablesMap,
-          )
-        }
+    return buildMap {
+        put(questionnaireFhirPathSupplement, questionnaire)
+        put(questionnaireItemFhirPathSupplement, questionnaireItem)
+        put("resource", questionnaireResponse)
+        put("context", questionnaireResponseItem)
+        questionnaireLaunchContextMap?.let { putAll(it) }
+        findDependentVariables(expression)
+          .filterNot { variable -> reservedItemVariables.contains(variable) }
+          .forEach { variableName ->
+            if (this[variableName] == null) {
+              findAndEvaluateVariable(
+                variableName,
+                questionnaireItem,
+                this,
+              )
+            }
+          }
       }
-    return variablesMap.apply {
-      put(questionnaireFhirPathSupplement, questionnaire)
-      put(questionnaireItemFhirPathSupplement, questionnaireItem)
-    }
+      .toMutableMap()
   }
 
   /**
@@ -443,7 +425,6 @@ internal class ExpressionEvaluator(
         evaluateQuestionnaireItemVariableExpression(
           expression,
           questionnaireItem,
-          variablesMap,
         )
       } // Secondly, check the ancestors of the questionnaire item
         ?: findVariableInAncestors(variableName, questionnaireItem)?.let {
@@ -451,7 +432,6 @@ internal class ExpressionEvaluator(
           evaluateQuestionnaireItemVariableExpression(
             expression,
             questionnaireItem,
-            variablesMap,
           )
         } // Finally, check the variables defined on the questionnaire itself
           ?: questionnaire.findVariableExpression(variableName)?.let { expression ->

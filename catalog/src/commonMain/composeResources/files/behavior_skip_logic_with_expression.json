@@ -5,7 +5,7 @@
     {
       "url": "http://hl7.org/fhir/StructureDefinition/variable",
       "valueExpression": {
-        "name": "has-fever",
+        "name": "feverish",
         "language": "text/fhirpath",
         "expression": "%resource.descendants().where(linkId='1').answer.value"
       }
@@ -32,7 +32,7 @@
             }
           ],
           "linkId": "1.1",
-          "text": "Define the questionnaire variable 'has-fever' based on the answer to the question 'Does the patient have a fever?",
+          "text": "Define the questionnaire variable 'feverish' based on the answer to the question 'Does the patient have a fever?",
           "type": "display"
         }
       ]
@@ -46,7 +46,7 @@
           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
           "valueExpression": {
             "language": "text/fhirpath",
-            "expression": "%has-fever"
+            "expression": "%feverish"
           }
         }
       ],
@@ -66,7 +66,7 @@
             }
           ],
           "linkId": "2.1",
-          "text": "Enabled if variable 'has-fever' evaluates to true",
+          "text": "Enabled if variable 'feverish' evaluates to true",
           "type": "display"
         }
       ]

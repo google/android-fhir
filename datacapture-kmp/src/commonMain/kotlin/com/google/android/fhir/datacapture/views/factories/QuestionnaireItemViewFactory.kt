@@ -22,10 +22,3 @@ import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 interface QuestionnaireItemViewFactory {
   @Composable fun Content(questionnaireViewItem: QuestionnaireViewItem)
 }
-
-internal object EmptyQuestionnaireViewFactory : QuestionnaireItemViewFactory {
-  @Composable
-  override fun Content(questionnaireViewItem: QuestionnaireViewItem) {
-    // This is an empty place holder for view factories that are not implemented
-  }
-}

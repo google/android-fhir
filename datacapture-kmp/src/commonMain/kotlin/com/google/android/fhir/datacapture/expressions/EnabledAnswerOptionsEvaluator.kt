@@ -200,7 +200,12 @@ internal class EnabledAnswerOptionsEvaluator(
         checkNotNull(xFhirQueryResolver) {
           "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
         }
-        val variablesMap = expressionEvaluator.extractItemDependentVariables(answerExpression, item)
+        val variablesMap =
+          expressionEvaluator.extractItemDependentVariables(
+            answerExpression,
+            item,
+            null,
+          )
         val xFhirExpressionString =
           expressionEvaluator.createXFhirQueryFromExpression(answerExpression, variablesMap)
         if (answerExpressionMap.containsKey(xFhirExpressionString)) {
