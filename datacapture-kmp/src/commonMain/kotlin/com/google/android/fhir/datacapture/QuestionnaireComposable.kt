@@ -62,6 +62,7 @@ import com.google.fhir.model.r4.QuestionnaireResponse
 fun Questionnaire(
   questionnaireJson: String,
   questionnaireResponseJson: String? = null,
+  questionnaireLaunchContextMap: Map<String, String>? = null,
   showSubmitButton: Boolean = true,
   showCancelButton: Boolean = true,
   showReviewPage: Boolean = false,
@@ -80,6 +81,7 @@ fun Questionnaire(
     remember(
       questionnaireJson,
       questionnaireResponseJson,
+      questionnaireLaunchContextMap,
       showSubmitButton,
       showCancelButton,
       showReviewPage,
@@ -94,9 +96,11 @@ fun Questionnaire(
       buildMap<String, Any> {
         put(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireJson)
         questionnaireResponseJson?.let { put(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, it) }
+        questionnaireLaunchContextMap?.let { put(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP, it) }
         put(EXTRA_SHOW_SUBMIT_BUTTON, showSubmitButton)
         put(EXTRA_SHOW_CANCEL_BUTTON, showCancelButton)
         put(EXTRA_ENABLE_REVIEW_PAGE, showReviewPage)
+        put(EXTRA_SHOW_REVIEW_PAGE_FIRST, showReviewPageFirst)
         put(EXTRA_READ_ONLY, isReadOnly)
         put(EXTRA_SHOW_ASTERISK_TEXT, showAsterisk)
         put(EXTRA_SHOW_REQUIRED_TEXT, showRequiredText)
@@ -107,7 +111,8 @@ fun Questionnaire(
       }
     }
 
-  val viewModel: QuestionnaireViewModel = viewModel { QuestionnaireViewModel(stateMap) }
+  val viewModel: QuestionnaireViewModel =
+    viewModel(key = questionnaireJson) { QuestionnaireViewModel(stateMap) }
 
   LaunchedEffect(viewModel, onSubmit, onCancel) {
     viewModel.setOnSubmitButtonClickListener { onSubmit { viewModel.getQuestionnaireResponse() } }

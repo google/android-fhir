@@ -432,7 +432,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
 
-      updateAnswerWithAffectedCalculatedExpression(questionnaireItem)
+      updateAnswerWithAffectedCalculatedExpression(questionnaireItem, questionnaireResponseItem)
 
       modificationCount.update { it + 1 }
     }
@@ -710,10 +710,12 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
    */
   private suspend fun updateAnswerWithAffectedCalculatedExpression(
     questionnaireItem: Questionnaire.Item,
+    questionnaireResponseItem: QuestionnaireResponse.Item,
   ) {
     expressionEvaluator
       .evaluateAllAffectedCalculatedExpressions(
         questionnaireItem,
+        questionnaireResponseItem,
       )
       .forEach { (questionnaireItem, calculatedAnswers) ->
         // update all response item with updated values
@@ -765,7 +767,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
    *
    * Do nothing, otherwise.
    */
-  private fun updateAnswerWithCalculatedExpression(
+  private suspend fun updateAnswerWithCalculatedExpression(
     questionnaireItem: Questionnaire.Item,
     questionnaireResponseItem: QuestionnaireResponse.Item,
   ) {
@@ -1022,7 +1024,13 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     val cqfDynamicQuestionnaireText =
       questionnaireItem.text
         ?.cqfExpression
-        ?.let { expressionEvaluator.evaluateExpressionValue(it) }
+        ?.let {
+          expressionEvaluator.evaluateExpressionValue(
+            questionnaireItem,
+            questionnaireResponseItem,
+            it,
+          )
+        }
         ?.takeIf { it.isNotEmpty() }
         ?.let { convertToString(it) }
     val evaluatedQuestionnaireResponseItem =
@@ -1060,13 +1068,15 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
               enabledAnswerOptions = enabledQuestionnaireAnswerOptions,
               minAnswerValue =
                 questionnaireItem.minValueCqfCalculatedValueExpression?.let {
-                  expressionEvaluator.evaluateExpressionValue(it)?.singleOrNull()
-                    as Extension.Value?
+                  expressionEvaluator
+                    .evaluateExpressionValue(questionnaireItem, questionnaireResponseItem, it)
+                    ?.singleOrNull() as Extension.Value?
                 },
               maxAnswerValue =
                 questionnaireItem.maxValueCqfCalculatedValueExpression?.let {
-                  expressionEvaluator.evaluateExpressionValue(it)?.singleOrNull()
-                    as Extension.Value?
+                  expressionEvaluator
+                    .evaluateExpressionValue(questionnaireItem, questionnaireResponseItem, it)
+                    ?.singleOrNull() as Extension.Value?
                 },
               draftAnswer = draftAnswerMap[questionnaireItem],
               enabledDisplayItems =

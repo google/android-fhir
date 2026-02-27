@@ -74,7 +74,14 @@ internal class ConstraintItemExtensionValidator(
                 }
             }
             .build()
-        val isValid = convertToBoolean(expressionEvaluator.evaluateExpression(expression))
+        val isValid =
+          convertToBoolean(
+            expressionEvaluator.evaluateExpression(
+              questionnaireItem,
+              questionnaireResponseItem,
+              expression,
+            ),
+          )
         if (isValid) {
           ConstraintValidator.Result(true, null)
         } else {

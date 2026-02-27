@@ -200,7 +200,12 @@ internal class EnabledAnswerOptionsEvaluator(
         checkNotNull(xFhirQueryResolver) {
           "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
         }
-        val variablesMap = expressionEvaluator.extractItemDependentVariables(answerExpression, item)
+        val variablesMap =
+          expressionEvaluator.extractItemDependentVariables(
+            answerExpression,
+            item,
+            null,
+          )
         val xFhirExpressionString =
           expressionEvaluator.createXFhirQueryFromExpression(answerExpression, variablesMap)
         if (answerExpressionMap.containsKey(xFhirExpressionString)) {
@@ -214,7 +219,7 @@ internal class EnabledAnswerOptionsEvaluator(
         options
       }
       answerExpression.isFhirPath -> {
-        val data = expressionEvaluator.evaluateExpression(answerExpression)
+        val data = expressionEvaluator.evaluateExpression(item, null, answerExpression)
         item.extractAnswerOptions(data)
       }
       else ->
@@ -224,7 +229,7 @@ internal class EnabledAnswerOptionsEvaluator(
     }
   }
 
-  private fun evaluateAnswerOptionsToggleExpressions(
+  private suspend fun evaluateAnswerOptionsToggleExpressions(
     item: Questionnaire.Item,
     answerOptions: List<Questionnaire.Item.AnswerOption>,
   ): List<Questionnaire.Item.AnswerOption> {
@@ -235,7 +240,7 @@ internal class EnabledAnswerOptionsEvaluator(
           val evaluationResult =
             if (expression?.value?.isFhirPath == true) {
               convertToBoolean(
-                expressionEvaluator.evaluateExpression(expression.value),
+                expressionEvaluator.evaluateExpression(item, null, expression.value),
               )
             } else {
               throw UnsupportedOperationException(

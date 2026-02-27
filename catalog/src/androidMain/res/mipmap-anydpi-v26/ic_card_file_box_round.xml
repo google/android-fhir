@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<adaptive-icon
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:ignore="MonochromeLauncherIcon"
+>
+    <background android:drawable="@color/ic_card_file_box_background" />
+    <foreground android:drawable="@mipmap/ic_card_file_box_foreground" />
+</adaptive-icon>

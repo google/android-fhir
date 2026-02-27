@@ -127,7 +127,11 @@ internal fun QuestionnaireEditList(
         is QuestionnaireAdapterItem.Question -> {
           val questionnaireViewHolderType = getItemViewTypeForQuestion(adapterItem.item)
           val questionnaireItemViewHolderDelegate =
-            getQuestionnaireItemViewFactory(questionnaireViewHolderType)
+            getQuestionnaireItemViewFactory(
+              questionnaireItem = adapterItem.item.questionnaireItem,
+              questionnaireViewHolderType = questionnaireViewHolderType,
+              questionnaireItemViewHolderMatchers = questionnaireItemViewHolderMatchers,
+            )
           questionnaireItemViewHolderDelegate.Content(adapterItem.item)
         }
         is QuestionnaireAdapterItem.Navigation -> {
@@ -167,7 +171,7 @@ internal fun QuestionnaireReviewList(items: List<QuestionnaireReviewItem>) {
         }
         is QuestionnaireAdapterItem.Navigation -> {
           QuestionnaireBottomNavigation(
-            item.questionnaireNavigationUIState,
+            pageNavigationUIState = item.questionnaireNavigationUIState,
             modifier = Modifier.fillMaxWidth(),
           )
         }
@@ -306,24 +310,10 @@ private fun QuestionnaireReviewItem(
   }
 }
 
-// TODO provide option to override factory
-/*private fun getQuestionnaireItemViewHolder(
-  parent: ViewGroup,
-  questionnaireViewItem: QuestionnaireViewItem,
-  questionnaireItemViewHolderMatchers:
-  List<QuestionnaireItemViewHolderFactoryMatcher>,
-): QuestionnaireItemViewHolder {
-  // Find a matching custom widget
-  val questionnaireViewHolderFactory =
-    questionnaireItemViewHolderMatchers
-      .find { it.matches(questionnaireViewItem.questionnaireItem) }
-      ?.factory
-      ?: getQuestionnaireItemViewHolderFactory(getItemViewTypeForQuestion(questionnaireViewItem))
-  return questionnaireViewHolderFactory.create(parent)
-}*/
-
 fun getQuestionnaireItemViewFactory(
+  questionnaireItem: Questionnaire.Item,
   questionnaireViewHolderType: QuestionnaireViewHolderType,
+  questionnaireItemViewHolderMatchers: List<QuestionnaireItemViewHolderFactoryMatcher>,
 ): QuestionnaireItemViewFactory {
   return when (questionnaireViewHolderType) {
     QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE -> EditTextSingleLineViewFactory
