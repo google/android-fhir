@@ -45,10 +45,13 @@ internal object EditTextIntegerViewHolderFactory : QuestionnaireItemComposeViewH
       },
       uiValidationMessage = { questionnaireViewItem, context ->
         if (questionnaireViewItem.draftAnswer != null) {
+          val minValue = questionnaireViewItem.questionnaireItem.minValue ?: Int.MIN_VALUE
+          val maxValue = questionnaireViewItem.questionnaireItem.maxValue ?: Int.MAX_VALUE
+
           context.getString(
             R.string.integer_format_validation_error_msg,
-            formatInteger(Int.MIN_VALUE),
-            formatInteger(Int.MAX_VALUE),
+            formatInteger(minValue),
+            formatInteger(maxValue)
           )
         } else {
           getValidationErrorMessage(
