@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,13 +80,12 @@ private fun Project.configureLicensee() {
     }
 
     // SQLCipher
-    allowDependency("net.zetetic", "android-database-sqlcipher", "4.5.0") {
-      because("Custom license, essentially BSD-3. https://www.zetetic.net/sqlcipher/license/")
-    }
     allowDependency("net.zetetic", "android-database-sqlcipher", "4.5.4") {
       because("Custom license, essentially BSD-3. https://www.zetetic.net/sqlcipher/license/")
     }
-
+    allowDependency("net.zetetic", "sqlcipher-android", "4.12.0") {
+      because("Custom license, essentially BSD-3. https://www.zetetic.net/sqlcipher/license/")
+    }
     // Jakarta XML Binding API
     allowDependency("jakarta.xml.bind", "jakarta.xml.bind-api", "4.0.1") {
       because("BSD 3-clause.")
@@ -145,20 +144,54 @@ private fun Project.configureLicensee() {
 
     // More utility classes
     // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
-    allowDependency("com.google.android.gms", "play-services-basement", "17.4.0") { because("") }
-    allowDependency("com.google.android.gms", "play-services-basement", "18.0.0") { because("") }
-    allowDependency("com.google.android.gms", "play-services-basement", "18.1.0") { because("") }
+    allowDependency(
+      "com.google.android.gms",
+      "play-services-basement",
+      "17.4.0",
+    ) {
+      because("")
+    }
+    allowDependency(
+      "com.google.android.gms",
+      "play-services-basement",
+      "18.0.0",
+    ) {
+      because("")
+    }
+    allowDependency(
+      "com.google.android.gms",
+      "play-services-basement",
+      "18.1.0",
+    ) {
+      because("")
+    }
 
     // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
-    allowDependency("com.google.android.gms", "play-services-clearcut", "17.0.0") { because("") }
+    allowDependency(
+      "com.google.android.gms",
+      "play-services-clearcut",
+      "17.0.0",
+    ) {
+      because("")
+    }
 
     // ML Kit barcode scanning https://developers.google.com/ml-kit/vision/barcode-scanning/android
-    allowDependency("com.google.android.gms", "play-services-mlkit-barcode-scanning", "16.1.4") {
+    allowDependency(
+      "com.google.android.gms",
+      "play-services-mlkit-barcode-scanning",
+      "16.1.4",
+    ) {
       because("")
     }
 
     // Play Services Phenotype
-    allowDependency("com.google.android.gms", "play-services-phenotype", "17.0.0") { because("") }
+    allowDependency(
+      "com.google.android.gms",
+      "play-services-phenotype",
+      "17.0.0",
+    ) {
+      because("")
+    }
 
     // Tasks API Android https://developers.google.com/android/guides/tasks
     allowDependency("com.google.android.gms", "play-services-tasks", "17.2.0") { because("") }
