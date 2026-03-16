@@ -87,3 +87,44 @@ internal val Element.displayString: String?
 internal val Element.cqfExpression: Expression?
   get() =
     this.extension.find { it.url == EXTENSION_CQF_EXPRESSION_URL }?.value?.asExpression()?.value
+
+internal operator fun Element.compareTo(other: Element): Int {
+  if (this::class != other::class) {
+    throw IllegalArgumentException(
+      "Cannot compare different data types: ${this::class} and ${other::class}",
+    )
+  }
+
+  return when (this) {
+    is FhirR4Integer -> {
+      other as FhirR4Integer
+      this.value!!.compareTo(other.value!!)
+    }
+    is FhirR4Decimal -> {
+      other as FhirR4Decimal
+      this.value!!.compareTo(other.value!!)
+    }
+    is FhirR4DateType -> {
+      other as FhirR4DateType
+      this.value.toString().compareTo(other.value.toString())
+    }
+    is DateTime -> {
+      other as DateTime
+      this.value.toString().compareTo(other.value.toString())
+    }
+    is Time -> {
+      other as Time
+      this.value!!.compareTo(other.value!!)
+    }
+    is Quantity -> {
+      other as Quantity
+      if (this.code != other.code) {
+        throw IllegalArgumentException(
+          "Cannot compare different quantity codes: ${this.code} and ${other.code}",
+        )
+      }
+      this.value!!.value!!.compareTo(other.value!!.value!!)
+    }
+    else -> throw IllegalArgumentException("Comparison not supported for type :$this")
+  }
+}

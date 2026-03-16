@@ -22,7 +22,7 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_QUESTIONNAIRE_CO
 import com.google.android.fhir.datacapture.extensions.EXTENSION_QUESTIONNAIRE_CONSTRAINT_SEVERITY
 import com.google.android.fhir.datacapture.extensions.EXTENSION_QUESTIONNAIRE_CONSTRAINT_URL
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
-import com.google.android.fhir.datacapture.fhirpath.convertToBoolean
+import com.google.android.fhir.datacapture.fhirpath.FhirPathService
 import com.google.fhir.model.r4.Enumeration
 import com.google.fhir.model.r4.Expression
 import com.google.fhir.model.r4.Questionnaire
@@ -74,7 +74,14 @@ internal class ConstraintItemExtensionValidator(
                 }
             }
             .build()
-        val isValid = convertToBoolean(expressionEvaluator.evaluateExpression(expression))
+        val isValid =
+          FhirPathService.convertToBoolean(
+            expressionEvaluator.evaluateExpression(
+              questionnaireItem,
+              questionnaireResponseItem,
+              expression,
+            ),
+          )
         if (isValid) {
           ConstraintValidator.Result(true, null)
         } else {

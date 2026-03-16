@@ -51,26 +51,31 @@ kotlin {
       }
     }
 
-  @OptIn(ExperimentalWasmDsl::class)
-  wasmJs {
-    outputModuleName = "sdcKmpDemo"
-    browser {
-      val rootDirPath = project.rootDir.path
-      val projectDirPath = project.projectDir.path
-      commonWebpackConfig {
-        outputFileName = "sdcKmpDemo.js"
-        devServer =
-          (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-            static =
-              (static ?: mutableListOf()).apply {
-                // Serve sources to debug inside browser
-                add(rootDirPath)
-                add(projectDirPath)
-              }
-          }
+  // A project property to skip wasmJs build, when in CI
+  val skipWasmJs = project.findProperty("skipWasmJs")?.toString()?.toBoolean() ?: false
+
+  if (!skipWasmJs) {
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+      outputModuleName = "sdcKmpDemo"
+      browser {
+        val rootDirPath = project.rootDir.path
+        val projectDirPath = project.projectDir.path
+        commonWebpackConfig {
+          outputFileName = "sdcKmpDemo.js"
+          devServer =
+            (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+              static =
+                (static ?: mutableListOf()).apply {
+                  // Serve sources to debug inside browser
+                  add(rootDirPath)
+                  add(projectDirPath)
+                }
+            }
+        }
       }
+      binaries.executable()
     }
-    binaries.executable()
   }
 
   sourceSets {

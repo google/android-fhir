@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -224,6 +224,10 @@ private fun Project.configureLicensee() {
 
     // Logback
     allowDependency("ch.qos.logback", "logback-core", "1.4.14") { because("LGPL") }
+
+    // KMP FileKit
+    allowUrl("https://github.com/vinceglb/FileKit/blob/main/LICENSE") { because("") }
+    allowUrl("https://github.com/hypfvieh/dbus-java/blob/master/LICENSE") { because("") }
   }
 }
 

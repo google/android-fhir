@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 internal suspend fun Attachment.imageData(): ByteArray? {
   check(mimeType == MimeType.IMAGE.value) {
-    "${mimeType?.capitalize()} attachment is not supported in Item Media extension yet"
+    "${mimeType?.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }} attachment is not supported in Item Media extension yet"
   }
 
   return data?.data

@@ -16,11 +16,21 @@
 
 package com.google.android.fhir.datacapture
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.android.fhir.datacapture.extensions.flattened
+import com.google.android.fhir.datacapture.views.components.ValidationErrorDialog
 import com.google.fhir.model.r4.QuestionnaireResponse
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Public composable function for displaying a FHIR Questionnaire in KMP applications.
@@ -35,8 +45,10 @@ import com.google.fhir.model.r4.QuestionnaireResponse
  * @param isReadOnly Whether the questionnaire is read-only (default: false)
  * @param showAsterisk Whether to show asterisk for required fields (default: true)
  * @param showRequiredText Whether to show "required" text (default: false)
+ * @param showNavigationLongScroll: Boolean = false,
  * @param showOptionalText Whether to show "optional" text (default: false)
  * @param submitButtonText Custom text for submit button (optional)
+ * @param showSubmitAnywayWhenValidationFails: Boolean = true,
  * @param matchersProvider Custom matchers provider for custom question types (optional)
  * @param onSubmit Callback invoked when user submits the questionnaire with the response
  * @param onCancel Callback invoked when user cancels the questionnaire
@@ -62,6 +74,7 @@ import com.google.fhir.model.r4.QuestionnaireResponse
 fun Questionnaire(
   questionnaireJson: String,
   questionnaireResponseJson: String? = null,
+  questionnaireLaunchContextMap: Map<String, String>? = null,
   showSubmitButton: Boolean = true,
   showCancelButton: Boolean = true,
   showReviewPage: Boolean = false,
@@ -72,6 +85,7 @@ fun Questionnaire(
   showOptionalText: Boolean = false,
   showNavigationLongScroll: Boolean = false,
   submitButtonText: String? = null,
+  showSubmitAnywayWhenValidationFails: Boolean = true,
   matchersProvider: QuestionnaireItemViewHolderFactoryMatchersProvider? = null,
   onSubmit: (suspend () -> QuestionnaireResponse) -> Unit,
   onCancel: () -> Unit,
@@ -80,6 +94,7 @@ fun Questionnaire(
     remember(
       questionnaireJson,
       questionnaireResponseJson,
+      questionnaireLaunchContextMap,
       showSubmitButton,
       showCancelButton,
       showReviewPage,
@@ -90,13 +105,16 @@ fun Questionnaire(
       showOptionalText,
       showNavigationLongScroll,
       submitButtonText,
+      showSubmitAnywayWhenValidationFails,
     ) {
       buildMap<String, Any> {
         put(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireJson)
         questionnaireResponseJson?.let { put(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, it) }
+        questionnaireLaunchContextMap?.let { put(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP, it) }
         put(EXTRA_SHOW_SUBMIT_BUTTON, showSubmitButton)
         put(EXTRA_SHOW_CANCEL_BUTTON, showCancelButton)
         put(EXTRA_ENABLE_REVIEW_PAGE, showReviewPage)
+        put(EXTRA_SHOW_REVIEW_PAGE_FIRST, showReviewPageFirst)
         put(EXTRA_READ_ONLY, isReadOnly)
         put(EXTRA_SHOW_ASTERISK_TEXT, showAsterisk)
         put(EXTRA_SHOW_REQUIRED_TEXT, showRequiredText)
@@ -104,24 +122,59 @@ fun Questionnaire(
         put(EXTRA_SHOW_REVIEW_PAGE_FIRST, showReviewPageFirst)
         put(EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL, showNavigationLongScroll)
         submitButtonText?.let { put(EXTRA_SUBMIT_BUTTON_TEXT, it) }
+        put(EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON, showSubmitAnywayWhenValidationFails)
       }
     }
+  val effectiveMatchersProvider =
+    remember(matchersProvider) {
+      matchersProvider ?: EmptyQuestionnaireItemViewHolderFactoryMatchersProvider
+    }
 
-  val viewModel: QuestionnaireViewModel = viewModel { QuestionnaireViewModel(stateMap) }
+  val viewModel: QuestionnaireViewModel =
+    viewModel(key = questionnaireJson) { QuestionnaireViewModel(stateMap) }
+  val flattenedQuestionnaireItems =
+    remember(viewModel.questionnaire) { viewModel.questionnaire.item.flattened() }
 
-  LaunchedEffect(viewModel, onSubmit, onCancel) {
-    viewModel.setOnSubmitButtonClickListener { onSubmit { viewModel.getQuestionnaireResponse() } }
+  var showValidationDialog by remember { mutableStateOf(false) }
+  var invalidFields by remember { mutableStateOf<List<AnnotatedString>>(emptyList()) }
 
-    viewModel.setOnCancelButtonClickListener { onCancel() }
+  LaunchedEffect(Unit) {
+    viewModel.setOnSubmitButtonClickListener {
+      onSubmit {
+        val invalidValidationLinkIds =
+          viewModel.validateQuestionnaireUpdateUIAndGetErrorFields(flattenedQuestionnaireItems)
+        if (invalidValidationLinkIds.isNotEmpty()) {
+          invalidFields = invalidValidationLinkIds
+          showValidationDialog = true
+          throw CancellationException()
+        } else {
+          return@onSubmit viewModel.getQuestionnaireResponse()
+        }
+      }
+    }
   }
 
-  val effectiveMatchersProvider =
-    matchersProvider ?: EmptyQuestionnaireItemViewHolderFactoryMatchersProvider
+  LaunchedEffect(Unit) { viewModel.setOnCancelButtonClickListener { onCancel() } }
 
-  QuestionnaireScreen(
-    viewModel = viewModel,
-    matchersProvider = effectiveMatchersProvider,
-  )
+  Box(modifier = Modifier.fillMaxSize()) {
+    QuestionnaireScreen(
+      viewModel = viewModel,
+      matchersProvider = effectiveMatchersProvider,
+    )
+
+    if (showValidationDialog) {
+      ValidationErrorDialog(
+        invalidFields = invalidFields,
+        onDismiss = { showValidationDialog = false },
+        onFixQuestions = { showValidationDialog = false },
+        showSubmitAnyway = showSubmitAnywayWhenValidationFails,
+        onSubmitAnyway = {
+          showValidationDialog = false
+          onSubmit { viewModel.getQuestionnaireResponse() }
+        },
+      )
+    }
+  }
 }
 
 /**

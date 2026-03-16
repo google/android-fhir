@@ -26,6 +26,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
@@ -35,14 +36,17 @@ import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasTextExactly
 import androidx.compose.ui.test.isEditable
 import androidx.compose.ui.test.onChildren
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.text.AnnotatedString
 import com.google.android.fhir.datacapture.extensions.FhirR4Boolean
 import com.google.android.fhir.datacapture.extensions.FhirR4String
+import com.google.android.fhir.datacapture.setQuestionnaireContent
 import com.google.android.fhir.datacapture.theme.QuestionnaireTheme
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -50,11 +54,13 @@ import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.components.DATE_TEXT_INPUT_FIELD
 import com.google.android.fhir.datacapture.views.components.ERROR_TEXT_AT_HEADER_TEST_TAG
+import com.google.android.fhir.datacapture.views.components.HANDLE_INPUT_DEBOUNCE_TIME
 import com.google.android.fhir.datacapture.views.components.QUESTION_HEADER_TAG
 import com.google.android.fhir.datacapture.views.components.TIME_PICKER_INPUT_FIELD
 import com.google.fhir.model.r4.DateTime
 import com.google.fhir.model.r4.Enumeration
 import com.google.fhir.model.r4.Extension
+import com.google.fhir.model.r4.FhirDate
 import com.google.fhir.model.r4.FhirDateTime
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
@@ -63,16 +69,36 @@ import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import java.util.Locale
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.UtcOffset
 import kotlinx.datetime.number
 
-@OptIn(ExperimentalTestApi::class)
+@OptIn(ExperimentalTestApi::class, ExperimentalCoroutinesApi::class)
 class DateTimeViewFactoryTest {
   @Composable
   fun QuestionnaireDateTimeView(questionnaireViewItem: QuestionnaireViewItem) {
     QuestionnaireTheme { DateTimeViewFactory.Content(questionnaireViewItem) }
+  }
+
+  private val testDispatcher = StandardTestDispatcher()
+
+  @BeforeTest
+  fun setup() {
+    Dispatchers.setMain(testDispatcher)
+  }
+
+  @AfterTest
+  fun tearDown() {
+    Dispatchers.resetMain()
   }
 
   @Test
@@ -1211,4 +1237,78 @@ class DateTimeViewFactoryTest {
     setContent { QuestionnaireDateTimeView(questionnaireViewItem) }
     onNodeWithText("Optional").assertDoesNotExist()
   }
+
+  @Test
+  fun dateTimePicker_shouldEnableTimePickerWithCorrectDate_butNotSaveInQuestionnaireResponse() =
+    runComposeUiTest {
+      Locale.setDefault(Locale.US)
+      val getQuestionnaireResponseFunc =
+        setQuestionnaireContent("files/component_date_time_picker.json")
+
+      onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("01052005")
+      mainClock.advanceTimeBy(HANDLE_INPUT_DEBOUNCE_TIME + 500L)
+
+      onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+        .assert(
+          SemanticsMatcher.keyNotDefined(
+            SemanticsProperties.Error,
+          ),
+        )
+      onNodeWithTag(TIME_PICKER_INPUT_FIELD).assertIsEnabled()
+
+      (getQuestionnaireResponseFunc().item.first().answer.first().value?.asDateTime()?.value?.value
+          as? FhirDateTime.DateTime)
+        ?.dateTime
+        .shouldBe(LocalDateTime(2005, 1, 5, 0, 0))
+    }
+
+  @Test
+  fun dateTimePicker_shouldSetAnswerWhenDateAndTimeAreFilled() = runComposeUiTest {
+    Locale.setDefault(Locale.US)
+    val getQuestionnaireResponse = setQuestionnaireContent("files/component_date_time_picker.json")
+
+    onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextReplacement("01052005")
+    mainClock.advanceTimeBy(HANDLE_INPUT_DEBOUNCE_TIME + 500L)
+    onNodeWithTag(TIME_PICKER_INPUT_FIELD)
+      .onChildren()
+      .filterToOne(
+        SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button),
+      )
+      .performClick()
+
+    onNodeWithText("AM").performClick()
+    onNodeWithContentDescription("Select hour", substring = true).performClick()
+    onNodeWithContentDescription("6 o'clock", substring = true).performClick()
+
+    onNodeWithContentDescription("Select minutes", substring = true).performClick()
+    onNodeWithContentDescription("10 minutes", substring = true).performClick()
+
+    onNodeWithText("Ok", ignoreCase = true).performClick()
+    waitForIdle()
+
+    (getQuestionnaireResponse().item.first().answer.first().value?.asDateTime()?.value?.value
+        as? FhirDateTime.DateTime)
+      ?.dateTime
+      .shouldBe(
+        LocalDateTime(2005, 1, 5, 6, 10),
+      )
+  }
+
+  @Test
+  fun datePicker_shouldSaveInQuestionnaireResponseWhenCorrectDateWithEntryFormatIsEntered() =
+    runComposeUiTest {
+      val getQuestionnaireResponse = setQuestionnaireContent("files/component_date_picker.json")
+
+      onNodeWithTag(DATE_TEXT_INPUT_FIELD).performTextInput("20050105")
+      mainClock.advanceTimeBy(HANDLE_INPUT_DEBOUNCE_TIME + 500L)
+      onNodeWithTag(DATE_TEXT_INPUT_FIELD)
+        .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Error))
+
+      (getQuestionnaireResponse().item.first().answer.first().value?.asDate()?.value?.value
+          as? FhirDate.Date)
+        ?.date
+        .shouldBe(
+          LocalDate(2005, 1, 5),
+        )
+    }
 }

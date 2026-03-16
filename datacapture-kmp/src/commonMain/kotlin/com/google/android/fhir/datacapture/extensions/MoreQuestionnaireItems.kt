@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture.extensions
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
-import com.google.android.fhir.datacapture.fhirpath.evaluateToDisplay
+import com.google.android.fhir.datacapture.fhirpath.FhirPathService
 import com.google.fhir.model.r4.Attachment
 import com.google.fhir.model.r4.Coding
 import com.google.fhir.model.r4.Date
@@ -297,13 +297,15 @@ internal val Questionnaire.Item.minValue
   get() = this.extension.find { it.url == MIN_VALUE_EXTENSION_URL }?.value
 
 internal val Questionnaire.Item.minValueCqfCalculatedValueExpression: Expression?
-  get() = this.extension.find { it.url == MIN_VALUE_EXTENSION_URL }?.cqfCalculatedValueExpression
+  get() =
+    this.extension.find { it.url == MIN_VALUE_EXTENSION_URL }?.value?.cqfCalculatedValueExpression
 
 internal val Questionnaire.Item.maxValue
   get() = this.extension.find { it.url == MAX_VALUE_EXTENSION_URL }?.value
 
 internal val Questionnaire.Item.maxValueCqfCalculatedValueExpression: Expression?
-  get() = this.extension.find { it.url == MAX_VALUE_EXTENSION_URL }?.cqfCalculatedValueExpression
+  get() =
+    this.extension.find { it.url == MAX_VALUE_EXTENSION_URL }?.value?.cqfCalculatedValueExpression
 
 // ********************************************************************************************** //
 //                                                                                                //
@@ -370,22 +372,6 @@ fun List<Questionnaire.Item>.getLocalizedInstructionsAnnotatedString(
     }
     .joinTo(this, separator) { it.localizedTextAnnotatedString.toString() }
 }
-
-/**
- * A nested questionnaire item of type display with code [DisplayItemControlType.FLYOVER] (if
- * present) is used as the fly-over text of the parent question.
- */
-internal val Questionnaire.Item.localizedFlyoverSpanned: AnnotatedString?
-  get() = item.localizedFlyoverSpanned
-
-/** [localizedFlyoverSpanned] over list of [Questionnaire.Item] */
-val List<Questionnaire.Item>.localizedFlyoverSpanned: AnnotatedString?
-  get() =
-    this.firstOrNull { questionnaireItem ->
-        questionnaireItem.type.value == Questionnaire.QuestionnaireItemType.Display &&
-          questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
-      }
-      ?.localizedTextAnnotatedString
 
 val List<Questionnaire.Item>.localizedFlyoverAnnotatedString: AnnotatedString?
   get() =
@@ -758,7 +744,7 @@ internal fun Questionnaire.Item.extractAnswerOptions(
             this@extractAnswerOptions.choiceColumn
               .filter { it.forDisplay }
               .map { it.path }
-              .let { evaluateToDisplay(it, data) }
+              .let { FhirPathService.evaluateToDisplay(it, data) }
               .also { display = FhirString.Builder().apply { value = it } }
           }
           .build()
@@ -946,7 +932,7 @@ private fun Questionnaire.Item.createQuestionnaireResponseItemAnswers():
   // The [ResourceMapper] at L260 wrongfully sets the initial property of questionnaire after
   // evaluation of initial-expression.
   require(answerOption.isEmpty() || initial.isEmpty() || initialExpression != null) {
-    "Questionnaire item $linkId has both initial value(s) and has answerOption. See rule que-11 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+    "Questionnaire item ${linkId.value} has both initial value(s) and has answerOption. See rule que-11 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
   }
 
   // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
@@ -956,7 +942,8 @@ private fun Questionnaire.Item.createQuestionnaireResponseItemAnswers():
   if (
     answerOption.initialSelected.isEmpty() &&
       (initial.isEmpty() ||
-        (initialFirstRep?.value != null && initialFirstRep.value.asQuantity()?.value == null))
+        (initialFirstRep?.value?.asQuantity() != null &&
+          initialFirstRep.value.asQuantity()?.value?.value == null))
   ) {
     return mutableListOf()
   }
@@ -966,20 +953,24 @@ private fun Questionnaire.Item.createQuestionnaireResponseItemAnswers():
       type.value == Questionnaire.QuestionnaireItemType.Display
   ) {
     throw IllegalArgumentException(
-      "Questionnaire item $linkId has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.",
+      "Questionnaire item ${linkId.value} has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.",
     )
   }
 
   if ((answerOption.initialSelected.size > 1 || initial.size > 1) && repeats?.value == false) {
     throw IllegalArgumentException(
-      "Questionnaire item $linkId can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.",
+      "Questionnaire item ${linkId.value} can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.",
     )
   }
 
-  val thiso: List<Questionnaire.Item.Initial.Value> = initial.map { it.value }
-  val this1: List<Questionnaire.Item.AnswerOption.Value> = answerOption.initialSelected
+  val answersFromInitial =
+    initial.map { it.toQuestionnaireResponseItemAnswer() }.map { it.toBuilder() }
+  val answersFromInitialSelected =
+    answerOption.initialSelected
+      .map { it.toQuestionnaireResponseItemAnswer() }
+      .map { it.toBuilder() }
 
-  return mutableListOf()
+  return (answersFromInitial + answersFromInitialSelected).toMutableList()
 }
 
 /**
