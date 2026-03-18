@@ -58,8 +58,16 @@ internal class QuestionnaireResponseItemValidator(
       answerConstraintValidators.flatMap { validator ->
         questionnaireResponseItem.answer.map { answer ->
           validator.validate(questionnaireItem, answer) {
-            expressionEvaluator.evaluateExpressionValue(it)
-              ?: expressionEvaluator.evaluateExpression(it)
+            expressionEvaluator.evaluateExpressionValue(
+              questionnaireItem,
+              questionnaireResponseItem,
+              it,
+            )
+              ?: expressionEvaluator.evaluateExpression(
+                questionnaireItem,
+                questionnaireResponseItem,
+                it,
+              )
           }
         }
       }

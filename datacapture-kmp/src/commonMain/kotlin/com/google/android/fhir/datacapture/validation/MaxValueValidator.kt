@@ -18,9 +18,10 @@ package com.google.android.fhir.datacapture.validation
 
 import android_fhir.datacapture_kmp.generated.resources.Res
 import android_fhir.datacapture_kmp.generated.resources.max_value_validation_error_msg
-import com.google.android.fhir.datacapture.enablement.compareFhirValue
+import com.google.android.fhir.datacapture.extensions.compareTo
+import com.google.android.fhir.datacapture.extensions.elementDeepValue
+import com.google.android.fhir.datacapture.extensions.elementValue
 import com.google.fhir.model.r4.Extension
-import com.google.fhir.model.r4.Integer
 import com.google.fhir.model.r4.QuestionnaireResponse
 import org.jetbrains.compose.resources.getString
 
@@ -30,21 +31,14 @@ internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefin
 internal object MaxValueValidator :
   AnswerExtensionConstraintValidator(
     url = MAX_VALUE_EXTENSION_URL,
-    predicate = { constraintValue: Any, answer: QuestionnaireResponse.Item.Answer,
+    predicate = { constraintValue: Extension.Value, answer: QuestionnaireResponse.Item.Answer,
       ->
-      answer.value compareFhirValue constraintValue > 0
+      answer.elementValue!! > constraintValue.elementValue
     },
-    messageGenerator = { constraintValue: Any ->
+    messageGenerator = { constraintValue: Extension.Value ->
       getString(
         Res.string.max_value_validation_error_msg,
-        getValue(constraintValue).toString(),
+        constraintValue.elementDeepValue.toString(),
       )
     },
   )
-
-private fun getValue(constraintValue: Any): Int? =
-  when (constraintValue) {
-    is Integer -> constraintValue.value
-    is Extension.Value.Integer -> constraintValue.asInteger()?.value?.value
-    else -> null
-  }

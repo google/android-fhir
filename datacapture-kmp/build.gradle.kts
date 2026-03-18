@@ -41,13 +41,6 @@ kotlin {
     }
   }
 
-  // For iOS targets, this is also where you should
-  // configure native binary output. For more information, see:
-  // https://kotlinlang.org/docs/multiplatform-build-native-binaries.html#build-xcframeworks
-
-  // A step-by-step guide on how to include this library in an XCode
-  // project can be found here:
-  // https://developer.android.com/kotlin/multiplatform/migrate
   val xcfName = "sharedKit"
 
   iosX64 { binaries.framework { baseName = xcfName } }
@@ -68,11 +61,6 @@ kotlin {
     binaries.library()
   }
 
-  // Source set declarations.
-  // Declaring a target automatically creates a source set with the same name. By default, the
-  // Kotlin Gradle Plugin creates additional source sets that depend on each other, since it is
-  // common to share sources between related targets.
-  // See: https://kotlinlang.org/docs/multiplatform-hierarchy.html
   sourceSets {
     all {
       languageSettings {
@@ -114,57 +102,17 @@ kotlin {
       }
     }
 
-    androidMain {
-      resources.srcDir("res")
-      dependencies {
-
-        // Add Android-specific dependencies here. Note that this source set depends on
-        // commonMain by default and will correctly pull the Android artifacts of any KMP
-        // dependencies declared in commonMain.
-        //        api(libs.hapi.fhir.structures.r4)
-        implementation(libs.accompanist.themeadapter.material3)
-        //        implementation(libs.android.fhir.common)
-        implementation(libs.androidx.appcompat)
-        implementation(libs.androidx.constraintlayout)
-        implementation(libs.androidx.core)
-        implementation(libs.androidx.fragment)
-        implementation(libs.material)
-        //        implementation(libs.hapi.fhir.caching.guava)
-        /*   implementation(libs.hapi.fhir.validation) {
-          exclude(module = "commons-logging")
-          exclude(module = "httpclient")
-        }*/
-        implementation(libs.kotlinx.coroutines.core)
-        implementation(libs.timber)
-        implementation(libs.glide)
-        /*
-        constraints {
-          Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
-            api(libName, constraints)
-            implementation(libName, constraints)
-          }
-        }*/
-      }
-    }
+    androidMain { resources.srcDir("res") }
 
     getByName("androidDeviceTest") {
       dependencies {
-        implementation(libs.androidx.test.runner)
-        implementation(libs.androidx.test.core)
-        implementation(libs.androidx.test.ext.junit)
         implementation(libs.androidx.compose.ui.test.junit4)
         implementation(libs.androidx.compose.ui.test.manifest)
         implementation(libs.androidx.test.core)
-        /* implementation(libs.androidx.test.espresso.contrib) {
-          // build fails with error "Duplicate class found" (org.checkerframework.checker.*)
-          exclude(group = "org.checkerframework", module = "checker")
-        }*/
-        implementation(libs.androidx.test.espresso.core)
         implementation(libs.androidx.test.ext.junit)
         implementation(libs.androidx.test.ext.junit.ktx)
-        implementation(libs.androidx.test.rules)
         implementation(libs.androidx.test.runner)
-        implementation(libs.junit)
+        implementation(libs.androidx.test.rules)
         implementation(libs.kotlinx.coroutines.test)
         implementation(libs.truth)
       }
@@ -177,24 +125,15 @@ kotlin {
         implementation(libs.junit)
         implementation(libs.kotlin.test.junit)
         implementation(libs.kotlinx.coroutines.test)
-        implementation(libs.mockito.inline)
-        implementation(libs.mockito.kotlin)
-        implementation(libs.robolectric)
         implementation(libs.truth)
-        /* implementation(project(":knowledge")) {
-          exclude(group = "com.google.android.fhir", module = "engine")
-        }*/
       }
     }
 
     val desktopMain by getting {
       dependencies {
         implementation(compose.desktop.currentOs)
-        // Provide Main Dispatcher for JVM target
         implementation(libs.kotlinx.coroutines.swing)
       }
     }
-
-    iosMain { dependencies {} }
   }
 }

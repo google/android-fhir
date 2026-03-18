@@ -25,6 +25,7 @@ import android_fhir.datacapture_kmp.generated.resources.submit_questionnaire
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertCountEquals
@@ -37,9 +38,8 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.printToLog
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelStore
@@ -55,12 +55,14 @@ import com.google.android.fhir.datacapture.views.components.QUESTIONNAIRE_BOTTOM
 import com.google.android.fhir.datacapture.views.components.QUESTIONNAIRE_PAGE_NAVIGATION_BUTTON_TEST_TAG
 import com.google.android.fhir.datacapture.views.components.QUESTION_HEADER_TAG
 import com.google.android.fhir.datacapture.views.components.REPEATED_GROUP_INSTANCE_HEADER_TITLE_TAG
+import com.google.android.fhir.datacapture.views.components.SLIDER_TAG
 import com.google.android.fhir.datacapture.views.factories.NO_CHOICE_RADIO_BUTTON_TAG
 import com.google.android.fhir.datacapture.views.factories.YES_CHOICE_RADIO_BUTTON_TAG
 import com.google.fhir.model.r4.Enumeration
 import com.google.fhir.model.r4.FhirR4Json
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.terminologies.PublicationStatus
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import org.jetbrains.compose.resources.getString
 
@@ -69,6 +71,7 @@ class UIQuestionnaireTest {
 
   private val fhirR4Json = FhirR4Json()
 
+  @BeforeTest
   @Test
   fun shouldDisplayReviewButtonWhenNoMorePagesToDisplay() = runComposeUiTest {
     setQuestionnaireContent("files/paginated_questionnaire_with_dependent_answer.json", true)
@@ -127,7 +130,6 @@ class UIQuestionnaireTest {
   fun cqfExpression_shouldSetText_withEvaluatedAnswer() = runComposeUiTest {
     setQuestionnaireContent("files/questionnaire_with_dynamic_question_text.json")
 
-    onRoot().printToLog("Anyting!!!")
     onNode(hasTestTag(QUESTION_HEADER_TAG) and hasText("Option Date")).assertIsDisplayed()
     onNode(hasTestTag(QUESTION_HEADER_TAG) and hasText("Provide \"First Option\" Date"))
       .assertDoesNotExist()
@@ -508,6 +510,30 @@ class UIQuestionnaireTest {
         .assertIsDisplayed()
         .assertIsEnabled()
     }
+
+  @Test
+  fun sliderViewShouldLimitToMaxWhenProgressIsSetAboveMaxValue() = runComposeUiTest {
+    setQuestionnaireContent("files/component_slider.json")
+    onNodeWithTag(SLIDER_TAG).performSemanticsAction(SemanticsActions.SetProgress) {
+      it.invoke(20f)
+    }
+    onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(current = 15f, range = 0f..15f, steps = 14))
+  }
+
+  @Test
+  fun sliderValueToShouldComeFromTheMaxValueExtension() = runComposeUiTest {
+    setQuestionnaireContent("files/component_slider.json")
+    onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(current = 0f, range = 0f..15f, steps = 14))
+  }
+
+  @Test
+  fun sliderValueToShouldComeFromTheMaxValueExtensionWithCQF_calculatedValue() = runComposeUiTest {
+    setQuestionnaireContent("files/component_slider_with_cqf_calculatedValue.json")
+    onNodeWithTag(SLIDER_TAG)
+      .assertRangeInfoEquals(ProgressBarRangeInfo(current = 0f, range = 0f..127f, steps = 126))
+  }
 
   private suspend fun ComposeUiTest.setQuestionnaireContent(
     fileName: String,

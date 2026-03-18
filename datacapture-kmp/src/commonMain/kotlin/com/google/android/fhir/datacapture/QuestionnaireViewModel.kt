@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import android_fhir.datacapture_kmp.generated.resources.Res
 import android_fhir.datacapture_kmp.generated.resources.submit_questionnaire
 import androidx.annotation.VisibleForTesting
+import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
@@ -42,17 +43,20 @@ import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.isRepeatedGroup
+import com.google.android.fhir.datacapture.extensions.localizedFlyoverAnnotatedString
+import com.google.android.fhir.datacapture.extensions.localizedPrefixAnnotatedString
 import com.google.android.fhir.datacapture.extensions.localizedTextAnnotatedString
-import com.google.android.fhir.datacapture.extensions.maxValueCqfCalculatedValueExpression
-import com.google.android.fhir.datacapture.extensions.minValueCqfCalculatedValueExpression
+import com.google.android.fhir.datacapture.extensions.maxValue
+import com.google.android.fhir.datacapture.extensions.minValue
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
+import com.google.android.fhir.datacapture.extensions.populateCqfCalculatedValue
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
 import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
 import com.google.android.fhir.datacapture.extensions.zipByLinkId
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
-import com.google.android.fhir.datacapture.fhirpath.convertToString
+import com.google.android.fhir.datacapture.fhirpath.FhirPathService
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
@@ -432,7 +436,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
 
-      updateAnswerWithAffectedCalculatedExpression(questionnaireItem)
+      updateAnswerWithAffectedCalculatedExpression(questionnaireItem, questionnaireResponseItem)
 
       modificationCount.update { it + 1 }
     }
@@ -580,6 +584,22 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
         }
       }
 
+  internal suspend fun validateQuestionnaireUpdateUIAndGetErrorFields(
+    questionnaireItems: List<Questionnaire.Item>,
+  ): List<AnnotatedString> {
+    val validationLinkIdInvalidMap =
+      validateQuestionnaireAndUpdateUI().filterValues {
+        it.any { validation -> validation is Invalid }
+      }
+    return questionnaireItems
+      .filter { it.linkId.value!! in validationLinkIdInvalidMap }
+      .mapNotNull {
+        it.localizedTextAnnotatedString?.takeIf { text -> text.isNotBlank() }
+          ?: it.item.localizedFlyoverAnnotatedString?.takeIf { text -> text.isNotBlank() }
+            ?: it.localizedPrefixAnnotatedString
+      }
+  }
+
   internal fun goToPreviousPage() {
     when (entryMode) {
       EntryMode.PRIOR_EDIT,
@@ -710,10 +730,12 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
    */
   private suspend fun updateAnswerWithAffectedCalculatedExpression(
     questionnaireItem: Questionnaire.Item,
+    questionnaireResponseItem: QuestionnaireResponse.Item,
   ) {
     expressionEvaluator
       .evaluateAllAffectedCalculatedExpressions(
         questionnaireItem,
+        questionnaireResponseItem,
       )
       .forEach { (questionnaireItem, calculatedAnswers) ->
         // update all response item with updated values
@@ -765,7 +787,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
    *
    * Do nothing, otherwise.
    */
-  private fun updateAnswerWithCalculatedExpression(
+  private suspend fun updateAnswerWithCalculatedExpression(
     questionnaireItem: Questionnaire.Item,
     questionnaireResponseItem: QuestionnaireResponse.Item,
   ) {
@@ -848,7 +870,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
             if (showSubmitButton) {
               QuestionnaireNavigationViewUIState.Enabled(
                 submitButtonText.ifEmpty { getString(Res.string.submit_questionnaire) },
-                onSubmitButtonClickListener,
+                { onSubmitButtonClickListener.invoke() },
               )
             } else {
               QuestionnaireNavigationViewUIState.Hidden
@@ -932,7 +954,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
           if (showSubmitButton) {
             QuestionnaireNavigationViewUIState.Enabled(
               submitButtonText.ifEmpty { getString(Res.string.submit_questionnaire) },
-              onSubmitButtonClickListener,
+              { onSubmitButtonClickListener.invoke() },
             )
           } else {
             QuestionnaireNavigationViewUIState.Hidden
@@ -1022,9 +1044,15 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
     val cqfDynamicQuestionnaireText =
       questionnaireItem.text
         ?.cqfExpression
-        ?.let { expressionEvaluator.evaluateExpressionValue(it) }
+        ?.let {
+          expressionEvaluator.evaluateExpressionValue(
+            questionnaireItem,
+            questionnaireResponseItem,
+            it,
+          )
+        }
         ?.takeIf { it.isNotEmpty() }
-        ?.let { convertToString(it) }
+        ?.let { FhirPathService.convertToString(it) }
     val evaluatedQuestionnaireResponseItem =
       cqfDynamicQuestionnaireText?.let {
         questionnaireResponseItem.copy(text = FhirR4String(value = it))
@@ -1059,14 +1087,16 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
               answersChangedCallback = answersChangedCallback,
               enabledAnswerOptions = enabledQuestionnaireAnswerOptions,
               minAnswerValue =
-                questionnaireItem.minValueCqfCalculatedValueExpression?.let {
-                  expressionEvaluator.evaluateExpressionValue(it)?.singleOrNull()
-                    as Extension.Value?
+                questionnaireItem.minValue?.populateCqfCalculatedValue {
+                  expressionEvaluator
+                    .evaluateExpressionValue(questionnaireItem, questionnaireResponseItem, it)
+                    ?.singleOrNull()
                 },
               maxAnswerValue =
-                questionnaireItem.maxValueCqfCalculatedValueExpression?.let {
-                  expressionEvaluator.evaluateExpressionValue(it)?.singleOrNull()
-                    as Extension.Value?
+                questionnaireItem.maxValue?.populateCqfCalculatedValue {
+                  expressionEvaluator
+                    .evaluateExpressionValue(questionnaireItem, questionnaireResponseItem, it)
+                    ?.singleOrNull()
                 },
               draftAnswer = draftAnswerMap[questionnaireItem],
               enabledDisplayItems =
@@ -1221,11 +1251,12 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
         responseItemKeys.contains(questionnaireItem.linkId) &&
           enablementEvaluator.evaluate(questionnaireItem, questionnaireResponseItem)
       ) {
-        questionnaireResponseItem.toBuilder().apply {
+        val questionnaireResponseItemBuilder = questionnaireResponseItem.toBuilder()
+        questionnaireResponseItemBuilder.apply {
           if (text?.value.isNullOrBlank()) {
             text =
-              text.apply {
-                this?.value = questionnaireItem.localizedTextAnnotatedString?.toString()
+              questionnaireItem.localizedTextAnnotatedString?.toString()?.let {
+                com.google.fhir.model.r4.String.Builder().apply { value = it }
               }
           }
           // Nested group items
@@ -1246,7 +1277,7 @@ internal class QuestionnaireViewModel(state: Map<String, Any>) : ViewModel() {
                 .toMutableList()
           }
         }
-        result.add(questionnaireResponseItem.toBuilder())
+        result.add(questionnaireResponseItemBuilder)
       }
     }
     return result
