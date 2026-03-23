@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,10 +45,24 @@ internal object EditTextIntegerViewHolderFactory : QuestionnaireItemComposeViewH
       },
       uiValidationMessage = { questionnaireViewItem, context ->
         if (questionnaireViewItem.draftAnswer != null) {
+          val minValue =
+            questionnaireViewItem.questionnaireItem
+              .getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/minValue")
+              ?.value
+              ?.let { (it as? IntegerType)?.value }
+              ?: Int.MIN_VALUE
+
+          val maxValue =
+            questionnaireViewItem.questionnaireItem
+              .getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/maxValue")
+              ?.value
+              ?.let { (it as? IntegerType)?.value }
+              ?: Int.MAX_VALUE
+
           context.getString(
             R.string.integer_format_validation_error_msg,
-            formatInteger(Int.MIN_VALUE),
-            formatInteger(Int.MAX_VALUE),
+            formatInteger(minValue),
+            formatInteger(maxValue),
           )
         } else {
           getValidationErrorMessage(
