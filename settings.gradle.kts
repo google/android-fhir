@@ -76,3 +76,5 @@ include(":workflow_demo")
 include(":datacapture-kmp")
 
 include(":sdc-kmp-demo")
+
+include(":engine-kmp")
