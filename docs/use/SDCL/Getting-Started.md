@@ -48,44 +48,44 @@ your app, follow these steps:
 1. Add a `FragmentContainerView` to your activity's layout to contain the
     Questionnaire.
 
-    ```xml
-    <?xml version="1.0" encoding="utf-8"?>
-    <androidx.constraintlayout.widget.ConstraintLayout
-    ... >
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+... >
 
-    <androidx.fragment.app.FragmentContainerView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/fragment_container_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+<androidx.fragment.app.FragmentContainerView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_container_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    ```
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
 
 1. Create a bundle with the JSON questionnaire content for the fragment, in
     this case as a `String` read from a JSON file stored in the `assets` folder.
 
-    ```kotlin
-    // Small questionnaires can be read directly as a string, larger ones
-    // should be passed as a URI instead.
-    val questionnaireJsonString =
-    application.assets.open("questionnaire.json")
-        .bufferedReader().use { it.readText() }
+```kotlin
+// Small questionnaires can be read directly as a string, larger ones
+// should be passed as a URI instead.
+val questionnaireJsonString =
+application.assets.open("questionnaire.json")
+    .bufferedReader().use { it.readText() }
 
-    val bundle = bundleOf( QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to
-    questionnaireJsonString )
-    ```
+val bundle = bundleOf( QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to
+questionnaireJsonString )
+```
 
 1. Set the fragment to the `FragmentContainerView`.
 
-    ```kotlin
-    if (savedInstanceState == null) {
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            add<QuestionnaireFragment>(R.id.fragment_container_view, args = bundle)
-        }
+```kotlin
+if (savedInstanceState == null) {
+    supportFragmentManager.commit {
+        setReorderingAllowed(true)
+        add<QuestionnaireFragment>(R.id.fragment_container_view, args = bundle)
     }
-    ```
+}
+```
 
 ## Get a QuestionnaireResponse
 

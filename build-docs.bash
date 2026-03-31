@@ -28,4 +28,5 @@ mkdir -p site/
 # is up-to-date with the Pipfile before installing. If it's not, it will fail the
 # installation. This is useful for ensuring strict dependency control during CI.
 pipenv install --deploy
+pipenv run pip install -U setuptools
 pipenv run mkdocs build --strict
