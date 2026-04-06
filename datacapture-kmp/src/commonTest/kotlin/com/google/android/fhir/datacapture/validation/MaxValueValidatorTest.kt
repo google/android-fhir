@@ -16,15 +16,31 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_CALCULATED_VALUE_URL
+import com.google.android.fhir.datacapture.extensions.FhirR4DateType
+import com.google.android.fhir.datacapture.extensions.FhirR4String
+import com.google.android.fhir.datacapture.fhirpath.FhirPathService
+import com.google.fhir.model.r4.Enumeration
+import com.google.fhir.model.r4.Expression
 import com.google.fhir.model.r4.Extension
+import com.google.fhir.model.r4.FhirDate
 import com.google.fhir.model.r4.Integer
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
+import com.google.fhir.model.r4.QuestionnaireResponse.QuestionnaireResponseStatus
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
 
+@OptIn(ExperimentalTime::class)
 class MaxValueValidatorTest {
 
   @Test
@@ -33,7 +49,7 @@ class MaxValueValidatorTest {
       Questionnaire.Item.Builder(
           linkId = com.google.fhir.model.r4.String.Builder().apply { value = "link-id" },
           type =
-            com.google.fhir.model.r4.Enumeration(
+            Enumeration(
               value = Questionnaire.QuestionnaireItemType.Integer,
             ),
         )
@@ -59,7 +75,7 @@ class MaxValueValidatorTest {
       Questionnaire.Item.Builder(
           linkId = com.google.fhir.model.r4.String.Builder().apply { value = "link-id" },
           type =
-            com.google.fhir.model.r4.Enumeration(
+            Enumeration(
               value = Questionnaire.QuestionnaireItemType.Integer,
             ),
         )
@@ -94,7 +110,7 @@ class MaxValueValidatorTest {
       Questionnaire.Item.Builder(
           linkId = com.google.fhir.model.r4.String.Builder().apply { value = "link-id" },
           type =
-            com.google.fhir.model.r4.Enumeration(
+            Enumeration(
               value = Questionnaire.QuestionnaireItemType.Integer,
             ),
         )
@@ -129,7 +145,7 @@ class MaxValueValidatorTest {
       Questionnaire.Item.Builder(
           linkId = com.google.fhir.model.r4.String.Builder().apply { value = "link-id" },
           type =
-            com.google.fhir.model.r4.Enumeration(
+            Enumeration(
               value = Questionnaire.QuestionnaireItemType.Integer,
             ),
         )
@@ -156,5 +172,305 @@ class MaxValueValidatorTest {
     val result = MaxValueValidator.validate(questionnaireItem, answer) { null }
 
     assertFalse(result.isValid)
+  }
+
+  @Test
+  fun shouldReturnInvalidResultWithCorrectMaxAllowedValueIfContainsOnlyCqfCalculatedValue() =
+    runTest {
+      val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+      val questionnaireItem =
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "test-item"),
+          type =
+            Enumeration(
+              value = Questionnaire.QuestionnaireItemType.Date,
+            ),
+          extension =
+            listOf(
+              Extension(
+                url = MAX_VALUE_EXTENSION_URL,
+                value =
+                  Extension.Value.Date(
+                    value =
+                      FhirR4DateType(
+                        extension =
+                          listOf(
+                            Extension(
+                              url = EXTENSION_CQF_CALCULATED_VALUE_URL,
+                              value =
+                                Extension.Value.Expression(
+                                  value =
+                                    Expression(
+                                      language =
+                                        Enumeration(
+                                          value = Expression.ExpressionLanguage.Text_Fhirpath,
+                                        ),
+                                      expression = FhirR4String(value = "today() - 7 days"),
+                                    ),
+                                ),
+                            ),
+                          ),
+                      ),
+                  ),
+              ),
+            ),
+        )
+
+      val answer =
+        QuestionnaireResponse.Item.Answer(
+          value =
+            QuestionnaireResponse.Item.Answer.Value.Date(
+              value =
+                FhirR4DateType(
+                  value =
+                    FhirDate.Date(
+                      today,
+                    ),
+                ),
+            ),
+        )
+
+      val validationResult =
+        MaxValueValidator.validate(questionnaireItem, answer) {
+          FhirPathService.evaluate(
+              it.expression?.value!!,
+              QuestionnaireResponse(
+                status = Enumeration(value = QuestionnaireResponseStatus.In_Progress),
+              ),
+            )
+            .singleOrNull()
+        }
+
+      assertFalse(validationResult.isValid)
+      assertEquals(
+        "Maximum value allowed is:${today.minus(DatePeriod(days = 7))} ",
+        validationResult.errorMessage,
+      )
+    }
+
+  @Test
+  fun shouldReturnInvalidResultWithCorrectMaxAllowedValueIfContainsBothValueAndCqfCalculatedValue() =
+    runTest {
+      val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+      val tenDaysAgo = today.minus(DatePeriod(days = 10))
+
+      val questionnaireItem =
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "test-item"),
+          type =
+            Enumeration(
+              value = Questionnaire.QuestionnaireItemType.Date,
+            ),
+          extension =
+            listOf(
+              Extension(
+                url = MAX_VALUE_EXTENSION_URL,
+                value =
+                  Extension.Value.Date(
+                    value =
+                      FhirR4DateType(
+                        value = FhirDate.Date(tenDaysAgo),
+                        extension =
+                          listOf(
+                            Extension(
+                              url = EXTENSION_CQF_CALCULATED_VALUE_URL,
+                              value =
+                                Extension.Value.Expression(
+                                  value =
+                                    Expression(
+                                      language =
+                                        Enumeration(
+                                          value = Expression.ExpressionLanguage.Text_Fhirpath,
+                                        ),
+                                      expression = FhirR4String(value = "today() - 7 days"),
+                                    ),
+                                ),
+                            ),
+                          ),
+                      ),
+                  ),
+              ),
+            ),
+        )
+
+      val answer =
+        QuestionnaireResponse.Item.Answer(
+          value =
+            QuestionnaireResponse.Item.Answer.Value.Date(
+              value =
+                FhirR4DateType(
+                  value =
+                    FhirDate.Date(
+                      today,
+                    ),
+                ),
+            ),
+        )
+
+      val validationResult =
+        MaxValueValidator.validate(questionnaireItem, answer) {
+          FhirPathService.evaluate(
+              it.expression?.value!!,
+              QuestionnaireResponse(
+                status = Enumeration(value = QuestionnaireResponseStatus.In_Progress),
+              ),
+            )
+            .singleOrNull()
+        }
+
+      assertFalse(validationResult.isValid)
+      assertEquals(
+        "Maximum value allowed is:${today.minus(DatePeriod(days = 7))} ",
+        validationResult.errorMessage,
+      )
+    }
+
+  @Test
+  fun shouldReturnValidResultAndRemovesConstraintForAnAnswerValueWhenMaxValueCqfCalculatedValueEvaluatesToEmpty() =
+    runTest {
+      val questionnaireItem =
+        Questionnaire.Item(
+          linkId = FhirR4String(value = "test-item"),
+          type =
+            Enumeration(
+              value = Questionnaire.QuestionnaireItemType.Date,
+            ),
+          extension =
+            listOf(
+              Extension(
+                url = MAX_VALUE_EXTENSION_URL,
+                value =
+                  Extension.Value.Date(
+                    value =
+                      FhirR4DateType(
+                        extension =
+                          listOf(
+                            Extension(
+                              url = EXTENSION_CQF_CALCULATED_VALUE_URL,
+                              value =
+                                Extension.Value.Expression(
+                                  value =
+                                    Expression(
+                                      language =
+                                        Enumeration(
+                                          value = Expression.ExpressionLanguage.Text_Fhirpath,
+                                        ),
+                                      expression =
+                                        FhirR4String(
+                                          value = "yesterday()",
+                                        ), // invalid FHIRPath expression
+                                    ),
+                                ),
+                            ),
+                          ),
+                      ),
+                  ),
+              ),
+            ),
+        )
+
+      val answer =
+        QuestionnaireResponse.Item.Answer(
+          value =
+            QuestionnaireResponse.Item.Answer.Value.Date(
+              value =
+                FhirR4DateType(
+                  value =
+                    FhirDate.Date(
+                      Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+                    ),
+                ),
+            ),
+        )
+
+      val validationResult =
+        MaxValueValidator.validate(
+          questionnaireItem,
+          answer,
+        ) {
+          FhirPathService.evaluate(
+              it.expression?.value!!,
+              QuestionnaireResponse(
+                status = Enumeration(value = QuestionnaireResponseStatus.In_Progress),
+              ),
+            )
+            .singleOrNull()
+        }
+
+      assertTrue(validationResult.isValid)
+      assertTrue(validationResult.errorMessage.isNullOrBlank())
+    }
+
+  @Test
+  fun shouldReturnValidResultAndRemovesConstraintForAnAnswerWithAnEmptyValue() = runTest {
+    val questionnaireItem =
+      Questionnaire.Item(
+        linkId = FhirR4String(value = "test-item"),
+        type =
+          Enumeration(
+            value = Questionnaire.QuestionnaireItemType.Date,
+          ),
+        extension =
+          listOf(
+            Extension(
+              url = MAX_VALUE_EXTENSION_URL,
+              value =
+                Extension.Value.Date(
+                  value =
+                    FhirR4DateType(
+                      extension =
+                        listOf(
+                          Extension(
+                            url = EXTENSION_CQF_CALCULATED_VALUE_URL,
+                            value =
+                              Extension.Value.Expression(
+                                value =
+                                  Expression(
+                                    language =
+                                      Enumeration(
+                                        value = Expression.ExpressionLanguage.Text_Fhirpath,
+                                      ),
+                                    expression = FhirR4String(value = "today()"),
+                                  ),
+                              ),
+                          ),
+                        ),
+                    ),
+                ),
+            ),
+          ),
+      )
+
+    val answer =
+      QuestionnaireResponse.Item.Answer(
+        value =
+          QuestionnaireResponse.Item.Answer.Value.Date(
+            value =
+              FhirR4DateType(
+                value =
+                  FhirDate.Date(
+                    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+                  ),
+              ),
+          ),
+      )
+
+    val validationResult =
+      MaxValueValidator.validate(
+        questionnaireItem,
+        answer,
+      ) {
+        FhirPathService.evaluate(
+            it.expression?.value!!,
+            QuestionnaireResponse(
+              status = Enumeration(value = QuestionnaireResponseStatus.In_Progress),
+            ),
+          )
+          .singleOrNull()
+      }
+
+    assertTrue(validationResult.isValid)
+    assertTrue(validationResult.errorMessage.isNullOrBlank())
   }
 }

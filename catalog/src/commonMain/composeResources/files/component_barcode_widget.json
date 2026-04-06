@@ -1,0 +1,26 @@
+{
+  "resourceType": "Questionnaire",
+  "status": "active",
+  "language": "en",
+  "date": "2020-11-18T07:24:47.111Z",
+  "item": [
+    {
+      "linkId": "barcode",
+      "type": "string",
+      "text": "Barcode Widget",
+      "extension": [
+        {
+          "url": "https://github.com/google/android-fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "https://github.com/google/android-fhir/questionnaire-item-control",
+                "code": "barcode"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

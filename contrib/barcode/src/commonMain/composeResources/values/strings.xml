@@ -1,0 +1,5 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="scan_barcode">SCAN BARCODE</string>
+    <string name="rescan">RE-SCAN</string>
+</resources>

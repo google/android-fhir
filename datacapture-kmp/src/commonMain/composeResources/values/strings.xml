@@ -22,7 +22,7 @@
     >Fix the following questions:</string>
     <string
         name="questionnaire_validation_error_item_text_with_bullet"
-    >• %s</string>
+    >\u2022 %1$s</string>
     <string
         name="questionnaire_validation_error_submit_button_text"
     >Submit anyway</string>

@@ -16,6 +16,14 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android_fhir.datacapture_kmp.generated.resources.Res
+import android_fhir.datacapture_kmp.generated.resources.max_decimal_validation_error_msg
+import com.google.fhir.model.r4.Extension
+import com.google.fhir.model.r4.QuestionnaireResponse
+import org.jetbrains.compose.resources.getString
+
+private const val MAX_DECIMAL_URL = "http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces"
+
 /**
  * A validator to check if the answer (a decimal value) exceeds the maximum number of permitted
  * decimal places.
@@ -23,20 +31,11 @@ package com.google.android.fhir.datacapture.validation
  * Only decimal types permitted in questionnaires response are subjected to this validation. See
  * https://www.hl7.org/fhir/extension-maxdecimalplaces.html
  */
-import android_fhir.datacapture_kmp.generated.resources.Res
-import android_fhir.datacapture_kmp.generated.resources.max_decimal_validation_error_msg
-import com.google.fhir.model.r4.Extension
-import com.google.fhir.model.r4.Integer
-import com.google.fhir.model.r4.QuestionnaireResponse
-import org.jetbrains.compose.resources.getString
-
-private const val MAX_DECIMAL_URL = "http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces"
-
 internal object MaxDecimalPlacesValidator :
   AnswerExtensionConstraintValidator(
     url = MAX_DECIMAL_URL,
-    predicate = { constraintValue: Any, answer: QuestionnaireResponse.Item.Answer ->
-      val maxDecimalPlaces = getValue(constraintValue)
+    predicate = { constraintValue: Extension.Value, answer: QuestionnaireResponse.Item.Answer ->
+      val maxDecimalPlaces = constraintValue.asKotlinInt()
       answer.value != null &&
         maxDecimalPlaces != null &&
         answer.value!!
@@ -47,14 +46,12 @@ internal object MaxDecimalPlacesValidator :
           ?.substringAfter(".")
           ?.length!! > maxDecimalPlaces
     },
-    messageGenerator = { constraintValue: Any ->
-      getString(Res.string.max_decimal_validation_error_msg, getValue(constraintValue).toString())
+    messageGenerator = { constraintValue: Extension.Value ->
+      getString(
+        Res.string.max_decimal_validation_error_msg,
+        constraintValue.asKotlinInt().toString(),
+      )
     },
   )
 
-private fun getValue(constraintValue: Any): Int? =
-  when (constraintValue) {
-    is Integer -> constraintValue.value
-    is Extension.Value.Integer -> constraintValue.asInteger()?.value?.value
-    else -> null
-  }
+private fun Extension.Value.asKotlinInt(): Int? = asInteger()?.value?.value

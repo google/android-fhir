@@ -44,10 +44,7 @@ import kotlinx.coroutines.test.runTest
 class EnablementEvaluatorTest {
   private val json = FhirR4Json()
 
-  @Test
-  fun evaluate_noEnableWhen_shouldReturnTrue() {
-    assertTrue(evaluateEnableWhen())
-  }
+  @Test fun evaluate_noEnableWhen_shouldReturnTrue() = runTest { assertTrue(evaluateEnableWhen()) }
 
   @Test
   fun evaluate_missingResponseItem_shouldReturnFalse() = runTest {
@@ -87,7 +84,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectAnswerExists_answerExists_shouldReturnTrue() {
+  fun evaluate_expectAnswerExists_answerExists_shouldReturnTrue() = runTest {
     assertTrue(
       evaluateEnableWhen(
         behavior = null,
@@ -101,7 +98,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectAnswerExists_answerDoesNotExist_shouldReturnFalse() {
+  fun evaluate_expectAnswerExists_answerDoesNotExist_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = null,
@@ -115,7 +112,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectAnswerDoesNotExist_answerExists_shouldReturnFalse() {
+  fun evaluate_expectAnswerDoesNotExist_answerExists_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = null,
@@ -129,7 +126,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun `evaluate() should evaluate enableWhenExpression`() = runTest {
+  fun evaluate_ShouldEvaluateEnableWhenExpression() = runTest {
     val questionnaireJson =
       """
         {
@@ -208,7 +205,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun `evaluate() should evaluate false enableWhenExpression`() = runTest {
+  fun evaluateShouldEvaluateFalseEnableWhenExpression() = runTest {
     val questionnaireJson =
       """
         {
@@ -284,10 +281,9 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun `evaluate() should evaluate enableWhenExpression with %context fhirpath supplement literal`() =
-    runTest {
-      val questionnaireJson =
-        """
+  fun evaluate_ShouldEvaluateEnableWhenExpressionWithContextFhirpathSupplementLiteral() = runTest {
+    val questionnaireJson =
+      """
     {
       "resourceType": "Questionnaire",
       "status": "active",
@@ -316,10 +312,10 @@ class EnablementEvaluatorTest {
       ]
     }
                 """
-          .trimIndent()
+        .trimIndent()
 
-      val questionnaireResponseJson =
-        """
+    val questionnaireResponseJson =
+      """
     {
       "resourceType": "QuestionnaireResponse",
       "status": "completed",
@@ -342,30 +338,29 @@ class EnablementEvaluatorTest {
       ]
     }
                 """
-          .trimIndent()
+        .trimIndent()
 
-      val questionnaire = json.decodeFromString(questionnaireJson) as Questionnaire
+    val questionnaire = json.decodeFromString(questionnaireJson) as Questionnaire
 
-      val questionnaireItem: Questionnaire.Item =
-        questionnaire.item.find { it.linkId.value == "female" }!!
+    val questionnaireItem: Questionnaire.Item =
+      questionnaire.item.find { it.linkId.value == "female" }!!
 
-      val questionnaireResponse =
-        json.decodeFromString(questionnaireResponseJson) as QuestionnaireResponse
+    val questionnaireResponse =
+      json.decodeFromString(questionnaireResponseJson) as QuestionnaireResponse
 
-      assertTrue(
-        EnablementEvaluator(questionnaire, questionnaireResponse)
-          .evaluate(
-            questionnaireItem,
-            questionnaireResponse.item[1],
-          ),
-      )
-    }
+    assertTrue(
+      EnablementEvaluator(questionnaire, questionnaireResponse)
+        .evaluate(
+          questionnaireItem,
+          questionnaireResponse.item[1],
+        ),
+    )
+  }
 
   @Test
-  fun `evaluate() should evaluate enableWhenExpression with %questionnaire fhirpath supplement`() =
-    runTest {
-      val questionnaireJson =
-        """
+  fun evaluate_ShouldEvaluateEnableWhenExpressionWithQuestionnaireFhirpathSupplement() = runTest {
+    val questionnaireJson =
+      """
     {
       "resourceType": "Questionnaire",
       "subjectType": [ "Practitioner" ],
@@ -389,10 +384,10 @@ class EnablementEvaluatorTest {
       ]
     }
                 """
-          .trimIndent()
+        .trimIndent()
 
-      val questionnaireResponseJson =
-        """
+    val questionnaireResponseJson =
+      """
     {
       "resourceType": "QuestionnaireResponse",
       "status": "completed",
@@ -411,27 +406,26 @@ class EnablementEvaluatorTest {
       ]
     }
                 """
-          .trimIndent()
+        .trimIndent()
 
-      val questionnaire = json.decodeFromString(questionnaireJson) as Questionnaire
+    val questionnaire = json.decodeFromString(questionnaireJson) as Questionnaire
 
-      val questionnaireResponse =
-        json.decodeFromString(questionnaireResponseJson) as QuestionnaireResponse
+    val questionnaireResponse =
+      json.decodeFromString(questionnaireResponseJson) as QuestionnaireResponse
 
-      assertTrue(
-        EnablementEvaluator(questionnaire, questionnaireResponse)
-          .evaluate(
-            questionnaire.item[0],
-            questionnaireResponse.item[0],
-          ),
-      )
-    }
+    assertTrue(
+      EnablementEvaluator(questionnaire, questionnaireResponse)
+        .evaluate(
+          questionnaire.item[0],
+          questionnaireResponse.item[0],
+        ),
+    )
+  }
 
   @Test
-  fun `evaluate() should evaluate enableWhenExpression with %qItem fhirpath supplement`() =
-    runTest {
-      val questionnaireJson =
-        """
+  fun evaluate_shouldEvaluateEnableWhenExpressionWithQItemFhirpathSupplement() = runTest {
+    val questionnaireJson =
+      """
     {
         "resourceType": "Questionnaire",
         "subjectType": [ "Practitioner" ],
@@ -455,10 +449,10 @@ class EnablementEvaluatorTest {
         ]
     }
                 """
-          .trimIndent()
+        .trimIndent()
 
-      val questionnaireResponseJson =
-        """
+    val questionnaireResponseJson =
+      """
     {
       "resourceType": "QuestionnaireResponse",
       "status": "completed",
@@ -477,24 +471,24 @@ class EnablementEvaluatorTest {
       ]
     }
                 """
-          .trimIndent()
+        .trimIndent()
 
-      val questionnaire = json.decodeFromString(questionnaireJson) as Questionnaire
+    val questionnaire = json.decodeFromString(questionnaireJson) as Questionnaire
 
-      val questionnaireResponse =
-        json.decodeFromString(questionnaireResponseJson) as QuestionnaireResponse
+    val questionnaireResponse =
+      json.decodeFromString(questionnaireResponseJson) as QuestionnaireResponse
 
-      assertTrue(
-        EnablementEvaluator(questionnaire, questionnaireResponse)
-          .evaluate(
-            questionnaire.item[0],
-            questionnaireResponse.item[0],
-          ),
-      )
-    }
+    assertTrue(
+      EnablementEvaluator(questionnaire, questionnaireResponse)
+        .evaluate(
+          questionnaire.item[0],
+          questionnaireResponse.item[0],
+        ),
+    )
+  }
 
   @Test
-  fun evaluate_expectAnswerDoesNotExist_answerDoesNotExist_shouldReturnTrue() {
+  fun evaluate_expectAnswerDoesNotExist_answerDoesNotExist_shouldReturnTrue() = runTest {
     assertTrue(
       evaluateEnableWhen(
         behavior = null,
@@ -508,7 +502,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectAnswerEqualToToValue_noAnswer_shouldReturnFalse() {
+  fun evaluate_expectAnswerEqualToToValue_noAnswer_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = null,
@@ -522,7 +516,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectAnswerEqualToToValue_someAnswerEqualToToValue_shouldReturnTrue() {
+  fun evaluate_expectAnswerEqualToToValue_someAnswerEqualToToValue_shouldReturnTrue() = runTest {
     assertTrue(
       evaluateEnableWhen(
         behavior = null,
@@ -536,7 +530,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectAnswerEqualToToValue_noAnswerEqualToToValue_shouldReturnFalse() {
+  fun evaluate_expectAnswerEqualToToValue_noAnswerEqualToToValue_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = null,
@@ -550,7 +544,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectAnswerNotEqualToValue_noAnswer_shouldReturnFalse() {
+  fun evaluate_expectAnswerNotEqualToValue_noAnswer_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = null,
@@ -564,7 +558,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectAnswerNotEqualToValue_someAnswerNotEqualToValue_shouldReturnTrue() {
+  fun evaluate_expectAnswerNotEqualToValue_someAnswerNotEqualToValue_shouldReturnTrue() = runTest {
     assertTrue(
       evaluateEnableWhen(
         behavior = null,
@@ -578,7 +572,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectAnswerNotEqualToValue_noAnswerNotEqualToValue_shouldReturnFalse() {
+  fun evaluate_expectAnswerNotEqualToValue_noAnswerNotEqualToValue_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = null,
@@ -592,21 +586,22 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectAnswerGreaterThanValue_someAnswerGreaterThanValue_shouldReturnTrue() {
-    assertTrue(
-      evaluateEnableWhen(
-        behavior = null,
-        EnableWhen(
-          operator = Questionnaire.QuestionnaireItemOperator.GreaterThan,
-          expected = Integer(value = 10),
-          actual = listOf(Integer(value = 20)),
+  fun evaluate_expectAnswerGreaterThanValue_someAnswerGreaterThanValue_shouldReturnTrue() =
+    runTest {
+      assertTrue(
+        evaluateEnableWhen(
+          behavior = null,
+          EnableWhen(
+            operator = Questionnaire.QuestionnaireItemOperator.GreaterThan,
+            expected = Integer(value = 10),
+            actual = listOf(Integer(value = 20)),
+          ),
         ),
-      ),
-    )
-  }
+      )
+    }
 
   @Test
-  fun evaluate_expectAnswerGreaterThanValue_noAnswerGreaterThanValue_shouldReturnFalse() {
+  fun evaluate_expectAnswerGreaterThanValue_noAnswerGreaterThanValue_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = null,
@@ -620,35 +615,37 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectAnswerGreaterThanOrEqualToToValue_someAnswerGreaterThanOrEqualToToValue_shouldReturnTrue() {
-    assertTrue(
-      evaluateEnableWhen(
-        behavior = null,
-        EnableWhen(
-          operator = Questionnaire.QuestionnaireItemOperator.GreaterThanOrEqualTo,
-          expected = Integer(value = 10),
-          actual = listOf(Integer(value = 10)),
+  fun evaluate_expectAnswerGreaterThanOrEqualToToValue_someAnswerGreaterThanOrEqualToToValue_shouldReturnTrue() =
+    runTest {
+      assertTrue(
+        evaluateEnableWhen(
+          behavior = null,
+          EnableWhen(
+            operator = Questionnaire.QuestionnaireItemOperator.GreaterThanOrEqualTo,
+            expected = Integer(value = 10),
+            actual = listOf(Integer(value = 10)),
+          ),
         ),
-      ),
-    )
-  }
+      )
+    }
 
   @Test
-  fun evaluate_expectAnswerGreaterThanOrEqualToToValue_noAnswerGreaterThanOrEqualToToValue_shouldReturnFalse() {
-    assertFalse(
-      evaluateEnableWhen(
-        behavior = null,
-        EnableWhen(
-          operator = Questionnaire.QuestionnaireItemOperator.GreaterThanOrEqualTo,
-          expected = Integer(value = 10),
-          actual = listOf(Integer(value = 5)),
+  fun evaluate_expectAnswerGreaterThanOrEqualToToValue_noAnswerGreaterThanOrEqualToToValue_shouldReturnFalse() =
+    runTest {
+      assertFalse(
+        evaluateEnableWhen(
+          behavior = null,
+          EnableWhen(
+            operator = Questionnaire.QuestionnaireItemOperator.GreaterThanOrEqualTo,
+            expected = Integer(value = 10),
+            actual = listOf(Integer(value = 5)),
+          ),
         ),
-      ),
-    )
-  }
+      )
+    }
 
   @Test
-  fun evaluate_expectAnswerLessThanValue_someAnswerLessThanValue_shouldReturnTrue() {
+  fun evaluate_expectAnswerLessThanValue_someAnswerLessThanValue_shouldReturnTrue() = runTest {
     assertTrue(
       evaluateEnableWhen(
         behavior = null,
@@ -662,7 +659,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectAnswerLessThanValue_noAnswerLessThanValue_shouldReturnFalse() {
+  fun evaluate_expectAnswerLessThanValue_noAnswerLessThanValue_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = null,
@@ -676,35 +673,37 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectAnswerLessThanOrEqualToToValue_someAnswerLessThanOrEqualToToValue_shouldReturnTrue() {
-    assertTrue(
-      evaluateEnableWhen(
-        behavior = null,
-        EnableWhen(
-          operator = Questionnaire.QuestionnaireItemOperator.LessThanOrEqualTo,
-          expected = Integer(value = 10),
-          actual = listOf(Integer(value = 10)),
+  fun evaluate_expectAnswerLessThanOrEqualToToValue_someAnswerLessThanOrEqualToToValue_shouldReturnTrue() =
+    runTest {
+      assertTrue(
+        evaluateEnableWhen(
+          behavior = null,
+          EnableWhen(
+            operator = Questionnaire.QuestionnaireItemOperator.LessThanOrEqualTo,
+            expected = Integer(value = 10),
+            actual = listOf(Integer(value = 10)),
+          ),
         ),
-      ),
-    )
-  }
+      )
+    }
 
   @Test
-  fun evaluate_expectAnswerLessThanOrEqualToToValue_noAnswerLessThanOrEqualToToValue_shouldReturnFalse() {
-    assertFalse(
-      evaluateEnableWhen(
-        behavior = null,
-        EnableWhen(
-          operator = Questionnaire.QuestionnaireItemOperator.LessThanOrEqualTo,
-          expected = Integer(value = 10),
-          actual = listOf(Integer(value = 20)),
+  fun evaluate_expectAnswerLessThanOrEqualToToValue_noAnswerLessThanOrEqualToToValue_shouldReturnFalse() =
+    runTest {
+      assertFalse(
+        evaluateEnableWhen(
+          behavior = null,
+          EnableWhen(
+            operator = Questionnaire.QuestionnaireItemOperator.LessThanOrEqualTo,
+            expected = Integer(value = 10),
+            actual = listOf(Integer(value = 20)),
+          ),
         ),
-      ),
-    )
-  }
+      )
+    }
 
   @Test
-  fun evaluate_multipleEnableWhens_behaviorAny_noneSatisfied_shouldReturnFalse() {
+  fun evaluate_multipleEnableWhens_behaviorAny_noneSatisfied_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = Questionnaire.EnableWhenBehavior.Any,
@@ -723,7 +722,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_multipleEnableWhens_behaviorAny_someSatisfied_shouldReturnTrue() {
+  fun evaluate_multipleEnableWhens_behaviorAny_someSatisfied_shouldReturnTrue() = runTest {
     assertTrue(
       evaluateEnableWhen(
         behavior = Questionnaire.EnableWhenBehavior.Any,
@@ -742,7 +741,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_multipleEnableWhens_behaviorAll_someSatisfied_shouldReturnFalse() {
+  fun evaluate_multipleEnableWhens_behaviorAll_someSatisfied_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = Questionnaire.EnableWhenBehavior.All,
@@ -761,7 +760,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_multipleEnableWhens_behaviorAll_allSatisfied_shouldReturnTrue() {
+  fun evaluate_multipleEnableWhens_behaviorAll_allSatisfied_shouldReturnTrue() = runTest {
     assertTrue(
       evaluateEnableWhen(
         behavior = Questionnaire.EnableWhenBehavior.All,
@@ -780,7 +779,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_primitiveType_EqualTo_shouldReturnTrue() {
+  fun evaluate_primitiveType_EqualTo_shouldReturnTrue() = runTest {
     assertTrue(
       evaluateEnableWhen(
         behavior = null,
@@ -794,7 +793,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_primitiveType_EqualTo_shouldReturnFalse() {
+  fun evaluate_primitiveType_EqualTo_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = null,
@@ -808,7 +807,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_primitiveType_notEqualTo_shouldReturnTrue() {
+  fun evaluate_primitiveType_notEqualTo_shouldReturnTrue() = runTest {
     assertTrue(
       evaluateEnableWhen(
         behavior = null,
@@ -822,7 +821,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_primitiveType_notEqualTo_shouldReturnFalse() {
+  fun evaluate_primitiveType_notEqualTo_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = null,
@@ -836,7 +835,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_codingType_EqualTo_differentSystem_shouldReturnFalse() {
+  fun evaluate_codingType_EqualTo_differentSystem_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = null,
@@ -862,7 +861,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_codingType_EqualTo_differentCode_shouldReturnFalse() {
+  fun evaluate_codingType_EqualTo_differentCode_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = null,
@@ -888,7 +887,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_codingType_EqualTo_differentDisplay_shouldReturnTrue() {
+  fun evaluate_codingType_EqualTo_differentDisplay_shouldReturnTrue() = runTest {
     assertTrue(
       evaluateEnableWhen(
         behavior = null,
@@ -914,7 +913,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_codingType_notEqualTo_differentSystem_shouldReturnTrue() {
+  fun evaluate_codingType_notEqualTo_differentSystem_shouldReturnTrue() = runTest {
     assertTrue(
       evaluateEnableWhen(
         behavior = null,
@@ -940,7 +939,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_codingType_notEqualTo_differentCode_shouldReturnTrue() {
+  fun evaluate_codingType_notEqualTo_differentCode_shouldReturnTrue() = runTest {
     assertTrue(
       evaluateEnableWhen(
         behavior = null,
@@ -966,7 +965,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_codingType_notEqualTo_differentDisplay_shouldReturnFalse() {
+  fun evaluate_codingType_notEqualTo_differentDisplay_shouldReturnFalse() = runTest {
     assertFalse(
       evaluateEnableWhen(
         behavior = null,
@@ -991,7 +990,7 @@ class EnablementEvaluatorTest {
     )
   }
 
-  private fun evaluateEnableWhen(
+  private suspend fun evaluateEnableWhen(
     behavior: Questionnaire.EnableWhenBehavior? = null,
     vararg enableWhen: EnableWhen,
   ): kotlin.Boolean {

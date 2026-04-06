@@ -28,8 +28,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -140,7 +142,7 @@ internal const val QUESTIONNAIRE_PROGRESS_INDICATOR_TEST_TAG =
 @Composable
 internal fun QuestionnaireScreen(
   viewModel: QuestionnaireViewModel,
-  matchersProvider: QuestionnaireItemViewHolderFactoryMatchersProvider,
+  matchersProvider: QuestionnaireItemViewFactoryMatchersProvider,
 ) {
   val questionnaireState by viewModel.questionnaireStateFlow.collectAsStateWithLifecycle()
 
@@ -173,7 +175,7 @@ internal fun QuestionnaireScreen(
 private fun EditModeContent(
   state: QuestionnaireState,
   displayMode: DisplayMode.EditMode,
-  matchersProvider: QuestionnaireItemViewHolderFactoryMatchersProvider,
+  matchersProvider: QuestionnaireItemViewFactoryMatchersProvider,
   bottomNavItem: QuestionnaireAdapterItem.Navigation?,
 ) {
   var progress by remember { mutableIntStateOf(0) }
@@ -205,7 +207,7 @@ private fun EditModeContent(
       QuestionnaireEditList(
         items = state.items,
         displayMode = displayMode,
-        questionnaireItemViewHolderMatchers = matchersProvider.get(),
+        questionnaireItemViewHolderMatchers = remember(matchersProvider) { matchersProvider.get() },
         onUpdateProgressIndicator = { currentPage, totalCount ->
           progress = calculateProgressPercentage(count = (currentPage + 1), totalCount = totalCount)
         },
@@ -261,7 +263,11 @@ fun QuestionnaireTitleBar(
     )
 
     if (showEditButton) {
-      OutlinedButton(onClick = onEditClick) {
+      OutlinedButton(
+        onClick = onEditClick,
+        colors =
+          ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+      ) {
         Icon(
           imageVector = Icons.Outlined.Edit,
           contentDescription = "Edit",

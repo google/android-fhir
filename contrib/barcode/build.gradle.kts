@@ -1,88 +1,131 @@
-import Dependencies.removeIncompatibleDependencies
+@file:OptIn(ExperimentalWasmDsl::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-  alias(libs.plugins.android.library)
-  alias(libs.plugins.kotlin.android)
-  `maven-publish`
-  jacoco
-  alias(libs.plugins.dokka)
+  id("org.jetbrains.kotlin.multiplatform")
+  id("com.android.kotlin.multiplatform.library")
+  id("org.jetbrains.kotlin.plugin.compose")
+  id("org.jetbrains.compose.hot-reload")
+  id("org.jetbrains.compose")
+  alias(libs.plugins.ksp)
 }
 
-publishArtifact(Releases.Contrib.Barcode)
+kotlin {
+  jvmToolchain(21)
 
-createJacocoTestReportTask()
-
-android {
-  namespace = "com.google.android.fhir.datacapture.contrib.views.barcode"
-  compileSdk = Sdk.COMPILE_SDK
-  defaultConfig {
+  androidLibrary {
+    namespace = "com.google.android.fhir.datacapture.contrib.views.barcode"
+    compileSdk = Sdk.COMPILE_SDK
     minSdk = Sdk.MIN_SDK
-    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    // Need to specify this to prevent junit runner from going deep into our dependencies
-    testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
-  }
+    withJava()
+    withHostTestBuilder {}
+    withDeviceTestBuilder { sourceSetTreeName = "test" }
+      .configure { instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
 
-  buildFeatures { viewBinding = true }
+    experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
 
-  buildTypes {
-    release {
-      isMinifyEnabled = false
-      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+    compilations.configureEach {
+      compilerOptions.configure {
+        jvmTarget.set(
+          org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11,
+        )
+      }
+    }
+
+    packaging {
+      resources.excludes.addAll(
+        listOf("META-INF/ASL2.0", "META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"),
+      )
     }
   }
-  compileOptions {
-    // Flag to enable support for the new language APIs
-    // See https://developer.android.com/studio/write/java8-support
-    isCoreLibraryDesugaringEnabled = true
+
+  val xcfName = "sharedBarcode"
+
+  iosX64 { binaries.framework { baseName = xcfName } }
+
+  iosArm64 { binaries.framework { baseName = xcfName } }
+
+  iosSimulatorArm64 { binaries.framework { baseName = xcfName } }
+
+  wasmJs {
+    browser()
+    binaries.library()
   }
 
-  packaging {
-    resources.excludes.addAll(
-      listOf(
-        "META-INF/INDEX.LIST",
-        "META-INF/ASL2.0",
-        "META-INF/ASL-2.0.txt",
-        "META-INF/LGPL-3.0.txt",
-      ),
-    )
+  jvm("desktop")
+
+  sourceSets {
+    all {
+      languageSettings {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions { freeCompilerArgs.add("-Xexpect-actual-classes") }
+      }
+    }
+
+    commonMain {
+      dependencies {
+        implementation(compose.components.resources)
+        implementation(compose.components.uiToolingPreview)
+        implementation(compose.foundation)
+        implementation(compose.material3)
+        implementation(compose.runtime)
+        implementation(compose.ui)
+        implementation(project(":datacapture-kmp"))
+        implementation(libs.kotlinx.coroutines.core)
+        implementation(libs.kotlin.fhir)
+        implementation(libs.kscan)
+      }
+    }
+
+    commonTest {
+      dependencies {
+        implementation(libs.kotlin.test)
+        @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+        implementation(compose.uiTest)
+      }
+    }
+
+    androidMain {
+      resources.srcDir("res")
+      dependencies {
+        implementation(libs.moko.permissions.camera)
+        implementation(libs.moko.permissions.compose)
+      }
+    }
+
+    iosMain {
+      dependencies {
+        implementation(libs.moko.permissions.camera)
+        implementation(libs.moko.permissions.compose)
+      }
+    }
+
+    getByName("androidDeviceTest") {
+      dependencies {
+        implementation(libs.androidx.compose.ui.test.junit4)
+        implementation(libs.androidx.compose.ui.test.manifest)
+        implementation(libs.androidx.test.core)
+        implementation(libs.androidx.test.ext.junit)
+        implementation(libs.androidx.test.runner)
+        implementation(libs.androidx.test.rules)
+        implementation(libs.kotlinx.coroutines.test)
+        implementation(libs.truth)
+      }
+    }
+
+    getByName("androidHostTest") {
+      dependencies {
+        implementation(libs.androidx.test.core)
+        implementation(libs.junit)
+        implementation(libs.kotlin.test.junit)
+        implementation(libs.kotlinx.coroutines.test)
+        implementation(libs.truth)
+      }
+    }
+
+    @Suppress("unused")
+    val desktopMain by getting { dependencies { implementation(compose.desktop.currentOs) } }
   }
-
-  configureJacocoTestOptions()
-
-  testOptions { animationsDisabled = true }
-  kotlin { jvmToolchain(11) }
-}
-
-configurations { all { removeIncompatibleDependencies() } }
-
-dependencies {
-  androidTestImplementation(libs.androidx.fragment.testing)
-  androidTestImplementation(libs.androidx.test.core)
-  androidTestImplementation(libs.androidx.test.ext.junit)
-  androidTestImplementation(libs.androidx.test.ext.junit.ktx)
-  androidTestImplementation(libs.androidx.test.rules)
-  androidTestImplementation(libs.androidx.test.runner)
-  androidTestImplementation(libs.mockito.inline)
-  androidTestImplementation(libs.truth)
-
-  coreLibraryDesugaring(libs.desugar.jdk.libs)
-
-  implementation(libs.androidx.appcompat)
-  implementation(libs.androidx.core)
-  implementation(libs.androidx.fragment)
-  implementation(libs.material)
-  implementation(libs.mlkit.barcode.scanning)
-  implementation(libs.mlkit.obj.detection)
-  implementation(libs.mlkit.obj.detection.custom)
-  implementation(libs.timber)
-  implementation(project(":datacapture"))
-
-  testImplementation(libs.androidx.fragment.testing)
-  testImplementation(libs.androidx.test.core)
-  testImplementation(libs.junit)
-  testImplementation(libs.kotlin.test.junit)
-  testImplementation(libs.mockito.inline)
-  testImplementation(libs.mockito.kotlin)
-  testImplementation(libs.robolectric)
-  testImplementation(libs.truth)
 }

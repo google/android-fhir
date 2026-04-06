@@ -16,8 +16,9 @@
 
 package com.google.android.fhir.datacapture.validation
 
-import com.google.android.fhir.datacapture.extensions.cqfCalculatedValueExpression
+import com.google.android.fhir.datacapture.extensions.populateCqfCalculatedValue
 import com.google.fhir.model.r4.Expression
+import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.Questionnaire
 import com.google.fhir.model.r4.QuestionnaireResponse
 
@@ -36,10 +37,10 @@ internal open class AnswerExtensionConstraintValidator(
   val predicate:
     (
       /*constraintValue*/
-      Any,
+      Extension.Value,
       QuestionnaireResponse.Item.Answer,
     ) -> Boolean,
-  val messageGenerator: suspend (Any) -> String,
+  val messageGenerator: suspend (Extension.Value) -> String,
 ) : AnswerConstraintValidator {
   override suspend fun validate(
     questionnaireItem: Questionnaire.Item,
@@ -48,8 +49,7 @@ internal open class AnswerExtensionConstraintValidator(
   ): ConstraintValidator.Result {
     if (questionnaireItem.extension.isNotEmpty()) {
       val extension = questionnaireItem.extension.find { it.url == url }
-      val extensionValue =
-        extension.cqfCalculatedValueExpression?.let { expressionEvaluator(it) } ?: extension?.value
+      val extensionValue = extension?.value?.populateCqfCalculatedValue(expressionEvaluator)
 
       // Only checks constraint if both extension and answer have a value
       if (extensionValue != null && answer.value != null && predicate(extensionValue, answer)) {

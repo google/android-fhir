@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.views.components
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,8 +29,8 @@ internal const val ERROR_TEXT_TAG = "error_text"
 internal fun ErrorText(validationMessage: String) {
   Text(
     text = validationMessage,
-    style = MaterialTheme.typography.bodySmall,
-    color = MaterialTheme.colorScheme.error,
+    style = QuestionnaireTheme.typography.bodySmall,
+    color = QuestionnaireTheme.colorScheme.error,
     modifier =
       Modifier.padding(start = QuestionnaireTheme.dimensions.errorTextMarginHorizontal)
         .testTag(ERROR_TEXT_TAG),

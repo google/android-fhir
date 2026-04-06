@@ -21,7 +21,6 @@ import android_fhir.datacapture_kmp.generated.resources.regex_validation_error_m
 import co.touchlab.kermit.Logger
 import com.google.fhir.model.r4.Extension
 import com.google.fhir.model.r4.QuestionnaireResponse
-import com.google.fhir.model.r4.String
 import org.jetbrains.compose.resources.getString
 
 internal const val REGEX_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/regex"
@@ -35,8 +34,9 @@ internal const val REGEX_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinitio
 internal object RegexValidator :
   AnswerExtensionConstraintValidator(
     url = REGEX_EXTENSION_URL,
-    predicate = predicate@{ constraintValue: Any, answer: QuestionnaireResponse.Item.Answer ->
-        val regex = getValue(constraintValue)
+    predicate =
+      predicate@{ constraintValue: Extension.Value, answer: QuestionnaireResponse.Item.Answer ->
+        val regex = constraintValue.asString()?.value?.value
         if (regex == null || answer.value == null) {
           return@predicate false
         }
@@ -48,14 +48,10 @@ internal object RegexValidator :
           false
         }
       },
-    messageGenerator = { constraintValue: Any ->
-      getString(Res.string.regex_validation_error_msg, getValue(constraintValue) as kotlin.String)
+    messageGenerator = { constraintValue: Extension.Value ->
+      getString(
+        Res.string.regex_validation_error_msg,
+        constraintValue.asString()?.value?.value.toString(),
+      )
     },
   )
-
-private fun getValue(constraintValue: Any): kotlin.String? =
-  when (constraintValue) {
-    is String -> constraintValue.value
-    is Extension.Value.String -> constraintValue.asString()?.value?.value
-    else -> null
-  }
