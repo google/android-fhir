@@ -182,6 +182,91 @@ class MaxValueValidatorTest {
     }
 
   @Test
+  fun `should return invalid result when date of birth is in the future and maxValue is today`() =
+    runTest {
+      val questionnaireItem =
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(
+            Extension().apply {
+              this.url = MAX_VALUE_EXTENSION_URL
+              this.setValue(
+                DateType().apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
+                      Expression().apply {
+                        expression = "today()"
+                        language = "text/fhirpath"
+                      },
+                    ),
+                  )
+                },
+              )
+            },
+          )
+        }
+      val tomorrow =
+        Date.from(
+          LocalDate.now().plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
+        )
+      val answer =
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = DateType().apply { value = tomorrow }
+        }
+
+      val validationResult =
+        MaxValueValidator.validate(questionnaireItem, answer, context) {
+          TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
+        }
+
+      assertThat(validationResult.isValid).isFalse()
+      assertThat(validationResult.errorMessage)
+        .isEqualTo("Maximum value allowed is:${LocalDate.now()}")
+    }
+
+  @Test
+  fun `should return valid result when date of birth is today and maxValue is today`() =
+    runTest {
+      val questionnaireItem =
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(
+            Extension().apply {
+              this.url = MAX_VALUE_EXTENSION_URL
+              this.setValue(
+                DateType().apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
+                      Expression().apply {
+                        expression = "today()"
+                        language = "text/fhirpath"
+                      },
+                    ),
+                  )
+                },
+              )
+            },
+          )
+        }
+      val today =
+        Date.from(
+          LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
+        )
+      val answer =
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = DateType().apply { value = today }
+        }
+
+      val validationResult =
+        MaxValueValidator.validate(questionnaireItem, answer, context) {
+          TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
+        }
+
+      assertThat(validationResult.isValid).isTrue()
+      assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
+    }
+
+  @Test
   fun `should return valid result and removes constraint for an answer value when maxValue cqf-calculatedValue evaluates to empty`() =
     runTest {
       val questionnaireItem =
