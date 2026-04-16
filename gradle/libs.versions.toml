@@ -17,7 +17,7 @@ androidx-compose-material3 = "1.4.0"
 androidx-compose-ui = "1.9.4"
 androidx-constraintlayout = "2.1.4"
 androidx-core = "1.10.1"
-androidx-datastore = "1.0.0"
+androidx-datastore = "1.2.1"
 androidx-espresso = "3.7.0"
 androidx-fragment = "1.6.0"
 androidx-lifecycle = "2.8.7"
@@ -27,6 +27,7 @@ androidx-navigation-compose = "2.9.5"
 androidx-recyclerview = "1.4.0"
 androidx-room = "2.7.1"
 androidx-sqlite = "2.5.0"
+ktor = "3.1.1"
 androidx-test-core = "1.6.1"
 androidx-test-ext-junit = "1.1.5"
 androidx-test-rules = "1.5.0"
@@ -57,6 +58,7 @@ kotlin = "2.2.20"
 kotlin-fhir = "1.0.0-beta02"
 kotlinpoet = "2.2.0"
 kotlinx-coroutines = "1.10.2"
+kotlinx-datetime = "0.6.2"
 kotlinx-serialization-json = "1.9.0"
 kotlinx-coroutines-swing = "1.10.2"
 kotlinx-io-core = "0.8.0"
@@ -128,6 +130,13 @@ androidx-room-room = { module = "androidx.room:room-ktx", version.ref = "android
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidx-room" }
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "androidx-room" }
 androidx-sqlite = { module = "androidx.sqlite:sqlite-ktx", version.ref = "androidx-sqlite" }
+androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "androidx-sqlite" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
 androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-espresso" }
 androidx-test-espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "androidx-espresso" }
@@ -168,11 +177,15 @@ kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-coroutines-playservices = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines-swing" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io-core" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 licensee-gradle-plugin = { module = "app.cash.licensee:licensee-gradle-plugin", version.ref = "licensee-gradle-plugin" }
 logback-android = { module = "com.github.tony19:logback-android", version.ref = "logback-android" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }

@@ -1,0 +1,158 @@
+/*
+ * Copyright 2023-2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.google.android.fhir.sync.upload.request
+
+import com.google.android.fhir.LocalChange
+import com.google.android.fhir.sync.upload.patch.Patch
+import com.google.android.fhir.sync.upload.patch.PatchMapping
+import com.google.android.fhir.sync.upload.patch.StronglyConnectedPatchMappings
+import com.google.fhir.model.r4.Bundle
+import com.google.fhir.model.r4.Enumeration
+
+/** Generates list of [BundleUploadRequest] of type Transaction [Bundle] from the [Patch]es */
+internal class TransactionBundleGenerator(
+  private val generatedBundleSize: Int,
+  private val useETagForUpload: Boolean,
+  private val getBundleEntryComponentGeneratorForPatch:
+    (patch: Patch, useETagForUpload: Boolean) -> BundleEntryComponentGenerator,
+) : UploadRequestGenerator {
+
+  /**
+   * In order to accommodate cyclic dependencies between [PatchMapping]s and maintain referential
+   * integrity on the server, the [PatchMapping]s in a [StronglyConnectedPatchMappings] are all put
+   * in a single [BundleUploadRequestMapping]. Based on the [generatedBundleSize], the remaining
+   * space of the [BundleUploadRequestMapping] maybe filled with other
+   * [StronglyConnectedPatchMappings] mappings.
+   *
+   * In case a single [StronglyConnectedPatchMappings] has more [PatchMapping]s than the
+   * [generatedBundleSize], [generatedBundleSize] will be ignored so that all the dependent mappings
+   * in [StronglyConnectedPatchMappings] can be sent in a single [Bundle].
+   */
+  override fun generateUploadRequests(
+    mappedPatches: List<StronglyConnectedPatchMappings>,
+  ): List<BundleUploadRequestMapping> {
+    val mappingsPerBundle = mutableListOf<List<PatchMapping>>()
+
+    var bundle = mutableListOf<PatchMapping>()
+    mappedPatches.forEach {
+      if ((bundle.size + it.patchMappings.size) <= generatedBundleSize) {
+        bundle.addAll(it.patchMappings)
+      } else {
+        if (bundle.isNotEmpty()) {
+          mappingsPerBundle.add(bundle)
+          bundle = mutableListOf()
+        }
+        bundle.addAll(it.patchMappings)
+      }
+    }
+
+    if (bundle.isNotEmpty()) mappingsPerBundle.add(bundle)
+
+    return mappingsPerBundle.map { patchList ->
+      generateBundleRequest(patchList).let { mappedBundleRequest ->
+        BundleUploadRequestMapping(
+          splitLocalChanges = mappedBundleRequest.first,
+          generatedRequest = mappedBundleRequest.second,
+        )
+      }
+    }
+  }
+
+  private fun generateBundleRequest(
+    patches: List<PatchMapping>,
+  ): Pair<List<List<LocalChange>>, BundleUploadRequest> {
+    val splitLocalChanges = mutableListOf<List<LocalChange>>()
+    val entries = mutableListOf<Bundle.Entry>()
+    patches.forEach {
+      splitLocalChanges.add(it.localChanges)
+      entries.add(
+        getBundleEntryComponentGeneratorForPatch(it.generatedPatch, useETagForUpload)
+          .getEntry(it.generatedPatch),
+      )
+    }
+    val bundleRequest =
+      Bundle(
+        type = Enumeration(value = Bundle.BundleType.Transaction),
+        entry = entries,
+      )
+    return splitLocalChanges to
+      BundleUploadRequest(
+        resource = bundleRequest,
+      )
+  }
+
+  companion object Factory {
+
+    private val createMapping =
+      mapOf(
+        Bundle.HTTPVerb.Put to this::putForCreateBasedBundleComponentMapper,
+        Bundle.HTTPVerb.Post to this::postForCreateBasedBundleComponentMapper,
+      )
+
+    private val updateMapping =
+      mapOf(
+        Bundle.HTTPVerb.Patch to this::patchForUpdateBasedBundleComponentMapper,
+      )
+
+    fun getDefault(useETagForUpload: Boolean = true, bundleSize: Int = 500) =
+      getGenerator(Bundle.HTTPVerb.Put, Bundle.HTTPVerb.Patch, bundleSize, useETagForUpload)
+
+    /**
+     * Returns a [TransactionBundleGenerator] based on the provided [Bundle.HTTPVerb]s for creating
+     * and updating resources. The function may throw an [IllegalArgumentException] if the provided
+     * [Bundle.HTTPVerb]s are not supported.
+     */
+    fun getGenerator(
+      httpVerbToUseForCreate: Bundle.HTTPVerb,
+      httpVerbToUseForUpdate: Bundle.HTTPVerb,
+      generatedBundleSize: Int = 500,
+      useETagForUpload: Boolean = true,
+    ): TransactionBundleGenerator {
+      val createFunction =
+        createMapping[httpVerbToUseForCreate]
+          ?: throw IllegalArgumentException(
+            "Creation using $httpVerbToUseForCreate is not supported.",
+          )
+
+      val updateFunction =
+        updateMapping[httpVerbToUseForUpdate]
+          ?: throw IllegalArgumentException(
+            "Update using $httpVerbToUseForUpdate is not supported.",
+          )
+
+      return TransactionBundleGenerator(generatedBundleSize, useETagForUpload) { patch, useETag ->
+        when (patch.type) {
+          Patch.Type.INSERT -> createFunction(useETag)
+          Patch.Type.UPDATE -> updateFunction(useETag)
+          Patch.Type.DELETE -> HttpDeleteEntryComponentGenerator(useETag)
+        }
+      }
+    }
+
+    private fun putForCreateBasedBundleComponentMapper(
+      useETagForUpload: Boolean,
+    ): BundleEntryComponentGenerator = HttpPutForCreateEntryComponentGenerator(useETagForUpload)
+
+    private fun postForCreateBasedBundleComponentMapper(
+      useETagForUpload: Boolean,
+    ): BundleEntryComponentGenerator = HttpPostForCreateEntryComponentGenerator(useETagForUpload)
+
+    private fun patchForUpdateBasedBundleComponentMapper(
+      useETagForUpload: Boolean,
+    ): BundleEntryComponentGenerator = HttpPatchForUpdateEntryComponentGenerator(useETagForUpload)
+  }
+}

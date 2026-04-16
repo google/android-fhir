@@ -18,4 +18,12 @@ package com.example.sdckmpdemo
 
 import androidx.compose.ui.window.ComposeUIViewController
 
-fun MainViewController() = ComposeUIViewController { App() }
+private var _engineInitialized = false
+
+fun MainViewController() = run {
+  if (!_engineInitialized) {
+    initializeFhirEngine()
+    _engineInitialized = true
+  }
+  ComposeUIViewController { App() }
+}

@@ -1,0 +1,47 @@
+/*
+ * Copyright 2025-2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.example.sdckmpdemo.sync
+
+import android.content.Context
+import androidx.work.WorkerParameters
+import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.sync.AcceptRemoteConflictResolver
+import com.google.android.fhir.sync.ConflictResolver
+import com.google.android.fhir.sync.DownloadWorkManager
+import com.google.android.fhir.sync.FhirSyncWorker
+import com.google.android.fhir.sync.upload.HttpCreateMethod
+import com.google.android.fhir.sync.upload.HttpUpdateMethod
+import com.google.android.fhir.sync.upload.UploadStrategy
+
+class DemoFhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
+  FhirSyncWorker(appContext, workerParams) {
+
+  override fun getFhirEngine(): FhirEngine = FhirEngineProvider.getInstance()
+
+  override fun getDownloadWorkManager(): DownloadWorkManager = DemoDownloadWorkManager()
+
+  override fun getConflictResolver(): ConflictResolver = AcceptRemoteConflictResolver
+
+  override fun getUploadStrategy(): UploadStrategy =
+    UploadStrategy.forBundleRequest(
+      methodForCreate = HttpCreateMethod.PUT,
+      methodForUpdate = HttpUpdateMethod.PATCH,
+      squash = true,
+      bundleSize = 500,
+    )
+}

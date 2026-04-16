@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,14 @@ package com.example.sdckmpdemo
 import android_fhir.sdc_kmp_demo.generated.resources.Res
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.search.search
 import com.google.fhir.model.r4.FhirR4Json
 import com.google.fhir.model.r4.Patient
+import com.google.fhir.model.r4.terminologies.ResourceType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -32,18 +34,60 @@ import kotlinx.serialization.json.JsonArray
 private val json = Json { prettyPrint = true }
 
 class PatientViewModel : ViewModel() {
+  private val fhirEngine = FhirEngineProvider.getInstance()
+
   private val _patients = MutableStateFlow<List<Patient>>(emptyList())
   val patients: StateFlow<List<Patient>> = _patients.asStateFlow()
 
   init {
     viewModelScope.launch {
-      val jsonString = Res.readBytes("files/list.json").decodeToString()
-      val jsonArray = json.parseToJsonElement(jsonString) as JsonArray
-      val patients =
-        jsonArray.map { patientJson ->
-          FhirR4Json().decodeFromString(json.encodeToString(patientJson)) as Patient
-        }
-      _patients.update { patients }
+//      seedIfEmpty()
+      refreshPatients()
+    }
+  }
+
+  private suspend fun seedIfEmpty() {
+    val count =
+      fhirEngine.count(
+        com.google.android.fhir.search.Search(ResourceType.Patient),
+      )
+    if (count > 0L) return
+
+    val jsonString = Res.readBytes("files/list.json").decodeToString()
+    val jsonArray = json.parseToJsonElement(jsonString) as JsonArray
+    val fhirJson = FhirR4Json()
+    val patients =
+      jsonArray.map { patientJson ->
+        fhirJson.decodeFromString(json.encodeToString(patientJson)) as Patient
+      }
+    fhirEngine.create(*patients.toTypedArray())
+  }
+
+  fun refreshPatients() {
+    viewModelScope.launch {
+      val results = fhirEngine.search<Patient> {}
+      _patients.value = results.map { it.resource }
+    }
+  }
+
+  fun createPatient(patient: Patient) {
+    viewModelScope.launch {
+      fhirEngine.create(patient)
+      refreshPatients()
+    }
+  }
+
+  fun updatePatient(patient: Patient) {
+    viewModelScope.launch {
+      fhirEngine.update(patient)
+      refreshPatients()
+    }
+  }
+
+  fun deletePatient(id: String) {
+    viewModelScope.launch {
+      fhirEngine.delete(ResourceType.Patient, id)
+      refreshPatients()
     }
   }
 }

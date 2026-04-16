@@ -1,7 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
   id("org.jetbrains.kotlin.multiplatform")
@@ -27,13 +25,13 @@ android {
   packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
   buildTypes { getByName("release") { isMinifyEnabled = false } }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
   }
 }
 
 kotlin {
-  androidTarget { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
+  androidTarget { compilerOptions { jvmTarget.set(JvmTarget.JVM_21) } }
 
   jvm("desktop")
 
@@ -51,32 +49,11 @@ kotlin {
       }
     }
 
-  @OptIn(ExperimentalWasmDsl::class)
-  wasmJs {
-    outputModuleName = "sdcKmpDemo"
-    browser {
-      val rootDirPath = project.rootDir.path
-      val projectDirPath = project.projectDir.path
-      commonWebpackConfig {
-        outputFileName = "sdcKmpDemo.js"
-        devServer =
-          (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-            static =
-              (static ?: mutableListOf()).apply {
-                // Serve sources to debug inside browser
-                add(rootDirPath)
-                add(projectDirPath)
-              }
-          }
-      }
-    }
-    binaries.executable()
-  }
-
   sourceSets {
     androidMain.dependencies {
       implementation(compose.preview)
       implementation(libs.androidx.activity.compose)
+      implementation(libs.androidx.work.runtime)
     }
     commonMain.dependencies {
       implementation(compose.runtime)
@@ -94,6 +71,7 @@ kotlin {
       implementation(libs.kotlinx.coroutines.core)
       implementation(libs.navigation.compose)
       implementation(project(":datacapture-kmp"))
+      implementation(project(":engine-kmp"))
     }
 
     val desktopMain by getting { dependencies { implementation(compose.desktop.currentOs) } }

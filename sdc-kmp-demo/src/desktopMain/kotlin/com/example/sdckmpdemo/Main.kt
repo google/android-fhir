@@ -21,12 +21,15 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 
-fun main() = application {
-  Window(
-    onCloseRequest = ::exitApplication,
-    title = "SDC Demo",
-    state = WindowState(placement = WindowPlacement.Maximized),
-  ) {
-    App()
+fun main() {
+  initializeFhirEngine()
+  application {
+    Window(
+      onCloseRequest = ::exitApplication,
+      title = "SDC Demo",
+      state = WindowState(placement = WindowPlacement.Maximized),
+    ) {
+      App()
+    }
   }
 }
