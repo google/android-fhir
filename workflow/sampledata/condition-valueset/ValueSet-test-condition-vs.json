@@ -1,0 +1,29 @@
+{
+  "resourceType": "ValueSet",
+  "id": "test-condition-vs",
+  "url": "http://example.org/fhir/ValueSet/test-condition-vs",
+  "version": "1.0.0",
+  "status": "active",
+  "compose": {
+    "include": [
+      {
+        "system": "http://example.org/fhir/CodeSystem/test",
+        "concept": [
+          {
+            "code": "has-condition"
+          }
+        ]
+      }
+    ]
+  },
+  "expansion": {
+    "timestamp": "2026-01-01T00:00:00+00:00",
+    "total": 1,
+    "contains": [
+      {
+        "system": "http://example.org/fhir/CodeSystem/test",
+        "code": "has-condition"
+      }
+    ]
+  }
+}
