@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -774,6 +774,36 @@ class DatabaseImplTest {
   fun getLocalChangesCount_twoLocalChange_returnsTwo() = runBlocking {
     database.insert(TEST_PATIENT_2)
     assertThat(database.getLocalChangesCount()).isEqualTo(2)
+  }
+
+  @Test
+  fun getLocalChangesResourceCount_noLocalChange_returnsZero() = runBlocking {
+    database.deleteUpdates(listOf(TEST_PATIENT_1))
+    assertThat(database.getLocalChangesResourceCount()).isEqualTo(0)
+  }
+
+  @Test
+  fun getLocalChangesResourceCount_oneResource_returnsOne() = runBlocking {
+    assertThat(database.getLocalChangesResourceCount()).isEqualTo(1)
+  }
+
+  @Test
+  fun getLocalChangesResourceCount_twoResources_returnsTwo() = runBlocking {
+    database.insert(TEST_PATIENT_2)
+    assertThat(database.getLocalChangesResourceCount()).isEqualTo(2)
+  }
+
+  @Test
+  fun getLocalChangesResourceCount_multipleChangesOnSameResource_returnsOne() = runBlocking {
+    // TEST_PATIENT_1 already has an INSERT change from setUp(); add an UPDATE so the resource has
+    // two local changes but is still a single resource to upload.
+    val patient = Patient()
+    patient.id = TEST_PATIENT_1_ID
+    patient.gender = Enumerations.AdministrativeGender.FEMALE
+    database.update(patient)
+
+    assertThat(database.getLocalChangesCount()).isEqualTo(2)
+    assertThat(database.getLocalChangesResourceCount()).isEqualTo(1)
   }
 
   @Test
