@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,16 +78,16 @@ internal class PerResourceLocalChangeFetcher(
   override var total by Delegates.notNull<Int>()
 
   suspend fun initTotalCount() {
-    total = database.getLocalChangesCount()
+    total = database.getLocalChangesResourceCount()
   }
 
-  override suspend fun hasNext(): Boolean = database.getLocalChangesCount().isNotZero()
+  override suspend fun hasNext(): Boolean = database.getLocalChangesResourceCount().isNotZero()
 
   override suspend fun next(): List<LocalChange> =
     database.getAllChangesForEarliestChangedResource()
 
   override suspend fun getProgress(): SyncUploadProgress =
-    SyncUploadProgress(database.getLocalChangesCount(), total)
+    SyncUploadProgress(database.getLocalChangesResourceCount(), total)
 }
 
 /** Represents the mode in which local changes should be fetched. */

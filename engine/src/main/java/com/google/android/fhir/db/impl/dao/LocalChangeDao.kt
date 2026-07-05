@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -270,10 +270,18 @@ internal abstract class LocalChangeDao {
   @Query(
     """
         SELECT COUNT(*)
-        FROM LocalChangeEntity 
+        FROM LocalChangeEntity
         """,
   )
   abstract suspend fun getLocalChangesCount(): Int
+
+  @Query(
+    """
+        SELECT COUNT(DISTINCT resourceUuid)
+        FROM LocalChangeEntity
+        """,
+  )
+  abstract suspend fun getLocalChangesResourceCount(): Int
 
   @Query(
     """
