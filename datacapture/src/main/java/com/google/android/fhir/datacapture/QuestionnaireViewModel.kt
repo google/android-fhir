@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -438,7 +438,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     questionnaireItems.forEach {
       if (responseItemMap[it.linkId].isNullOrEmpty()) {
-        responseItems.add(it.createQuestionnaireResponseItem())
+        // Do not create a response item for a repeated group that the response does not have.
+        // A repeated group has no response item until the user adds an instance of it, which is
+        // also why they are excluded when a questionnaire response is created from scratch above.
+        // createQuestionnaireResponseItem() does not populate the nested items of a repeated
+        // group, so adding one here would produce an instance with no nested response items, and
+        // packRepeatedGroups() would turn that into an answer whose item list is empty.
+        if (!it.isRepeatedGroup) {
+          responseItems.add(it.createQuestionnaireResponseItem())
+        }
       } else {
         if (it.type == Questionnaire.QuestionnaireItemType.GROUP && !it.repeats) {
           addMissingResponseItems(
