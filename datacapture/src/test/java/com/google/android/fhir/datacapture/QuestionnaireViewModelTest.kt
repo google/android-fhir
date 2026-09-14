@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2026 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -881,6 +881,41 @@ class QuestionnaireViewModelTest {
       )
     }
   }
+
+  @Test
+  fun `should not throw exception for repeated group missing from questionnaire response`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "repeated-group"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              repeats = true
+              addItem(
+                QuestionnaireItemComponent().apply {
+                  linkId = "nested-question"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                },
+              )
+            },
+          )
+        }
+      // A questionnaire response saved while the repeated group had no instances carries no item
+      // for that group, so loading it in edit mode must not crash.
+      // See https://github.com/google/android-fhir/issues/2685
+      val questionnaireResponse = QuestionnaireResponse().apply { id = "a-questionnaire-response" }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+
+      viewModel.runViewModelBlocking {
+        assertThat(
+            viewModel.getQuestionnaireResponse().item.filter { it.linkId == "repeated-group" },
+          )
+          .isEmpty()
+      }
+    }
 
   @Test
   fun `should not throw exception for non primitive type`() {
